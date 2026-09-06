@@ -6952,6 +6952,7 @@
     "description": "Debug-only title for reopening the onboarding welcome from Maintenance."
   },
   "settingsMaintenanceTitle": "Maintenance",
+  "settingsManualLanguageChineseTitle": "Chinese",
   "settingsManualLanguageCzechTitle": "Czech",
   "settingsManualLanguageDanishTitle": "Danish",
   "settingsManualLanguageDutchTitle": "Dutch",

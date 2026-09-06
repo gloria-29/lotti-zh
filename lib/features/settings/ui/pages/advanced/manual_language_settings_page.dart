@@ -120,8 +120,17 @@ class ManualLanguageSettingsBody extends ConsumerWidget {
           _ManualLanguageOption(
             title: messages.settingsManualLanguageSwedishTitle,
             selected: selectedOverride == ManualLanguage.swedish,
-            onTap: () =>
-                unawaited(controller.setOverride(ManualLanguage.swedish)),
+            onTap: () => unawaited(
+              controller.setOverride(ManualLanguage.swedish),
+            ),
+            showDivider: true,
+          ),
+          _ManualLanguageOption(
+            title: messages.settingsManualLanguageChineseTitle,
+            selected: selectedOverride == ManualLanguage.chinese,
+            onTap: () => unawaited(
+              controller.setOverride(ManualLanguage.chinese),
+            ),
           ),
         ],
       ),
