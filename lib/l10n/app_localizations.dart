@@ -16,6 +16,7 @@ import 'app_localizations_nl.dart';
 import 'app_localizations_pt.dart';
 import 'app_localizations_ro.dart';
 import 'app_localizations_sv.dart';
+import 'app_localizations_zh.dart';
 
 // ignore_for_file: type=lint
 
@@ -115,6 +116,7 @@ abstract class AppLocalizations {
     Locale('pt'),
     Locale('ro'),
     Locale('sv'),
+    Locale('zh'),
   ];
 
   /// No description provided for @activeLabel.
@@ -20539,6 +20541,12 @@ abstract class AppLocalizations {
   /// **'Maintenance'**
   String get settingsMaintenanceTitle;
 
+  /// No description provided for @settingsManualLanguageChineseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Chinese'**
+  String get settingsManualLanguageChineseTitle;
+
   /// No description provided for @settingsManualLanguageCzechTitle.
   ///
   /// In en, this message translates to:
@@ -24486,6 +24494,7 @@ class _AppLocalizationsDelegate
     'pt',
     'ro',
     'sv',
+    'zh',
   ].contains(locale.languageCode);
 
   @override
@@ -24529,6 +24538,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsRo();
     case 'sv':
       return AppLocalizationsSv();
+    case 'zh':
+      return AppLocalizationsZh();
   }
 
   throw FlutterError(

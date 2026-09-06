@@ -1,8 +1,8 @@
 name: Flutter Android Chinese Release
 
-# Builds a Simplified-Chinese-localized release APK without requiring any
-# repository secrets: a self-signed keystore is generated at build time so
-# the APK can be sideloaded directly.
+# Builds a Simplified-Chinese-localized release APK.
+# Uses a fixed self-signed keystore committed to this fork so every build
+# has the SAME signing key: users can update the app without uninstalling.
 
 on:
   workflow_dispatch:
@@ -52,18 +52,12 @@ jobs:
       - name: Flutter pub get
         run: flutter pub get
 
+      # gen-l10n runs automatically during the build (generate: true),
+      # but we run it up front to fail fast on any ARB problem.
       - name: Generate localizations (includes app_zh.arb)
         run: flutter gen-l10n
 
-      - name: Generate self-signed keystore
-        run: |
-          keytool -genkeypair -v \
-            -keystore android/app/upload-keystore.jks \
-            -storepass lotti-zh-2026 -keypass lotti-zh-2026 \
-            -alias lotti-zh -keyalg RSA -keysize 2048 -validity 10000 \
-            -dname "CN=Lotti Chinese, OU=Lotti, O=Lotti, C=CN"
-
-      - name: Create key.properties
+      - name: Create key.properties from committed keystore
         run: |
           {
             echo "storePassword=lotti-zh-2026"
@@ -71,6 +65,31 @@ jobs:
             echo "keyAlias=lotti-zh"
             echo "storeFile=${{ github.workspace }}/android/app/upload-keystore.jks"
           } > android/key.properties
+
+      - name: Generate keystore if not committed
+        run: |
+          if [ -f android/app/upload-keystore.jks ]; then
+            echo "keystore already committed, reusing it (stable signing)."
+          else
+            echo "keystore not found, generating a new one (signing will be committed for future updates)."
+            keytool -genkeypair -v \
+              -keystore android/app/upload-keystore.jks \
+              -storepass lotti-zh-2026 -keypass lotti-zh-2026 \
+              -alias lotti-zh -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Lotti Chinese, OU=Lotti, O=Lotti, C=CN"
+            mkdir -p keystore_export
+            cp android/app/upload-keystore.jks keystore_export/
+            echo "lotti-zh-2026" > keystore_export/keystore_password.txt
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: keystore
+          path: keystore_export/
+
+      - name: Verify keystore exists
+        run: ls -la android/app/upload-keystore.jks
 
       - name: Build universal APK
         run: flutter build apk --release
@@ -85,17 +104,24 @@ jobs:
             build/app/outputs/flutter-apk/app-release.apk
             build/app/outputs/flutter-apk/*-release.apk
 
-      - name: Create GitHub Release
-        run: gh release create -p --generate-notes --target "$GITHUB_SHA" "zh-v$(grep '^version:' pubspec.yaml | awk '{print $2}')" || true
+      - name: Compute APK SHA256
+        run: |
+          sha256sum build/app/outputs/flutter-apk/*-release.apk | tee apk-sha256.txt
+
+      - name: Create or update GitHub Release (zh-v1.1.1)
+        id: release
+        run: |
+          gh release create "zh-v1.1.1" --title "Lotti 简体中文汉化版" --generate-notes --target "$GITHUB_SHA" || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload APKs to GitHub Release
         run: |
-          gh release upload "zh-v$(grep '^version:' pubspec.yaml | awk '{print $2}')" \
+          gh release upload "zh-v1.1.1" \
             build/app/outputs/flutter-apk/app-release.apk \
             build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk \
             build/app/outputs/flutter-apk/app-arm64-v8a-release.apk \
-            build/app/outputs/flutter-apk/app-x86_64-release.apk || true
+            build/app/outputs/flutter-apk/app-x86_64-release.apk \
+            --clobber || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

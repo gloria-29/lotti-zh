@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -2744,8 +2745,7 @@ class AppLocalizationsCs extends AppLocalizations {
           'Toto vrátí všech $count neřešitelných záznamů sekvenčního logu zpět na chybějící, aby se normální backfill znovu zeptal peerů. Peeři, kteří data stále mají, odpoví; skutečně neobnovitelné záznamy se znovu stáhnou po 7denní amnestii.',
       few:
           'Toto vrátí všechny $count neřešitelné záznamy sekvenčního logu zpět na chybějící, aby se normální backfill znovu zeptal peerů. Peeři, kteří data stále mají, odpoví; skutečně neobnovitelné záznamy se znovu stáhnou po 7denní amnestii.',
-      one:
-          'Toto vrátí 1 neřešitelný záznam sekvenčního logu zpět na chybějící, aby se normální backfill znovu zeptal peerů. Peeři, kteří data stále mají, odpoví; skutečně neobnovitelné záznamy se znovu stáhnou po 7denní amnestii.',
+      one: 'Toto vrátí 1 neřešitelný záznam sekvenčního logu zpět na chybějící, aby se normální backfill znovu zeptal peerů. Peeři, kteří data stále mají, odpoví; skutečně neobnovitelné záznamy se znovu stáhnou po 7denní amnestii.',
     );
     return '$_temp0';
   }
@@ -2844,8 +2844,7 @@ class AppLocalizationsCs extends AppLocalizations {
           'Označí $count aktuálně otevřených (chybějících nebo požadovaných) záznamů sekvenčního logu jako neřešitelných. Použij k odblokování watermarku, když jsou záznamy zaseknuté, aniž by uplynulo 7denní okno amnestie. Záznamy lze později vzkřísit, pokud jejich data dorazí na disk s platnými vektorovými hodinami.',
       few:
           'Označí $count aktuálně otevřené (chybějící nebo požadované) záznamy sekvenčního logu jako neřešitelné. Použij k odblokování watermarku, když jsou záznamy zaseknuté, aniž by uplynulo 7denní okno amnestie. Záznamy lze později vzkřísit, pokud jejich data dorazí na disk s platnými vektorovými hodinami.',
-      one:
-          'Označí 1 aktuálně otevřený (chybějící nebo požadovaný) záznam sekvenčního logu jako neřešitelný. Použij k odblokování watermarku, když jsou záznamy zaseknuté, aniž by uplynulo 7denní okno amnestie. Záznamy lze později vzkřísit, pokud jejich data dorazí na disk s platnými vektorovými hodinami.',
+      one: 'Označí 1 aktuálně otevřený (chybějící nebo požadovaný) záznam sekvenčního logu jako neřešitelný. Použij k odblokování watermarku, když jsou záznamy zaseknuté, aniž by uplynulo 7denní okno amnestie. Záznamy lze později vzkřísit, pokud jejich data dorazí na disk s platnými vektorovými hodinami.',
     );
     return '$_temp0';
   }
@@ -6690,16 +6689,13 @@ class AppLocalizationsCs extends AppLocalizations {
     String direction,
     String target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      target,
-      {
-        '1': 'hodinu',
-        '2': 'hodiny',
-        '3': 'hodiny',
-        '4': 'hodiny',
-        'other': 'hodin',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(target, {
+      '1': 'hodinu',
+      '2': 'hodiny',
+      '3': 'hodiny',
+      '4': 'hodiny',
+      'other': 'hodin',
+    });
     return '$categoryName: $direction $target $_temp0 za klouzavých 7 dní';
   }
 
@@ -6858,16 +6854,13 @@ class AppLocalizationsCs extends AppLocalizations {
     String direction,
     String target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      target,
-      {
-        '1': 'hodinu',
-        '2': 'hodiny',
-        '3': 'hodiny',
-        '4': 'hodiny',
-        'other': 'hodin',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(target, {
+      '1': 'hodinu',
+      '2': 'hodiny',
+      '3': 'hodiny',
+      '4': 'hodiny',
+      'other': 'hodin',
+    });
     return '$labelName: $direction $target $_temp0 denně';
   }
 
@@ -7025,14 +7018,11 @@ class AppLocalizationsCs extends AppLocalizations {
     Object value,
     Object target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      status,
-      {
-        'missing': '$date: bez hodnoty; cíl $target',
-        'met': '$date: $value; cíl $target; splněno',
-        'other': '$date: $value; cíl $target; nesplněno',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(status, {
+      'missing': '$date: bez hodnoty; cíl $target',
+      'met': '$date: $value; cíl $target; splněno',
+      'other': '$date: $value; cíl $target; nesplněno',
+    });
     return '$_temp0';
   }
 
@@ -11036,8 +11026,7 @@ class AppLocalizationsCs extends AppLocalizations {
           '$count synchronizačních událostí, které fronta vzdala. Klepni na opakovat pro nový pokus.',
       few:
           '$count synchronizační události, které fronta vzdala. Klepni na opakovat pro nový pokus.',
-      one:
-          '1 synchronizační událost, kterou fronta vzdala. Klepni na opakovat pro nový pokus.',
+      one: '1 synchronizační událost, kterou fronta vzdala. Klepni na opakovat pro nový pokus.',
     );
     return '$_temp0';
   }
@@ -12383,6 +12372,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get settingsMaintenanceTitle => 'Údržba';
 
   @override
+  String get settingsManualLanguageChineseTitle => 'Chinese';
+
+  @override
   String get settingsManualLanguageCzechTitle => 'Čeština';
 
   @override
@@ -13195,8 +13187,7 @@ class AppLocalizationsCs extends AppLocalizations {
           '$count neověřených zařízení nemůže číst nové záznamy — odstraň je nebo ověř níže.',
       few:
           '$count neověřená zařízení nemohou číst nové záznamy — odstraň je nebo ověř níže.',
-      one:
-          '1 neověřené zařízení nemůže číst nové záznamy — odstraň ho nebo ověř níže.',
+      one: '1 neověřené zařízení nemůže číst nové záznamy — odstraň ho nebo ověř níže.',
     );
     return '$_temp0';
   }

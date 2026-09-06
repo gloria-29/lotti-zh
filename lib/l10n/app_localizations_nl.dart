@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -2726,8 +2727,7 @@ class AppLocalizationsNl extends AppLocalizations {
       locale: localeName,
       other:
           'Hiermee worden alle $count onherstelbare vermeldingen in het sequentielogboek weer als ontbrekend gemarkeerd, zodat de normale inhaalslag andere apparaten opnieuw bevraagt. Apparaten die de gegevens nog hebben, reageren; echt onherstelbare vermeldingen worden na het amnestievenster van zeven dagen opnieuw als onherstelbaar aangemerkt.',
-      one:
-          'Hiermee wordt 1 onherstelbare vermelding in het sequentielogboek weer als ontbrekend gemarkeerd, zodat de normale inhaalslag andere apparaten opnieuw bevraagt. Apparaten die de gegevens nog hebben, reageren; echt onherstelbare vermeldingen worden na het amnestievenster van zeven dagen opnieuw als onherstelbaar aangemerkt.',
+      one: 'Hiermee wordt 1 onherstelbare vermelding in het sequentielogboek weer als ontbrekend gemarkeerd, zodat de normale inhaalslag andere apparaten opnieuw bevraagt. Apparaten die de gegevens nog hebben, reageren; echt onherstelbare vermeldingen worden na het amnestievenster van zeven dagen opnieuw als onherstelbaar aangemerkt.',
     );
     return '$_temp0';
   }
@@ -2821,8 +2821,7 @@ class AppLocalizationsNl extends AppLocalizations {
       locale: localeName,
       other:
           'Dit markeert $count momenteel-openen (ontbrekende of gevraagde) sequence-log ingangen als niet-oplosbaar. Gebruik dit om het watermerk te deblokkeren wanneer de ingangen een tijdje vastzitten zonder dat het 7-daagse amnestie venster is voorbijgegaan. Inzendingen kunnen nog steeds worden opgewekt als hun lading later op de schijf aankomt met een geldige vectorklok.',
-      one:
-          'Dit markeert 1 momenteel open (ontbrekende of gevraagde) sequence-log invoer als niet op te lossen. Gebruik dit om het watermerk te deblokkeren wanneer de ingangen zijn vastgezet voor een tijdje zonder de 7-daagse amnestie venster is voorbij. Inzendingen kunnen nog steeds worden opgewekt als hun lading later aankomt op de schijf met een geldige vector klok.',
+      one: 'Dit markeert 1 momenteel open (ontbrekende of gevraagde) sequence-log invoer als niet op te lossen. Gebruik dit om het watermerk te deblokkeren wanneer de ingangen zijn vastgezet voor een tijdje zonder de 7-daagse amnestie venster is voorbij. Inzendingen kunnen nog steeds worden opgewekt als hun lading later aankomt op de schijf met een geldige vector klok.',
     );
     return '$_temp0';
   }
@@ -6961,14 +6960,11 @@ class AppLocalizationsNl extends AppLocalizations {
     Object value,
     Object target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      status,
-      {
-        'missing': '$date: geen waarde; doel $target',
-        'met': '$date: $value; doel $target; behaald',
-        'other': '$date: $value; doel $target; niet behaald',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(status, {
+      'missing': '$date: geen waarde; doel $target',
+      'met': '$date: $value; doel $target; behaald',
+      'other': '$date: $value; doel $target; niet behaald',
+    });
     return '$_temp0';
   }
 
@@ -10892,8 +10888,7 @@ class AppLocalizationsNl extends AppLocalizations {
       locale: localeName,
       other:
           '$count Synchroniseer gebeurtenissen die de wachtrij heeft opgegeven. Tik op opnieuw proberen om opnieuw te starten.',
-      one:
-          '1 synchronisatie-gebeurtenis waarmee de wachtrij is gestopt. Tik op opnieuw proberen om opnieuw te vervoegen.',
+      one: '1 synchronisatie-gebeurtenis waarmee de wachtrij is gestopt. Tik op opnieuw proberen om opnieuw te vervoegen.',
     );
     return '$_temp0';
   }
@@ -12241,6 +12236,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get settingsMaintenanceTitle => 'Onderhoud';
 
   @override
+  String get settingsManualLanguageChineseTitle => 'Chinese';
+
+  @override
   String get settingsManualLanguageCzechTitle => 'Tsjechisch';
 
   @override
@@ -13055,8 +13053,7 @@ class AppLocalizationsNl extends AppLocalizations {
       locale: localeName,
       other:
           '$count niet-geverifieerde apparaten kunnen nieuwe items niet lezen — verwijder of verifieer ze hieronder.',
-      one:
-          '1 niet-geverifieerd apparaat kan nieuwe items niet lezen — verwijder of verifieer het hieronder.',
+      one: '1 niet-geverifieerd apparaat kan nieuwe items niet lezen — verwijder of verifieer het hieronder.',
     );
     return '$_temp0';
   }
@@ -13068,8 +13065,7 @@ class AppLocalizationsNl extends AppLocalizations {
       locale: localeName,
       other:
           '$count niet-geverifieerde apparaten kunnen nieuwe items niet lezen — verwijder ze hieronder.',
-      one:
-          '1 niet-geverifieerd apparaat kan nieuwe items niet lezen — verwijder het hieronder.',
+      one: '1 niet-geverifieerd apparaat kan nieuwe items niet lezen — verwijder het hieronder.',
     );
     return '$_temp0';
   }
@@ -13081,8 +13077,7 @@ class AppLocalizationsNl extends AppLocalizations {
       locale: localeName,
       other:
           '$count niet-geverifieerde apparaten kunnen nieuwe items niet lezen — verifieer ze hieronder.',
-      one:
-          '1 niet-geverifieerd apparaat kan nieuwe items niet lezen — verifieer het hieronder.',
+      one: '1 niet-geverifieerd apparaat kan nieuwe items niet lezen — verifieer het hieronder.',
     );
     return '$_temp0';
   }

@@ -52,7 +52,8 @@
    <application
         android:label="Lotti"
         android:requestLegacyExternalStorage="true"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:localeConfig="@xml/locales_config">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

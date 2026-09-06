@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -2754,8 +2755,7 @@ class AppLocalizationsFr extends AppLocalizations {
       locale: localeName,
       other:
           'Bascule les $count entrées du journal de séquence irrésolubles vers manquantes pour que le rattrapage normal redemande aux pairs. Les pairs qui ont encore les données répondront ; les entrées vraiment irrécupérables seront retirées à nouveau après la fenêtre d\'amnistie de 7 jours.',
-      one:
-          'Bascule 1 entrée du journal de séquence irrésoluble vers manquante pour que le rattrapage normal redemande aux pairs. Les pairs qui ont encore les données répondront ; les entrées vraiment irrécupérables seront retirées à nouveau après la fenêtre d\'amnistie de 7 jours.',
+      one: 'Bascule 1 entrée du journal de séquence irrésoluble vers manquante pour que le rattrapage normal redemande aux pairs. Les pairs qui ont encore les données répondront ; les entrées vraiment irrécupérables seront retirées à nouveau après la fenêtre d\'amnistie de 7 jours.',
     );
     return '$_temp0';
   }
@@ -2851,8 +2851,7 @@ class AppLocalizationsFr extends AppLocalizations {
       locale: localeName,
       other:
           'Marque les $count entrées actuellement ouvertes (manquantes ou demandées) du journal de séquence comme irrésolubles. Utilise cette action pour débloquer le marqueur de progression si des entrées restent bloquées depuis un moment et que le délai de grâce de 7 jours n\'est pas écoulé. Les entrées peuvent toujours être restaurées si leurs données arrivent plus tard sur le disque avec une horloge vectorielle valide.',
-      one:
-          'Marque 1 entrée actuellement ouverte (manquante ou demandée) du journal de séquence comme irrésoluble. Utilise cette action pour débloquer le marqueur de progression si des entrées restent bloquées depuis un moment et que le délai de grâce de 7 jours n\'est pas écoulé. Une entrée peut toujours être restaurée si ses données arrivent plus tard sur le disque avec une horloge vectorielle valide.',
+      one: 'Marque 1 entrée actuellement ouverte (manquante ou demandée) du journal de séquence comme irrésoluble. Utilise cette action pour débloquer le marqueur de progression si des entrées restent bloquées depuis un moment et que le délai de grâce de 7 jours n\'est pas écoulé. Une entrée peut toujours être restaurée si ses données arrivent plus tard sur le disque avec une horloge vectorielle valide.',
     );
     return '$_temp0';
   }
@@ -6727,13 +6726,10 @@ class AppLocalizationsFr extends AppLocalizations {
     String direction,
     String target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      target,
-      {
-        '1': 'heure',
-        'other': 'heures',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(target, {
+      '1': 'heure',
+      'other': 'heures',
+    });
     return '$categoryName : $direction $target $_temp0 sur 7 jours glissants';
   }
 
@@ -6894,13 +6890,10 @@ class AppLocalizationsFr extends AppLocalizations {
     String direction,
     String target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      target,
-      {
-        '1': 'heure',
-        'other': 'heures',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(target, {
+      '1': 'heure',
+      'other': 'heures',
+    });
     return '$labelName : $direction $target $_temp0 par jour';
   }
 
@@ -7058,14 +7051,11 @@ class AppLocalizationsFr extends AppLocalizations {
     Object value,
     Object target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      status,
-      {
-        'missing': '$date : aucune valeur ; objectif $target',
-        'met': '$date : $value ; objectif $target ; atteint',
-        'other': '$date : $value ; objectif $target ; non atteint',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(status, {
+      'missing': '$date : aucune valeur ; objectif $target',
+      'met': '$date : $value ; objectif $target ; atteint',
+      'other': '$date : $value ; objectif $target ; non atteint',
+    });
     return '$_temp0';
   }
 
@@ -11070,8 +11060,7 @@ class AppLocalizationsFr extends AppLocalizations {
       locale: localeName,
       other:
           '$count événements de synchronisation que la file a abandonnés. Appuie sur réessayer pour les retenter.',
-      one:
-          '1 événement de synchronisation que la file a abandonné. Appuie sur réessayer pour le retenter.',
+      one: '1 événement de synchronisation que la file a abandonné. Appuie sur réessayer pour le retenter.',
     );
     return '$_temp0';
   }
@@ -12431,6 +12420,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsMaintenanceTitle => 'Maintenance';
 
   @override
+  String get settingsManualLanguageChineseTitle => 'Chinese';
+
+  @override
   String get settingsManualLanguageCzechTitle => 'Tchèque';
 
   @override
@@ -13256,8 +13248,7 @@ class AppLocalizationsFr extends AppLocalizations {
       locale: localeName,
       other:
           '$count appareils non vérifiés ne peuvent pas lire les nouvelles entrées — supprime-les ou vérifie-les ci-dessous.',
-      one:
-          '1 appareil non vérifié ne peut pas lire les nouvelles entrées — supprime-le ou vérifie-le ci-dessous.',
+      one: '1 appareil non vérifié ne peut pas lire les nouvelles entrées — supprime-le ou vérifie-le ci-dessous.',
     );
     return '$_temp0';
   }
@@ -13269,8 +13260,7 @@ class AppLocalizationsFr extends AppLocalizations {
       locale: localeName,
       other:
           '$count appareils non vérifiés ne peuvent pas lire les nouvelles entrées — supprime-les ci-dessous.',
-      one:
-          '1 appareil non vérifié ne peut pas lire les nouvelles entrées — supprime-le ci-dessous.',
+      one: '1 appareil non vérifié ne peut pas lire les nouvelles entrées — supprime-le ci-dessous.',
     );
     return '$_temp0';
   }
@@ -13282,8 +13272,7 @@ class AppLocalizationsFr extends AppLocalizations {
       locale: localeName,
       other:
           '$count appareils non vérifiés ne peuvent pas lire les nouvelles entrées — vérifie-les ci-dessous.',
-      one:
-          '1 appareil non vérifié ne peut pas lire les nouvelles entrées — vérifie-le ci-dessous.',
+      one: '1 appareil non vérifié ne peut pas lire les nouvelles entrées — vérifie-le ci-dessous.',
     );
     return '$_temp0';
   }
