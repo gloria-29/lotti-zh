@@ -67,11 +67,18 @@ void main() {
     required DateTime at,
     bool private = false,
     DateTime? deletedAt,
+    CheckInInteractionType interactionType = CheckInInteractionType.call,
+    Duration length = Duration.zero,
   }) => JournalEntity.checkIn(
-    meta: meta(id, dateFrom: at, private: private, deletedAt: deletedAt),
+    meta: meta(
+      id,
+      dateFrom: at,
+      private: private,
+      deletedAt: deletedAt,
+    ).copyWith(dateTo: at.add(length)),
     data: CheckInData(
       relationshipId: relationshipId,
-      interactionType: CheckInInteractionType.call,
+      interactionType: interactionType,
     ),
   );
 
@@ -303,6 +310,110 @@ void main() {
     );
 
     test(
+      'latestCheckIns resolves the newest live check-in row per relationship '
+      'in one further query and respects the private filter',
+      () async {
+        await db!.updateJournalEntity(
+          checkIn('a-old', relationshipId: 'rel-a', at: baseTime),
+        );
+        await db!.updateJournalEntity(
+          checkIn(
+            'a-new',
+            relationshipId: 'rel-a',
+            at: baseTime.add(const Duration(days: 2)),
+          ),
+        );
+        // A deleted newer row must not shadow the live one.
+        await db!.updateJournalEntity(
+          checkIn(
+            'a-deleted',
+            relationshipId: 'rel-a',
+            at: baseTime.add(const Duration(days: 5)),
+            deletedAt: baseTime.add(const Duration(days: 6)),
+          ),
+        );
+        // rel-b's newest is private; its older one is public — with private
+        // entries hidden the OLDER public row is the newest visible one.
+        await db!.updateJournalEntity(
+          checkIn('b-public', relationshipId: 'rel-b', at: baseTime),
+        );
+        await db!.updateJournalEntity(
+          checkIn(
+            'b-private',
+            relationshipId: 'rel-b',
+            at: baseTime.add(const Duration(days: 1)),
+            private: true,
+          ),
+        );
+        // The same instant as a-new on ANOTHER person: the pair must be
+        // matched, not only the instant.
+        await db!.updateJournalEntity(
+          checkIn(
+            'c-same-instant',
+            relationshipId: 'rel-c',
+            at: baseTime.add(const Duration(days: 2)),
+          ),
+        );
+
+        Future<void> setPrivateFlag({required bool status}) =>
+            db!.upsertConfigFlag(
+              ConfigFlag(
+                name: privateFlag,
+                description: 'Show private entries?',
+                status: status,
+              ),
+            );
+
+        await setPrivateFlag(status: true);
+        final shown = await db!.latestCheckIns();
+        expect(
+          shown.map((id, entry) => MapEntry(id, entry.meta.id)),
+          {'rel-a': 'a-new', 'rel-b': 'b-private', 'rel-c': 'c-same-instant'},
+        );
+        expect(shown['rel-a']!.data.relationshipId, 'rel-a');
+
+        await setPrivateFlag(status: false);
+        final hidden = await db!.latestCheckIns();
+        expect(
+          hidden.map((id, entry) => MapEntry(id, entry.meta.id)),
+          {'rel-a': 'a-new', 'rel-b': 'b-public', 'rel-c': 'c-same-instant'},
+        );
+      },
+    );
+
+    test(
+      'latestCheckIns breaks a same-instant tie by id, so the interaction a '
+      'People row shows does not change between loads',
+      () async {
+        final at = baseTime.add(const Duration(days: 3));
+        // The message is inserted first so that natural (insertion) order
+        // and id order disagree — only a deterministic ORDER BY picks the
+        // call both times.
+        await db!.updateJournalEntity(
+          checkIn(
+            'd-2-message',
+            relationshipId: 'rel-d',
+            at: at,
+            interactionType: CheckInInteractionType.message,
+          ),
+        );
+        await db!.updateJournalEntity(
+          checkIn('d-1-call', relationshipId: 'rel-d', at: at),
+        );
+
+        final first = await db!.latestCheckIns();
+        final again = await db!.latestCheckIns();
+
+        expect(first['rel-d']!.meta.id, 'd-1-call');
+        expect(
+          first['rel-d']!.data.interactionType,
+          CheckInInteractionType.call,
+        );
+        expect(again['rel-d']!.meta.id, 'd-1-call');
+      },
+    );
+
+    test(
       'latestCheckInTimes aggregates the newest live check-in per '
       'relationship and respects the private filter',
       () async {
@@ -397,6 +508,100 @@ void main() {
         expect(tasks.map((t) => t.id), ['task-live']);
       },
     );
+
+    group('getRankedCheckInDurations -', () {
+      Future<void> seed(
+        String id, {
+        required Duration length,
+        DateTime? at,
+        bool private = false,
+        DateTime? deletedAt,
+      }) => db!.updateJournalEntity(
+        checkIn(
+          id,
+          relationshipId: 'rel-a',
+          at: at ?? baseTime,
+          length: length,
+          private: private,
+          deletedAt: deletedAt,
+        ),
+      );
+
+      Future<void> setPrivateFlag({required bool status}) =>
+          db!.upsertConfigFlag(
+            ConfigFlag(
+              name: privateFlag,
+              description: 'Show private entries?',
+              status: status,
+            ),
+          );
+
+      test('ranks the lengths this user logs by use, ties shortest first, and '
+          'ignores zero-length check-ins', () async {
+        await seed('a', length: const Duration(minutes: 30));
+        await seed('b', length: const Duration(minutes: 30));
+        await seed('c', length: const Duration(minutes: 10));
+        await seed('d', length: const Duration(minutes: 45));
+        await seed('e', length: Duration.zero);
+        await setPrivateFlag(status: true);
+
+        expect(
+          await db!.getRankedCheckInDurations(
+            since: baseTime.subtract(const Duration(days: 1)),
+            limit: 10,
+          ),
+          const [
+            Duration(minutes: 30),
+            Duration(minutes: 10),
+            Duration(minutes: 45),
+          ],
+        );
+      });
+
+      test(
+        'honours the window, the limit, deletion and the private filter',
+        () async {
+          await seed(
+            'old',
+            length: const Duration(minutes: 5),
+            at: baseTime.subtract(const Duration(days: 100)),
+          );
+          await seed(
+            'gone',
+            length: const Duration(minutes: 15),
+            deletedAt: baseTime,
+          );
+          await seed(
+            'hidden',
+            length: const Duration(minutes: 20),
+            private: true,
+          );
+          await seed('x', length: const Duration(minutes: 30));
+          await seed('y', length: const Duration(minutes: 60));
+          await setPrivateFlag(status: false);
+
+          expect(
+            await db!.getRankedCheckInDurations(
+              since: baseTime.subtract(const Duration(days: 90)),
+              limit: 1,
+            ),
+            const [Duration(minutes: 30)],
+          );
+          expect(
+            await db!.getRankedCheckInDurations(
+              since: baseTime.subtract(const Duration(days: 90)),
+              limit: 10,
+            ),
+            const [Duration(minutes: 30), Duration(minutes: 60)],
+            reason: 'the old, the deleted and the hidden one never rank',
+          );
+          expect(
+            await db!.getRankedCheckInDurations(since: baseTime, limit: 0),
+            isEmpty,
+          );
+        },
+      );
+    });
 
     test('getLiveTasksByIds honours the private-entry filter', () async {
       await db!.updateJournalEntity(task('task-open', at: baseTime));

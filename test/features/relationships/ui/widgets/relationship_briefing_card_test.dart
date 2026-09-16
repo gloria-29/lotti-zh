@@ -1,574 +1,1327 @@
 import 'dart:async';
 
-import 'package:flutter/rendering.dart';
+import 'package:clock/clock.dart';
+import 'package:flutter/semantics.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gpt_markdown/gpt_markdown.dart';
+import 'package:glados/glados.dart' as glados;
+import 'package:lotti/classes/check_in_data.dart';
 import 'package:lotti/classes/journal_entities.dart';
 import 'package:lotti/classes/relationship_data.dart';
 import 'package:lotti/features/agents/model/agent_constants.dart';
 import 'package:lotti/features/agents/model/agent_domain_entity.dart';
+import 'package:lotti/features/agents/model/agent_token_usage.dart';
+import 'package:lotti/features/agents/model/change_set.dart';
 import 'package:lotti/features/agents/state/agent_providers.dart';
+import 'package:lotti/features/agents/state/task_agent_model_providers.dart';
+import 'package:lotti/features/agents/state/unified_suggestion_providers.dart';
 import 'package:lotti/features/agents/ui/agent_internals_panel.dart';
-import 'package:lotti/features/agents/ui/ai_summary_card/tldr_section_part.dart';
+import 'package:lotti/features/agents/ui/task_agent_identity_region.dart';
 import 'package:lotti/features/agents/ui/widgets/agent_markdown_view.dart';
 import 'package:lotti/features/agents/ui/widgets/ai_card_chrome.dart';
+import 'package:lotti/features/ai/model/ai_config.dart';
+import 'package:lotti/features/ai/model/resolved_profile.dart';
+import 'package:lotti/features/ai/repository/ai_config_repository.dart';
+import 'package:lotti/features/design_system/components/badges/design_system_badge.dart';
 import 'package:lotti/features/design_system/components/buttons/design_system_button.dart';
+import 'package:lotti/features/design_system/components/cards/design_system_section_card.dart';
 import 'package:lotti/features/design_system/components/chips/ds_pill.dart';
 import 'package:lotti/features/design_system/theme/design_tokens.dart';
 import 'package:lotti/features/relationships/model/relationship_health_metrics.dart';
+import 'package:lotti/features/relationships/repository/relationship_repository.dart';
+import 'package:lotti/features/relationships/service/contact_launcher.dart';
+import 'package:lotti/features/relationships/service/pending_interaction_store.dart';
 import 'package:lotti/features/relationships/state/relationship_agent_providers.dart';
+import 'package:lotti/features/relationships/state/relationship_proposal_providers.dart';
 import 'package:lotti/features/relationships/ui/widgets/relationship_briefing_card.dart';
-import 'package:lotti/services/nav_service.dart';
+import 'package:lotti/features/relationships/util/contact_channel_uri.dart';
+import 'package:lotti/l10n/app_localizations_context.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../../../helpers/fallbacks.dart';
 import '../../../../mocks/mocks.dart';
-import '../../../../test_utils/screenshot_harness.dart';
 import '../../../../widget_test_utils.dart';
+import '../../../agents/test_data/ai_config_factories.dart';
+import '../../../agents/test_data/change_set_factories.dart';
 import '../../../agents/test_data/entity_factories.dart';
 
-void main() {
-  setUpAll(() async {
-    // Real font metrics: the band-label measurement below is only
-    // meaningful against Inter, not the test placeholder face whose glyphs
-    // are all the same (much wider) box. Awaited: `loadAppFonts` is async,
-    // and an unawaited call leaves the placeholder face installed while the
-    // measurement runs.
-    await loadAppFonts();
-    registerAllFallbackValues();
-    registerFallbackValue(
-      RelationshipEntry(
-        meta: Metadata(
-          id: 'fallback',
-          createdAt: DateTime(2026),
-          updatedAt: DateTime(2026),
-          dateFrom: DateTime(2026),
-          dateTo: DateTime(2026),
-        ),
-        data: RelationshipData(
-          title: 'fallback',
-          status: RelationshipStatus.active(
-            id: 's',
-            createdAt: DateTime(2026),
-            utcOffset: 0,
-          ),
-        ),
-      ),
+class _FakeContactLauncher implements ContactLauncher {
+  _FakeContactLauncher({required this.launchable});
+
+  final Set<ContactAction> launchable;
+  final List<(ContactChannel, ContactAction)> launched = [];
+
+  @override
+  Future<bool> canLaunch(ContactChannel channel, ContactAction action) async =>
+      launchable.contains(action) && contactChannelUri(channel, action) != null;
+
+  @override
+  Future<bool> launch(ContactChannel channel, ContactAction action) async {
+    launched.add((channel, action));
+    return true;
+  }
+}
+
+class _FakePendingInteractionStore implements PendingInteractionStore {
+  PendingInteraction? remembered;
+
+  @override
+  Future<void> remember({
+    required String relationshipId,
+    required CheckInInteractionType interactionType,
+  }) async {
+    remembered = (
+      relationshipId: relationshipId,
+      interactionType: interactionType,
+      startedAt: DateTime(2026, 8, 13, 14),
     );
-  });
+  }
+
+  @override
+  Future<PendingInteraction?> read() async => remembered;
+
+  @override
+  Future<void> clear() async => remembered = null;
+}
+
+void main() {
+  setUpAll(registerAllFallbackValues);
 
   const relationshipId = 'person-1';
   final agentId = relationshipAgentIdFor(relationshipId);
-  final testDate = DateTime(2026, 8, 1, 9);
+  // A Thursday afternoon.
+  final now = DateTime(2026, 8, 13, 14);
+  const mobile = ContactChannel(
+    type: ContactChannelType.mobile,
+    value: '+15550109999',
+  );
 
   late MockRelationshipAgentService agentService;
+  late MockRelationshipRepository repository;
+  late _FakePendingInteractionStore store;
 
-  RelationshipEntry relationship({bool important = true}) => RelationshipEntry(
+  RelationshipEntry relationship({
+    bool important = true,
+    int? cadenceDays = 7,
+    RelationshipStatus? status,
+    List<ContactChannel> channels = const [],
+  }) => RelationshipEntry(
     meta: Metadata(
       id: relationshipId,
-      createdAt: testDate,
-      updatedAt: testDate,
-      dateFrom: testDate,
-      dateTo: testDate,
+      createdAt: DateTime(2026, 7),
+      updatedAt: DateTime(2026, 7),
+      dateFrom: DateTime(2026, 7),
+      dateTo: DateTime(2026, 7),
     ),
     data: RelationshipData(
-      title: 'Anna',
+      title: 'Commander Pip Frostbeak',
+      nickname: 'Pip',
       important: important,
-      status: RelationshipStatus.active(
-        id: 'status-1',
-        createdAt: testDate,
-        utcOffset: 0,
-      ),
+      checkInCadenceDays: cadenceDays,
+      contactChannels: channels,
+      status:
+          status ??
+          RelationshipStatus.active(
+            id: 'status-1',
+            createdAt: DateTime(2026, 7),
+            utcOffset: 0,
+          ),
     ),
   );
 
+  CheckInEntry checkIn(String id, DateTime at) => CheckInEntry(
+    meta: Metadata(
+      id: id,
+      createdAt: at,
+      updatedAt: at,
+      dateFrom: at,
+      dateTo: at,
+    ),
+    data: const CheckInData(
+      relationshipId: relationshipId,
+      interactionType: CheckInInteractionType.call,
+    ),
+  );
+
+  /// Two check-ins, the latest one yesterday evening: on track, next due
+  /// Wed 19 Aug.
+  final onTrackCheckIns = [
+    checkIn('c2', DateTime(2026, 8, 12, 19, 5)),
+    checkIn('c1', DateTime(2026, 8, 5, 9, 30)),
+  ];
+
+  /// One check-in twelve days ago: five days over a weekly cadence.
+  final lapsedCheckIns = [checkIn('c1', DateTime(2026, 8))];
+
   AgentReportEntity report({
-    String? tldr,
-    String content = 'Full briefing.',
-    String? band = 'needsAttention',
-    String rationale = 'Two difficult calls in a row.',
-    String scope = AgentReportScopes.current,
-    DateTime? deletedAt,
+    String? tldr = 'Pip is in good spirits.',
+    String content = 'The **long** version.',
+    String? band = 'thriving',
+    DateTime? createdAt,
   }) =>
       AgentDomainEntity.agentReport(
             id: 'report-1',
             agentId: agentId,
-            scope: scope,
-            createdAt: DateTime(2026, 8, 15),
+            scope: AgentReportScopes.current,
+            createdAt: createdAt ?? now.subtract(const Duration(hours: 1)),
             vectorClock: null,
             content: content,
             tldr: tldr,
-            deletedAt: deletedAt,
             provenance: {
               RelationshipReportProvenanceKeys.healthBand: ?band,
-              RelationshipReportProvenanceKeys.healthRationale: rationale,
+              RelationshipReportProvenanceKeys.healthRationale:
+                  'Two good calls in a row.',
             },
           )
           as AgentReportEntity;
 
+  AgentStateEntity agentState({
+    DateTime? lastWakeAt,
+    int failures = 0,
+    DateTime? staleAt,
+    DateTime? freshAt,
+  }) => makeTestState(
+    agentId: agentId,
+    lastWakeAt: lastWakeAt,
+    consecutiveFailureCount: failures,
+  ).copyWith(reportStaleAt: staleAt, reportFreshAt: freshAt);
+
+  ResolvedAgentSetup resolvedSetup() {
+    final model = testAiModel();
+    return ResolvedAgentSetup(
+      status: AgentSetupResolutionStatus.resolved,
+      profile: ResolvedProfile(
+        thinkingModelId: model.providerModelId,
+        thinkingProvider: testInferenceProvider(),
+        thinkingModel: model,
+      ),
+    );
+  }
+
   setUp(() {
     agentService = MockRelationshipAgentService();
+    when(() => agentService.requestBriefing(any())).thenAnswer((_) async {});
+    repository = MockRelationshipRepository();
     when(
-      () => agentService.requestBriefing(any()),
-    ).thenAnswer((_) async {});
+      () => repository.updateRelationship(any()),
+    ).thenAnswer((_) async => true);
+    store = _FakePendingInteractionStore();
   });
 
-  Widget build({
+  Future<_FakeContactLauncher> pump(
+    WidgetTester tester, {
     RelationshipEntry? entry,
+    ValueNotifier<RelationshipEntry>? entryNotifier,
+    List<CheckInEntry> checkIns = const [],
     AgentReportEntity? current,
+    AgentStateEntity? state,
+    bool running = false,
+    bool modelResolved = true,
+    int totalTokens = 0,
     String? disclosureProviderName,
-    String agentDisplayName = "Anna's companion",
-    bool identityResolves = true,
-  }) => makeTestableWidgetWithScaffold(
-    RelationshipBriefingCard(relationship: entry ?? relationship()),
-    overrides: [
-      agentReportProvider(agentId).overrideWith((ref) async => current),
-      agentIdentityProvider(agentId).overrideWith(
-        (ref) async => identityResolves
-            ? makeTestIdentity(
-                agentId: agentId,
-                kind: AgentKinds.relationshipAgent,
-                displayName: agentDisplayName,
-              )
-            : null,
-      ),
-      relationshipAgentServiceProvider.overrideWithValue(agentService),
-      relationshipBriefingDisclosureProvider(
-        relationshipId,
-      ).overrideWith((ref) async => disclosureProviderName),
-    ],
-  );
-
-  /// Every string the widget tree actually paints, markdown already
-  /// resolved — the only way to tell "rendered as Markdown" apart from
-  /// "printed the source".
-  Iterable<String> paintedText(WidgetTester tester) => tester
-      .widgetList<Text>(find.byType(Text))
-      .map((text) => text.data ?? text.textSpan?.toPlainText() ?? '');
-
-  final cardFinder = find.byKey(
-    const ValueKey('relationship-briefing-card'),
-  );
-
-  group('gating', () {
-    testWidgets('renders nothing for an unimportant person with no briefing — '
-        'no advertising a feature they are not enrolled in', (tester) async {
-      await tester.pumpWidget(build(entry: relationship(important: false)));
-      await tester.pumpAndSettle();
-      expect(cardFinder, findsNothing);
-    });
-
-    testWidgets('a standing briefing keeps the card even after importance is '
-        'switched off — the report is still theirs to read', (tester) async {
+    bool setupUnavailable = false,
+    TextScaler textScaler = TextScaler.noScaling,
+    bool realDisclosure = false,
+    List<Override> additionalOverrides = const [],
+    TaskAgentSetupOptions setupOptions = const TaskAgentSetupOptions(
+      profiles: [],
+      models: [],
+      providers: [],
+    ),
+    Set<ContactAction> launchable = const {ContactAction.call},
+  }) async {
+    final launcher = _FakeContactLauncher(launchable: launchable);
+    await withClock(Clock.fixed(now), () async {
       await tester.pumpWidget(
-        build(
-          entry: relationship(important: false),
-          current: report(tldr: 'You last spoke two weeks ago.'),
+        makeTestableWidgetWithScaffold(
+          mediaQueryData: MediaQueryData(textScaler: textScaler),
+          entryNotifier == null
+              ? RelationshipBriefingCard(
+                  relationship: entry ?? relationship(),
+                  checkIns: checkIns,
+                )
+              : ValueListenableBuilder<RelationshipEntry>(
+                  valueListenable: entryNotifier,
+                  builder: (context, value, child) => RelationshipBriefingCard(
+                    relationship: value,
+                    checkIns: checkIns,
+                  ),
+                ),
+          overrides: [
+            agentReportProvider.overrideWith((ref, id) async => current),
+            agentStateProvider.overrideWith((ref, id) async => state),
+            agentIsRunningProvider.overrideWith(
+              (ref, id) => Stream.value(running),
+            ),
+            agentIdentityProvider.overrideWith(
+              (ref, id) async => makeTestIdentity(
+                agentId: id,
+                kind: AgentKinds.relationshipAgent,
+                displayName: 'Commander Pip Frostbeak',
+              ),
+            ),
+            taskAgentResolvedSetupProvider.overrideWith(
+              (ref, id) async => modelResolved
+                  ? resolvedSetup()
+                  : const ResolvedAgentSetup(
+                      status: AgentSetupResolutionStatus.disabled,
+                    ),
+            ),
+            agentTokenUsageSummariesProvider.overrideWith(
+              (ref, id) async => [
+                if (totalTokens > 0)
+                  AgentTokenUsageSummary(
+                    modelId: 'model-1',
+                    inputTokens: totalTokens,
+                  ),
+              ],
+            ),
+            taskAgentSetupOptionsProvider.overrideWith(
+              (ref) async => setupOptions,
+            ),
+            relationshipAgentServiceProvider.overrideWithValue(agentService),
+            if (!realDisclosure)
+              relationshipBriefingDisclosureProvider(
+                relationshipId,
+              ).overrideWith((ref) async {
+                if (setupUnavailable) {
+                  throw const RelationshipInferenceSetupUnavailable();
+                }
+                return disclosureProviderName;
+              }),
+            relationshipRepositoryProvider.overrideWithValue(repository),
+            contactLauncherProvider.overrideWithValue(launcher),
+            pendingInteractionStoreProvider.overrideWithValue(store),
+            ...additionalOverrides,
+          ],
         ),
       );
-      await tester.pumpAndSettle();
-      expect(cardFinder, findsOneWidget);
+      if (running) {
+        // The running face wears a spinner, so nothing ever "settles".
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 100));
+      } else {
+        await tester.pumpAndSettle();
+      }
+    });
+    return launcher;
+  }
+
+  Text statusWidget(WidgetTester tester) => tester.widget<Text>(
+    find.byKey(const ValueKey('relationship-agent-status')),
+  );
+  // A two-ink status renders as rich text; either way, the words.
+  String statusText(WidgetTester tester) {
+    final text = statusWidget(tester);
+    return text.data ?? text.textSpan!.toPlainText();
+  }
+
+  SemanticsNode statusNode(WidgetTester tester) => tester.getSemantics(
+    find.byKey(const ValueKey('relationship-agent-status')),
+  );
+  final briefMe = find.byKey(const ValueKey('relationship-brief-me'));
+
+  group('relationshipAgentCardStateOf', () {
+    final at = DateTime(2026, 8, 13, 13, 41);
+
+    test('not enrolled beats everything', () {
+      expect(
+        relationshipAgentCardStateOf(
+          enrolled: false,
+          isRunning: true,
+          report: report(),
+          state: agentState(failures: 2, lastWakeAt: at),
+        ),
+        RelationshipAgentCardState.notEnrolled,
+      );
     });
 
-    testWidgets('an important person with no briefing gets the empty line, '
-        'not an empty report body', (tester) async {
-      await tester.pumpWidget(build());
-      await tester.pumpAndSettle();
-      expect(cardFinder, findsOneWidget);
-      expect(find.byType(TldrBody), findsNothing);
+    test('running beats a failure and a stale briefing', () {
       expect(
-        find.textContaining('No briefing yet'),
+        relationshipAgentCardStateOf(
+          enrolled: true,
+          isRunning: true,
+          report: report(),
+          state: agentState(failures: 1, lastWakeAt: at, staleAt: at),
+        ),
+        RelationshipAgentCardState.running,
+      );
+    });
+
+    test('a failure counts while nothing newer succeeded', () {
+      expect(
+        relationshipAgentCardStateOf(
+          enrolled: true,
+          isRunning: false,
+          report: null,
+          state: agentState(failures: 1, lastWakeAt: at),
+        ),
+        RelationshipAgentCardState.failed,
+      );
+      expect(
+        relationshipAgentCardStateOf(
+          enrolled: true,
+          isRunning: false,
+          report: report(createdAt: at.subtract(const Duration(hours: 2))),
+          state: agentState(failures: 1, lastWakeAt: at),
+        ),
+        RelationshipAgentCardState.failed,
+      );
+    });
+
+    test('a failure older than the briefing is history, not a state', () {
+      expect(
+        relationshipAgentCardStateOf(
+          enrolled: true,
+          isRunning: false,
+          report: report(createdAt: at.add(const Duration(hours: 1))),
+          state: agentState(failures: 3, lastWakeAt: at),
+        ),
+        RelationshipAgentCardState.current,
+      );
+    });
+
+    test('no briefing, out of date, current', () {
+      expect(
+        relationshipAgentCardStateOf(
+          enrolled: true,
+          isRunning: false,
+          report: null,
+          state: null,
+        ),
+        RelationshipAgentCardState.noBriefing,
+      );
+      expect(
+        relationshipAgentCardStateOf(
+          enrolled: true,
+          isRunning: false,
+          report: report(),
+          state: agentState(staleAt: at),
+        ),
+        RelationshipAgentCardState.outOfDate,
+      );
+      expect(
+        relationshipAgentCardStateOf(
+          enrolled: true,
+          isRunning: false,
+          report: report(),
+          state: agentState(
+            staleAt: at,
+            freshAt: at.add(const Duration(minutes: 1)),
+          ),
+        ),
+        RelationshipAgentCardState.current,
+      );
+    });
+
+    glados.Glados3<bool, bool, int>(
+      glados.any.bool,
+      glados.any.bool,
+      glados.any.intInRange(0, 4),
+    ).test('enrolment and running are decided before anything else, and a '
+        'briefing is a precondition of current and out of date', (
+      enrolled,
+      running,
+      failures,
+    ) {
+      for (final hasReport in [true, false]) {
+        final state = relationshipAgentCardStateOf(
+          enrolled: enrolled,
+          isRunning: running,
+          report: hasReport ? report() : null,
+          state: agentState(failures: failures, lastWakeAt: now),
+        );
+        expect(state == RelationshipAgentCardState.notEnrolled, !enrolled);
+        if (enrolled) {
+          expect(state == RelationshipAgentCardState.running, running);
+        }
+        if (state == RelationshipAgentCardState.current ||
+            state == RelationshipAgentCardState.outOfDate) {
+          expect(hasReport, isTrue);
+        }
+        if (enrolled && !running && failures > 0) {
+          // The wake is newer than any report here, so it is the state.
+          expect(state, RelationshipAgentCardState.failed);
+        }
+      }
+    }, tags: 'glados');
+  });
+
+  group('not enrolled', () {
+    testWidgets('is a plain section card, no AI chrome, saying what '
+        'important turns on', (tester) async {
+      await pump(tester, entry: relationship(important: false));
+
+      expect(find.byType(AgentSummaryCardSurface), findsNothing);
+      expect(find.byType(DesignSystemSectionCard), findsOneWidget);
+      expect(find.text('Briefing'), findsOneWidget);
+      expect(statusText(tester), 'No agent for this person');
+      expect(
+        find.byType(DsPill),
+        findsNothing,
+        reason: 'the header above the card already carries the pills',
+      );
+      expect(
+        find.textContaining('Mark Pip as important to get a chat'),
+        findsOneWidget,
+      );
+      // Prose in the prose ink, like the enrolled faces.
+      final tokens = tester
+          .element(find.byType(RelationshipBriefingCard))
+          .designTokens;
+      expect(
+        tester
+            .widget<Text>(find.byKey(const ValueKey('relationship-agent-body')))
+            .style
+            ?.color,
+        tokens.colors.text.highEmphasis,
+      );
+      // Nothing under the action row: the footer closes symmetric.
+      expect(
+        tester
+            .widget<Container>(
+              find.byKey(const ValueKey('relationship-agent-footer')),
+            )
+            .padding!
+            .resolve(TextDirection.ltr)
+            .bottom,
+        tokens.spacing.step4,
+      );
+      expect(find.text('Mark important'), findsOneWidget);
+      expect(
+        find.text('Only what you start yourself uses AI'),
         findsOneWidget,
       );
     });
 
-    testWidgets('a superseded report is not the current briefing', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        build(
-          current: report(scope: 'archived', tldr: 'Old news.'),
-        ),
+    testWidgets('at large text the footer stacks the privacy note above the '
+        'primary, so neither squeezes the other', (tester) async {
+      await pump(
+        tester,
+        entry: relationship(important: false),
+        textScaler: const TextScaler.linear(1.6),
       );
-      await tester.pumpAndSettle();
-      expect(find.byType(TldrBody), findsNothing);
-      expect(find.textContaining('No briefing yet'), findsOneWidget);
+      final note = tester.getRect(
+        find.byKey(const ValueKey('relationship-agent-meta')),
+      );
+      final action = tester.getRect(
+        find.byKey(const ValueKey('relationship-agent-mark-important')),
+      );
+      expect(action.top, greaterThanOrEqualTo(note.bottom));
+      expect(find.text('Only what you start yourself uses AI'), findsOneWidget);
     });
 
-    testWidgets('a soft-deleted report is not the current briefing', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        build(
-          current: report(tldr: 'Retracted.', deletedAt: DateTime(2026, 8, 16)),
-        ),
+    testWidgets('Mark important switches the person on through the '
+        'repository', (tester) async {
+      await pump(tester, entry: relationship(important: false));
+
+      await tester.tap(
+        find.byKey(const ValueKey('relationship-agent-mark-important')),
       );
       await tester.pumpAndSettle();
-      expect(find.byType(TldrBody), findsNothing);
-      expect(find.textContaining('No briefing yet'), findsOneWidget);
+
+      final saved =
+          verify(
+                () => repository.updateRelationship(captureAny()),
+              ).captured.single
+              as RelationshipEntry;
+      expect(saved.data.important, isTrue);
+      expect(saved.meta.id, relationshipId);
+    });
+
+    testWidgets('Mark important also mints the agent, the way the edit form '
+        'does — otherwise nothing proactive ever starts', (tester) async {
+      when(
+        () => agentService.ensureAgentForRelationship(any()),
+      ).thenAnswer((_) async => makeTestIdentity(agentId: agentId));
+      await pump(tester, entry: relationship(important: false));
+
+      await tester.tap(
+        find.byKey(const ValueKey('relationship-agent-mark-important')),
+      );
+      await tester.pumpAndSettle();
+
+      final ensured =
+          verify(
+                () => agentService.ensureAgentForRelationship(captureAny()),
+              ).captured.single
+              as RelationshipEntry;
+      expect(ensured.data.important, isTrue);
+    });
+
+    testWidgets('a failed agent creation never fails the save the user '
+        'watched succeed', (tester) async {
+      when(
+        () => agentService.ensureAgentForRelationship(any()),
+      ).thenThrow(StateError('agent db closed'));
+      await pump(tester, entry: relationship(important: false));
+
+      await tester.tap(
+        find.byKey(const ValueKey('relationship-agent-mark-important')),
+      );
+      await tester.pumpAndSettle();
+
+      verify(() => repository.updateRelationship(any())).called(1);
+      expect(
+        find.text('Could not save the changes. Please try again.'),
+        findsNothing,
+      );
+    });
+
+    testWidgets('a rejected save says so', (tester) async {
+      when(
+        () => repository.updateRelationship(any()),
+      ).thenAnswer((_) async => false);
+      await pump(tester, entry: relationship(important: false));
+
+      await tester.tap(
+        find.byKey(const ValueKey('relationship-agent-mark-important')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('Could not save the changes. Please try again.'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('a throwing save says so too', (tester) async {
+      when(
+        () => repository.updateRelationship(any()),
+      ).thenThrow(StateError('db closed'));
+      await pump(tester, entry: relationship(important: false));
+
+      await tester.tap(
+        find.byKey(const ValueKey('relationship-agent-mark-important')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('Could not save the changes. Please try again.'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('an important but dormant person is paused, with the status '
+        'as the footer and no switch to press', (tester) async {
+      await pump(
+        tester,
+        entry: relationship(
+          status: RelationshipStatus.dormant(
+            id: 's',
+            createdAt: now,
+            utcOffset: 0,
+          ),
+        ),
+      );
+
+      expect(
+        find.text('Briefings pause while this person is dormant or archived.'),
+        findsOneWidget,
+      );
+      expect(statusText(tester), 'Dormant');
+      expect(find.text('Mark important'), findsNothing);
     });
   });
 
-  group('AI card chrome', () {
-    testWidgets('wears the shared AI card decoration, not a bespoke surface', (
-      tester,
-    ) async {
-      await tester.pumpWidget(build(current: report(tldr: 'Short version.')));
-      await tester.pumpAndSettle();
+  group('enrolled, no briefing', () {
+    testWidgets('wears the AI chrome, names the watching agent, counts the '
+        'check-ins it would read, and offers Brief now next to the next '
+        'look', (tester) async {
+      await pump(tester, checkIns: onTrackCheckIns);
 
-      final box = tester.widget<DecoratedBox>(
+      final card = tester.widget<DecoratedBox>(
         find
             .descendant(
-              of: cardFinder,
+              of: find.byKey(const ValueKey('relationship-briefing-card')),
               matching: find.byType(DecoratedBox),
-              matchRoot: true,
             )
             .first,
       );
+      final context = tester.element(find.byType(RelationshipBriefingCard));
+      expect(card.decoration, aiCardDecoration(context));
+      expect(statusText(tester), 'Agent watching · next look Wed 19 Aug');
       expect(
-        box.decoration,
-        aiCardDecoration(tester.element(cardFinder)),
-        reason: 'the briefing is the same panel as the task and goal cards',
+        find.text(
+          'No briefing yet. Brief now writes one from your 2 check-ins; it '
+          'never sees the phone number or email.',
+        ),
+        findsOneWidget,
       );
-    });
-
-    testWidgets('the header is the shared identity block titled "Briefing", '
-        'carrying the agent name below it', (tester) async {
-      await tester.pumpWidget(build(current: report(tldr: 'Short version.')));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(TldrHeader), findsOneWidget);
-      expect(find.text('Briefing'), findsOneWidget);
+      expect(find.byType(DsPill), findsNothing);
+      expect(find.text('Brief now'), findsOneWidget);
       expect(
-        find.text('AI summary'),
+        find.byKey(const ValueKey('relationship-chat-button')),
         findsNothing,
-        reason: 'the briefing names itself, it is not a task summary',
       );
-      expect(find.text("Anna's companion"), findsOneWidget);
     });
 
-    testWidgets('an agent named after the person leaves the subtitle empty — '
-        'the app bar above already says "Anna"', (tester) async {
-      await tester.pumpWidget(
-        build(
-          current: report(tldr: 'Short version.'),
-          agentDisplayName: 'Anna',
-        ),
-      );
-      await tester.pumpAndSettle();
+    testWidgets('with no check-in yet the body says what to do first and the '
+        'next look is still known from the tracking start', (tester) async {
+      await pump(tester);
 
       expect(
-        tester.widget<TldrHeader>(find.byType(TldrHeader)).agentName,
-        isNull,
-        reason: 'the relationship agent is named after the person it watches',
+        find.textContaining('writes one once you have logged a check-in'),
+        findsOneWidget,
       );
-      expect(find.text('Anna'), findsNothing);
+      expect(statusText(tester), startsWith('Agent watching · next look'));
     });
 
-    testWidgets('a display name that has diverged from the person is still '
-        'shown — it carries information the app bar does not', (tester) async {
-      await tester.pumpWidget(
-        build(
-          current: report(tldr: 'Short version.'),
-          agentDisplayName: 'Anna Sørensen (old)',
-        ),
-      );
+    testWidgets('Brief now on a LOCAL route requests without any dialog', (
+      tester,
+    ) async {
+      await pump(tester, checkIns: onTrackCheckIns);
+
+      await tester.tap(briefMe);
       await tester.pumpAndSettle();
 
-      expect(find.text('Anna Sørensen (old)'), findsOneWidget);
-    });
-
-    testWidgets('an unresolved identity leaves the header nameless rather '
-        'than blank-lined', (tester) async {
-      await tester.pumpWidget(
-        build(current: report(tldr: 'Short version.'), identityResolves: false),
-      );
-      await tester.pumpAndSettle();
-
+      verify(() => agentService.requestBriefing(any())).called(1);
       expect(
-        tester.widget<TldrHeader>(find.byType(TldrHeader)).agentName,
-        isNull,
+        find.text('Briefing requested — it will appear here shortly.'),
+        findsOneWidget,
       );
-      expect(find.text('Briefing'), findsOneWidget);
     });
-  });
 
-  group('health chip', () {
-    Future<DsPill> pumpBand(WidgetTester tester, String band) async {
-      await tester.pumpWidget(build(current: report(band: band)));
+    testWidgets('Brief now on a CLOUD route names the provider first and '
+        'only proceeds on consent', (tester) async {
+      await pump(
+        tester,
+        checkIns: onTrackCheckIns,
+        disclosureProviderName: 'Mission Control Cloud',
+      );
+
+      await tester.tap(briefMe);
       await tester.pumpAndSettle();
-      return tester.widget<DsPill>(
-        find.byKey(const ValueKey('relationship-health-chip')),
+      expect(find.text('Send to Mission Control Cloud?'), findsOneWidget);
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      verifyNever(() => agentService.requestBriefing(any()));
+
+      await tester.tap(briefMe);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+      verify(() => agentService.requestBriefing(any())).called(1);
+    });
+
+    for (final route in ['cloud', 'local', 'unavailable']) {
+      testWidgets(
+        'a delayed default-profile preflight survives frames: $route',
+        (tester) async {
+          final readGate = Completer<RelationshipEntry?>();
+          final aiRepository = MockAiConfigRepository();
+          final agentRepository = MockAgentRepository();
+          final provider = route == 'local'
+              ? testLocalInferenceProvider()
+              : testInferenceProvider();
+          final model = testAiModel(inferenceProviderId: provider.id);
+          final profile = testInferenceProfile(thinkingModelId: model.id);
+          when(
+            () => repository.getRelationshipByIdUnfiltered(relationshipId),
+          ).thenAnswer((_) => readGate.future);
+          when(
+            () => agentRepository.getEntity(agentId),
+          ).thenAnswer((_) async => null);
+          when(
+            aiRepository.getDefaultProfileId,
+          ).thenAnswer((_) async => profile.id);
+          when(
+            () => aiRepository.getConfigById(profile.id),
+          ).thenAnswer((_) async => route == 'unavailable' ? null : profile);
+          when(
+            () => aiRepository.getConfigById(provider.id),
+          ).thenAnswer((_) async => provider);
+          when(
+            () => aiRepository.getConfigsByType(AiConfigType.model),
+          ).thenAnswer((_) async => [model]);
+          when(
+            () => aiRepository.getConfigsByType(AiConfigType.inferenceProvider),
+          ).thenAnswer((_) async => [provider]);
+          await pump(
+            tester,
+            checkIns: onTrackCheckIns,
+            realDisclosure: true,
+            additionalOverrides: [
+              aiConfigRepositoryProvider.overrideWithValue(aiRepository),
+              agentRepositoryProvider.overrideWithValue(agentRepository),
+            ],
+          );
+          await tester.tap(briefMe);
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 100));
+          verifyNever(() => agentService.requestBriefing(any()));
+          expect(find.text('Could not request the briefing.'), findsNothing);
+
+          readGate.complete(relationship());
+          await tester.pumpAndSettle();
+          final context = tester.element(find.byType(RelationshipBriefingCard));
+          final container = ProviderScope.containerOf(context, listen: false);
+          expect(
+            container.exists(
+              relationshipBriefingDisclosureProvider(relationshipId),
+            ),
+            isFalse,
+            reason:
+                'the preflight subscription must be released after completion',
+          );
+          if (route == 'unavailable') {
+            expect(
+              find.text(context.messages.taskAgentSetupBroken),
+              findsOneWidget,
+            );
+            verifyNever(() => agentService.requestBriefing(any()));
+          } else {
+            if (route == 'cloud') {
+              expect(
+                find.text(
+                  context.messages.relationshipBriefingDisclosureTitle(
+                    provider.name,
+                  ),
+                ),
+                findsOneWidget,
+              );
+              verifyNever(() => agentService.requestBriefing(any()));
+              await tester.tap(find.text('Continue'));
+              await tester.pumpAndSettle();
+            }
+            verify(() => agentService.requestBriefing(any())).called(1);
+          }
+          expect(find.text('Could not request the briefing.'), findsNothing);
+        },
       );
     }
 
-    testWidgets('thriving reads as its own label, tinted with success', (
-      tester,
-    ) async {
-      final pill = await pumpBand(tester, 'thriving');
-      expect(pill.label, 'Thriving');
-      expect(
-        pill.color,
-        tester
-            .element(cardFinder)
-            .designTokens
-            .colors
-            .alert
-            .success
-            .defaultColor,
+    testWidgets('a card replacement during disclosure cannot retarget '
+        'the briefing request', (tester) async {
+      final original = relationship();
+      final replacement = original.copyWith(
+        meta: original.meta.copyWith(id: 'person-2'),
+        data: original.data.copyWith(title: 'Another person'),
       );
-    });
-
-    testWidgets('steady reads as its own label, tinted with the AI accent', (
-      tester,
-    ) async {
-      final pill = await pumpBand(tester, 'steady');
-      expect(pill.label, 'Steady');
-      expect(
-        pill.color,
-        tester.element(cardFinder).designTokens.colors.aiCard.accent,
+      final entry = ValueNotifier(original);
+      addTearDown(entry.dispose);
+      final disclosure = Completer<String?>();
+      final disclosedIds = <String>[];
+      await pump(
+        tester,
+        entryNotifier: entry,
+        checkIns: onTrackCheckIns,
+        realDisclosure: true,
+        additionalOverrides: [
+          relationshipBriefingDisclosureProvider.overrideWith((ref, id) async {
+            disclosedIds.add(id);
+            return disclosure.future;
+          }),
+        ],
       );
-    });
-
-    testWidgets('needs attention reads as its own label, tinted with warning', (
-      tester,
-    ) async {
-      final pill = await pumpBand(tester, 'needsAttention');
-      expect(pill.label, 'Needs attention');
-      expect(
-        pill.color,
-        tester
-            .element(cardFinder)
-            .designTokens
-            .colors
-            .alert
-            .warning
-            .defaultColor,
-      );
-    });
-
-    testWidgets('strained reads as its own label, tinted with error', (
-      tester,
-    ) async {
-      final pill = await pumpBand(tester, 'strained');
-      expect(pill.label, 'Strained');
-      expect(
-        pill.color,
-        tester.element(cardFinder).designTokens.colors.alert.error.defaultColor,
-      );
-    });
-
-    testWidgets('the pill sits in the card body, not the header rail whose '
-        'half-width cap would ellipsize a longer band label', (tester) async {
-      await tester.pumpWidget(build(current: report()));
+      await tester.tap(briefMe);
+      await tester.pump();
+      entry.value = replacement;
+      await tester.pump();
+      disclosure.complete('Original provider');
       await tester.pumpAndSettle();
-
-      expect(
-        find.descendant(
-          of: find.byType(TldrHeader),
-          matching: find.byKey(const ValueKey('relationship-health-chip')),
-        ),
-        findsNothing,
-      );
-      expect(
-        tester.widget<TldrHeader>(find.byType(TldrHeader)).trailing,
-        isNull,
-      );
+      expect(disclosedIds, [original.meta.id]);
+      expect(find.text('Send to Original provider?'), findsOneWidget);
+      verifyNever(() => agentService.requestBriefing(any()));
+      await tester.tap(find.text('Continue'));
+      await tester.pumpAndSettle();
+      verify(() => agentService.requestBriefing(original)).called(1);
+      verifyNever(() => agentService.requestBriefing(replacement));
     });
 
-    testWidgets('the band label stays whole on a small phone at a raised '
-        'text scale, in the longest locale we ship', (tester) async {
-      tester.view
-        ..physicalSize = const Size(320, 900) * 3
-        ..devicePixelRatio = 3.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
-
-      await tester.pumpWidget(
-        makeTestableWidgetWithScaffold(
-          // The page insets the card by `step5` on each side; measuring
-          // without that would hand the pill room it never gets.
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: RelationshipBriefingCard(relationship: relationship()),
-          ),
-          locale: const Locale('de'),
-          mediaQueryData: const MediaQueryData(
-            size: Size(320, 900),
-            textScaler: TextScaler.linear(1.3),
-          ),
-          overrides: [
-            agentReportProvider(agentId).overrideWith((ref) async => report()),
-            agentIdentityProvider(agentId).overrideWith((ref) async => null),
-            relationshipAgentServiceProvider.overrideWithValue(agentService),
-            relationshipBriefingDisclosureProvider(
-              relationshipId,
-            ).overrideWith((ref) async => null),
-          ],
+    testWidgets('unavailable setup explains recovery and opens configuration', (
+      tester,
+    ) async {
+      final model = testAiModel();
+      await pump(
+        tester,
+        checkIns: onTrackCheckIns,
+        setupUnavailable: true,
+        setupOptions: TaskAgentSetupOptions(
+          profiles: const [],
+          models: [model],
+          providers: [testInferenceProvider()],
         ),
       );
+      await tester.tap(briefMe);
+      await tester.pumpAndSettle();
+      verifyNever(() => agentService.requestBriefing(any()));
+      expect(find.text('Could not request the briefing.'), findsNothing);
+      expect(find.text('Selected AI setup is unavailable'), findsOneWidget);
+      await tester.tap(find.text('Choose a model'));
+      await tester.pumpAndSettle();
+      expect(find.text('Agent setup'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('agent-choose-model')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(ValueKey('agent-model-${model.id}')), findsOneWidget);
+      expect(find.text(model.name), findsWidgets);
+    });
+
+    testWidgets('a failed request surfaces the error toast', (tester) async {
+      when(
+        () => agentService.requestBriefing(any()),
+      ).thenThrow(StateError('no model'));
+      await pump(tester, checkIns: onTrackCheckIns);
+
+      await tester.tap(briefMe);
       await tester.pumpAndSettle();
 
-      final context = tester.element(cardFinder);
-      final label = find.descendant(
-        of: find.byKey(const ValueKey('relationship-health-chip')),
-        matching: find.byType(Text),
-      );
-      expect(
-        tester.renderObject<RenderParagraph>(label).didExceedMaxLines,
-        isFalse,
-        reason: 'a truncated health verdict is the card losing its headline',
+      expect(find.text('Could not request the briefing.'), findsOneWidget);
+    });
+  });
+
+  group('running', () {
+    testWidgets('says the agent is writing, what it is reading, and since '
+        'when — with only the activity log to open', (tester) async {
+      await pump(
+        tester,
+        checkIns: onTrackCheckIns,
+        running: true,
+        state: agentState(lastWakeAt: DateTime(2026, 8, 13, 13, 41)),
       );
 
-      // Non-vacuous: the pill genuinely needs more than the header rail
-      // could ever have given it, so this passes because the pill left the
-      // rail — not because "Braucht Aufmerksamkeit" happens to be short.
-      final headerContentWidth =
-          tester.getSize(find.byType(TldrHeader)).width -
-          (context.designTokens.spacing.cardPadding * 2);
+      expect(statusText(tester), 'Writing the briefing…');
+      expect(
+        find.text('Reading 2 check-ins. Usually under a minute.'),
+        findsOneWidget,
+      );
+      expect(briefMe, findsNothing);
+      // The quiet door stays open while the agent writes; nothing primary.
+      expect(find.byType(DesignSystemButton), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('relationship-agent-see-activity')),
+        findsOneWidget,
+      );
+      // With no primary, the footer still washes the whole card.
       expect(
         tester
-            .getSize(find.byKey(const ValueKey('relationship-health-chip')))
+            .getSize(find.byKey(const ValueKey('relationship-agent-footer')))
             .width,
-        greaterThan(headerContentWidth / 2),
+        tester
+            .getSize(find.byKey(const ValueKey('relationship-briefing-card')))
+            .width,
       );
     });
 
-    testWidgets('the chip explains itself through the model rationale', (
+    testWidgets('a refresh with a briefing on file still reads as writing', (
       tester,
     ) async {
-      await tester.pumpWidget(build(current: report()));
-      await tester.pumpAndSettle();
-      final tooltip = tester.widget<Tooltip>(
-        find.ancestor(
-          of: find.byKey(const ValueKey('relationship-health-chip')),
-          matching: find.byType(Tooltip),
-        ),
+      await pump(
+        tester,
+        checkIns: onTrackCheckIns,
+        current: report(),
+        running: true,
       );
-      expect(tooltip.message, 'Two difficult calls in a row.');
-    });
 
-    testWidgets('a report with no parseable band shows no chip at all', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        build(current: report(band: null, tldr: 'Short version.')),
-      );
-      await tester.pumpAndSettle();
-      expect(
-        find.byKey(const ValueKey('relationship-health-chip')),
-        findsNothing,
-      );
+      expect(statusText(tester), 'Writing the briefing…');
+      expect(find.byType(AgentMarkdownView), findsNothing);
     });
   });
 
-  group('briefing prose', () {
-    testWidgets('renders the briefing as Markdown — the reader never sees the '
-        'hashes and asterisks the model wrote', (tester) async {
-      await tester.pumpWidget(
-        build(
-          current: report(
-            tldr: '## State of the relationship\n\n**Anna** is drifting.',
-          ),
+  group('failed', () {
+    final failedAt = DateTime(2026, 8, 13, 13, 41);
+
+    testWidgets('with no model set up, the reason is the fix: Choose a model', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        checkIns: onTrackCheckIns,
+        modelResolved: false,
+        state: agentState(failures: 1, lastWakeAt: failedAt),
+      );
+
+      // A past event in the "as of" grammar: how long ago, not a clock
+      // time that reads as an appointment — and the alert ink is the
+      // state's alone: the age reads in the meta ink.
+      expect(statusText(tester), 'Last run failed · 19 min ago');
+      final tokens = tester
+          .element(find.byType(RelationshipBriefingCard))
+          .designTokens;
+      final spans = (statusWidget(tester).textSpan! as TextSpan).children!;
+      expect((spans.first as TextSpan).text, 'Last run failed');
+      expect((spans.last as TextSpan).text, ' · 19 min ago');
+      expect(
+        (spans.last as TextSpan).style?.color,
+        tokens.colors.aiCard.metaText,
+      );
+      // Announced as the state, not the age.
+      expect(statusNode(tester).flagsCollection.isLiveRegion, isTrue);
+      expect(statusNode(tester).label, 'Last run failed');
+      expect(
+        find.textContaining('No model is set up for briefings.'),
+        findsOneWidget,
+      );
+      expect(find.text('Choose a model'), findsOneWidget);
+      expect(find.text('See activity'), findsOneWidget);
+      expect(briefMe, findsNothing);
+    });
+
+    testWidgets('Choose a model opens the agent setup sheet', (tester) async {
+      await pump(
+        tester,
+        checkIns: onTrackCheckIns,
+        modelResolved: false,
+        state: agentState(failures: 1, lastWakeAt: failedAt),
+      );
+
+      await tester.tap(
+        find.byKey(const ValueKey('relationship-agent-choose-model')),
+      );
+      await tester.pumpAndSettle();
+
+      final context = tester.element(find.byType(RelationshipBriefingCard));
+      expect(find.text(context.messages.taskAgentSetupTitle), findsOneWidget);
+    });
+
+    testWidgets('a failure with no wake time yet reads plainly', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        checkIns: onTrackCheckIns,
+        state: agentState(failures: 1),
+      );
+
+      expect(
+        find.text(
+          'The provider returned an error before the briefing was written. '
+          'Your check-ins are unchanged.',
         ),
+        findsOneWidget,
+      );
+      expect(statusText(tester), 'Last run failed');
+      expect(find.text('Try again'), findsOneWidget);
+    });
+
+    testWidgets('See activity opens the internals panel', (tester) async {
+      await pump(
+        tester,
+        checkIns: onTrackCheckIns,
+        state: agentState(failures: 1, lastWakeAt: failedAt),
+      );
+
+      await tester.tap(
+        find.byKey(const ValueKey('relationship-agent-see-activity')),
       );
       await tester.pumpAndSettle();
 
-      expect(find.byType(GptMarkdown), findsWidgets);
-      final painted = paintedText(tester).toList();
-      expect(
-        painted.any((text) => text.contains('State of the relationship')),
-        isTrue,
-      );
-      expect(
-        painted.any((text) => text.contains('Anna')),
-        isTrue,
-      );
-      expect(
-        painted.where((text) => text.contains('##') || text.contains('**')),
-        isEmpty,
-        reason: 'markdown syntax on screen is the bug this fixes',
-      );
+      expect(find.byType(AgentInternalsPanel), findsOneWidget);
     });
 
-    testWidgets('the summary is the report tldr when it has one', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        build(current: report(tldr: 'You last spoke two weeks ago.')),
+    testWidgets('with a model, the action is Try again, which requests a '
+        'briefing', (tester) async {
+      await pump(
+        tester,
+        checkIns: onTrackCheckIns,
+        state: agentState(failures: 2, lastWakeAt: failedAt),
       );
-      await tester.pumpAndSettle();
-      expect(
-        tester.widget<AgentMarkdownView>(find.byType(AgentMarkdownView)).text,
-        'You last spoke two weeks ago.',
-      );
-    });
 
-    testWidgets('the full content stands in when the run produced no tldr', (
-      tester,
-    ) async {
-      await tester.pumpWidget(build(current: report()));
-      await tester.pumpAndSettle();
       expect(
-        tester.widget<AgentMarkdownView>(find.byType(AgentMarkdownView)).text,
-        'Full briefing.',
-      );
-      expect(
-        find.text('Read more'),
-        findsNothing,
-        reason: 'there is nothing further to disclose',
-      );
-    });
-
-    testWidgets('a full text identical to the tldr offers no disclosure', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        build(
-          current: report(tldr: 'Same words.', content: 'Same words.'),
+        find.text(
+          'The provider returned an error before the briefing was written. '
+          'Your check-ins are unchanged.',
         ),
+        findsOneWidget,
       );
+      await tester.tap(find.text('Try again'));
       await tester.pumpAndSettle();
-      expect(find.text('Read more'), findsNothing);
-    });
 
-    testWidgets('an empty full text offers no disclosure either', (
-      tester,
-    ) async {
-      await tester.pumpWidget(
-        build(
-          current: report(tldr: 'Only a summary.', content: '   '),
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(find.text('Read more'), findsNothing);
-      expect(
-        tester.widget<AgentMarkdownView>(find.byType(AgentMarkdownView)).text,
-        'Only a summary.',
-      );
+      verify(() => agentService.requestBriefing(any())).called(1);
     });
   });
 
-  group('disclosure', () {
-    Future<void> pumpExpandable(WidgetTester tester) async {
-      await tester.pumpWidget(
-        build(
-          current: report(
-            tldr: 'Short version.',
-            content: 'The **long** version.',
-          ),
-        ),
+  group('current', () {
+    testWidgets('the status line says when and which band; the cost rides '
+        'the model row; the sources line closes the card; Log check-in '
+        'sits beside a quiet Update now', (tester) async {
+      await pump(
+        tester,
+        checkIns: onTrackCheckIns,
+        current: report(),
+        state: agentState(lastWakeAt: now.subtract(const Duration(hours: 1))),
+        totalTokens: 38200,
       );
-      await tester.pumpAndSettle();
-    }
 
-    testWidgets('Read more reveals the full briefing and flips its own label', (
-      tester,
-    ) async {
-      await pumpExpandable(tester);
+      expect(statusText(tester), 'Thriving · as of 1 h ago');
+      expect(find.byType(DsPill), findsNothing);
+      expect(find.textContaining('· 38.2K tokens'), findsOneWidget);
+      // Provenance waits behind Read more: collapsed, the summary outweighs
+      // its sources. Under the fixed clock: a rebuild on the real one would
+      // find the fixture overdue and swap the footer to Call.
+      expect(find.textContaining('Sources:'), findsNothing);
+      await withClock(Clock.fixed(now), () async {
+        await tester.tap(
+          find.byKey(const ValueKey('relationship-briefing-expand')),
+        );
+        await tester.pumpAndSettle();
+      });
+      expect(
+        find.text('Sources: 2 check-ins · contact channels never sent'),
+        findsOneWidget,
+      );
+      final quiet = tester.widget<DesignSystemButton>(
+        find.byKey(const ValueKey('relationship-agent-log-check-in')),
+      );
+      expect(quiet.variant, DesignSystemButtonVariant.tertiary);
+      final update = tester.widget<DesignSystemButton>(briefMe);
+      expect(update.label, 'Update now');
+      expect(update.variant, DesignSystemButtonVariant.secondary);
+    });
+
+    testWidgets('the "as of" line moves on its own once the displayed bucket '
+        'changes — a briefing is not "just now" for hours', (tester) async {
+      var current = now;
+      final written = now.subtract(const Duration(seconds: 58));
+      await withClock(Clock(() => current), () async {
+        await tester.pumpWidget(
+          makeTestableWidgetWithScaffold(
+            RelationshipBriefingCard(
+              relationship: relationship(),
+              checkIns: onTrackCheckIns,
+            ),
+            overrides: [
+              agentReportProvider(agentId).overrideWith(
+                (ref) async => report(createdAt: written),
+              ),
+              agentStateProvider(agentId).overrideWith((ref) async => null),
+              agentIsRunningProvider(
+                agentId,
+              ).overrideWith((ref) => Stream.value(false)),
+              agentIdentityProvider(agentId).overrideWith((ref) async => null),
+              taskAgentResolvedSetupProvider(
+                agentId,
+              ).overrideWith((ref) async => resolvedSetup()),
+              agentTokenUsageSummariesProvider(
+                agentId,
+              ).overrideWith((ref) async => const []),
+              relationshipAgentServiceProvider.overrideWithValue(agentService),
+              relationshipBriefingDisclosureProvider(
+                relationshipId,
+              ).overrideWith((ref) async => null),
+              relationshipRepositoryProvider.overrideWithValue(repository),
+              contactLauncherProvider.overrideWithValue(
+                _FakeContactLauncher(launchable: const {}),
+              ),
+              pendingInteractionStoreProvider.overrideWithValue(store),
+            ],
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(statusText(tester), 'Thriving · as of just now');
+        // A resting age is not news: the line is not a live region here.
+        expect(statusNode(tester).flagsCollection.isLiveRegion, isFalse);
+
+        // Nobody rebuilds the card; the clock crosses the minute.
+        current = now.add(const Duration(seconds: 5));
+        await tester.pump(const Duration(seconds: 5));
+
+        expect(statusText(tester), 'Thriving · as of 1 min ago');
+      });
+    });
+
+    testWidgets('a briefing finishing is announced as it arrives, and the '
+        'age ticking afterwards is not', (tester) async {
+      var current = now;
+      final running = StreamController<bool>();
+      addTearDown(running.close);
+      final written = now.subtract(const Duration(seconds: 58));
+      await withClock(Clock(() => current), () async {
+        await tester.pumpWidget(
+          makeTestableWidgetWithScaffold(
+            RelationshipBriefingCard(
+              relationship: relationship(),
+              checkIns: onTrackCheckIns,
+            ),
+            overrides: [
+              agentReportProvider(agentId).overrideWith(
+                (ref) async => report(createdAt: written),
+              ),
+              agentStateProvider(agentId).overrideWith((ref) async => null),
+              agentIsRunningProvider(
+                agentId,
+              ).overrideWith((ref) => running.stream),
+              agentIdentityProvider(agentId).overrideWith((ref) async => null),
+              taskAgentResolvedSetupProvider(
+                agentId,
+              ).overrideWith((ref) async => resolvedSetup()),
+              agentTokenUsageSummariesProvider(
+                agentId,
+              ).overrideWith((ref) async => const []),
+              relationshipAgentServiceProvider.overrideWithValue(agentService),
+              relationshipBriefingDisclosureProvider(
+                relationshipId,
+              ).overrideWith((ref) async => null),
+              relationshipRepositoryProvider.overrideWithValue(repository),
+              contactLauncherProvider.overrideWithValue(
+                _FakeContactLauncher(launchable: const {}),
+              ),
+              pendingInteractionStoreProvider.overrideWithValue(store),
+            ],
+          ),
+        );
+        running.add(true);
+        await tester.pump();
+        await tester.pump();
+        expect(statusText(tester), 'Writing the briefing…');
+        expect(statusNode(tester).flagsCollection.isLiveRegion, isTrue);
+
+        // The run finishes: the current face arrives, and that is news.
+        running.add(false);
+        await tester.pump();
+        await tester.pump();
+        expect(statusText(tester), 'Thriving · as of just now');
+        expect(statusNode(tester).flagsCollection.isLiveRegion, isTrue);
+
+        // The age ticks over on its own: the same face, not news.
+        current = now.add(const Duration(seconds: 5));
+        await tester.pump(const Duration(seconds: 5));
+        expect(statusText(tester), 'Thriving · as of 1 min ago');
+        expect(statusNode(tester).flagsCollection.isLiveRegion, isFalse);
+      });
+    });
+
+    testWidgets('the failed face ages from its last wake, not from a '
+        'briefing it does not have', (tester) async {
+      var current = now;
+      final failedAt = now.subtract(const Duration(seconds: 58));
+      await withClock(Clock(() => current), () async {
+        await tester.pumpWidget(
+          makeTestableWidgetWithScaffold(
+            RelationshipBriefingCard(
+              relationship: relationship(),
+              checkIns: onTrackCheckIns,
+            ),
+            overrides: [
+              agentReportProvider(agentId).overrideWith((ref) async => null),
+              agentStateProvider(agentId).overrideWith(
+                (ref) async => agentState(failures: 1, lastWakeAt: failedAt),
+              ),
+              agentIsRunningProvider(
+                agentId,
+              ).overrideWith((ref) => Stream.value(false)),
+              agentIdentityProvider(agentId).overrideWith((ref) async => null),
+              taskAgentResolvedSetupProvider(
+                agentId,
+              ).overrideWith((ref) async => resolvedSetup()),
+              agentTokenUsageSummariesProvider(
+                agentId,
+              ).overrideWith((ref) async => const []),
+              relationshipAgentServiceProvider.overrideWithValue(agentService),
+              relationshipBriefingDisclosureProvider(
+                relationshipId,
+              ).overrideWith((ref) async => null),
+              relationshipRepositoryProvider.overrideWithValue(repository),
+              contactLauncherProvider.overrideWithValue(
+                _FakeContactLauncher(launchable: const {}),
+              ),
+              pendingInteractionStoreProvider.overrideWithValue(store),
+            ],
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(statusText(tester), 'Last run failed · just now');
+
+        current = now.add(const Duration(seconds: 5));
+        await tester.pump(const Duration(seconds: 5));
+        expect(statusText(tester), 'Last run failed · 1 min ago');
+      });
+    });
+
+    testWidgets('the footer keeps a designed gap between its actions and the '
+        'model row, at every text size', (tester) async {
+      for (final scale in [1.0, 1.6]) {
+        await pump(
+          tester,
+          checkIns: onTrackCheckIns,
+          current: report(),
+          textScaler: TextScaler.linear(scale),
+        );
+        final tokens = tester
+            .element(find.byType(RelationshipBriefingCard))
+            .designTokens;
+        final action = tester.getRect(briefMe);
+        final identity = tester.getRect(find.byType(TaskAgentIdentityRegion));
+        expect(
+          identity.top - action.bottom,
+          greaterThanOrEqualTo(tokens.spacing.step3),
+          reason: 'scale $scale: the primary must not touch the model row',
+        );
+      }
+    });
+
+    testWidgets('the band wears its colour as a dot beside its word, centred '
+        'on the first line', (tester) async {
+      await pump(tester, checkIns: onTrackCheckIns, current: report());
+      final dotFinder = find.byKey(
+        const ValueKey('relationship-agent-band-dot'),
+      );
+      // The design system's own presence dot, in the band's tone.
+      final dot = tester.widget<DesignSystemBadge>(dotFinder);
+      final tokens = tester
+          .element(find.byType(RelationshipBriefingCard))
+          .designTokens;
+      expect(dot.tone, DesignSystemBadgeTone.success);
+      expect(
+        relationshipHealthBandTone(RelationshipHealthBand.steady),
+        DesignSystemBadgeTone.neutral,
+      );
+      // The dot's offset is the text line less the dot, halved — computed,
+      // not a fixed step, so it scales with the text.
+      final line = tokens.typography.styles.body.bodySmall;
+      final offset = tester
+          .widget<Padding>(
+            find.ancestor(of: dotFinder, matching: find.byType(Padding)).first,
+          )
+          .padding
+          .resolve(TextDirection.ltr)
+          .top;
+      expect(
+        offset,
+        (line.fontSize! * line.height! - tokens.spacing.step3) / 2,
+      );
+    });
+
+    testWidgets('with nothing to expand, the sources line is not hidden '
+        'behind a Read more that does not exist', (tester) async {
+      await pump(
+        tester,
+        checkIns: onTrackCheckIns,
+        current: report(tldr: null),
+      );
+      expect(
+        find.byKey(const ValueKey('relationship-briefing-expand')),
+        findsNothing,
+      );
+      expect(
+        find.text('Sources: 2 check-ins · contact channels never sent'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('no cost on the model row without usage', (tester) async {
+      await pump(tester, checkIns: onTrackCheckIns, current: report());
+
+      expect(statusText(tester), 'Thriving · as of 1 h ago');
+      expect(find.textContaining('tokens'), findsNothing);
+    });
+
+    testWidgets('Update now requests a briefing', (tester) async {
+      await pump(tester, checkIns: onTrackCheckIns, current: report());
+
+      await tester.tap(briefMe);
+      await tester.pumpAndSettle();
+
+      verify(() => agentService.requestBriefing(any())).called(1);
+    });
+
+    testWidgets('renders the briefing as Markdown, and Read more reveals the '
+        'full report', (tester) async {
+      await pump(tester, checkIns: onTrackCheckIns, current: report());
+
       expect(find.byType(AgentMarkdownView), findsOneWidget);
-
       await tester.tap(
         find.byKey(const ValueKey('relationship-briefing-expand')),
       );
@@ -576,183 +1329,309 @@ void main() {
 
       final views = tester
           .widgetList<AgentMarkdownView>(find.byType(AgentMarkdownView))
-          .map((view) => view.text)
+          .map((v) => v.text)
           .toList();
-      expect(views, ['Short version.', 'The **long** version.']);
+      expect(views, ['Pip is in good spirits.', 'The **long** version.']);
       expect(find.text('Show less'), findsOneWidget);
-      expect(find.text('Read more'), findsNothing);
     });
 
-    testWidgets('Show less collapses it again', (tester) async {
-      await pumpExpandable(tester);
-      final disclosure = find.byKey(
-        const ValueKey('relationship-briefing-expand'),
-      );
-      await tester.tap(disclosure);
-      await tester.pumpAndSettle();
-      await tester.tap(disclosure);
-      await tester.pumpAndSettle();
-      expect(find.byType(AgentMarkdownView), findsOneWidget);
-      expect(find.text('Read more'), findsOneWidget);
-    });
-
-    testWidgets('the expanded body offers the way into the agent internals', (
+    testWidgets('every band reads as its own label on the status line', (
       tester,
     ) async {
-      await pumpExpandable(tester);
-      expect(find.text('Open agent internals'), findsNothing);
-      await tester.tap(
-        find.byKey(const ValueKey('relationship-briefing-expand')),
-      );
-      await tester.pumpAndSettle();
-      expect(find.text('Open agent internals'), findsOneWidget);
+      const bands = {
+        'steady': RelationshipHealthBand.steady,
+        'needsAttention': RelationshipHealthBand.needsAttention,
+        'strained': RelationshipHealthBand.strained,
+      };
+      for (final entry in bands.entries) {
+        await pump(
+          tester,
+          checkIns: onTrackCheckIns,
+          current: report(band: entry.key),
+        );
+        final context = tester.element(find.byType(RelationshipBriefingCard));
+        expect(
+          statusText(tester),
+          '${relationshipHealthBandLabel(context, entry.value)} · as of 1 h ago',
+          reason: entry.key,
+        );
+        await tester.pumpWidget(const SizedBox.shrink());
+      }
     });
-  });
 
-  group('agent internals', () {
-    Widget buildWithInternals() => makeTestableWidgetNoScroll(
-      RelationshipBriefingCard(relationship: relationship()),
-      overrides: [
-        agentReportProvider(agentId).overrideWith(
-          (ref) async => report(
-            tldr: 'Short version.',
-            content: 'The long version.',
-          ),
-        ),
-        agentIdentityProvider.overrideWith(
-          (ref, id) async => makeTestIdentity(
-            agentId: id,
-            kind: AgentKinds.relationshipAgent,
-            displayName: "Anna's companion",
-          ),
-        ),
-        agentStateProvider.overrideWith((ref, id) async => null),
-        relationshipAgentServiceProvider.overrideWithValue(agentService),
-        relationshipBriefingDisclosureProvider(
-          relationshipId,
-        ).overrideWith((ref) async => null),
-      ],
-    );
-
-    testWidgets('tapping the card identity opens the internals panel', (
+    testWidgets('a report with no parseable band says only when', (
       tester,
     ) async {
-      await tester.pumpWidget(buildWithInternals());
-      await tester.pumpAndSettle();
+      await pump(
+        tester,
+        checkIns: onTrackCheckIns,
+        current: report(band: null),
+      );
+
+      expect(statusText(tester), 'as of 1 h ago');
+    });
+
+    testWidgets('open proposals are counted once — by the band, not the '
+        'header too', (tester) async {
+      final set = makeTestChangeSet(
+        agentId: agentId,
+        taskId: relationshipId,
+        items: const [
+          ChangeItem(
+            toolName: 'create_and_link_task',
+            args: {'title': 'Send the draft'},
+            humanSummary: 'Create task: Send the draft',
+          ),
+          ChangeItem(
+            toolName: 'create_and_link_task',
+            args: {'title': 'Book the walkthrough'},
+            humanSummary: 'Create task: Book the walkthrough',
+          ),
+        ],
+      );
+      await pump(
+        tester,
+        checkIns: onTrackCheckIns,
+        current: report(),
+        additionalOverrides: [
+          relationshipSuggestionListProvider(relationshipId).overrideWith(
+            (ref) async => RelationshipProposalSnapshot(
+              suggestions: UnifiedSuggestionList(
+                open: [
+                  for (var i = 0; i < set.items.length; i++)
+                    PendingSuggestion(
+                      changeSet: set,
+                      itemIndex: i,
+                      item: set.items[i],
+                      fingerprint: ChangeItem.fingerprint(set.items[i]),
+                    ),
+                ],
+                activity: const [],
+              ),
+            ),
+          ),
+        ],
+      );
+
+      expect(
+        find.byKey(const ValueKey('relationship-briefing-proposals')),
+        findsNothing,
+      );
+      expect(find.text('2 pending'), findsOneWidget);
+    });
+
+    testWidgets('tapping the identity opens the internals panel', (
+      tester,
+    ) async {
+      await pump(tester, checkIns: onTrackCheckIns, current: report());
 
       await tester.tap(find.text('Briefing'));
       await tester.pumpAndSettle();
 
       expect(find.byType(AgentInternalsPanel), findsOneWidget);
-      expect(
-        tester
-            .widget<AgentInternalsPanel>(
-              find.byType(AgentInternalsPanel),
-            )
-            .agentId,
-        agentId,
-      );
-    });
-
-    testWidgets('so does the expanded body link', (tester) async {
-      await tester.pumpWidget(buildWithInternals());
-      await tester.pumpAndSettle();
-
-      await tester.tap(
-        find.byKey(const ValueKey('relationship-briefing-expand')),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Open agent internals'));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(AgentInternalsPanel), findsOneWidget);
     });
   });
 
-  group('actions footer', () {
-    testWidgets('the chat entry beams to the person-scoped chat route', (
-      tester,
-    ) async {
-      final beamedTo = <String>[];
-      beamToNamedOverride = beamedTo.add;
-      addTearDown(() => beamToNamedOverride = null);
-      await tester.pumpWidget(build());
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const ValueKey('relationship-chat-button')));
-      expect(beamedTo, ['/people/$relationshipId/chat']);
-    });
-
-    testWidgets('Brief me on a LOCAL route runs without any dialog', (
-      tester,
-    ) async {
-      await tester.pumpWidget(build());
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const ValueKey('relationship-brief-me')));
-      await tester.pumpAndSettle();
-      expect(find.byType(AlertDialog), findsNothing);
-      verify(() => agentService.requestBriefing(any())).called(1);
-      expect(find.textContaining('Briefing requested'), findsOneWidget);
-    });
-
-    testWidgets('Brief me on a CLOUD route names the provider first and only '
-        'proceeds on consent (ADR 0037)', (tester) async {
-      await tester.pumpWidget(build(disclosureProviderName: 'Melious'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const ValueKey('relationship-brief-me')));
-      await tester.pumpAndSettle();
-
-      expect(find.textContaining('Melious'), findsWidgets);
-      await tester.tap(find.text('Cancel'));
-      await tester.pumpAndSettle();
-      verifyNever(() => agentService.requestBriefing(any()));
-
-      await tester.tap(find.byKey(const ValueKey('relationship-brief-me')));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Continue'));
-      await tester.pumpAndSettle();
-      verify(() => agentService.requestBriefing(any())).called(1);
-    });
-
-    testWidgets('a failed request surfaces the error toast instead of '
-        'silence', (tester) async {
-      when(
-        () => agentService.requestBriefing(any()),
-      ).thenAnswer((_) async => throw StateError('wake enqueue failed'));
-      await tester.pumpWidget(build());
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const ValueKey('relationship-brief-me')));
-      await tester.pumpAndSettle();
-      expect(find.textContaining('Could not request'), findsOneWidget);
-    });
-
-    testWidgets('an in-flight request disables Brief me, so a second tap '
-        'cannot enqueue a second wake', (tester) async {
-      final gate = Completer<void>();
-      when(
-        () => agentService.requestBriefing(any()),
-      ).thenAnswer((_) => gate.future);
-      await tester.pumpWidget(build());
-      await tester.pumpAndSettle();
-
-      final button = find.byKey(const ValueKey('relationship-brief-me'));
-      await tester.tap(button);
-      await tester.pump();
-
-      expect(
-        tester.widget<DesignSystemButton>(button).onPressed,
-        isNull,
-        reason: 'the control has to say the request is already running',
+  group('out of date', () {
+    testWidgets('names the new check-in in warning tone and offers Update '
+        'now as the primary', (tester) async {
+      await pump(
+        tester,
+        checkIns: onTrackCheckIns,
+        current: report(),
+        state: agentState(staleAt: DateTime(2026, 8, 12, 19, 6)),
       );
-      await tester.tap(button, warnIfMissed: false);
-      await tester.pump();
-      verify(() => agentService.requestBriefing(any())).called(1);
 
-      gate.complete();
-      await tester.pumpAndSettle();
+      expect(statusText(tester), 'Out of date · new check-in Wed 12 Aug');
+      final tokens = tester
+          .element(find.byType(RelationshipBriefingCard))
+          .designTokens;
       expect(
-        tester.widget<DesignSystemButton>(button).onPressed,
-        isNotNull,
-        reason: 'and hand the action back once it finishes',
+        tester
+            .widget<Text>(
+              find.byKey(const ValueKey('relationship-agent-status')),
+            )
+            .style
+            ?.color,
+        tokens.colors.alert.warning.ink,
+      );
+      final update = tester.widget<DesignSystemButton>(briefMe);
+      expect(update.label, 'Update now');
+      expect(update.variant, DesignSystemButtonVariant.primary);
+      expect(
+        find.byKey(const ValueKey('relationship-briefing-age')),
+        findsNothing,
+        reason: 'an hour-old briefing is not old enough to count in days',
+      );
+      expect(
+        find.textContaining('Sources:'),
+        findsNothing,
+        reason: 'the count would include the check-in the briefing missed',
+      );
+    });
+
+    testWidgets('a briefing days old wears its age on the trailing rail', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        checkIns: onTrackCheckIns,
+        current: report(createdAt: now.subtract(const Duration(days: 6))),
+        state: agentState(staleAt: DateTime(2026, 8, 12, 19, 6)),
+      );
+
+      expect(
+        tester
+            .widget<DsPill>(
+              find.byKey(const ValueKey('relationship-briefing-age')),
+            )
+            .label,
+        '6 days old',
+      );
+    });
+  });
+
+  group('out of date without a check-in on file', () {
+    testWidgets('says only that it is out of date', (tester) async {
+      await pump(
+        tester,
+        current: report(),
+        state: agentState(staleAt: DateTime(2026, 8, 13, 13)),
+      );
+
+      expect(statusText(tester), 'Out of date');
+    });
+  });
+
+  group('due', () {
+    testWidgets('the cadence pill turns warning and the footer offers Log '
+        'check-in and Call', (tester) async {
+      final launcher = await pump(
+        tester,
+        entry: relationship(channels: const [mobile]),
+        checkIns: lapsedCheckIns,
+        current: report(),
+      );
+
+      final quiet = tester.widget<DesignSystemButton>(
+        find.byKey(const ValueKey('relationship-agent-log-check-in')),
+      );
+      expect(quiet.label, 'Log check-in');
+      expect(quiet.variant, DesignSystemButtonVariant.tertiary);
+      expect(find.text('Call Pip'), findsOneWidget);
+      expect(briefMe, findsNothing);
+      expect(
+        statusText(tester),
+        'Thriving · as of 1 h ago',
+        reason: 'the status stays in the header; the footer is two actions',
+      );
+
+      await tester.tap(find.byKey(const ValueKey('relationship-agent-call')));
+      await tester.pumpAndSettle();
+
+      expect(launcher.launched, [(mobile, ContactAction.call)]);
+      expect(store.remembered?.relationshipId, relationshipId);
+    });
+
+    testWidgets('a channel that arrives later is offered — the card '
+        're-resolves when the channels change', (tester) async {
+      final launcher = _FakeContactLauncher(
+        launchable: const {ContactAction.call},
+      );
+      Widget card(List<ContactChannel> channels) =>
+          makeTestableWidgetWithScaffold(
+            RelationshipBriefingCard(
+              relationship: relationship(channels: channels),
+              checkIns: lapsedCheckIns,
+            ),
+            overrides: [
+              agentReportProvider(
+                agentId,
+              ).overrideWith((ref) async => report()),
+              agentStateProvider(agentId).overrideWith((ref) async => null),
+              agentIsRunningProvider(
+                agentId,
+              ).overrideWith((ref) => Stream.value(false)),
+              agentIdentityProvider(agentId).overrideWith((ref) async => null),
+              taskAgentResolvedSetupProvider(
+                agentId,
+              ).overrideWith((ref) async => resolvedSetup()),
+              agentTokenUsageSummariesProvider(
+                agentId,
+              ).overrideWith((ref) async => const []),
+              relationshipAgentServiceProvider.overrideWithValue(agentService),
+              relationshipBriefingDisclosureProvider(
+                relationshipId,
+              ).overrideWith((ref) async => null),
+              relationshipRepositoryProvider.overrideWithValue(repository),
+              contactLauncherProvider.overrideWithValue(launcher),
+              pendingInteractionStoreProvider.overrideWithValue(store),
+            ],
+          );
+
+      await withClock(Clock.fixed(now), () async {
+        await tester.pumpWidget(card(const []));
+        await tester.pumpAndSettle();
+        expect(find.text('Call Pip'), findsNothing);
+
+        await tester.pumpWidget(card(const [mobile]));
+        await tester.pumpAndSettle();
+        expect(find.text('Call Pip'), findsOneWidget);
+      });
+    });
+
+    testWidgets('Log check-in opens the composer for this person', (
+      tester,
+    ) async {
+      setTestSurfaceSize(tester, const Size(1000, 1400));
+      // The composer's header reads the person through the detail
+      // controller, which listens to the update bus.
+      await setUpTestGetIt();
+      addTearDown(tearDownTestGetIt);
+      when(
+        () => repository.getRelationshipById(relationshipId),
+      ).thenAnswer((_) async => relationship(channels: const [mobile]));
+      when(
+        () => repository.getCheckInsForRelationship(relationshipId),
+      ).thenAnswer((_) async => lapsedCheckIns);
+      when(
+        () => repository.getLinkedTasks(relationshipId),
+      ).thenAnswer((_) async => []);
+      await pump(
+        tester,
+        entry: relationship(channels: const [mobile]),
+        checkIns: lapsedCheckIns,
+        current: report(),
+      );
+
+      await tester.tap(
+        find.byKey(const ValueKey('relationship-agent-log-check-in')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Log check-in'), findsNWidgets(2));
+      // The status line tiers its wording by width; whatever the test font
+      // leaves room for, the person is the tier that never goes.
+      expect(
+        tester
+            .widget<Text>(
+              find.byKey(const ValueKey('check-in-composer-status')),
+            )
+            .data,
+        startsWith('with '),
+      );
+      expect(find.byKey(const ValueKey('check-in-narrative')), findsOneWidget);
+    });
+
+    testWidgets('without a launchable channel, Log check-in is the primary', (
+      tester,
+    ) async {
+      await pump(tester, checkIns: lapsedCheckIns, current: report());
+
+      expect(find.text('Call Pip'), findsNothing);
+      expect(
+        find.byKey(const ValueKey('relationship-agent-log-check-in-primary')),
+        findsOneWidget,
       );
     });
   });

@@ -2,17 +2,21 @@ import 'dart:math' as math;
 import 'dart:ui' show Color;
 
 import 'package:flutter_scene/scene.dart';
+import 'package:lotti/features/design_system/theme/design_tokens.dart';
 import 'package:lotti/features/plaza/domain/attention.dart';
+import 'package:lotti/features/plaza/domain/building_architecture.dart';
 import 'package:lotti/features/plaza/domain/plaza_layout.dart';
 import 'package:lotti/features/plaza/domain/plaza_task.dart';
 import 'package:lotti/features/plaza/domain/scenery.dart';
 import 'package:lotti/features/plaza/domain/street_layout.dart';
+import 'package:lotti/features/plaza/scene/plaza_architecture.dart';
 import 'package:lotti/features/plaza/scene/plaza_boxes.dart';
 import 'package:lotti/features/plaza/scene/plaza_primitives.dart';
 import 'package:lotti/features/plaza/scene/plaza_scene_records.dart';
 import 'package:lotti/features/plaza/scene/plaza_static_meshes.dart';
 import 'package:lotti/features/plaza/scene/plaza_world.dart';
 import 'package:lotti/features/plaza/scene/wall_textures.dart';
+import 'package:lotti/features/plaza/ui/plaza_palette.dart';
 import 'package:lotti/features/plaza/ui/plaza_style.dart';
 import 'package:vector_math/vector_math.dart' hide Colors;
 
@@ -34,12 +38,20 @@ enum _Face { front, back, right, left }
 /// Widget surfaces (facades, billboards, tickers, block markers) and the
 /// screen-clamped sprites are attached by the other scene classes.
 class PlazaSceneController {
-  PlazaSceneController({required this.world, this.hidden = const {}})
-    : pxPerMeter = world.layout.pxPerMeter {
+  PlazaSceneController({
+    required this.world,
+    this.palette = PlazaPalette.night,
+    this.hidden = const {},
+  }) : pxPerMeter = world.layout.pxPerMeter {
     _build();
   }
 
   final PlazaWorld world;
+
+  /// The hour this scene is built under. Every colour and atmospheric
+  /// number below comes from it, which is why none of them is static: two
+  /// scenes under different skies must not share a material.
+  final PlazaPalette palette;
   final double pxPerMeter;
 
   /// Dev-only: pieces left out of the scene (`gantry`, `jumbotron`,
@@ -48,6 +60,9 @@ class PlazaSceneController {
   final Set<String> hidden;
   bool _shown(String piece) => !hidden.contains(piece);
   final Scene scene = Scene();
+  // Decorative enclosure has its own batch root so the map can reveal task
+  // roofs without leaving detached windows or signs floating in space.
+  final Node _cityContext = Node(name: 'city-context');
   final PlazaSceneBindings bindings = PlazaSceneBindings();
   late final _boxes = PlazaBoxes(
     cube: CuboidGeometry(Vector3.all(1)),
@@ -59,24 +74,21 @@ class PlazaSceneController {
 
   /// The ground plane, and the plaza slab flush with it: the paving
   /// joints set the square apart, not its colour.
-  static final Vector4 _ground = linearColor(const Color(0xFF15131E));
-  static final Vector4 _road = linearColor(const Color(0xFF1A1D2B));
-  static final Vector4 _gap = linearColor(const Color(0xFF15171F));
-  static final Vector4 _post = linearColor(const Color(0xFF14171F));
-  static final Vector4 _tower = linearColor(const Color(0xFF0E0B18));
+  late final Vector4 _ground = linearColor(palette.surfaces.ground);
+  late final Vector4 _road = linearColor(palette.surfaces.road);
+  late final Vector4 _gap = linearColor(palette.surfaces.gap);
+  late final Vector4 _post = linearColor(palette.surfaces.post);
+  late final Vector4 _tower = linearColor(palette.surfaces.tower);
 
-  /// The skyline ring's body: a shade above the fillers so distant
-  /// silhouettes read against the sky instead of dissolving into it.
-  static final Vector4 _skyline = linearColor(const Color(0xFF161428));
-  static final Vector4 _pavement = linearColor(const Color(0xFF232532));
-  static final Vector4 _kerb = linearColor(const Color(0xFF5A5E72));
+  late final Vector4 _pavement = linearColor(palette.surfaces.pavement);
+  late final Vector4 _kerb = linearColor(palette.surfaces.kerb);
 
   /// One material per solid colour, shared by every box in it: only the
   /// pools and washes are ever rewritten by [updateForCamera].
-  static final _postMaterial = UnlitMaterial()..baseColorFactor = _post;
-  static final _towerMaterial = UnlitMaterial()..baseColorFactor = _tower;
-  static final _pavementMaterial = UnlitMaterial()..baseColorFactor = _pavement;
-  static final _kerbMaterial = UnlitMaterial()..baseColorFactor = _kerb;
+  late final _postMaterial = UnlitMaterial()..baseColorFactor = _post;
+  late final _towerMaterial = UnlitMaterial()..baseColorFactor = _tower;
+  late final _pavementMaterial = UnlitMaterial()..baseColorFactor = _pavement;
+  late final _kerbMaterial = UnlitMaterial()..baseColorFactor = _kerb;
 
   /// The map layer: road ribbons shown from altitude, in the ticker teal.
   static final Vector4 _ribbon = linearColor(PlazaStyle.teal, alpha: 0.55);
@@ -84,7 +96,7 @@ class PlazaSceneController {
 
   /// Washes fade to nothing with altitude, unlike the pools.
   final List<(UnlitMaterial, double)> _washes = [];
-  static final Vector4 _centreLine = linearColor(const Color(0xFF7A7050));
+  late final Vector4 _centreLine = linearColor(palette.surfaces.centreLine);
 
   /// Top of the pavement; every ground light pool sits above this.
   static const _groundTop = 0.11;
@@ -96,6 +108,13 @@ class PlazaSceneController {
   /// Light pools: (material, full alpha). Their alpha fades with camera
   /// altitude so the overview is carried by lanterns, not discs.
   final List<(UnlitMaterial, double)> _pools = [];
+
+  /// Contact shadows. Unlike the pools they do not fade with altitude — a
+  /// city seen from above is read by its shadows more than from the street.
+  final List<UnlitMaterial> _shadows = [];
+
+  /// How many shadow quads this hour put on the ground. Night has none.
+  int get shadowCount => _shadows.length;
 
   /// Ground surfaces that take the asphalt grain.
   final List<UnlitMaterial> _grainMaterials = [];
@@ -113,6 +132,7 @@ class PlazaSceneController {
           for (final billboard in bindings.billboards) ?billboard.back,
         },
         localGroups: [
+          _cityContext,
           for (final building in bindings.buildings) ...[
             building.ring,
             building.neon,
@@ -121,6 +141,7 @@ class PlazaSceneController {
           ...bindings.pickableBillboards.keys,
         ],
         preserve: {
+          _cityContext,
           ...bindings.pickableBuildings.keys,
           ...bindings.pickableBillboards.keys,
           ...bindings.markerAnchors.values,
@@ -148,8 +169,19 @@ class PlazaSceneController {
           ..baseColorFactor = Vector4(1, 1, 1, 1);
       }
     }
-    for (final (material, _) in _pools) {
+    for (final (material, _) in [..._pools, ..._washes]) {
       material.baseColorTexture = textures.pool;
+    }
+    // A shadow takes the shadow mask, not the light pool's falloff: the
+    // pool is a hot core with a long skirt, and a dark colour multiplied
+    // through that skirt darkens the paving by almost nothing.
+    for (final material in _shadows) {
+      material.baseColorTexture = textures.shadow;
+    }
+    // Billboard glows have their own animation owner, but still need the
+    // falloff texture. An untextured blended quad reads as a coloured sheet.
+    for (final billboard in bindings.billboards) {
+      billboard.glow?.baseColorTexture = textures.pool;
     }
     for (final material in _grainMaterials) {
       material.baseColorTexture = textures.grain;
@@ -176,22 +208,10 @@ class PlazaSceneController {
   /// still shows a lit street, not so much that the discs read as discs.
   static const poolFloor = 0.15;
 
-  /// Fog at eye level and from the air: the street haze thins as the
-  /// camera climbs, so the map shot sees a lit district instead of a
-  /// purple wash.
-  static const fogDensityLow = 0.0055;
-  static const fogDensityHigh = 0.002;
-  static const fogOpacityLow = 0.92;
-  static const fogOpacityHigh = 0.6;
-
-  /// HDR brightness above which a pixel blooms, and how much of the bloom
-  /// is added back. Widget whites sit at 1.0, so screens bloom a little;
-  /// neon and chase heads are pushed past it with [emissiveColor].
-  static const bloomThreshold = 1.0;
-  static const bloomIntensity = 0.3;
-
-  /// How far past white the neon and the lit rooflines go.
-  static const neonBoost = 1.6;
+  /// How far past white the neon and the lit rooflines go, and how much of
+  /// a ground pool or emitter glow survives this hour.
+  double get neonBoost => palette.lights.emissiveBoost;
+  double get glowScale => palette.lights.glowScale;
 
   /// The altitude fade last applied, so a camera that has not climbed
   /// does not rewrite every pool and wash material each frame.
@@ -211,6 +231,7 @@ class PlazaSceneController {
     final mapVisible = eye.y >= poolFadeStart;
     if (mapVisible != _mapVisible) {
       _mapVisible = mapVisible;
+      _cityContext.visible = !mapVisible;
       for (final anchor in bindings.markerAnchors.values) {
         anchor.visible = mapVisible;
       }
@@ -225,9 +246,12 @@ class PlazaSceneController {
     final last = _lastFadeT;
     if (last != null && (t - last).abs() < 1e-6) return;
     _lastFadeT = t;
+    final air = palette.air;
     scene.fog
-      ..density = fogDensityLow + (fogDensityHigh - fogDensityLow) * t
-      ..maxOpacity = fogOpacityLow + (fogOpacityHigh - fogOpacityLow) * t;
+      ..density =
+          air.fogDensityLow + (air.fogDensityHigh - air.fogDensityLow) * t
+      ..maxOpacity =
+          air.fogOpacityLow + (air.fogOpacityHigh - air.fogOpacityLow) * t;
     void fade(List<(UnlitMaterial, double)> materials, double factor) {
       for (final (material, alpha) in materials) {
         material.baseColorFactor = Vector4(
@@ -251,9 +275,9 @@ class PlazaSceneController {
   /// parade on the street face; a shorter one is all sign.
   static const paradeWallHeight = 12.0;
 
-  /// The cornice band: the wall's own dark, a shade above the night.
-  static final _corniceMaterial = UnlitMaterial()
-    ..baseColorFactor = linearColor(const Color(0xFF141220));
+  /// The cornice band: the wall's own colour, a shade along from it.
+  late final _corniceMaterial = UnlitMaterial()
+    ..baseColorFactor = linearColor(palette.surfaces.cornice);
 
   /// A shared unit box scaled to [size], with an unscaled anchor centred
   /// at [at] under [parent] so attached decorations retain their placement.
@@ -298,6 +322,10 @@ class PlazaSceneController {
   }
 
   static final Vector4 _panelBack = linearColor(PlazaStyle.panel);
+
+  /// A ground pool or wash at this hour's strength. Daylight scales them to
+  /// nothing: a disc of lamplight on sunlit paving reads as a stain.
+  double _groundLight(double alpha) => alpha * palette.lights.groundLightScale;
 
   /// A soft glow quad behind an emitter: the faux bloom that makes neon
   /// and lightboxes read as lit rather than painted.

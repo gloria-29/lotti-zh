@@ -1,5 +1,4 @@
 import 'dart:math' as math;
-import 'dart:ui' show Color;
 
 import 'package:flutter/foundation.dart' show ValueListenable, ValueNotifier;
 import 'package:flutter_scene/scene.dart';
@@ -146,7 +145,7 @@ class PlazaSurfaces {
       final task = byId[taskId];
       if (task == null) continue;
       final label = world.categoryLabels.isEmpty
-          ? 'open late'
+          ? world.copy.messages.plazaOpenLate
           : world.categoryLabelOf(task);
       _once(
         anchor,
@@ -174,7 +173,7 @@ class PlazaSurfaces {
       final task = byId[banner.taskId];
       if (anchor == null || task == null) continue;
       final label = world.categoryLabels.isEmpty
-          ? PlazaStyle.chip(world.attentionOf(task)).label
+          ? world.copy.state(world.attentionOf(task)).toUpperCase()
           : world.categoryLabelOf(task);
       _once(
         anchor,
@@ -204,6 +203,7 @@ class PlazaSurfaces {
     final component = hostedSurface(
       child: JumbotronWidget(
         projectLabel: world.projectLabel,
+        isCategory: world.isCategory,
         taskCount: world.liveTaskCount,
         attentionCount: world.anomalies.length,
         headlines: world.anomalies,
@@ -300,7 +300,7 @@ class PlazaSurfaces {
       final rim = UnlitMaterial()
         ..baseColorFactor = linearColor(PlazaStyle.teal, alpha: 0.8);
       final track = UnlitMaterial()
-        ..baseColorFactor = linearColor(const Color(0xFF0B0D14));
+        ..baseColorFactor = linearColor(PlazaStyle.housing);
       anchor.add(
         Node(
           localTransform: Matrix4.translation(Vector3(0, 0, -0.22)),
@@ -383,6 +383,8 @@ class PlazaSurfaces {
     }
     _captures.requestDue(_jumbotron, eye, seconds, forward: forward);
   }
+
+  bool get hasPendingCaptures => _captures.hasPending;
 
   /// Total captures across these surfaces, for the debug overlay.
   int get captures => _captures.captures;

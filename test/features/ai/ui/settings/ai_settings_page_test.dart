@@ -8,6 +8,7 @@ import 'package:lotti/features/ai/model/ai_config.dart';
 import 'package:lotti/features/ai/model/ai_runtime_settings.dart';
 import 'package:lotti/features/ai/repository/ai_config_repository.dart'
     show CascadeDeletionResult, aiConfigRepositoryProvider;
+import 'package:lotti/features/ai/speech/sherpa_installed_models_provider.dart';
 import 'package:lotti/features/ai/state/profile_usage_provider.dart';
 import 'package:lotti/features/ai/ui/inference_profile_form.dart';
 import 'package:lotti/features/ai/ui/settings/ai_settings_filter_state.dart';
@@ -19,8 +20,6 @@ import 'package:lotti/features/ai/ui/settings/widgets/ftue/ai_pick_provider_moda
 import 'package:lotti/features/ai/ui/settings/widgets/v2/ai_settings_cards.dart';
 import 'package:lotti/features/ai/ui/settings/widgets/v2/ai_settings_header_bar.dart';
 import 'package:lotti/features/ai/ui/settings/widgets/v2/ai_settings_tab_bar.dart';
-import 'package:lotti/features/ai/util/known_models.dart';
-import 'package:lotti/features/ai/util/mlx_audio_channel.dart';
 import 'package:lotti/features/design_system/components/buttons/design_system_button.dart';
 import 'package:lotti/features/design_system/components/dropdowns/design_system_dropdown.dart';
 import 'package:lotti/features/design_system/theme/design_tokens.dart';
@@ -33,7 +32,6 @@ import 'package:material_ui/material_ui.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../../../mocks/mocks.dart';
-import '../../../../test_utils/material_ui_finders.dart';
 import '../../../../widget_test_utils.dart';
 
 void main() {
@@ -244,6 +242,107 @@ void main() {
   Future<void> settleTimers(WidgetTester tester) =>
       tester.pump(const Duration(milliseconds: 400));
 
+  testWidgets(
+    'sherpa cards follow installed files rather than synced model rows',
+    (tester) async {
+      var installed = <String>{};
+      await pumpWith(
+        tester: tester,
+        providers: [
+          buildProvider(
+            id: 'embedded',
+            type: InferenceProviderType.sherpa,
+            apiKey: '',
+            baseUrl: '',
+          ),
+        ],
+        models: [
+          buildModel(
+            id: 'tiny-model',
+            providerId: 'embedded',
+            providerModelId: 'tiny',
+          ),
+        ],
+        profiles: [],
+        initialTab: AiSettingsTab.providers,
+        additionalOverrides: [
+          sherpaInstalledModelIdsProvider.overrideWith(
+            (ref) async => installed,
+          ),
+        ],
+      );
+      await tester.pump();
+      AiProviderCard card() =>
+          tester.widget<AiProviderCard>(find.byType(AiProviderCard));
+      expect(card().status, AiProviderCardStatus.offline);
+      expect(card().modelCount, 0);
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(AiSettingsPage)),
+      );
+      installed = {'tiny'};
+      container.invalidate(sherpaInstalledModelIdsProvider);
+      await tester.pump();
+      await tester.pump();
+      expect(card().status, AiProviderCardStatus.connected);
+      expect(card().modelCount, 1);
+      installed = {};
+      container.invalidate(sherpaInstalledModelIdsProvider);
+      await tester.pump();
+      await tester.pump();
+      expect(card().status, AiProviderCardStatus.offline);
+      expect(card().modelCount, 0);
+      await settleTimers(tester);
+    },
+  );
+
+  testWidgets('Models tab lists only sherpa models verified on this device', (
+    tester,
+  ) async {
+    var installed = <String>{};
+    await pumpWith(
+      tester: tester,
+      providers: [
+        buildProvider(
+          id: 'embedded',
+          type: InferenceProviderType.sherpa,
+          apiKey: '',
+          baseUrl: '',
+        ),
+      ],
+      models: [
+        buildModel(
+          id: 'medium-model',
+          providerId: 'embedded',
+          providerModelId: 'medium',
+        ),
+      ],
+      profiles: [],
+      initialTab: AiSettingsTab.models,
+      additionalOverrides: [
+        sherpaInstalledModelIdsProvider.overrideWith((ref) async => installed),
+      ],
+    );
+    await tester.pump();
+    expect(find.byType(AiModelCard), findsNothing);
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(AiSettingsPage)),
+    );
+    installed = {'medium'};
+    container.invalidate(sherpaInstalledModelIdsProvider);
+    await tester.pump();
+    await tester.pump();
+    expect(
+      tester.widget<AiModelCard>(find.byType(AiModelCard)).model.id,
+      'medium-model',
+    );
+    installed = {};
+    container.invalidate(sherpaInstalledModelIdsProvider);
+    await tester.pump();
+    await tester.pump();
+    expect(find.byType(AiModelCard), findsNothing);
+    await settleTimers(tester);
+  });
+
   group('AiSettingsPage — empty state', () {
     testWidgets(
       'renders the FTUE banner + the No-providers card with four quick-add '
@@ -287,7 +386,14 @@ void main() {
         profiles: const <AiConfig>[],
       );
 
-      final dropdown = find.byType(DesignSystemDropdown);
+      final dropdown = find.byWidgetPredicate(
+        (widget) =>
+            widget is DesignSystemDropdown &&
+            widget.label ==
+                AppLocalizations.of(
+                  tester.element(find.byType(AiSettingsPage)),
+                )!.aiSettingsAgentWakeConcurrencyLabel,
+      );
       await tester.tap(
         find.descendant(of: dropdown, matching: find.byType(InkWell)).first,
       );
@@ -310,6 +416,74 @@ void main() {
       await settleTimers(tester);
     });
   });
+
+  testWidgets(
+    'default profile selection persists, survives refresh, and reports failed saves',
+    (tester) async {
+      when(
+        () => mockRepository.setDefaultProfileId('selected'),
+      ).thenAnswer((_) async {});
+      when(
+        () => mockRepository.setDefaultProfileId(null),
+      ).thenThrow(StateError('storage failed'));
+      final profile = buildProfile(
+        id: 'selected',
+        thinking: 'thinking',
+        name: 'My default',
+      );
+      await pumpWith(
+        tester: tester,
+        providers: [
+          buildProvider(id: 'p1', type: InferenceProviderType.gemini),
+        ],
+        models: const [],
+        profiles: [profile],
+      );
+      final messages = AppLocalizations.of(
+        tester.element(find.byType(AiSettingsPage)),
+      )!;
+      final dropdown = find.byWidgetPredicate(
+        (widget) =>
+            widget is DesignSystemDropdown &&
+            widget.label == messages.agentDefaultProfileLabel,
+      );
+      await tester.tap(
+        find.descendant(of: dropdown, matching: find.byType(InkWell)).first,
+      );
+      await tester.pump();
+      await tester.tap(find.text('My default').last);
+      await tester.pump();
+      verify(() => mockRepository.setDefaultProfileId('selected')).called(1);
+      expect(
+        tester.widget<DesignSystemDropdown>(dropdown).inputLabel,
+        'My default',
+      );
+      profilesController.add([profile.copyWith(name: 'Renamed default')]);
+      await tester.pump();
+      expect(
+        tester.widget<DesignSystemDropdown>(dropdown).inputLabel,
+        'Renamed default',
+      );
+      await tester.tap(
+        find.descendant(of: dropdown, matching: find.byType(InkWell)).first,
+      );
+      await tester.pump();
+      await tester.tap(find.text(messages.aiSettingsNoDefaultProfile).last);
+      await tester.pump();
+      expect(
+        tester.widget<DesignSystemDropdown>(dropdown).inputLabel,
+        'Renamed default',
+      );
+      expect(find.text(messages.commonError), findsOneWidget);
+      profilesController.add([]);
+      await tester.pump();
+      expect(
+        tester.widget<DesignSystemDropdown>(dropdown).inputLabel,
+        messages.inferenceProfileDetailNotFound,
+      );
+      await settleTimers(tester);
+    },
+  );
 
   group('AiSettingsPage — populated', () {
     testWidgets(
@@ -402,59 +576,33 @@ void main() {
       },
     );
 
-    testWidgets('MLX model install action opens the shared download dialog', (
-      tester,
-    ) async {
-      await tester.binding.setSurfaceSize(const Size(900, 1600));
-      addTearDown(() => tester.binding.setSurfaceSize(null));
-      final mlxAudioChannel = _PageMlxAudioChannel();
-      addTearDown(mlxAudioChannel.close);
-
-      await pumpWith(
-        tester: tester,
-        providers: [
-          buildProvider(
-            id: 'mlx-provider',
-            type: InferenceProviderType.mlxAudio,
-            name: 'MLX Audio',
-            apiKey: '',
-            baseUrl: '',
-          ),
-        ],
-        models: [
-          buildModel(
-            id: 'mlx-model',
-            providerId: 'mlx-provider',
-            name: 'Qwen3 ASR 1.7B (MLX 8-bit)',
-            providerModelId: mlxAudioQwenAsr17B8BitModelId,
-            inputs: const [Modality.audio, Modality.text],
-          ),
-        ],
-        profiles: const <AiConfig>[],
-        additionalOverrides: [
-          mlxAudioChannelProvider.overrideWithValue(mlxAudioChannel),
-        ],
-      );
-
-      await tester.tap(find.text('Models'));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 400));
-      await tester.pump();
-
-      expect(find.text('Not installed'), findsOneWidget);
-
-      await tester.tap(findMaterialTooltip('Install model'));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 400));
-      await tester.pump();
-
-      expect(
-        find.textContaining('Install Qwen3 ASR 1.7B (MLX 8-bit)'),
-        findsOneWidget,
-      );
-      expect(find.text('Downloading 12%'), findsNWidgets(2));
-      expect(mlxAudioChannel.installRequests, [mlxAudioQwenAsr17B8BitModelId]);
-    });
+    testWidgets(
+      'profile provider lookup includes a chat-only provider reference',
+      (tester) async {
+        await pumpWith(
+          tester: tester,
+          providers: [
+            buildProvider(
+              id: 'chat-provider',
+              type: InferenceProviderType.melious,
+            ),
+          ],
+          models: [buildModel(id: 'chat-row', providerId: 'chat-provider')],
+          profiles: [
+            buildProfile(
+              id: 'chat-profile',
+              thinking: 'missing-thinking',
+            ).copyWith(chatModelId: 'chat-row'),
+          ],
+        );
+        await tester.tap(find.text('Profiles'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 400));
+        final card = tester.widget<AiProfileCard>(find.byType(AiProfileCard));
+        expect(card.providerTypeFor(), InferenceProviderType.melious);
+        await settleTimers(tester);
+      },
+    );
 
     testWidgets(
       'switching to the Profiles tab renders one AiProfileCard per profile '
@@ -1884,37 +2032,4 @@ class _PushSpy extends NavigatorObserver {
     pushed.add(route);
     super.didPush(route, previousRoute);
   }
-}
-
-class _PageMlxAudioChannel extends MlxAudioChannel {
-  final _progressController =
-      StreamController<MlxAudioModelDownloadProgress>.broadcast();
-  final installRequests = <String>[];
-
-  @override
-  Stream<MlxAudioModelDownloadProgress> get downloadProgressStream =>
-      _progressController.stream;
-
-  @override
-  Future<MlxAudioModelDownloadProgress> getModelStatus(String modelId) async {
-    return MlxAudioModelDownloadProgress(
-      modelId: modelId,
-      status: MlxAudioModelStatus.notInstalled,
-    );
-  }
-
-  @override
-  Future<void> installModel(String modelId) async {
-    installRequests.add(modelId);
-    _progressController.add(
-      MlxAudioModelDownloadProgress(
-        modelId: modelId,
-        status: MlxAudioModelStatus.downloading,
-        completedUnitCount: 12,
-        totalUnitCount: 100,
-      ),
-    );
-  }
-
-  Future<void> close() => _progressController.close();
 }

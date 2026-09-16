@@ -15,6 +15,7 @@ class ResizableDivider extends StatefulWidget {
     required this.onDrag,
     this.hitTargetWidth = 8,
     this.enabled = true,
+    this.reverse = false,
     this.currentValue,
     this.minValue,
     this.maxValue,
@@ -25,9 +26,16 @@ class ResizableDivider extends StatefulWidget {
          'Provide all resize semantic values or none of them.',
        );
 
-  /// Called with the horizontal drag delta when the user drags the divider.
+  /// Reserved row width, independent of the overflowing pointer hit target.
+  static const layoutWidth = 3.0;
+
+  /// Called with the change in pane width. Pointer and arrow-key deltas are
+  /// reversed when [reverse] is true; semantic increase always grows the pane.
   /// Ignored while [enabled] is false.
   final ValueChanged<double> onDrag;
+
+  /// Whether the controlled pane sits to the right of the divider.
+  final bool reverse;
 
   /// Width of the invisible hit target area for easier grabbing.
   final double hitTargetWidth;
@@ -85,13 +93,13 @@ class _ResizableDividerState extends State<ResizableDivider> {
     // 3 px width (hover/drag), while a wider invisible [OverflowBox] on top
     // preserves the full hitTargetWidth drag/hover area.
     final visual = SizedBox(
-      width: 3,
+      width: ResizableDivider.layoutWidth,
       child: OverflowBox(
         maxWidth: widget.hitTargetWidth,
         child: Center(
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 150),
-            width: isActive ? 3 : 1,
+            width: isActive ? ResizableDivider.layoutWidth : 1,
             color: lineColor,
           ),
         ),
@@ -140,11 +148,11 @@ class _ResizableDividerState extends State<ResizableDivider> {
             return KeyEventResult.ignored;
           }
           if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-            widget.onDrag(-keyboardStep());
+            widget.onDrag(widget.reverse ? keyboardStep() : -keyboardStep());
             return KeyEventResult.handled;
           }
           if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
-            widget.onDrag(keyboardStep());
+            widget.onDrag(widget.reverse ? -keyboardStep() : keyboardStep());
             return KeyEventResult.handled;
           }
           return KeyEventResult.ignored;
@@ -157,7 +165,7 @@ class _ResizableDividerState extends State<ResizableDivider> {
             behavior: HitTestBehavior.opaque,
             onHorizontalDragStart: (_) => setState(() => _isDragging = true),
             onHorizontalDragUpdate: (details) =>
-                widget.onDrag(details.delta.dx),
+                widget.onDrag(details.delta.dx * (widget.reverse ? -1 : 1)),
             onHorizontalDragCancel: () => setState(() => _isDragging = false),
             onHorizontalDragEnd: (_) => setState(() => _isDragging = false),
             child: visual,

@@ -23,8 +23,8 @@ void main() {
           InferenceProviderType.nebiusAiStudio: LottiIcons.rocket,
           InferenceProviderType.omlx: LottiIcons.memory,
           InferenceProviderType.whisper: LottiIcons.mic,
+          InferenceProviderType.sherpa: LottiIcons.mic,
           InferenceProviderType.voxtral: LottiIcons.waveform,
-          InferenceProviderType.mlxAudio: LottiIcons.memory,
         };
 
         for (final entry in icons.entries) {
@@ -51,8 +51,8 @@ void main() {
           InferenceProviderType.nebiusAiStudio,
           InferenceProviderType.omlx,
           InferenceProviderType.whisper,
+          InferenceProviderType.sherpa,
           InferenceProviderType.voxtral,
-          InferenceProviderType.mlxAudio,
         };
         expect(pinned, InferenceProviderType.values.toSet());
       });

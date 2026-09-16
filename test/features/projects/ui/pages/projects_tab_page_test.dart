@@ -2,10 +2,16 @@
 
 import 'dart:async';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lotti/classes/journal_entities.dart';
 import 'package:lotti/classes/project_data.dart';
+import 'package:lotti/features/agents/model/query_chat_models.dart';
+import 'package:lotti/features/agents/query/query_chat_providers.dart';
+import 'package:lotti/features/agents/ui/chat/chat_recorder_controller.dart';
+import 'package:lotti/features/agents/ui/query/query_companion.dart';
 import 'package:lotti/features/design_system/components/buttons/design_system_floating_action_button.dart';
 import 'package:lotti/features/design_system/components/checkboxes/design_system_checkbox.dart';
 import 'package:lotti/features/design_system/components/chips/active_filter_chip.dart';
@@ -18,6 +24,8 @@ import 'package:lotti/features/keyboard/domain/app_command.dart';
 import 'package:lotti/features/keyboard/ui/app_command_controller.dart';
 import 'package:lotti/features/keyboard/ui/app_command_host.dart';
 import 'package:lotti/features/keyboard/ui/list_detail_focus_traversal.dart';
+import 'package:lotti/features/plaza/state/project_plaza_provider.dart';
+import 'package:lotti/features/plaza/ui/category_plaza_page.dart';
 import 'package:lotti/features/projects/model/projects_overview_models.dart';
 import 'package:lotti/features/projects/state/project_detail_controller.dart';
 import 'package:lotti/features/projects/state/project_detail_record_provider.dart';
@@ -33,24 +41,28 @@ import 'package:lotti/services/entities_cache_service.dart';
 import 'package:lotti/services/nav_service.dart';
 import 'package:lotti/themes/theme.dart';
 import 'package:lotti/widgets/nav_bar/design_system_bottom_navigation_bar.dart';
+import 'package:lotti/widgets/nav_bar/mobile_navigation_launcher.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../../../helpers/test_finders.dart';
 import '../../../../mocks/mocks.dart';
 import '../../../../widget_test_utils.dart';
+import '../../../agents/ui/evolution/widgets/evolution_recorder_test_utils.dart';
 import '../../../categories/test_utils.dart';
 import '../../test_utils.dart';
 
 /// Loading-state detail controller stub for the split-view swap test.
 class _StubProjectDetailController extends ProjectDetailController {
-  _StubProjectDetailController() : super('p1');
+  _StubProjectDetailController({this.project}) : super('p1');
+
+  final ProjectEntry? project;
 
   @override
-  ProjectDetailState build() => const ProjectDetailState(
-    project: null,
+  ProjectDetailState build() => ProjectDetailState(
+    project: project,
     linkedTasks: [],
-    isLoading: true,
+    isLoading: project == null,
     isSaving: false,
     hasChanges: false,
   );
@@ -203,6 +215,38 @@ void main() {
     await tearDownTestGetIt();
   });
 
+  testWidgets('category plaza action opens only the chosen category', (
+    tester,
+  ) async {
+    await pumpPage(
+      tester,
+      groups: [buildWorkGroup(), buildStudyGroup()],
+      extraOverrides: [
+        categoryPlazaProvider('work').overrideWith((ref) => Stream.value(null)),
+      ],
+    );
+    final label = tester
+        .element(find.byType(ProjectsTabPage))
+        .messages
+        .plazaExploreCategory;
+    // The way in is the map glyph in the category header's trailing
+    // corner; its tooltip and semantics carry the label.
+    await tester.tap(find.byTooltip(label).first);
+    await tester.pumpAndSettle();
+    expect(
+      tester
+          .widget<CategoryPlazaPage>(find.byType(CategoryPlazaPage))
+          .categoryId,
+      'work',
+    );
+    expect(find.text('This category has no visible projects.'), findsOneWidget);
+    final context = tester.element(find.byType(CategoryPlazaPage));
+    Navigator.of(context).pop();
+    await tester.pumpAndSettle();
+    expect(find.byType(CategoryPlazaPage), findsNothing);
+    expect(find.text('Device Sync'), findsOneWidget);
+  });
+
   testWidgets('renders grouped projects with an enabled search bar', (
     tester,
   ) async {
@@ -236,36 +280,141 @@ void main() {
     expect(find.text('Completed'), findsOneWidget);
     expect(findRichTextContaining('5 tasks'), findsOneWidget);
     expect(findRichTextContaining('Due Mar 27'), findsOneWidget);
-    expect(find.bySemanticsLabel('New Project'), findsOneWidget);
-    expect(find.byType(DesignSystemBottomNavigationFabPadding), findsOneWidget);
-    expect(find.byType(DesignSystemFloatingActionButton), findsOneWidget);
-
     final textField = tester.widget<TextField>(find.byType(TextField));
     expect(textField.enabled, isTrue);
   });
 
-  testWidgets(
-    'list bottom padding clears the docked nav bar plus the FAB footprint',
-    (tester) async {
+  group('the mobile navigation launcher owns the create action', () {
+    testWidgets('the projects list drops its floating button so the launcher '
+        'can dock the same action on its own row', (tester) async {
       await pumpPage(tester, groups: [buildWorkGroup()]);
+      // The Scaffold animates its floating button out, so it outlives the
+      // rebuild that dropped it.
+      await tester.pump(const Duration(milliseconds: 400));
 
-      final BuildContext context = tester.element(
-        find.byType(ProjectsTabPage),
-      );
-      final occupied = DesignSystemBottomNavigationBar.occupiedHeight(context);
-      // The harness renders at a mobile width, so the bar genuinely occupies
-      // space — a zero here would make the clearance assertion vacuous.
-      expect(occupied, greaterThan(0));
+      expect(find.byType(DesignSystemFloatingActionButton), findsNothing);
+      expect(find.byType(DesignSystemBottomNavigationFabPadding), findsNothing);
+    });
 
-      final content = tester.widget<ProjectsOverviewContent>(
-        find.byType(ProjectsOverviewContent),
+    testWidgets('a desktop window keeps the floating button, lifted by the '
+        'clearance wrapper — the sidebar replaces the launcher there', (
+      tester,
+    ) async {
+      await pumpPage(
+        tester,
+        groups: [buildWorkGroup()],
+        mediaQueryData: desktopLayoutMediaQueryData,
       );
+
+      expect(find.bySemanticsLabel('New Project'), findsOneWidget);
+      expect(find.byType(DesignSystemFloatingActionButton), findsOneWidget);
       expect(
-        content.listBottomPadding,
-        occupied + context.designTokens.spacing.step12,
+        find.byType(DesignSystemBottomNavigationFabPadding),
+        findsOneWidget,
       );
-    },
-  );
+    });
+
+    testWidgets(
+      'projectsTabDockAction is a glyph action named for the create modal it '
+      'opens, and needs nothing from the overview query the floating button '
+      'waits for — a chip arriving late would shove Navigate sideways',
+      (tester) async {
+        // Deliberately no page and no `projectsOverviewProvider`: the factory
+        // is a pure function of context, which is what makes the docked
+        // action available from the first frame.
+        MobileNavDockAction? action;
+        await tester.pumpWidget(
+          makeTestableWidgetNoScroll(
+            Consumer(
+              builder: (context, ref, _) {
+                action = projectsTabDockAction(context, ref);
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        );
+        await tester.pump();
+
+        // Glyph, not worded: the page is titled Projects and lists projects.
+        expect(action, isNotNull);
+        expect(action!.worded, isFalse);
+        expect(action!.icon, LottiIcons.add);
+        expect(
+          action!.label,
+          tester.element(find.byType(Consumer)).messages.projectCreateButton,
+        );
+
+        // ...and it opens the same modal the floating button opens.
+        action!.onPressed();
+        await tester.pumpAndSettle();
+        expect(find.byType(ProjectCreateForm), findsOneWidget);
+      },
+    );
+
+    double listBottomPadding(WidgetTester tester) => tester
+        .widget<ProjectsOverviewContent>(find.byType(ProjectsOverviewContent))
+        .listBottomPadding;
+
+    testWidgets(
+      "and reserves the launcher's height but not a floating button's "
+      'footprint, so the docked chip leaves no empty gutter above it',
+      (tester) async {
+        await pumpPage(tester, groups: [buildWorkGroup()]);
+        await tester.pump(const Duration(milliseconds: 400));
+
+        final context = tester.element(find.byType(ProjectsTabPage));
+        final occupied = DesignSystemBottomNavigationBar.occupiedHeight(
+          context,
+        );
+        // The harness renders at a phone width, so the launcher genuinely
+        // occupies space — a zero here would make the assertion vacuous.
+        expect(occupied, greaterThan(0));
+        expect(listBottomPadding(tester), occupied);
+      },
+    );
+
+    testWidgets(
+      "a desktop list reserves its floating button's own footprint above "
+      'the sidebar-only clearance',
+      (tester) async {
+        await pumpPage(
+          tester,
+          groups: [buildWorkGroup()],
+          mediaQueryData: desktopLayoutMediaQueryData,
+        );
+
+        final context = tester.element(find.byType(ProjectsTabPage));
+        // Desktop reserves nothing for a bottom bar; the allowance is the
+        // button's footprint alone.
+        expect(DesignSystemBottomNavigationBar.occupiedHeight(context), 0);
+        expect(
+          listBottomPadding(tester),
+          context.designTokens.spacing.step12,
+        );
+      },
+    );
+
+    testWidgets(
+      'the page still withholds its own floating button until the overview '
+      'resolves',
+      (tester) async {
+        await pumpPage(
+          tester,
+          groups: [buildWorkGroup()],
+          overrideVisibleGroups: false,
+          mediaQueryData: desktopLayoutMediaQueryData,
+          extraOverrides: [
+            visibleProjectGroupsProvider.overrideWith(
+              (ref) => const AsyncValue<List<ProjectCategoryGroup>>.loading(),
+            ),
+          ],
+        );
+        await tester.pump(const Duration(milliseconds: 400));
+
+        expect(find.byType(DesignSystemFloatingActionButton), findsNothing);
+      },
+    );
+  });
 
   testWidgets(
     'list bottom padding grows with the home-indicator inset',
@@ -396,9 +545,11 @@ void main() {
     var beamed = false;
     beamToNamedOverride = (_) => beamed = true;
 
+    // Desktop-wide: on a phone the launcher docks the create action instead.
     await pumpPage(
       tester,
       groups: [buildWorkGroup()],
+      mediaQueryData: desktopLayoutMediaQueryData,
     );
 
     final messages = tester.element(find.byType(ProjectsTabPage)).messages;
@@ -806,6 +957,9 @@ void main() {
     await tester.pumpWidget(
       makeTestableWidgetNoScroll(
         const ProjectsTabPage(),
+        // Desktop-wide, so the floating button below can stand in for "the
+        // established page, not the loading shell".
+        mediaQueryData: desktopLayoutMediaQueryData,
         theme: withOverrides(ThemeData.dark(useMaterial3: true)),
         overrides: [
           projectsOverviewProvider.overrideWith(
@@ -837,6 +991,7 @@ void main() {
     await tester.pumpWidget(
       makeTestableWidgetNoScroll(
         const ProjectsTabPage(),
+        mediaQueryData: desktopLayoutMediaQueryData,
         theme: withOverrides(ThemeData.dark(useMaterial3: true)),
         overrides: [
           projectsOverviewProvider.overrideWith(
@@ -1229,6 +1384,226 @@ void main() {
   });
 
   group('desktop split-view layout', () {
+    testWidgets(
+      'closing project chat returns focus to Ask after restoring the list',
+      (tester) async {
+        const scope = QueryScope(kind: QueryScopeKind.project, id: 'p1');
+        const size = Size(1200, 900);
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        final nav = getIt<NavService>() as MockNavService;
+        final selected = ValueNotifier<String?>('p1');
+        addTearDown(selected.dispose);
+        when(() => nav.desktopSelectedProjectId).thenReturn(selected);
+        final project = makeTestProject(
+          id: 'p1',
+          title: 'Penguin habitat',
+          categoryId: 'work',
+        );
+        await pumpPage(
+          tester,
+          groups: [buildWorkGroup()],
+          mediaQueryData: const MediaQueryData(size: size),
+          extraOverrides: [
+            queryChatEnabledProvider.overrideWithValue(true),
+            queryChatTargetProvider(scope).overrideWith(
+              (ref) async => const QueryChatTarget(
+                scope: scope,
+                label: 'Penguin habitat',
+                agent: null,
+              ),
+            ),
+            chatRecorderControllerProvider.overrideWith(
+              TranscriptEmittingController.new,
+            ),
+            projectDetailControllerProvider('p1').overrideWith(
+              () => _StubProjectDetailController(project: project),
+            ),
+            projectDetailRecordProvider('p1').overrideWith(
+              (ref) async => makeTestProjectRecord(project: project),
+            ),
+          ],
+        );
+        await tester.pump();
+        await tester.pump();
+        final opener = Focus.of(tester.element(find.text('Ask')))
+          ..requestFocus();
+        await tester.pump();
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+        await tester.pump();
+        await tester.pump();
+        expect(find.text('Device Sync'), findsNothing);
+        expect(opener.hasFocus, isFalse);
+        await tester.tap(find.byIcon(LottiIcons.close).last);
+        await tester.pump();
+        await tester.pump();
+        expect(find.text('Device Sync'), findsOneWidget);
+        expect(opener.hasFocus, isTrue);
+        await tester.pumpWidget(const SizedBox.shrink());
+      },
+    );
+
+    testWidgets('project companion includes divider width at docking boundary', (
+      tester,
+    ) async {
+      const scope = QueryScope(kind: QueryScopeKind.project, id: 'p1');
+      const size = Size(1400, 900);
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      final nav = getIt<NavService>() as MockNavService;
+      final selected = ValueNotifier<String?>('p1');
+      addTearDown(selected.dispose);
+      when(() => nav.desktopSelectedProjectId).thenReturn(selected);
+      await pumpPage(
+        tester,
+        groups: [buildWorkGroup()],
+        mediaQueryData: const MediaQueryData(size: size),
+        extraOverrides: [
+          queryChatEnabledProvider.overrideWithValue(true),
+          queryChatTargetProvider(scope).overrideWith(
+            (ref) async => const QueryChatTarget(
+              scope: scope,
+              label: 'Penguin habitat',
+              agent: null,
+            ),
+          ),
+          chatRecorderControllerProvider.overrideWith(
+            TranscriptEmittingController.new,
+          ),
+          projectDetailControllerProvider(
+            'p1',
+          ).overrideWith(_StubProjectDetailController.new),
+          projectDetailRecordProvider('p1').overrideWith((ref) async => null),
+        ],
+      );
+      final context = tester.element(find.byType(ProjectsTabPage));
+      final container = ProviderScope.containerOf(context);
+      final panes = container.read(paneWidthControllerProvider.notifier);
+      final dividerWidth = tester.getSize(find.byType(ResizableDivider)).width;
+      final fittingListWidth =
+          size.width -
+          QueryCompanion.minimumDockedWidth(context) -
+          dividerWidth;
+      panes.updateListPaneWidth(
+        fittingListWidth -
+            container.read(paneWidthControllerProvider).listPaneWidth,
+      );
+      container.read(queryPaneOpenProvider(scope).notifier).open = true;
+      await tester.pump();
+      await tester.pump();
+      expect(find.text('Device Sync'), findsOneWidget);
+      expect(find.byType(DraggableScrollableSheet), findsNothing);
+
+      // One pixel less detail space must suppress the list, keeping chat docked.
+      panes.updateListPaneWidth(1);
+      await tester.pump();
+      await tester.pump();
+      expect(find.text('Device Sync'), findsNothing);
+      expect(find.byType(DraggableScrollableSheet), findsNothing);
+      expect(
+        container.read(paneWidthControllerProvider).listPaneCollapsed,
+        isFalse,
+      );
+
+      panes.updateListPaneWidth(-1);
+      await tester.pump();
+      await tester.pump();
+      expect(find.text('Device Sync'), findsOneWidget);
+      expect(find.byType(DraggableScrollableSheet), findsNothing);
+      expect(container.read(queryPaneOpenProvider(scope)), isTrue);
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+
+    for (final useSearch in [false, true]) {
+      testWidgets('project companion restores its list (search=$useSearch)', (
+        tester,
+      ) async {
+        const scope = QueryScope(kind: QueryScopeKind.project, id: 'p1');
+        const size = Size(1200, 900);
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        final nav = getIt<NavService>() as MockNavService;
+        final selected = ValueNotifier<String?>('p1');
+        addTearDown(selected.dispose);
+        when(() => nav.desktopSelectedProjectId).thenReturn(selected);
+        await pumpPage(
+          tester,
+          groups: [buildWorkGroup()],
+          mediaQueryData: const MediaQueryData(size: size),
+          extraOverrides: [
+            queryChatEnabledProvider.overrideWithValue(true),
+            queryChatTargetProvider(scope).overrideWith(
+              (ref) async => const QueryChatTarget(
+                scope: scope,
+                label: 'Penguin habitat',
+                agent: null,
+              ),
+            ),
+            chatRecorderControllerProvider.overrideWith(
+              TranscriptEmittingController.new,
+            ),
+            projectDetailControllerProvider(
+              'p1',
+            ).overrideWith(_StubProjectDetailController.new),
+            projectDetailRecordProvider('p1').overrideWith((ref) async => null),
+          ],
+        );
+        final context = tester.element(find.byType(ProjectsTabPage));
+        final container = ProviderScope.containerOf(context);
+        final list = tester.element(find.byType(ProjectsOverviewContent));
+        final detail = tester.element(find.byType(ProjectDetailsPage));
+        container.read(queryPaneOpenProvider(scope).notifier).open = true;
+        await tester.pump();
+        await tester.pump();
+        expect(find.text('Device Sync'), findsNothing);
+        expect(
+          tester.element(
+            find.byType(ProjectsOverviewContent, skipOffstage: false),
+          ),
+          same(list),
+        );
+        expect(
+          container.read(paneWidthControllerProvider).listPaneCollapsed,
+          isFalse,
+        );
+        if (useSearch) {
+          final commands = AppCommandControllerProvider.of(
+            tester.element(find.byType(ProjectDetailsPage)),
+          );
+          expect(
+            await commands.invoke(context, AppCommandId.focusSearch),
+            isTrue,
+          );
+        } else {
+          await tester.tap(
+            find.byKey(const ValueKey('projects-show-list-pane')),
+          );
+        }
+        await tester.pump();
+        await tester.pump();
+        expect(container.read(queryPaneOpenProvider(scope)), isFalse);
+        expect(find.text('Device Sync'), findsOneWidget);
+        expect(tester.element(find.byType(ProjectDetailsPage)), same(detail));
+        expect(
+          tester.element(find.byType(ProjectsOverviewContent)),
+          same(list),
+        );
+        if (useSearch) {
+          expect(
+            tester
+                .widget<TextField>(find.byType(TextField))
+                .focusNode!
+                .hasFocus,
+            isTrue,
+          );
+        }
+        await tester.pumpWidget(const SizedBox.shrink());
+      });
+    }
+
     testWidgets(
       'wide viewport renders list pane + divider + empty detail state',
       (tester) async {

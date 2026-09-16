@@ -1,5 +1,7 @@
 # Goal check-in compaction evaluation
 
+**Judged run, 2026-09-16:** hierarchical passes the bar (96% recall, zero hallucinations, 15/15 same recommendation) — [full results](../lotti-gym-2026-09-16.md).
+
 Does the goal agent draw the same conclusions from a **compacted** check-in
 history as from the **full** one? A goal runs for years; three check-ins a
 week at ~100 tokens each is ~15k tokens a year of user voice, against a wake
@@ -60,7 +62,7 @@ arm. A same-status wake is a no-op by contract and would compare nothing.
 
 | Metric | Source | Judge needed |
 | --- | --- | --- |
-| Status accuracy — `update_goal_report.status` equals the derived status | packet | no |
+| Status accuracy — the status of the last wake report the production `GoalAgentStrategy` accepts (replayed with the workflow's expected status and rolling aggregates) equals the derived status, after production's pinned forced-report retry (every fixture is a status transition, so a wake without an accepted report gets the same one retry `GoalAgentWorkflow` sends). From 2026-09-16; earlier tables scored the status of any report call in the first response | packet | no |
 | Tool-set agreement — the wake's tool names equal the full arm's for the same fixture and sample | packet | no |
 | Wake input tokens (provider-reported) and `userVoice` tokens (estimated), per arm | packet | no |
 | Token growth curve — `userVoice` tokens at 3/6/12/18/24 months per arm | packet | no |

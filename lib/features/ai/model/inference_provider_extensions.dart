@@ -22,8 +22,6 @@ extension InferenceProviderTypeExtension on InferenceProviderType {
         return context.messages.aiProviderMeliousName;
       case InferenceProviderType.mistral:
         return context.messages.aiProviderMistralName;
-      case InferenceProviderType.mlxAudio:
-        return context.messages.aiProviderMlxAudioName;
       case InferenceProviderType.omlx:
         return context.messages.aiProviderOmlxName;
       case InferenceProviderType.openAi:
@@ -34,6 +32,8 @@ extension InferenceProviderTypeExtension on InferenceProviderType {
         return context.messages.aiProviderOpenRouterName;
       case InferenceProviderType.ollama:
         return context.messages.aiProviderOllamaName;
+      case InferenceProviderType.sherpa:
+        return context.messages.aiProviderSherpaName;
       case InferenceProviderType.whisper:
         return context.messages.aiProviderWhisperName;
       case InferenceProviderType.voxtral:
@@ -57,8 +57,6 @@ extension InferenceProviderTypeExtension on InferenceProviderType {
         return LottiIcons.eco;
       case InferenceProviderType.mistral:
         return LottiIcons.voice;
-      case InferenceProviderType.mlxAudio:
-        return LottiIcons.memory;
       case InferenceProviderType.omlx:
         return LottiIcons.memory;
       case InferenceProviderType.openRouter:
@@ -69,6 +67,7 @@ extension InferenceProviderTypeExtension on InferenceProviderType {
         return LottiIcons.cloud;
       case InferenceProviderType.nebiusAiStudio:
         return LottiIcons.rocket;
+      case InferenceProviderType.sherpa:
       case InferenceProviderType.whisper:
         return LottiIcons.mic;
       case InferenceProviderType.voxtral:

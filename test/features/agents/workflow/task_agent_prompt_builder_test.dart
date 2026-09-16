@@ -1,11 +1,33 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lotti/features/agents/model/seeded_directive_content.dart';
+import 'package:lotti/features/agents/workflow/task_agent_evidence_synthesis.dart';
 import 'package:lotti/features/agents/workflow/task_agent_prompt_builder.dart';
+import 'package:lotti/features/agents/workflow/task_agent_report_policy.dart';
 
 import '../test_utils.dart';
 
 void main() {
   group('TaskAgentPromptBuilder.buildSystemPrompt', () {
+    test('both scaffolds defer routine language writes on no-change wakes', () {
+      for (final modelId in const [
+        'glm-5.3-flash',
+        'deepseek-v4.1-flash',
+        'qwen3.5-122b-a10b',
+        'mistral-small-4-119b-instruct',
+      ]) {
+        final prompt = TaskAgentPromptBuilder.buildSystemPrompt(
+          version: makeTestTemplateVersion(),
+          soulVersion: null,
+          modelId: modelId,
+        );
+        expect(
+          prompt,
+          contains(TaskAgentReportPolicy.languageRule),
+          reason: modelId,
+        );
+      }
+    });
+
     test('identifies only empty and seeded report directives as built in', () {
       for (final scenario in [
         (directive: '', expected: true),
@@ -153,6 +175,102 @@ Use the task language and omit empty sections.
       expect(prompt, contains('Custom report.'));
       expect(prompt, contains('## Your Personality & Directives'));
       expect(prompt, contains('Legacy voice.'));
+    });
+
+    test('Flash profiles keep custom reports within compact authority', () {
+      for (final model in ['deepseek-v4.1-flash', 'glm-5.3-flash']) {
+        final prompt = TaskAgentPromptBuilder.buildSystemPrompt(
+          version: makeTestTemplateVersion(
+            reportDirective:
+                'Write a brief delivery memo in the task language.',
+          ),
+          soulVersion: null,
+          modelId: model,
+        );
+        expect(
+          prompt,
+          contains(TaskAgentPromptBuilder.taskAgentCompactScaffold),
+        );
+        expect(
+          prompt,
+          isNot(contains(TaskAgentPromptBuilder.taskAgentScaffoldCore)),
+        );
+        expect(
+          prompt,
+          contains('Write a brief delivery memo in the task language.'),
+        );
+        expect(prompt, contains('User actions are sovereign'));
+        expect(prompt, contains('Omit absent\nmetadata completely'));
+      }
+    });
+
+    test(
+      'custom directives finish with conditional-section interpretation',
+      () {
+        const directive =
+            'Use the requested evidence heading when a URL exists.';
+        for (final model in <String?>[null, 'glm-5.3-flash']) {
+          final prompt = TaskAgentPromptBuilder.buildSystemPrompt(
+            version: makeTestTemplateVersion(reportDirective: directive),
+            soulVersion: null,
+            modelId: model,
+          );
+          expect(prompt, contains(directive));
+          expect(
+            prompt,
+            endsWith('Never invent headings for a directive requesting none.'),
+          );
+          expect(
+            prompt.lastIndexOf('First select the required headings'),
+            greaterThan(prompt.indexOf(directive)),
+          );
+          expect(
+            prompt.indexOf(TaskAgentPromptBuilder.reportDirectivePrecedence),
+            greaterThan(prompt.indexOf('## Evidence-First Synthesis Protocol')),
+          );
+          expect(prompt.split(directive), hasLength(2));
+        }
+      },
+    );
+
+    test('conditional additions survive an exact base heading list', () {
+      const directive =
+          'Use exactly ## Summary and ## Next. '
+          'Add ## Sources only when a real external URL exists.';
+      for (final model in <String?>[
+        null,
+        'deepseek-v4.1-flash',
+        'glm-5.3-flash',
+      ]) {
+        final prompt = TaskAgentPromptBuilder.buildSystemPrompt(
+          version: makeTestTemplateVersion(reportDirective: directive),
+          soulVersion: null,
+          modelId: model,
+        );
+        final afterDirective = prompt.substring(
+          prompt.indexOf(directive) + directive.length,
+        );
+        expect(
+          afterDirective,
+          contains('does not cancel a later conditional addition'),
+        );
+        expect(
+          afterDirective,
+          contains('three sections when a URL is present'),
+        );
+        expect(
+          afterDirective,
+          contains('Build this heading outline before writing the prose'),
+        );
+        expect(
+          afterDirective,
+          contains('check the content against that outline'),
+        );
+        expect(
+          afterDirective,
+          contains('Never invent headings for a directive requesting none'),
+        );
+      }
     });
 
     test('appends evidence synthesis after the active template directives', () {
@@ -537,6 +655,10 @@ Lead with the decision. Keep it to three sentences.''';
         prompt,
         contains(TaskAgentPromptBuilder.reportDirectivePrecedence),
       );
+      expect(prompt, contains(TaskAgentReportPolicy.decisionSectionRule));
+      expect(prompt, contains(TaskAgentReportPolicy.publicationRule));
+      expect(prompt, contains('First select the required headings'));
+      expect(prompt, contains('must appear under its requested heading'));
       expect(
         prompt.indexOf(TaskAgentPromptBuilder.reportDirectivePrecedence),
         lessThan(prompt.indexOf('Lead the report with a risk callout.')),
@@ -636,10 +758,10 @@ Lead with the decision. Keep it to three sentences.''';
         modelId: 'glm-5.2',
       );
 
-      expect(prompt, contains('Always include a haiku.'));
+      expect(prompt, contains(custom));
       expect(
         prompt,
-        isNot(contains('do not republish unchanged content')),
+        isNot(contains(TaskAgentEvidenceSynthesis.reportDirective.trim())),
         reason: 'substitution must not override an evolved directive',
       );
     });

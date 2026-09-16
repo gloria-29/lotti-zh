@@ -159,7 +159,7 @@ void main() {
         cpuModel: 'Apple M4 Max',
         ramMb: 65536,
         capabilities: const [
-          NodeCapability.mlxAudio,
+          NodeCapability.whisper,
           NodeCapability.ollamaLlm,
         ],
         updatedAt: updatedAt,
@@ -178,10 +178,32 @@ void main() {
       expect(decoded.profile.cpuModel, 'Apple M4 Max');
       expect(decoded.profile.ramMb, 65536);
       expect(decoded.profile.capabilities, [
-        NodeCapability.mlxAudio,
+        NodeCapability.whisper,
         NodeCapability.ollamaLlm,
       ]);
       expect(decoded.profile.updatedAt, updatedAt);
+    });
+
+    test('sherpa wire capability does not break a legacy profile decoder', () {
+      final profile = SyncNodeProfile(
+        hostId: 'h',
+        displayName: 'Local',
+        platform: 'linux',
+        capabilities: const [NodeCapability.sherpa, NodeCapability.ollamaLlm],
+        updatedAt: updatedAt,
+      );
+      final json =
+          jsonDecode(
+                jsonEncode(
+                  SyncMessage.syncNodeProfile(profile: profile).toJson(),
+                ),
+              )
+              as Map<String, dynamic>;
+      final wireProfile = json['profile'] as Map<String, dynamic>;
+      expect(wireProfile['capabilities'], ['ollamaLlm']);
+      expect(wireProfile['capabilitiesV2'], ['sherpa', 'ollamaLlm']);
+      final decoded = SyncMessage.fromJson(json) as SyncSyncNodeProfile;
+      expect(decoded.profile, profile);
     });
 
     test('emits a stable runtimeType discriminator', () {
@@ -189,7 +211,7 @@ void main() {
         hostId: 'h',
         displayName: 'A',
         platform: 'macos',
-        capabilities: const [NodeCapability.mlxAudio],
+        capabilities: const [NodeCapability.whisper],
         updatedAt: updatedAt,
       );
 

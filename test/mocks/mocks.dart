@@ -31,6 +31,8 @@ import 'package:lotti/database/settings_db.dart';
 import 'package:lotti/database/sync_db.dart';
 import 'package:lotti/features/agents/database/agent_database.dart';
 import 'package:lotti/features/agents/database/agent_repository.dart';
+import 'package:lotti/features/agents/query/query_chat_action_service.dart';
+import 'package:lotti/features/agents/query/query_chat_store.dart';
 import 'package:lotti/features/agents/service/agent_log_llm_summarizer.dart';
 import 'package:lotti/features/agents/service/agent_service.dart';
 import 'package:lotti/features/agents/service/agent_sidecar_reclaimer.dart';
@@ -81,13 +83,15 @@ import 'package:lotti/features/ai/repository/task_summary_resolver.dart';
 import 'package:lotti/features/ai/repository/unified_ai_inference_repository.dart';
 import 'package:lotti/features/ai/repository/vector_search_repository.dart';
 import 'package:lotti/features/ai/service/embedding_service.dart';
+import 'package:lotti/features/ai/services/audio_transcription_service.dart';
 import 'package:lotti/features/ai/services/auto_checklist_service.dart';
 import 'package:lotti/features/ai/services/profile_automation_service.dart';
 import 'package:lotti/features/ai/services/skill_inference_runner.dart';
+import 'package:lotti/features/ai/speech/sherpa_model_repository.dart';
+import 'package:lotti/features/ai/speech/sherpa_transcription_repository.dart';
 import 'package:lotti/features/ai/ui/settings/services/provider_prompt_setup_service.dart';
 import 'package:lotti/features/ai/util/known_models.dart';
 import 'package:lotti/features/ai/util/profile_resolver.dart';
-import 'package:lotti/features/ai_chat/services/audio_transcription_service.dart';
 import 'package:lotti/features/ai_consumption/database/consumption_database.dart';
 import 'package:lotti/features/ai_consumption/repository/consumption_repository.dart';
 import 'package:lotti/features/ai_consumption/service/ai_attribution_identity_resolver.dart';
@@ -134,6 +138,7 @@ import 'package:lotti/features/nudges/service/nudge_interactions.dart';
 import 'package:lotti/features/onboarding/repository/onboarding_metrics_repository.dart';
 import 'package:lotti/features/onboarding/services/onboarding_capture_to_task_service.dart';
 import 'package:lotti/features/onboarding/services/onboarding_task_structuring_service.dart';
+import 'package:lotti/features/plaza/data/plaza_repository.dart';
 import 'package:lotti/features/profiles/service/profile_switcher.dart';
 import 'package:lotti/features/profiles/service/world_handle.dart';
 import 'package:lotti/features/projects/repository/project_repository.dart';
@@ -143,6 +148,7 @@ import 'package:lotti/features/relationships/repository/relationship_repository.
 import 'package:lotti/features/relationships/runtime/relationship_agent_phase_a.dart';
 import 'package:lotti/features/relationships/service/relationship_agent_service.dart';
 import 'package:lotti/features/relationships/service/relationship_chat_service.dart';
+import 'package:lotti/features/relationships/service/relationship_proposal_service.dart';
 import 'package:lotti/features/relationships/service/relationship_reminder_service.dart';
 import 'package:lotti/features/relationships/workflow/relationship_agent_workflow.dart';
 import 'package:lotti/features/speech/repository/audio_recorder_repository.dart';
@@ -171,6 +177,8 @@ import 'package:lotti/features/sync/outbox/outbox_repository.dart';
 import 'package:lotti/features/sync/outbox/outbox_service.dart';
 import 'package:lotti/features/sync/queue/bridge_coordinator.dart';
 import 'package:lotti/features/sync/queue/inbound_event_queue.dart';
+import 'package:lotti/features/sync/queue/inbound_worker.dart';
+import 'package:lotti/features/sync/queue/queue_marker_seeder.dart';
 import 'package:lotti/features/sync/queue/queue_pipeline_coordinator.dart';
 import 'package:lotti/features/sync/repository/sync_maintenance_repository.dart';
 import 'package:lotti/features/sync/repository/sync_node_profile_repository.dart';
@@ -210,6 +218,7 @@ import 'package:lotti/services/vector_clock_service.dart';
 import 'package:lotti/services/window_service.dart';
 import 'package:lotti/utils/consts.dart';
 import 'package:lotti/utils/location.dart';
+import 'package:lotti/utils/screenshots.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:matrix/encryption.dart';
 import 'package:matrix/encryption/cross_signing.dart';
@@ -222,6 +231,7 @@ import 'package:openai_dart/openai_dart.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:record/record.dart' as record;
+import 'package:sherpa_onnx/sherpa_onnx.dart' as sherpa;
 import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
@@ -1063,9 +1073,18 @@ class MockSuggestionRetractionService extends Mock
 /// [ChangeSetBuilder.proposedFingerprints] when exercising wake persistence.
 class MockChangeSetBuilder extends Mock implements ChangeSetBuilder {}
 
+class MockQueryChatActionService extends Mock
+    implements QueryChatActionService {}
+
+class MockQueryChatStore extends Mock implements QueryChatStore {}
+
 class MockAgentSyncService extends Mock implements AgentSyncService {
+  /// Optional transaction boundary hook for concurrency regression tests.
+  Future<T> Function<T>(Future<T> Function() action)? transactionDelegate;
+
   @override
-  Future<T> runInTransaction<T>(Future<T> Function() action) => action();
+  Future<T> runInTransaction<T>(Future<T> Function() action) =>
+      transactionDelegate?.call<T>(action) ?? action();
 
   /// Default local host so tests that exercise counter (G-counter) increments
   /// don't each have to stub it. A fixed value is fine — workflow tests assert
@@ -1163,7 +1182,16 @@ class MockTaskAgentWorkflow extends Mock implements TaskAgentWorkflow {}
 
 class MockTaskToolDispatcher extends Mock implements TaskToolDispatcher {}
 
-class MockAiConfigRepository extends Mock implements AiConfigRepository {}
+class MockAiConfigRepository extends Mock implements AiConfigRepository {
+  MockAiConfigRepository() {
+    when(getDefaultProfileId).thenAnswer((_) async => null);
+    for (final type in AiConfigType.values) {
+      when(
+        () => watchConfigsByType(type),
+      ).thenAnswer((_) => const Stream.empty());
+    }
+  }
+}
 
 class MockProviderPromptSetupService extends Mock
     implements ProviderPromptSetupService {}
@@ -1325,6 +1353,10 @@ class MockSyncSequenceLogService extends Mock
     implements SyncSequenceLogService {}
 
 class MockInboundQueue extends Mock implements InboundQueue {}
+
+class MockInboundWorker extends Mock implements InboundWorker {}
+
+class MockQueueMarkerSeeder extends Mock implements QueueMarkerSeeder {}
 
 class MockBridgeCoordinator extends Mock implements BridgeCoordinator {}
 
@@ -1574,6 +1606,18 @@ class FakeFileSelectorPlatform extends Fake
     return filesToReturn;
   }
 
+  /// The single-file picker; the first of [filesToReturn], or `null` for a
+  /// dismissed dialog.
+  @override
+  Future<XFile?> openFile({
+    List<XTypeGroup>? acceptedTypeGroups,
+    String? initialDirectory,
+    String? confirmButtonText,
+  }) async {
+    lastAcceptedTypeGroups = acceptedTypeGroups;
+    return filesToReturn.firstOrNull;
+  }
+
   @override
   Future<FileSaveLocation?> getSaveLocation({
     List<XTypeGroup>? acceptedTypeGroups,
@@ -1599,3 +1643,23 @@ class MockSupertonicTtsSession extends Mock implements SupertonicTtsSession {}
 class MockIoFile extends Mock implements io.File {}
 
 class MockIoDirectory extends Mock implements io.Directory {}
+
+class MockSherpaModelRepository extends Mock implements SherpaModelRepository {}
+
+class MockSherpaTranscriptionRepository extends Mock
+    implements SherpaTranscriptionRepository {}
+
+class MockSherpaRecognizer extends Mock implements sherpa.OfflineRecognizer {}
+
+class MockSherpaStream extends Mock implements sherpa.OfflineStream {}
+
+class MockRelationshipProposalService extends Mock
+    implements RelationshipProposalService {}
+
+class MockPlazaRepository extends Mock implements PlazaRepository {}
+
+class MockScreenshotHost extends Mock implements ScreenshotHost {}
+
+class MockProcess extends Mock implements io.Process {}
+
+class MockStdout extends Mock implements io.Stdout {}

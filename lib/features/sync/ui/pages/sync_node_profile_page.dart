@@ -198,11 +198,11 @@ class SyncNodeProfilePage extends StatelessWidget {
 String _capabilityLabel(BuildContext context, NodeCapability cap) {
   final m = context.messages;
   return switch (cap) {
-    NodeCapability.mlxAudio => m.settingsSyncNodeProfileCapabilityMlxAudio,
     NodeCapability.omlxLlm => m.settingsSyncNodeProfileCapabilityOmlxLlm,
     NodeCapability.ollamaLlm => m.settingsSyncNodeProfileCapabilityOllamaLlm,
     NodeCapability.voxtral => m.settingsSyncNodeProfileCapabilityVoxtral,
     NodeCapability.whisper => m.settingsSyncNodeProfileCapabilityWhisper,
+    NodeCapability.sherpa => m.aiProviderSherpaName,
   };
 }
 

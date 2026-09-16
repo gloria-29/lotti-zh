@@ -5,7 +5,7 @@ description: Ten independent Beamer stacks behind one IndexedStack, how the acti
 resource: ../../lib/beamer
 tags: [architecture, navigation, beamer, routing, app-shell]
 status: stable
-generated: { by: claude-code/fable-5, at: 2026-09-02T12:00:00Z }
+generated: { by: claude-code/fable-5.1, at: 2026-09-16T11:30:00Z }
 stale_after: 2027-03-02
 sources:
   - id: route-mirror
@@ -15,15 +15,23 @@ sources:
   - id: beamer-app
     resource: ../../lib/beamer/beamer_app.dart
     title: MyBeamerApp and AppScreen
-    last_modified: 2026-09-02
+    last_modified: 2026-09-15
+  - id: activity-island
+    resource: ../../lib/widgets/nav_bar/mobile_activity_island.dart
+    title: The activity island floating above the mobile navigation
+    last_modified: 2026-09-15
   - id: contact-support-row
     resource: ../../lib/widgets/misc/contact_support_row.dart
     title: ContactSupportRow — the Contact Us footer, wired to its destinations
     last_modified: 2026-08-05
-  - id: more-sheet
-    resource: ../../lib/widgets/nav_bar/mobile_nav_more_sheet.dart
-    title: Mobile More overflow sheet
-    last_modified: 2026-08-05
+  - id: mobile-launcher
+    resource: ../../lib/widgets/nav_bar/mobile_navigation_launcher.dart
+    title: MobileNavigationLauncher — the mobile navigation and its docked page action
+    last_modified: 2026-09-16
+  - id: mobile-nav-sheet
+    resource: ../../lib/widgets/nav_bar/mobile_nav_sheet.dart
+    title: The Navigate grid of every enabled destination
+    last_modified: 2026-09-07
   - id: settings-location
     resource: ../../lib/beamer/locations/settings_location.dart
     title: SettingsLocation — the settings page stack and its pop targets
@@ -111,12 +119,18 @@ flowchart TD
   Screen --> Chrome{"Form factor"}
   Chrome -->|desktop| Sidebar["DesktopSidebar"]
   Chrome -->|desktop| DayCol["DayViewSidePanel (right-docked day view)"]
-  Chrome -->|mobile| Bar["DesignSystemFiveSlotNavBar + More sheet"]
+  Chrome -->|mobile| Launcher["MobileNavigationLauncher: glass Navigate chip (+ docked page action)"]
+  Launcher --> Grid["showMobileNavSheet: two-column grid of every enabled destination"]
 ```
 
 An `IndexedStack` keeps every tab **mounted**. Tabs preserve scroll position and
 in-flight state across switches, at the cost of every enabled tab holding its
-widgets in memory.
+widgets in memory. `TickerMode` and `ExcludeFocus` disable animation and
+keyboard focus in inactive tabs. `HeroMode` also excludes their retained images
+from root-route Hero discovery: Flutter visits the current route of every nested
+Navigator even when its IndexedStack child is offstage. Only the active tab may
+supply an image for a full-screen transition; otherwise opening or returning
+from a root overlay such as Plaza can throw a duplicate-Hero-tag assertion.
 
 The desktop `Row` has up to four children: the sidebar, its `ResizableDivider`,
 the expanded content stack, and — while the **Tasks tab is active**, the Daily
@@ -155,6 +169,11 @@ selected detail always forces the list visible even if the saved preference is
 collapsed; there must be somewhere meaningful for focus mode to land. Because
 that forced-visible divider is actionable, its drag may update the stored width
 without clearing the latent collapse preference.
+Task discussions also coordinate temporary pane visibility through the
+[query companion](../features/agents/query-chat.md#ownership-and-entry-points):
+the selected task's open chat can yield list/day-view space without changing the
+saved pane preferences.
+
 `ListDetailFocusTraversal` observes the effective visibility input itself, so a
 persisted collapsed preference taking effect when a new selection appears moves
 focus into the detail just as reliably as pressing Hide list; every transition
@@ -474,8 +493,8 @@ bug, not a shortcut.
 `DesignSystemBottomNavigationBar.occupiedHeight`, so a hidden bar must also
 stop being reserved, or the page keeps a bar-sized empty gutter exactly where
 its own pinned surface was meant to dock. `_MobileNavOverlayHeightScope`
-therefore publishes `barDocked` alongside the indicator-row height, and
-`occupiedHeight` adds the bar's own height only when it is docked. The flag
+therefore publishes `barDocked` alongside the activity island's reserved
+height, and `occupiedHeight` adds the bar's own height only when it is docked. The flag
 defaults to true when no scope exists, so a page rendered outside the shell
 (previews, widget tests) reserves room exactly as before.
 
@@ -508,10 +527,183 @@ Two consequences worth knowing before adding a settings page:
   URL of the page that pushed them. They escape the nav by pushing onto the root
   navigator through `bottomNavSafeNavigatorOf` instead.
 
-Mobile slot allocation is likewise derived from width. Tasks, Daily OS and
-Journal are the primary destinations that survive the narrowest window; the rest
-start behind a *More* sheet and are promoted into their own slots as width
-allows, until everything fits and the More slot disappears.
+## The mobile launcher
+
+`MobileNavigationLauncher` is the mobile shell's navigation: a floating row of
+glass chips over the page rather than an edge-to-edge bar of slots. Its
+Navigate chip opens `showMobileNavSheet`, which presents every enabled section
+in a two-column grid with 16-point horizontal tile padding, the active section
+highlighted, support links on the left and sync counts on the right. Selection
+dismisses the grid and resolves the destination index at tap time
+(`_currentDestinationIndex`), so section flags changing while the grid is open
+cannot route to a stale index. Desktop never shows it: the sidebar replaces it
+there, with the Settings sync counts beside the Settings row.
+
+`DesignSystemBottomNavigationBar.occupiedHeight` reads
+`MobileNavigationLauncher.barHeight` directly, so page/FAB clearance and the
+activity island follow the launcher's rendered height on every window and text
+scale; there is no second navigation design whose height the shell would have
+to publish. The launcher measures its localized label with `TextPainter`,
+including nonlinear text scaling. The route-hiding rules above apply to it
+unchanged.
+
+The launcher and grid replaced the earlier five-slot bar and its More sheet.
+The `enable_mobile_navigation_launcher` flag that chose between the two is in
+`retiredConfigFlags`, so an upgraded install drops the stored row on its next
+start whichever way it was set.
+
+## The activity island
+
+While a time recording and/or an audio recording runs somewhere other than
+the page on screen, the mobile shell floats one glass capsule —
+[`MobileActivityIsland`](../../lib/widgets/nav_bar/mobile_activity_island.dart)
+— `spacing.step3` above the launcher. A running timer is a red dot
+(`alert.error`) and its elapsed time; a live recording is the level orb and its
+elapsed time; both at once share the capsule with a hairline between them.
+Each half is its own button: the timer opens the running entry through
+`navigateToTimerTarget` (the same routing the desktop sidebar's timer card
+uses), the recording reopens its modal. With nothing running the island
+renders nothing and reserves nothing.
+
+It replaced two square-bottomed *tabs* that were drawn to sit flush on the top
+edge of the old full-width bar, in the legacy Material palette. The launcher
+is not a bar, so over it the tabs floated in mid-air above the chips with
+nothing to be an extension of. The island is built from the launcher chips'
+own vocabulary — `DsGlassChipSurface`, `dsGlassChipFill`, `dsGlassChipBorder`,
+`radii.badgesPills`, subtitle2 in tabular figures — at `spacing.step8` tall at
+the default text size, a step under the 48 px chips so it reads as their
+subordinate rather than a third peer, growing with the system text scale the
+way the launcher's chips do (`capsuleHeight`: the scaled subtitle2 line inside
+`spacing.step2` of air, never below `step8`).
+
+Three contracts hold it together:
+
+- **One rule for what counts.** `MobileActivityIsland.showsRecording` decides
+  which recorder states show (a session in flight — recording or paused, which
+  the modal treats as active too — with its modal closed, and not on a Flatpak
+  build, which omits the recording half). Two consumers read that one
+  predicate and the same `TimeService` stream: `MobileActivityIsland`, which
+  decides what to render, and `_MobileNavOverlayHeightScope`, which publishes
+  the height pages pad by (`MobileActivityIsland.reservedHeight`, the capsule
+  plus its gap). Because they share the rule, the space a page reserves and
+  the island it reserves it for can never disagree. Both seed from
+  `TimeService.getCurrent()`, so a timer already running shows, and is
+  reserved for, on the first frame.
+- **Outside the slide-away subtree.** The island is positioned by the shell,
+  not by the launcher: on routes that slide the launcher away it animates down to
+  its gap above the bottom safe-area edge in the same motion, so a running
+  timer stays visible inside settings editors; on task details the whole
+  bottom stack, island included, yields to the page's own action bar.
+- **A broken recorder never takes it down.** If the recorder controller fails
+  to build (MediaKit on some hosts), the island degrades to its timer half.
+- **Prose degrades before payloads**, as on the launcher beside it.
+  `MobileActivityIsland.bothHalvesFit` measures both elapsed times at the live
+  text scale against the window inside its insets; when they no longer share
+  the capsule (large accessibility text on a narrow phone) the recording half
+  drops to its orb — the orb still says "live", the timer's digits have no
+  glyph-only reading — and its button keeps announcing the time. The halves
+  carry the capsule's insets and the air around the hairline themselves, so
+  every point of the pill is one of the two targets.
+
+### The launcher's row, and the page action docked on it
+
+The launcher is not a bar. It is a transparent strip holding a centred row of
+chips built from the shared glass primitives in
+[`glass_action_bar.dart`](../../lib/features/design_system/components/glass_action_bar.dart)
+— the same `DsGlassPill` / `DsGlassRoundButton` vocabulary the task action bar
+uses, so every floating glass row in the app has one silhouette, one fill
+alpha, one hairline and one `spacing.step4` gap. Navigate is translucent and
+self-blurring: the `BackdropFilter` lives inside each chip's `ClipRRect` rather
+than around the row, because a filter spanning the row would also blur the
+transparent gap between the chips and smear the page the launcher exists to
+leave visible.
+
+`MobileNavigationLauncher.pageAction` is the second slot. The **shell** decides
+who fills it, from the active destination alone
+(`_AppScreenState._launcherDockAction`) — exactly the five destinations whose
+list page floats a create button:
+
+| Destination | Factory | Chip |
+|---|---|---|
+| Tasks | `tasksTabDockAction` | worded — "Add a task" |
+| Logbook | `logbookDockAction` | glyph |
+| Projects | `projectsTabDockAction` | glyph |
+| Goals | `unifiedGoalsDockAction` | glyph |
+| Habits | `habitsTabDockAction` | glyph |
+| Daily OS, Dashboards, People, Events, Settings | — | none |
+
+Nothing is registered from inside a page: the `IndexedStack` keeps every tab
+mounted, so a page-owned registry would keep its action docked on every other
+tab too.
+
+Each page decides its own wording, through the two `MobileNavDockAction`
+constructors, and it is the decision its floating button already made. The task
+list words its action because the app creates tasks, entries, habits, goals and
+projects from one glyph and the plus alone does not say which; the lists whose
+heading already answers that stay glyph-only.
+
+Docked actions resolve their page state at *tap* time, not when the shell built
+the row — `createTaskFromTaskListFilters` reads the task list's filters,
+`logbookCreateCategoryId` the feed's single-category selection — so a filter
+changed since the last shell rebuild still applies.
+
+One predicate decides the handover:
+`mobileNavigationLauncherOwnsPageActions(context)` — a non-desktop window — is
+what each of the five pages reads to drop its own
+`DesignSystemFloatingActionButton`, on exactly the windows where the shell
+floats the launcher and docks the action on it. One rule, one place; the action
+moves onto the row rather than being duplicated above it.
+
+It decides a third thing on the two lists that reserve scroll clearance for
+their floating button on top of the bar's own height — Goals and Projects both
+add a `spacing.step12` allowance to
+`DesignSystemBottomNavigationBar.occupiedHeight`. With the action docked there
+is no floating button to clear, and that allowance is an empty gutter, so the
+same predicate drops it.
+
+Two deliberate divergences from what the floating button did:
+
+- **The Logbook keeps its docked action during the first-run zero state**,
+  where the page withholds the corner button so its inline "Create new entry"
+  CTA is the single primary action. In the corner a second copy competed; on
+  the rail the create chip is persistent chrome beside Navigate, and dropping
+  it only there would make the rail inconsistent across tabs.
+- **Projects docks unconditionally**, where the floating button waits for
+  `visibleProjectGroupsProvider`. The create modal needs nothing from that
+  query, and a chip arriving one beat late would shove Navigate sideways under
+  the user's thumb; on its own layer in the corner the same delay cost nothing.
+
+Route sensitivity is needed in one place only. Projects, Goals and Habits
+slide the whole launcher away on their detail routes (`slideNavAway`), so a
+stale action there is off screen anyway. The journal tab keeps the bar on an
+entry's page — and that page owns a *different* action, an `add linked entry`
+button with its own glyph — so `isLogbookEntryDetailRoute` drops the logbook's
+action from the rail there and lets the detail page keep floating its own.
+That check is why `navService.journalDelegate` joins `_routeChangeListenable`.
+
+```mermaid
+stateDiagram-v2
+  [*] --> Centred
+  Centred --> Worded: Tasks becomes active
+  Centred --> Glyph: Logbook, Projects, Goals or Habits becomes active
+  Worded --> Centred: a destination with no create action becomes active
+  Glyph --> Centred: a destination with no create action becomes active
+  Worded --> Glyph: both labels no longer fit the row
+  Glyph --> Worded: labels fit again, on a worded action
+  Centred: Navigate alone, centred
+  Worded: Navigate + accent-filled labelled pill, pair centred
+  Glyph: Navigate + accent round button, pair centred
+```
+
+`labelsFit` measures both labels with a `TextPainter` at the current scaler
+against `availableRowWidth`. It is
+consulted only for a `MobileNavDockAction.worded` action; a `.glyph` one is
+round at every width. Below the threshold a worded action drops to
+`DsGlassRoundButton` at the same diameter as the row's chip height — it keeps
+its place, its accent and its accessible name, and only its word goes. The
+row's height is `chipHeight` in every case, so `barHeight` — and every
+clearance derived from it — does not move when an action docks, undocks or
+collapses.
 
 ## The Settings row and its counts
 
@@ -559,7 +751,7 @@ factors:
 | Form factor | Where | Suppressed when |
 |-------------|-------|-----------------|
 | Desktop | sidebar `footerBand`, under Settings | the sidebar is collapsed |
-| Mobile | last child of the *More* sheet | never — the sheet is its only home |
+| Mobile | footer of the *Navigate* grid | never — the grid is its only home |
 
 **No rule separates it from the rows above, on either surface.** These are the
 quietest controls the app's navigation has, and a divider gave them the weight
@@ -575,7 +767,8 @@ optional status row beneath Settings to displace it. Collapsing the sidebar
 removes the band entirely — the icon-only rail is 72 px, narrower than the four
 glyphs — and the Manual stays reachable from Settings meanwhile.
 
-The actions themselves are one right-aligned group. Email is a plain envelope
+The actions are right-aligned in the sidebar. The Navigate grid places the
+same intrinsic-width group on the left beside sync counts. Email is a plain envelope
 button with the same 44 px target, colour, tooltip and semantics as Manual,
 GitHub and Discord; its localized “Contact Us” wording remains the accessible
 name rather than visible copy. With no label competing for width, all four
@@ -605,7 +798,9 @@ Two rules hold it together:
 | Index, delegate registry, flag gating, state persistence | [`lib/services/nav_service.dart`](../../lib/services/nav_service.dart) |
 | Restore hook, awaited before `runApp` | [`lib/get_it.dart`](../../lib/get_it.dart) |
 | Logbook auto-selection, the background-navigation case | [`lib/features/journal/ui/pages/journal_root_page.dart`](../../lib/features/journal/ui/pages/journal_root_page.dart) |
-| Mobile overflow sheet | [`lib/widgets/nav_bar/mobile_nav_more_sheet.dart`](../../lib/widgets/nav_bar/mobile_nav_more_sheet.dart) |
+| Mobile launcher and its docked page action | [`lib/widgets/nav_bar/mobile_navigation_launcher.dart`](../../lib/widgets/nav_bar/mobile_navigation_launcher.dart) |
+| Navigate grid | [`lib/widgets/nav_bar/mobile_nav_sheet.dart`](../../lib/widgets/nav_bar/mobile_nav_sheet.dart) |
+| Bottom clearance contract, activity island scope | [`lib/widgets/nav_bar/design_system_bottom_navigation_bar.dart`](../../lib/widgets/nav_bar/design_system_bottom_navigation_bar.dart) |
 | Contact Us footer, wired | [`lib/widgets/misc/contact_support_row.dart`](../../lib/widgets/misc/contact_support_row.dart) |
 | Contact Us footer, presentation | [`lib/features/design_system/components/navigation/design_system_contact_row.dart`](../../lib/features/design_system/components/navigation/design_system_contact_row.dart) |
 | External addresses | [`lib/utils/support_links.dart`](../../lib/utils/support_links.dart) |

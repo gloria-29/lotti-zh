@@ -13,6 +13,7 @@ import 'package:mocktail/mocktail.dart';
 
 import '../../../helpers/fallbacks.dart';
 import '../../../mocks/mocks.dart';
+import '../../agents/test_data/entity_factories.dart';
 
 void main() {
   setUpAll(registerAllFallbackValues);
@@ -28,6 +29,7 @@ void main() {
   late MockRelationshipRepository relationshipRepository;
   late MockDomainLogger logger;
   late RelationshipRuntimeMaintenance maintenance;
+  late int scanRequests;
 
   const relationshipId = 'person-1';
 
@@ -83,6 +85,7 @@ void main() {
     relationshipAgentService = MockRelationshipAgentService();
     relationshipRepository = MockRelationshipRepository();
     logger = MockDomainLogger();
+    scanRequests = 0;
     maintenance = RelationshipRuntimeMaintenance(
       agentService: agentService,
       repository: repository,
@@ -90,6 +93,7 @@ void main() {
       relationshipAgentService: relationshipAgentService,
       relationshipRepository: relationshipRepository,
       domainLogger: logger,
+      onIdentityRestored: () => scanRequests++,
     );
     when(
       () => agentService.listAgents(lifecycle: AgentLifecycle.active),
@@ -111,6 +115,111 @@ void main() {
       ),
     ).thenAnswer((_) async => person());
   });
+
+  test(
+    'configured retry moves forward without losing episode tokens or lease election',
+    () async {
+      final workspace = relationshipEscalationWorkspaceKey('2026-08-08');
+      var configured = false;
+      final retry =
+          AgentDomainEntity.scheduledWake(
+                id: scheduledWakeRecordId(agentId, workspaceKey: workspace),
+                agentId: agentId,
+                scheduledAt: now.add(const Duration(hours: 8)),
+                status: ScheduledWakeStatus.pending,
+                reason: WakeReason.scheduled.name,
+                updatedAt: testDate,
+                vectorClock: null,
+                workspaceKey: workspace,
+                triggerTokens: [workspace, 'baseline'],
+                leaseHostId: 'old-host',
+                leaseUntil: now.add(const Duration(minutes: 5)),
+              )
+              as ScheduledWakeEntity;
+      when(() => repository.getAgentState(agentId)).thenAnswer(
+        (_) async => makeTestState(
+          agentId: agentId,
+        ).copyWith(consecutiveFailureCount: 3),
+      );
+      when(
+        () => repository.getEntitiesByAgentId(agentId, type: 'scheduledWake'),
+      ).thenAnswer((_) async => [retry]);
+      var inTransaction = false;
+      syncService.transactionDelegate = <T>(action) async {
+        inTransaction = true;
+        try {
+          return await action();
+        } finally {
+          inTransaction = false;
+        }
+      };
+      when(() => repository.getEntity(retry.id)).thenAnswer((_) async {
+        expect(
+          inTransaction,
+          isTrue,
+          reason: 'The consume check and reschedule must be atomic',
+        );
+        return retry;
+      });
+      final subject = RelationshipRuntimeMaintenance(
+        agentService: agentService,
+        repository: repository,
+        syncService: syncService,
+        relationshipAgentService: relationshipAgentService,
+        relationshipRepository: relationshipRepository,
+        inferenceIsConfigured: (_) async => configured,
+      );
+      await withClock(Clock.fixed(now), subject.beforeWakeScan);
+      verifyNever(
+        () => syncService.upsertEntity(
+          any(
+            that: isA<ScheduledWakeEntity>().having(
+              (e) => e.id,
+              'id',
+              retry.id,
+            ),
+          ),
+        ),
+      );
+      configured = true;
+      await withClock(Clock.fixed(now), subject.beforeWakeScan);
+      final written =
+          verify(
+                () => syncService.upsertEntity(
+                  captureAny(
+                    that: isA<ScheduledWakeEntity>().having(
+                      (e) => e.id,
+                      'id',
+                      retry.id,
+                    ),
+                  ),
+                ),
+              ).captured.single
+              as ScheduledWakeEntity;
+      expect(written.scheduledAt, now.toUtc());
+      expect(written.triggerTokens, retry.triggerTokens);
+      expect(written.workspaceKey, workspace);
+      expect(written.status, ScheduledWakeStatus.pending);
+      expect(written.leaseHostId, isNull);
+      expect(written.leaseUntil, isNull);
+      // A peer consumed it while the route was resolving: never resurrect it.
+      when(() => repository.getEntity(retry.id)).thenAnswer(
+        (_) async => retry.copyWith(status: ScheduledWakeStatus.consumed),
+      );
+      await withClock(Clock.fixed(now), subject.beforeWakeScan);
+      verifyNever(
+        () => syncService.upsertEntity(
+          any(
+            that: isA<ScheduledWakeEntity>().having(
+              (e) => e.id,
+              'id',
+              retry.id,
+            ),
+          ),
+        ),
+      );
+    },
+  );
 
   group('restoreSubscriptions', () {
     test('re-registers every active relationship agent and ignores other '
@@ -330,6 +439,7 @@ void main() {
     test('an active synced-in identity subscribes immediately — no restart '
         'needed', () async {
       await maintenance.onIdentityReceived(identity());
+      expect(scanRequests, 1);
       verify(
         () => relationshipAgentService.registerSubscription(agentId),
       ).called(1);
@@ -343,6 +453,7 @@ void main() {
         () => relationshipAgentService.removeSubscription(agentId),
       ).called(1);
       verifyNever(() => relationshipAgentService.registerSubscription(any()));
+      expect(scanRequests, 0);
     });
 
     test('another kind is ignored entirely', () async {
@@ -350,6 +461,7 @@ void main() {
         identity(kind: AgentKinds.goalAgent),
       );
       verifyZeroInteractions(relationshipAgentService);
+      expect(scanRequests, 0);
     });
 
     test('a subscription failure is contained — the sync apply loop must '

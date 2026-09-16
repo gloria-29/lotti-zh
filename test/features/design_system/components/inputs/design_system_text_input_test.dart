@@ -9,7 +9,80 @@ import 'package:material_ui/material_ui.dart';
 import '../../../../widget_test_utils.dart';
 
 void main() {
+  testWidgets(
+    'large-text composer hint stays inside the input without vertical clipping',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(320, 844));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await tester.pumpWidget(
+        makeTestableWidgetWithScaffold(
+          const DesignSystemTextInput(
+            shape: DesignSystemTextInputShape.pill,
+            hintText: 'Talk to Habitat Watcher about the penguin habitat',
+            trailingIcon: LottiIcons.mic,
+          ),
+          mediaQueryData: const MediaQueryData(
+            size: Size(320, 844),
+            textScaler: TextScaler.linear(1.5),
+          ),
+        ),
+      );
+      final hint = tester.getRect(
+        find.text('Talk to Habitat Watcher about the penguin habitat'),
+      );
+      final field = tester.getRect(find.byType(TextField));
+      expect(hint.top, greaterThanOrEqualTo(field.top));
+      expect(hint.bottom, lessThanOrEqualTo(field.bottom));
+    },
+  );
+
   group('DesignSystemTextInput', () {
+    testWidgets(
+      'pill composition keeps editing and uses the conversation surface',
+      (tester) async {
+        var draft = '';
+        var sends = 0;
+        await _pumpInput(
+          tester,
+          DesignSystemTextInput(
+            shape: DesignSystemTextInputShape.pill,
+            emphasizeTrailingIcon: true,
+            hintText: 'Ask the agent',
+            trailingIcon: LottiIcons.send,
+            trailingIconTooltip: 'Send',
+            onTrailingIconTap: () => sends++,
+            onChanged: (value) => draft = value,
+          ),
+        );
+        final field = find.byType(DesignSystemTextInput);
+        final tokens = tester.element(field).designTokens;
+        final decoration = tester
+            .widgetList<DecoratedBox>(
+              find.descendant(of: field, matching: find.byType(DecoratedBox)),
+            )
+            .map((box) => box.decoration)
+            .whereType<BoxDecoration>()
+            .first;
+        expect(
+          decoration.borderRadius,
+          BorderRadius.circular(tokens.radii.badgesPills),
+        );
+        expect(decoration.color, tokens.colors.surface.enabled);
+        expect(
+          tester
+              .widget<IconButton>(find.byType(IconButton))
+              .style!
+              .backgroundColor!
+              .resolve({}),
+          tokens.colors.interactive.enabled,
+        );
+        await tester.enterText(find.byType(TextField), 'What was agreed?');
+        expect(draft, 'What was agreed?');
+        await tester.tap(find.byIcon(LottiIcons.send));
+        expect(sends, 1);
+      },
+    );
+
     testWidgets('renders with label and hint text', (tester) async {
       const key = Key('basic-input');
 

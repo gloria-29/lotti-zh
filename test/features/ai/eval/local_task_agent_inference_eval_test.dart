@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lotti/features/agents/tools/agent_tool_registry.dart';
 import 'package:lotti/features/agents/workflow/task_agent_report_editor.dart';
+import 'package:lotti/features/agents/workflow/task_agent_report_policy.dart';
 import 'package:lotti/features/ai/conversation/conversation_manager.dart';
 import 'package:lotti/features/ai/conversation/conversation_repository.dart';
 import 'package:lotti/features/ai/model/ai_call_impact.dart';
@@ -13,8 +14,10 @@ import 'package:lotti/features/ai/model/gemini_tool_call.dart';
 import 'package:lotti/features/ai/model/inference_usage.dart';
 import 'package:lotti/features/ai/repository/inference_repository_interface.dart';
 import 'package:lotti/features/ai/util/known_models.dart';
+import 'package:lotti/features/ai_consumption/model/ai_consumption_event.dart';
 import 'package:openai_dart/openai_dart.dart';
 
+import '../../../helpers/fallbacks.dart';
 import 'support/local_task_agent_inference_eval.dart';
 
 void main() {
@@ -334,6 +337,32 @@ void main() {
     expect(defaultLocalTaskAgentWakeScenario().languageCode, 'en');
   });
 
+  test(
+    'follow-up fixtures use production publication context without prior prose',
+    () {
+      final followUps = defaultMeliousTaskAgentEvalScenarios().where(
+        (scenario) => !scenario.isFirstWake,
+      );
+      expect(followUps, hasLength(3));
+      for (final scenario in followUps) {
+        expect(
+          scenario.userMessage,
+          contains(TaskAgentReportPolicy.existingReportContext),
+        );
+        expect(
+          scenario.userMessage,
+          contains(TaskAgentReportPolicy.changedEntitiesRule),
+        );
+        expect(
+          scenario.userMessage,
+          endsWith('${TaskAgentReportPolicy.closingInstruction}\n'),
+        );
+        expect(scenario.userMessage, isNot(contains('Previous Agent Report')));
+        expect(scenario.userMessage, isNot(contains('## Achieved')));
+      }
+    },
+  );
+
   test('evolved-directive suite covers realistic reporting contracts', () {
     final scenarios = evolvedReportDirectiveTaskAgentEvalScenarios();
 
@@ -352,7 +381,7 @@ void main() {
     );
     expect(
       scenarios.map((scenario) => scenario.promptVariant).toSet(),
-      {LocalTaskAgentEvalPromptVariant.evidenceSynthesis},
+      {LocalTaskAgentEvalPromptVariant.production},
     );
     expect(
       scenarios.map((scenario) => scenario.reportDirective).toSet(),
@@ -367,7 +396,7 @@ void main() {
     expect(
       scenarios.every(
         (scenario) => scenario.systemPrompt.contains(
-          scenario.reportDirective!,
+          scenario.reportDirective!.trim(),
         ),
       ),
       isTrue,
@@ -830,7 +859,7 @@ void main() {
     test('adding the investigation the context asks for is allowed', () {
       // Verbatim from the 2026-08-08 Kimi K3 run. The QA note says
       // "Investigation is needed; no root cause yet", so creating that item is
-      // the requested behaviour; only undoing the user's checkmark is banned.
+      // the requested behaviour; reopening separately requires newer evidence.
       final scenario = defaultMeliousTaskAgentEvalScenarios().firstWhere(
         (scenario) => scenario.id.startsWith('user_completed_item_resurfaced'),
       );
@@ -839,13 +868,22 @@ void main() {
         contains(TaskAgentToolNames.addMultipleChecklistItems),
       );
       expect(
-        scenario.forbiddenToolNames,
-        contains(TaskAgentToolNames.updateChecklistItems),
+        scenario.checklistReopeningEvidence,
+        contains('item-sync-fix'),
       );
       expect(
         scenario.expectedToolCalls,
         isEmpty,
         reason: 'The investigation item is permitted, never required',
+      );
+      expect(
+        scenario.toJson()['checklistReopeningEvidence'],
+        scenario.checklistReopeningEvidence,
+      );
+      expect(scenario.userMessage, contains('"checkedBy": "user"'));
+      expect(
+        scenario.userMessage,
+        contains('"checkedAt": "2026-07-10T08:00:00Z"'),
       );
     });
 
@@ -1340,6 +1378,92 @@ void main() {
     },
   );
 
+  test(
+    'provider errors cannot become successful forced report retries',
+    () async {
+      for (final mode in [
+        LocalTaskAgentEvalExecutionMode.singlePass,
+        LocalTaskAgentEvalExecutionMode.productionRouting,
+      ]) {
+        final inference = _FailThenSucceedInferenceRepository();
+        final runner = _createRunner(
+          provider: provider,
+          inferenceRepository: inference,
+          executionMode: mode,
+        );
+        final report = await runner.run(
+          profiles: const [profile],
+          scenarios: [defaultLocalTaskAgentWakeScenario()],
+        );
+        final result = report.results.single;
+        expect(
+          result.failureCategory,
+          LocalTaskAgentEvalFailureCategory.inferenceFailed,
+        );
+        expect(result.errorMessage, contains('connection refused'));
+        expect(result.usedForcedReportRetry, isFalse);
+        expect(result.toolCalls, isEmpty);
+        expect(inference.requests, hasLength(1));
+      }
+    },
+  );
+
+  test(
+    'provider errors during forced report recovery remain inference failures',
+    () async {
+      final inference = _QueuedInferenceRepository(
+        [
+          [
+            _usage(
+              inputTokens: 100,
+              outputTokens: 20,
+              thoughtsTokens: 5,
+              cachedInputTokens: 10,
+            ),
+            _content('No report was produced.'),
+          ],
+        ],
+        failedRequest: 2,
+      );
+      final consumption = fallbackAiConsumptionEvent.copyWith(credits: 0.25);
+      String? capturedWakeRunKey;
+      final runner = _createRunner(
+        provider: provider,
+        inferenceRepository: inference,
+        executionMode: LocalTaskAgentEvalExecutionMode.productionRouting,
+        consumptionForWakeRunKey: (key) {
+          capturedWakeRunKey = key;
+          return [consumption];
+        },
+      );
+      final report = await runner.run(
+        profiles: const [profile],
+        scenarios: [defaultLocalTaskAgentWakeScenario()],
+      );
+      final result = report.results.single;
+      expect(
+        result.failureCategory,
+        LocalTaskAgentEvalFailureCategory.inferenceFailed,
+      );
+      expect(result.errorMessage, contains('connection refused'));
+      expect(result.usedForcedReportRetry, isTrue);
+      expect(result.inputTokens, 100);
+      expect(result.outputTokens, 20);
+      expect(result.thoughtsTokens, 5);
+      expect(result.cachedInputTokens, 10);
+      expect(result.consumption, [consumption]);
+      expect(result.credits, 0.25);
+      expect(
+        capturedWakeRunKey,
+        localTaskAgentEvalWakeRunKey(profile.name, result.scenario.id),
+      );
+      expect(inference.requests, hasLength(2));
+      expect(inference.requests.last.toolNames, [
+        TaskAgentToolNames.updateReport,
+      ]);
+    },
+  );
+
   test('runner records inference failure and continues the matrix', () async {
     const secondProfile = LocalTaskAgentEvalProfile(
       name: 'second-local-model',
@@ -1365,7 +1489,7 @@ void main() {
     );
     expect(
       report.results.first.finalContent,
-      'Bad state: connection refused',
+      'Inference failed with exception: Bad state: connection refused',
     );
     expect(
       report.results.last.failureCategory,
@@ -1649,9 +1773,185 @@ void main() {
     );
   });
 
+  group('implicit workflow report subject', () {
+    for (final entry in <String, LocalTaskAgentEvalFailureCategory>{
+      'Profile seeding cleanup: open a pull request, review, merge and release.':
+          LocalTaskAgentEvalFailureCategory.none,
+      'Fix empty inference profiles remaining selectable: open a pull request, review, merge and release.':
+          LocalTaskAgentEvalFailureCategory.none,
+      'Prevent empty profiles from remaining selectable: open a pull request, review, merge and release.':
+          LocalTaskAgentEvalFailureCategory.none,
+      'Document the inference profile, then open a pull request, review, merge and release.':
+          LocalTaskAgentEvalFailureCategory.missingRequiredContent,
+      'Open a pull request, review, merge and release.':
+          LocalTaskAgentEvalFailureCategory.missingRequiredContent,
+      'Fix empty inference profiles remaining selectable: open a pull request and release.':
+          LocalTaskAgentEvalFailureCategory.missingRequiredContent,
+    }.entries) {
+      test(entry.key, () async {
+        final scenario = defaultMeliousTaskAgentEvalScenarios().firstWhere(
+          (scenario) => scenario.id == 'implicit_workflow_plan_production',
+        );
+        final runner = _createRunner(
+          provider: provider,
+          inferenceRepository: _QueuedInferenceRepository([
+            [
+              _toolCalls([
+                (
+                  name: TaskAgentToolNames.addMultipleChecklistItems,
+                  argumentsJson: jsonEncode({
+                    'items': [
+                      {'title': 'Fix empty inference profiles'},
+                      {'title': 'Create pull request'},
+                      {'title': 'Address Gemini review comments'},
+                      {'title': 'Address code review comments'},
+                      {'title': 'Merge the pull request'},
+                      {'title': 'Create a release on all platforms'},
+                    ],
+                  }),
+                ),
+                (
+                  name: TaskAgentToolNames.updateReport,
+                  argumentsJson: jsonEncode({
+                    'oneLiner': 'Workflow pending',
+                    'tldr': 'Next steps remain to be done.',
+                    'content': entry.key,
+                  }),
+                ),
+              ]),
+            ],
+          ]),
+        );
+        final report = await runner.run(
+          profiles: const [profile],
+          scenarios: [scenario],
+        );
+        expect(report.results.single.failureCategory, entry.value);
+      });
+    }
+  });
+
+  group('resurfaced checklist override contract', () {
+    const justifiedReason =
+        'QA at 11:20 reported duplicate sync events reappeared after '
+        'reconnecting, after the user checked the item at 08:00.';
+    final validItem = <String, Object?>{
+      'id': 'item-sync-fix',
+      'isChecked': false,
+      'reason': justifiedReason,
+    };
+    final cases = <String, Object?>{
+      'preserve user completion': null,
+      'cite newer QA recurrence': [validItem],
+      'missing reason': [
+        {'id': 'item-sync-fix', 'isChecked': false},
+      ],
+      'short reason': [
+        {...validItem, 'reason': 'QA sync again'},
+      ],
+      'unrelated reason': [
+        {
+          ...validItem,
+          'reason': 'A general cleanup would make this task easier to read.',
+        },
+      ],
+      'no evidence citation': [
+        {
+          ...validItem,
+          'reason': 'Duplicate sync events could reappear someday.',
+        },
+      ],
+      'older QA evidence': [
+        {
+          ...validItem,
+          'reason':
+              'QA reported duplicate sync events recurred before the user '
+              'completed the item at 08:00.',
+        },
+      ],
+      'timestamp without QA source': [
+        {
+          ...validItem,
+          'reason': 'At 11:20 I guessed duplicate sync events recurred.',
+        },
+      ],
+      'wrong item': [
+        {...validItem, 'id': 'another-item'},
+      ],
+      'wrong state': [
+        {...validItem, 'isChecked': true},
+      ],
+      'archive item': [
+        {...validItem, 'isArchived': true},
+      ],
+      'rewrite title': [
+        {...validItem, 'title': 'Ship the fix'},
+      ],
+      'empty update': <Object?>[],
+      'malformed update': ['item-sync-fix'],
+      'mixed valid and invalid': [
+        validItem,
+        {...validItem, 'id': 'another-item'},
+      ],
+    };
+    for (final entry in cases.entries) {
+      test(entry.key, () async {
+        final scenario = defaultMeliousTaskAgentEvalScenarios().firstWhere(
+          (scenario) =>
+              scenario.id == 'user_completed_item_resurfaced_production',
+        );
+        final runner = _createRunner(
+          provider: provider,
+          inferenceRepository: _QueuedInferenceRepository([
+            [
+              _toolCalls([
+                if (entry.value != null)
+                  (
+                    name: TaskAgentToolNames.updateChecklistItems,
+                    argumentsJson: jsonEncode({'items': entry.value}),
+                  ),
+                (
+                  name: TaskAgentToolNames.updateReport,
+                  argumentsJson: jsonEncode({
+                    'oneLiner': 'Duplicate sync events reappeared',
+                    'tldr': 'QA saw recurrence after reconnecting two devices.',
+                    'content':
+                        'Investigate the sync root cause; the risk remains open.',
+                  }),
+                ),
+              ]),
+            ],
+          ]),
+        );
+        final report = await runner.run(
+          profiles: const [profile],
+          scenarios: [scenario],
+        );
+        final result = report.results.single;
+        final valid =
+            entry.key == 'preserve user completion' ||
+            entry.key == 'cite newer QA recurrence';
+        expect(
+          result.failureCategory,
+          valid
+              ? LocalTaskAgentEvalFailureCategory.none
+              : LocalTaskAgentEvalFailureCategory.forbiddenToolArguments,
+        );
+        expect(result.qualityScore, valid ? equals(1) : lessThan(1));
+        expect(
+          result.passedQualityCheckCount,
+          result.qualityCheckCount - (valid ? 0 : 1),
+        );
+        expect(
+          result.toJson()['qualityScore'],
+          valid ? equals(1) : lessThan(1),
+        );
+      });
+    }
+  });
+
   test('runner fails a report asserting work that did not happen', () async {
-    // `user_completed_item_resurfaced` expects NO tool calls, so "did the
-    // model claim the fix was verified?" is the only question it really asks.
+    // A justified checklist reopening does not establish that the fix works.
     // Those claims were counted in `qualityScore` and never gated, which made
     // the scenario pass on the strength of its incidental checks alone.
     final scenario = defaultMeliousTaskAgentEvalScenarios().firstWhere(
@@ -2620,6 +2920,7 @@ LocalTaskAgentInferenceEvalRunner _createRunner({
       LocalTaskAgentEvalExecutionMode.singlePass,
   String? reportEditorModelId,
   int reportEditorMaxAttempts = 1,
+  List<AiConsumptionEvent> Function(String)? consumptionForWakeRunKey,
 }) {
   final container = ProviderContainer();
   addTearDown(container.dispose);
@@ -2635,6 +2936,7 @@ LocalTaskAgentInferenceEvalRunner _createRunner({
     executionMode: executionMode,
     reportEditorModelId: reportEditorModelId,
     reportEditorMaxAttempts: reportEditorMaxAttempts,
+    consumptionForWakeRunKey: consumptionForWakeRunKey,
   );
 }
 
@@ -2773,7 +3075,9 @@ class _ThrowingConversationRepository extends ConversationRepository {
 }
 
 class _QueuedInferenceRepository extends InferenceRepositoryInterface {
-  _QueuedInferenceRepository(this.responsesByRequest);
+  _QueuedInferenceRepository(this.responsesByRequest, {this.failedRequest});
+
+  final int? failedRequest;
 
   final List<List<CreateChatCompletionStreamResponse>> responsesByRequest;
   final requests = <_RecordedRequest>[];
@@ -2801,6 +3105,9 @@ class _QueuedInferenceRepository extends InferenceRepositoryInterface {
         temperature: temperature,
       ),
     );
+    if (requests.length == failedRequest) {
+      throw StateError('connection refused');
+    }
     final responses = _requestIndex < responsesByRequest.length
         ? responsesByRequest[_requestIndex]
         : const <CreateChatCompletionStreamResponse>[];

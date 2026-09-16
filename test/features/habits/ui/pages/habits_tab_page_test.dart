@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lotti/classes/entity_definitions.dart';
 import 'package:lotti/database/database.dart';
@@ -16,6 +18,7 @@ import 'package:lotti/features/habits/ui/widgets/habits_section_header.dart';
 import 'package:lotti/features/keyboard/ui/app_command_host.dart';
 import 'package:lotti/features/user_activity/state/user_activity_service.dart';
 import 'package:lotti/get_it.dart';
+import 'package:lotti/l10n/app_localizations_context.dart';
 import 'package:lotti/logic/signals/health_signal_refresh_service.dart';
 import 'package:lotti/services/db_notification.dart';
 import 'package:lotti/services/entities_cache_service.dart';
@@ -23,6 +26,7 @@ import 'package:lotti/services/nav_service.dart';
 import 'package:lotti/utils/device_region.dart';
 import 'package:lotti/widgets/misc/timespan_segmented_control.dart';
 import 'package:lotti/widgets/nav_bar/design_system_bottom_navigation_bar.dart';
+import 'package:lotti/widgets/nav_bar/mobile_navigation_launcher.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -109,6 +113,7 @@ void main() {
       HabitsState state, {
       MediaQueryData? mediaQueryData,
       HealthSignalRefreshService? healthRefreshService,
+      List<Override> extraOverrides = const [],
     }) async {
       final controller = FakeHabitsController(state);
       await tester.pumpWidget(
@@ -128,6 +133,7 @@ void main() {
               healthSignalRefreshServiceProvider.overrideWithValue(
                 healthRefreshService,
               ),
+            ...extraOverrides,
           ],
         ),
       );
@@ -654,18 +660,97 @@ void main() {
       expect(find.byType(HabitActionRow), findsNothing);
     });
     group('creating a habit', () {
-      testWidgets('the FAB leads to the habit editor', (tester) async {
+      testWidgets('the desktop FAB opens the habit editor in its side panel', (
+        tester,
+      ) async {
         String? beamedTo;
         beamToNamedOverride = (path) => beamedTo = path;
         addTearDown(() => beamToNamedOverride = null);
-        await pump(tester, HabitsState.initial());
-        // The FAB floats below the 600 px test viewport; invoke it directly.
+        // Desktop-wide: on a phone the launcher docks the create action (see
+        // `habitsTabDockAction` below) and the page floats no button of its
+        // own. On desktop the same launcher opens the editor embedded in a
+        // panel instead of beaming to its route.
+        await pump(
+          tester,
+          HabitsState.initial(),
+          mediaQueryData: desktopLayoutMediaQueryData,
+        );
         tester
             .widget<DesignSystemFloatingActionButton>(
               find.byKey(const ValueKey('habits-create-fab')),
             )
             .onPressed!();
-        expect(beamedTo, '/habits/create');
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 400));
+
+        expect(beamedTo, isNull, reason: 'no navigation on desktop');
+        expect(find.byType(ModalBarrier), findsWidgets);
+        final messages = tester.element(find.byType(HabitsTabPage)).messages;
+        expect(find.text(messages.habitEditorCreateTitle), findsOneWidget);
+      });
+
+      group('the mobile navigation launcher owns the create action', () {
+        testWidgets('the habits list drops its floating button so the '
+            'launcher can dock the same action on its own row', (tester) async {
+          await pump(tester, HabitsState.initial());
+          // The Scaffold animates its floating button out, so it outlives the
+          // rebuild that dropped it.
+          await tester.pump(const Duration(milliseconds: 400));
+
+          expect(find.byKey(const ValueKey('habits-create-fab')), findsNothing);
+          expect(
+            find.byType(DesignSystemBottomNavigationFabPadding),
+            findsNothing,
+          );
+        });
+
+        testWidgets('a desktop window keeps the floating button — the sidebar '
+            'replaces the launcher there', (tester) async {
+          await pump(
+            tester,
+            HabitsState.initial(),
+            mediaQueryData: desktopLayoutMediaQueryData,
+          );
+
+          expect(
+            find.byKey(const ValueKey('habits-create-fab')),
+            findsOneWidget,
+          );
+        });
+
+        testWidgets('habitsTabDockAction is a glyph action opening the same '
+            'editor as the floating button', (tester) async {
+          String? beamedTo;
+          beamToNamedOverride = (path) => beamedTo = path;
+          addTearDown(() => beamToNamedOverride = null);
+
+          MobileNavDockAction? action;
+          await tester.pumpWidget(
+            makeTestableWidgetNoScroll(
+              Consumer(
+                builder: (context, ref, _) {
+                  action = habitsTabDockAction(context, ref);
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
+          );
+          await tester.pump();
+
+          // Glyph, not worded: the page is titled Habits and lists habits.
+          expect(action!.worded, isFalse);
+          expect(action!.icon, LottiIcons.add);
+          expect(
+            action!.label,
+            tester
+                .element(find.byType(Consumer))
+                .messages
+                .habitEditorCreateTitle,
+          );
+
+          action!.onPressed();
+          expect(beamedTo, '/habits/create');
+        });
       });
     });
   });

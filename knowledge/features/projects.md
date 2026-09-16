@@ -240,6 +240,13 @@ measure with its one standard horizontal gutter, keeping report lines and cards
 readable when the list releases a wide canvas without double-insetting mobile
 content.
 
+Project chat uses the retained companion described in
+[query chat](agents/query-chat.md#ownership-and-entry-points). Opening it may
+temporarily hide the list to make room without changing its saved collapse
+preference; Show list or keyboard search restores browsing and closes chat when
+the list and discussion cannot both fit. Automatic list restoration after Close
+keeps focus on the Ask control; an explicit Show list action focuses browsing.
+
 Project detail actions preserve workspace continuity. Edit uses the
 Projects-owned `/projects/<id>/edit` route on mobile and desktop, with an
 explicit return path back to the selected project. The editor owns the complete
@@ -336,7 +343,11 @@ surface instead of becoming competing cards or duplicating the report in the
 editor. The AI surface appears above the task list. `ProjectRecommendationsPanel`
 renders two bands inside the card: the newest run's **recommended next steps**
 (`ProjectNextStepRow`, one per step) and the agent's **proposed changes**
-(`ProjectProposalRow`, reusing Task Details' `RowActions` rail). A step offers
+(`ProjectProposalRow`, reusing Task Details' `RowActions` rail). What keeps
+that second band from growing a fresh copy of the same suggestion on every
+wake — the redundancy refusal, the dedup against open and rejected proposals,
+and the agent's own `retract_suggestions` — is
+[project and event agents](agents/project-and-event-agents.md#proposals-do-not-accumulate). A step offers
 **Add task** and **Dismiss** as labelled controls, and on touch the same two
 by swipe — right adds, left dismisses. Proposal rows swipe the same way (right
 confirms, left rejects), so the gesture means the same thing in both bands and
@@ -443,6 +454,13 @@ state; it never repeats the project description under an AI-authored heading
 or presents the project's own modification time as report freshness.
 
 # The task list groups and orders itself
+
+A task's row leads with its cover art when it has one —
+`TaskSummaryRow` draws the same `CoverArtThumbnail` square as the day
+planner's agenda card, at `spacing.step9`, honouring the crop stored on the
+task, so a picture identifies a task the same way in its project as in the
+tasks list. `projectTaskCoverArtId` is what decides: a missing *or blank*
+`coverArtId` reserves nothing and leaves the row exactly the width it had.
 
 `ProjectTasksSliverPanel` no longer renders one flat list. The pure model in
 `ui/model/project_task_groups.dart` turns the record's task summaries into

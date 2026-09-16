@@ -499,7 +499,10 @@ void main() {
           );
 
           expect(result.success, isFalse);
-          expect(result.error, contains('parse_capture_to_items'));
+          expect(
+            result.error,
+            'Day agent workflow failed (MissingCaptureParseException)',
+          );
           expect(conversationRepository.sendMessageCalls, hasLength(2));
           expect(
             conversationRepository.sendMessageCalls[1].toolChoice,
@@ -932,6 +935,14 @@ void main() {
       // Deriving that gap is what models were getting wrong.
       expect(window['availableMinutes'], 115);
       expect(window['earliestStart'], '2026-05-25T15:05:00.000');
+      // The writer rejects a block that ends past the working day, so the
+      // window states that end rather than leaving it to be inferred: a
+      // late-day wake spent a whole draft overrunning it.
+      expect(window['latestEnd'], '2026-05-25T17:00:00.000');
+      expect(
+        conversationRepository.lastSystemMessage,
+        contains('latestEnd'),
+      );
       expect(
         conversationRepository.lastSystemMessage,
         contains('availableMinutes'),

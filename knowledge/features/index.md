@@ -10,7 +10,6 @@ what it does for a user; these describe how it runs.
 * [AI](ai/) - the shared inference plumbing: configuration, provider routing, conversations, embeddings.
 * [Daily OS](daily_os_next/) - the day-planning runtime: coordinator and per-day agents, durable outbox, the capture ritual.
 * [Nudges](nudges.md) - the kind-agnostic banner channel: one view over two entity variants, one visibility contract, one rotating dock.
-* [AI chat](ai_chat.md) - a session-scoped Q&A surface over task history.
 * [AI consumption](ai_consumption.md) - the receipt for every piece of AI work.
 
 # Entries and work
@@ -43,6 +42,7 @@ what it does for a user; these describe how it runs.
 
 * [Settings](settings.md) - the settings shell: how a route becomes a page, desktop master/detail against mobile drill-down, and the shared editor kit.
 * [Settings v2](settings_v2.md) - where that tree is *defined*, and how feature pages are embedded into it as headerless bodies.
+* [System health](system_health.md) - the on-demand log report: daily files in, redaction, a bucketed digest, and a model's top three findings out.
 * [Design system](design_system/) - tokens, theming, and the component contracts.
 * [Theming](theming.md) - theme selection and construction.
 * [Keyboard](keyboard.md) - the desktop command layer.

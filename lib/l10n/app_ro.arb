@@ -413,6 +413,7 @@
   "agentSuggestionTimeEntryUpdateUnavailable": "Înregistrarea originală nu este disponibilă",
   "agentSummaryAddItem": "Adăugați: „{title}”",
   "agentSummaryArchiveItem": "Arhivați: „{title}”",
+  "agentSummaryAssignLabel": "Atribuiți eticheta „{label}”",
   "agentSummaryCheckItem": "Bifați: „{title}”",
   "agentSummaryCreateFollowUp": "Creați sarcină ulterioară: „{title}”",
   "agentSummaryCreateFollowUpRelated": "Creați sarcină ulterioară: „{title}” — {relation}",
@@ -621,8 +622,6 @@
   "aiCardReadMore": "Citiți mai mult",
   "aiCardShowLess": "Afișați mai puțin",
   "aiCardTitle": "Rezumat AI",
-  "aiChatAssistantResponding": "Asistentul răspunde",
-  "aiChatMessageCopied": "Copiat în clipboard",
   "aiConfigFailedToLoadModelsGeneric": "Eșec la încărcarea modelelor. Vă rugăm să încercați din nou.",
   "aiConfigNoModelsAvailable": "Nu sunt configurate modele AI încă. Vă rugăm să adăugați unul în setări.",
   "aiConfigNoSuitableModelsAvailable": "Niciun model nu îndeplinește cerințele pentru acest prompt. Vă rugăm să configurați modele cu capabilitățile necesare.",
@@ -736,44 +735,6 @@
   "aiInferenceErrorUnknownTitle": "Eroare",
   "aiInternalsTitle": "Componente interne ale agentului",
   "aiModelCardDeleteTooltip": "Ștergeți modelul",
-  "aiModelDownloadCloseButton": "Închideți",
-  "aiModelDownloadDialogDescription": "Lotti va descărca {modelName} în cache-ul MLX Audio și îl va utiliza pentru procesarea vocală locală.",
-  "@aiModelDownloadDialogDescription": {
-    "placeholders": {
-      "modelName": {
-        "type": "String"
-      }
-    }
-  },
-  "aiModelDownloadDialogTitle": "Instalați {modelName}",
-  "@aiModelDownloadDialogTitle": {
-    "placeholders": {
-      "modelName": {
-        "type": "String"
-      }
-    }
-  },
-  "aiModelDownloadInstallTooltip": "Instalați modelul",
-  "aiModelDownloadOpenProgressTooltip": "Afișați progresul descărcării",
-  "aiModelDownloadStatusChecking": "Se verifică starea modelului",
-  "aiModelDownloadStatusDownloading": "Se descarcă {percent} %",
-  "@aiModelDownloadStatusDownloading": {
-    "placeholders": {
-      "percent": {
-        "type": "int"
-      }
-    }
-  },
-  "aiModelDownloadStatusDownloadingIndeterminate": "Se descarcă",
-  "aiModelDownloadStatusFailed": "Descărcarea a eșuat",
-  "aiModelDownloadStatusInstalled": "Instalat",
-  "aiModelDownloadStatusNotInstalled": "Neinstalat",
-  "aiModelDownloadStatusUnsupported": "Apple Silicon necesar",
-  "aiModelInstallChoiceCancelButton": "Anulați",
-  "aiModelInstallChoiceDescription": "Alegeți mai întâi modelul local de recunoaștere vocală pe care doriți să-l descărcați. Puteți instala celelalte modele mai târziu din lista de modele.",
-  "aiModelInstallChoiceInstallButton": "Instalați modelul",
-  "aiModelInstallChoiceRecommended": "Recomandat",
-  "aiModelInstallChoiceTitle": "Alegeți modelul MLX Audio",
   "aiModelPickerByProviderLabel": "Alegeți un furnizor",
   "aiModelPickerCurrentDefaultLabel": "Modelul implicit actual",
   "aiModelPickerProviderModelCount": "{count, plural, =1{1 model} few{{count} modele} other{{count} de modele}}",
@@ -941,22 +902,20 @@
   "aiProviderDetailRemoveDescription": "Ștergeți furnizorul și toate modelele care depind de el. Această acțiune este ireversibilă.",
   "aiProviderDetailRemoveTitle": "Eliminați acest furnizor",
   "aiProviderDetailValueUnset": "Nesetat",
-  "aiProviderEmbeddedRuntimeHint": "Rulează integrat în procesul aplicației Apple. Nu este necesar un server local sau un URL de bază.",
   "aiProviderGeminiName": "Google Gemini",
   "aiProviderGenericOpenAiName": "Compatibil OpenAI",
   "aiProviderMeliousName": "Melious.ai",
   "aiProviderMistralName": "Mistral",
-  "aiProviderMlxAudioName": "MLX Audio (local)",
   "aiProviderNebiusAiStudioName": "Nebius AI Studio",
   "aiProviderOllamaName": "Ollama",
   "aiProviderOmlxName": "oMLX (local)",
   "aiProviderOpenAiName": "OpenAI",
   "aiProviderOpenRouterName": "OpenRouter",
+  "aiProviderSherpaName": "sherpa-onnx (pe dispozitiv)",
   "aiProviderTaglineAlibaba": "Modele Qwen · multimodal · context lung",
   "aiProviderTaglineAnthropic": "Familia Claude · context lung",
   "aiProviderTaglineGemini": "Multimodal · transcriere audio",
   "aiProviderTaglineMelious": "Găzduit în UE · catalog dinamic · rutare eco",
-  "aiProviderTaglineMlxAudio": "Integrat · Apple Silicon · audio local",
   "aiProviderTaglineOllama": "Rulează local · fără apeluri în cloud",
   "aiProviderTaglineOmlx": "Inferență MLX locală · compatibilă OpenAI",
   "aiProviderTaglineOpenAi": "Familia GPT · vision + raționament",
@@ -985,6 +944,7 @@
   "aiSettingsCounterModels": "Modele",
   "aiSettingsCounterProfiles": "Profile",
   "aiSettingsCounterProviders": "Furnizori",
+  "aiSettingsDefaultProfileDescription": "Profil de rezervă pentru agenții fără un model configurat pe acest dispozitiv.",
   "aiSettingsEmptyDescription": "Adăugați unul pentru a debloca transcrierea, recunoașterea de imagini, generarea de imagini și căutarea semantică.",
   "aiSettingsEmptyTitle": "Încă niciun furnizor",
   "aiSettingsFilterByCapabilityTooltip": "Filtrează după capabilitatea {capability}",
@@ -1010,6 +970,7 @@
   "aiSettingsModalityAudio": "Audio",
   "aiSettingsModalityText": "Text",
   "aiSettingsModalityVision": "Viziune",
+  "aiSettingsNoDefaultProfile": "Niciun profil implicit",
   "aiSettingsNoModelsConfigured": "Niciun model AI configurat",
   "aiSettingsNoProvidersConfigured": "Niciun furnizor AI configurat",
   "aiSettingsPageLead": "Configurați furnizorii AI, modelele pe care Lotti le poate apela și profilurile de inferență care decid ce model gestionează fiecare sarcină.",
@@ -1210,6 +1171,10 @@
   "audioRecordingResume": "Reluare",
   "audioRecordings": "Înregistrări audio",
   "audioRecordingStop": "Opriți",
+  "avatarCropHint": "Trageți pentru a muta · apropiați degetele pentru zoom",
+  "avatarCropPreviewLabel": "Așa va arăta în listă",
+  "avatarCropTitle": "Alegeți fața",
+  "avatarCropUse": "Folosiți fotografia",
   "backfillAdvancedRecoveryActions": "{count, plural, =1{1 acțiune} other{{count} acțiuni}}",
   "@backfillAdvancedRecoveryActions": {
     "placeholders": {
@@ -1388,49 +1353,162 @@
   "chatInputStopRealtime": "Opriți transcrierea în timp real",
   "chatInputStopTranscribe": "Opriți și transcrieți",
   "chatInputTranscriptionFailed": "Înregistrarea a fost captată, dar transcrierea a eșuat. Vă rugăm să încercați din nou.",
+  "checkInAddMoreButton": "Adăugați",
+  "checkInAudioSaved": "{length} de sunet salvat",
+  "checkInAudioSavedAsYouGo": "Sunetul se salvează pe acest dispozitiv pe măsură ce înregistrați",
+  "checkInAudioSavedRoute": "{length} de sunet salvat · {route}",
   "checkInAvoidLabel": "De evitat",
-  "checkInDateLabel": "Când?",
-  "checkInDeleteConfirmMessage": "Ștergeți această înregistrare? Acțiunea nu poate fi anulată.",
-  "checkInDone": "Gata",
-  "@checkInDone": {
-    "description": "Relationships redesign label."
+  "checkInComposerSubtitle": "cu {name} · ultima discuție {day}",
+  "checkInComposerSubtitleNoContact": "cu {name} · încă niciun check-in",
+  "checkInComposerWithName": "cu {name}",
+  "@checkInComposerWithName": {
+    "description": "The composer header's status line when only the person fits: the name is never shed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
+  "checkInContextSummary": "{type} · {time} · {duration}",
+  "checkInDeleteConfirmMessage": "Ștergeți această înregistrare? Acțiunea nu poate fi anulată.",
+  "checkInDictateButton": "Dictați",
+  "checkInDiscardDraftAudioKeptMessage": "Renunțați la acest check-in? Înregistrarea rămâne în jurnal.",
+  "@checkInDiscardDraftAudioKeptMessage": {
+    "description": "The discard confirmation while a saved recording exists: the check-in goes, the audio stays in the journal."
+  },
+  "checkInDiscardDraftMessage": "Renunțați la acest check-in? Nu s-a salvat nimic.",
+  "checkInDiscardDraftRecordingMessage": "Renunțați la acest check-in și la înregistrare? Înregistrarea va fi ștearsă.",
+  "checkInDiscardRecording": "Renunțați",
+  "checkInDiscardRecordingBody": "Înregistrarea audio este ștearsă. Check-in-ul dvs. rămâne deschis.",
+  "@checkInDiscardRecordingBody": {
+    "description": "Body of the confirmation before discarding a check-in recording: the audio is deleted, the composer stays open."
+  },
+  "checkInDismissButton": "Închideți",
+  "checkInDurationChip": "Durată",
+  "checkInDurationChipSemantics": "Durată: {duration}. Schimbați",
+  "checkInDurationQuickPickHint": "Atingeți o durată pentru a o salva sau rotiți rotița.",
+  "checkInDurationSemanticsLabel": "Setați durata la {label}",
   "checkInEditTitle": "Editați înregistrarea",
   "checkInErrorCreateFailed": "Înregistrarea nu a putut fi salvată. Încercați din nou.",
   "checkInErrorDeleteFailed": "Înregistrarea nu a putut fi ștearsă. Încercați din nou.",
-  "checkInHowDidItFeel": "Cum a fost?",
-  "@checkInHowDidItFeel": {
-    "description": "Relationships redesign label."
-  },
-  "checkInHowDidYouConnect": "Cum a fost contactul?",
-  "@checkInHowDidYouConnect": {
-    "description": "Relationships redesign label."
-  },
   "checkInInteractionCall": "Apel",
   "checkInInteractionInPerson": "În persoană",
   "checkInInteractionLabel": "Cum ați vorbit?",
   "checkInInteractionMessage": "Mesaj",
   "checkInInteractionOther": "Altfel",
   "checkInInteractionVideoCall": "Apel video",
-  "checkInNarrativeLabel": "Despre ce ați vorbit?",
+  "checkInMicrophoneDeniedBody": "Activați-l pentru Lotti în setările de sistem, apoi atingeți Dictați. Nu s-a înregistrat nimic.",
+  "checkInMicrophoneDeniedCalloutTitle": "Permiteți accesul la microfon",
+  "@checkInMicrophoneDeniedCalloutTitle": {
+    "description": "The refused-microphone card's title: the next step, since the header status already says the microphone is unavailable."
+  },
+  "checkInMoreCaptionFeeling": "Impresie",
+  "@checkInMoreCaptionFeeling": {
+    "description": "Folded More row caption segment while no feeling is chosen."
+  },
+  "checkInMoreCaptionNextTime": "data viitoare",
+  "@checkInMoreCaptionNextTime": {
+    "description": "Folded More row caption segment while nothing is noted for next time."
+  },
+  "checkInMoreCaptionNextTimeSet": "data viitoare notată",
+  "@checkInMoreCaptionNextTimeSet": {
+    "description": "Folded More row caption segment once something is noted for next time."
+  },
+  "checkInMoreCaptionTopics": "subiecte",
+  "@checkInMoreCaptionTopics": {
+    "description": "Folded More row caption segment while no topics are entered."
+  },
+  "checkInMoreCaptionTopicsCount": "{count, plural, =1{1 subiect} few{{count} subiecte} other{{count} de subiecte}}",
+  "@checkInMoreCaptionTopicsCount": {
+    "description": "Folded More row caption segment: how many topics are entered.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkInMoreSection": "Mai mult",
+  "checkInNarrativeHint": "Despre ce ați vorbit? O linie este de ajuns.",
+  "checkInNoDuration": "Fără durată",
+  "checkInOpenSettingsButton": "Deschideți setările",
+  "checkInOrTypeHint": "Sau scrieți aici…",
   "checkInPayAttentionLabel": "Data viitoare, acordați atenție la",
-  "checkInPreparedOverline": "✦ LOTTI · PREGĂTIT AZI-DIMINEAȚĂ",
+  "checkInPreparingLabel": "Se pregătește sunetul…",
+  "checkInRecorderBusyBody": "Opriți-o mai întâi din indicatorul de înregistrare, apoi încercați din nou. Nu s-a înregistrat nimic nou.",
+  "checkInRecorderBusyTitle": "O înregistrare este deja în curs",
+  "checkInRecordingFailedBody": "Microfonul nu a putut fi pornit. Încercați din nou sau scrieți check-in-ul. Nu s-a înregistrat nimic.",
+  "checkInRecordingFailedTitle": "Înregistrarea nu a pornit",
+  "checkInRecordingHint": "Vorbiți normal. Cuvintele apar aici când opriți.",
+  "checkInRecordingNotSavedBody": "Înregistrarea nu a putut fi salvată. Încercați din nou sau scrieți check-in-ul.",
+  "checkInRecordingNotSavedTitle": "Înregistrarea nu a putut fi salvată",
+  "checkInReRecordButton": "Reînregistrați",
+  "checkInReRecordReplaceMessage": "Înlocuiți cuvintele editate cu o înregistrare nouă?",
+  "@checkInReRecordReplaceMessage": {
+    "description": "Confirmation before Re-record when the transcript has been edited since it landed."
+  },
+  "checkInSaveBlockedEmpty": "Adăugați câteva cuvinte pentru a salva",
+  "checkInSaveBlockedRecording": "Opriți înregistrarea pentru a salva",
+  "checkInSaveBlockedRetry": "Scrieți sau reîncercați pentru a salva",
+  "checkInSaveBlockedTranscribing": "Se așteaptă transcrierea",
+  "checkInSaveButton": "Salvați check-in-ul",
+  "checkInSaveShortButton": "Salvați",
+  "checkInSaveShortcutHint": "{shortcut} pentru salvare",
   "checkInSentimentDelightful": "Minunat",
   "checkInSentimentDifficult": "Dificil",
   "checkInSentimentGood": "Bine",
   "checkInSentimentLabel": "Cum a fost?",
   "checkInSentimentNeutral": "Neutru",
+  "checkInSentimentOptional": "Opțional. Agentul nu completează niciodată.",
   "checkInSentimentStrained": "Tensionat",
+  "checkInSourceCall": "Din apelul pe care l-ați făcut de pe această pagină. Totul se poate edita.",
+  "checkInSourceMessage": "Din mesajul pe care l-ați trimis de pe această pagină. Totul se poate edita.",
   "checkInSpeakButton": "Dictați contactul",
+  "checkInSpokenMinutes": "{count, plural, =1{1 minut} few{{count} minute} other{{count} de minute}}",
+  "@checkInSpokenMinutes": {
+    "description": "Minutes of a recording length, read by assistive technology.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkInSpokenSeconds": "{count, plural, =1{1 secundă} few{{count} secunde} other{{count} de secunde}}",
+  "@checkInSpokenSeconds": {
+    "description": "Seconds of a recording length, read by assistive technology.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkInStartedLabel": "Început",
+  "checkInStatusMicrophoneDenied": "Microfon indisponibil",
+  "checkInStatusPaused": "În pauză",
+  "checkInStatusRecorderBusy": "Reportofon ocupat",
+  "checkInStatusRecording": "Se înregistrează",
+  "checkInStatusRecordingFailed": "Înregistrarea nu a pornit",
+  "checkInStatusRecordingNotSaved": "Înregistrare nesalvată",
+  "checkInStatusTranscriptionUnavailable": "Niciun model de transcriere",
+  "checkInStatusTranscriptMissing": "Transcrierea nu a fost primită",
+  "checkInTimeChipSemantics": "Început: {time}. Schimbați",
   "checkInTopicsHint": "Separate prin virgulă, de ex. muncă, călătorii",
   "checkInTopicsLabel": "Subiecte",
-  "checkInTranscribingLabel": "Se transcrie…",
-  "checkInTranscriptFailed": "Nu a venit nicio transcriere. O puteți scrie dvs.",
-  "checkInTranscriptUnavailable": "Transcrierea nu este configurată pentru această persoană. Adăugați un model audio și activați inferența automată pentru categoria sa, sau scrieți contactul.",
-  "checkInWriteInstead": "Scrie în schimb",
-  "@checkInWriteInstead": {
-    "description": "Relationships redesign label."
+  "checkInTranscribingEta": "de obicei sub un minut",
+  "@checkInTranscribingEta": {
+    "description": "The last, first-shed tier of the transcribing caption: a time expectation for the wait."
   },
+  "checkInTranscribingLabel": "Se transcrie…",
+  "checkInTranscriptAdded": "Transcriere adăugată",
+  "checkInTranscriptionUnavailableTitle": "Niciun model de transcriere configurat",
+  "checkInTranscriptMissingBody": "Înregistrarea dvs. de {length} rămâne salvată în jurnal, chiar dacă renunțați la acest check-in. Încercați din nou în scurt timp.",
+  "checkInTranscriptMissingCalloutTitle": "Încercați din nou sau scrieți",
+  "@checkInTranscriptMissingCalloutTitle": {
+    "description": "The transcript-not-received card's title: the next step, since the header status already names the state."
+  },
+  "checkInTranscriptUnavailable": "Selectați un profil de inferență implicit cu un model de transcriere în setările AI sau scrieți înregistrarea de contact.",
+  "checkInTypeChipSemantics": "Tip: {type}. Schimbați",
+  "checkInTypeInstead": "Scrieți în schimb",
+  "checkInWordCount": "{count, plural, =1{1 cuvânt} few{{count} cuvinte} other{{count} de cuvinte}}",
   "checklistAddItem": "Adăugați un element nou",
   "checklistAiConfidenceLabel": "Încredere: {level}",
   "@checklistAiConfidenceLabel": {
@@ -1494,7 +1572,7 @@
   "configFlagEnableAiStreaming": "Activați transmiterea în flux AI pentru acțiunile legate de sarcini",
   "configFlagEnableAiStreamingDescription": "Transmiteți răspunsurile AI în flux pentru acțiunile legate de sarcini. Dezactivați opțiunea pentru a păstra răspunsurile în memoria tampon și a menține interfața mai fluidă.",
   "configFlagEnableAiSummaryTts": "Redare rezumate AI",
-  "configFlagEnableAiSummaryTtsDescription": "Afișează butonul local text-to-speech pentru rezumatele AI ale sarcinilor. Necesită un model TTS MLX Audio instalat.",
+  "configFlagEnableAiSummaryTtsDescription": "Afișează butonul local text-to-speech pentru rezumatele AI ale sarcinilor. Necesită un model TTS Supertonic instalat.",
   "configFlagEnableDailyOs": "Activează DailyOS",
   "configFlagEnableDailyOsDescription": "Afișează DailyOS în navigarea principală.",
   "configFlagEnableDashboardsPage": "Activați pagina Tablouri de bord",
@@ -1514,6 +1592,8 @@
   "configFlagEnableNotificationsDescription": "Primiți notificări pentru mementouri, actualizări și evenimente importante.",
   "configFlagEnableProjects": "Activați proiectele",
   "configFlagEnableProjectsDescription": "Afișează funcțiile de gestionare a proiectelor pentru organizarea sarcinilor în proiecte.",
+  "configFlagEnableQueryChat": "Chat experimental pentru sarcini",
+  "configFlagEnableQueryChatDescription": "Afișează chaturi pentru sarcini, proiecte și categorii. Dezactivat implicit.",
   "configFlagEnableRelationships": "Activați pagina Persoane",
   "configFlagEnableRelationshipsDescription": "Afișează fila Persoane pentru a vă îngriji relațiile personale.",
   "configFlagEnableSessionRatings": "Activați evaluările de sesiune",
@@ -2492,6 +2572,7 @@
   "designSystemTextareaWithCounterLabel": "Cu contor",
   "designSystemTextareaWithErrorLabel": "Cu eroare",
   "designSystemTextareaWithHelperLabel": "Cu text ajutător",
+  "designSystemTieredTextTitle": "Text pe niveluri la trei lățimi",
   "designSystemTimePickerFormatsTitle": "Formate de oră",
   "designSystemTimePickerTwelveHourLabel": "12 ore",
   "designSystemTimePickerTwentyFourHourLabel": "24 de ore",
@@ -3037,6 +3118,8 @@
   "imageViewerPreviousTooltip": "Imaginea anterioară",
   "inactiveLabel": "Inactiv",
   "inactiveSwitchDescription": "Poate fi ales pentru intrări noi când este activ",
+  "inferenceProfileChat": "Model de chat",
+  "inferenceProfileChatUsesThinking": "Fără model de chat selectat, se folosește modelul de gândire",
   "inferenceProfileChooseModelTitle": "Alegeți un model",
   "inferenceProfileChooseTitle": "Alegeți un profil de inferență",
   "inferenceProfileCreateTitle": "Creați un profil",
@@ -3670,14 +3753,13 @@
   "multiSelectNoItemsFound": "Nu s-au găsit elemente",
   "navSidebarManualBrowserHint": "Se deschide în browserul dvs.",
   "navSidebarManualLabel": "Ghid",
-  "navTabMoreSemanticsLabel": "{count, plural, =1{Mai multe, 1 secțiune suplimentară} few{Mai multe, {count} secțiuni suplimentare} other{Mai multe, {count} de secțiuni suplimentare}}",
   "navTabTitleCalendar": "DailyOS",
   "navTabTitleEvents": "Evenimente",
   "navTabTitleGoals": "Obiective",
   "navTabTitleHabits": "Obiceiuri",
   "navTabTitleInsights": "Informaţii",
   "navTabTitleJournal": "Jurnal",
-  "navTabTitleMore": "Mai multe",
+  "navTabTitleNavigate": "Navigare",
   "navTabTitlePeople": "Persoane",
   "navTabTitleProjects": "Proiecte",
   "navTabTitleSettings": "Setări",
@@ -3874,6 +3956,47 @@
   "panasScaleModerately": "Moderat",
   "panasScaleQuiteABit": "Destul de mult",
   "panasScaleVerySlightlyOrNotAtAll": "Deloc sau foarte puțin",
+  "plazaBlockedReason": "blocată — este necesară o decizie",
+  "plazaCategoryEmpty": "Această categorie nu are proiecte vizibile.",
+  "plazaClosedForNight": "ÎNCHIS PESTE NOAPTE",
+  "plazaCloseHint": "Esc pentru a închide",
+  "plazaControls": "WASD mers · țineți apăsat Shift: viteză ×8 · trageți pentru a privi · Tab următorul reper · H acasă · M vedere de ansamblu · / căutare · T bara de instrumente · Esc închide · ⌘[ înapoi",
+  "plazaCornerAfter": "Viraj după {week}",
+  "plazaDebug": "Depanare",
+  "plazaDecisionStrip": "ESTE NECESARĂ O DECIZIE",
+  "plazaDoneCount": "Finalizate: {done} din {total}",
+  "plazaDueOn": "termen {date}",
+  "plazaDueSoonReason": "termen {date} — finalizați-o",
+  "plazaEmpty": "Adăugați o sarcină pentru a începe construirea pieței acestui proiect.",
+  "plazaEnterProject": "Intrați în proiect",
+  "plazaExploreCategory": "Explorați categoria",
+  "plazaExploreProject": "Explorați proiectul",
+  "plazaFlyThere": "Zburați acolo ›",
+  "plazaInProgressCount": "În desfășurare: {count}",
+  "plazaLinks": "legături {count}",
+  "plazaMeerkats": "Suricate",
+  "plazaMorningWalk": "Plimbare de dimineață",
+  "plazaNeedsAttention": "Necesită atenție: {count}",
+  "plazaOpeningSoon": "DESCHIDERE ÎN CURÂND",
+  "plazaOpenLate": "DESCHIS PÂNĂ TÂRZIU",
+  "plazaOverdueSince": "întârziată din {date} — finalizați sau amânați",
+  "plazaOverview": "Vedere de ansamblu",
+  "plazaPaused": "În pauză",
+  "plazaProjectOverdue": "Sarcini întârziate: {count}",
+  "plazaSearchHint": "Căutați sarcini, Enter pentru a zbura",
+  "plazaShowPenguins": "Pinguini",
+  "plazaSkyDay": "Zi",
+  "plazaSkyNight": "Noapte",
+  "plazaStaleReason": "fără activitate de {days} zile — reluați-o",
+  "plazaStats": "{tasks} sarcini · {weeks} săptămâni · {attention} necesită atenție",
+  "plazaTaskCount": "Sarcini: {count}",
+  "plazaTitle": "Piață",
+  "plazaToggleToolbar": "Afișați / ascundeți bara de instrumente",
+  "plazaToLet": "DE ÎNCHIRIAT",
+  "plazaTourControls": "Spațiu: pauză · mișcați-vă pentru a ieși",
+  "plazaUnavailable": "Acest dispozitiv nu poate afișa lumea 3D.",
+  "plazaWeek": "S{week} · {date}",
+  "plazaWeekShort": "S{week}",
   "privateLabel": "Privat",
   "privateSwitchDescription": "Vizibil doar când intrările private sunt afișate",
   "projectActionAddTask": "Adăugați o sarcină",
@@ -4205,6 +4328,129 @@
   "provisionedSyncSummaryHomeserver": "Server de sincronizare",
   "provisionedSyncSummaryUser": "Cont de sincronizare",
   "provisionedSyncTitle": "Dispozitive",
+  "queryActionsAccept": "Acceptați",
+  "queryActionsDismiss": "Respingeți",
+  "queryActionsIncomplete": "Unele modificări nu au putut fi aplicate. Modificările deja aplicate nu se vor repeta când încercați din nou.",
+  "queryActionsReview": "Modificări propuse",
+  "queryActionsTarget": "Pentru: {target}",
+  "queryAllSources": "Toate",
+  "queryArchiveChat": "Arhivați conversația",
+  "queryArchiveConfirmation": "Conversație arhivată. Concluziile rămân disponibile.",
+  "queryArchivedChats": "Conversații arhivate",
+  "queryArchivedReadOnly": "Această conversație este arhivată. Restabiliți-o pentru a continua.",
+  "queryAsk": "Întrebați",
+  "queryAskCategory": "Întrebați despre această categorie",
+  "queryAskProject": "Întrebați despre acest proiect",
+  "queryAskTask": "Întrebați despre această sarcină",
+  "queryAudioFailed": "Fișierul audio nu a putut fi pregătit sau redat. Încercați din nou.",
+  "queryAudioListen": "Ascultați · {start}–{end}",
+  "queryAudioMissingFile": "Înregistrarea nu este încă disponibilă pe acest dispozitiv.",
+  "queryAudioNoMatch": "Acest citat nu a putut fi asociat fără ambiguitate cu înregistrarea. Puteți deschide în continuare însemnarea completă.",
+  "queryAudioOpenRecording": "Deschideți înregistrarea",
+  "queryAudioPlaying": "Se redă {start}–{end}",
+  "queryAudioPrepare": "Pregătiți fragmentul audio",
+  "queryAudioPreparing": "Se pregătește redarea audio…",
+  "queryAudioReadAloud": "Ascultați răspunsul",
+  "queryAudioReading": "Se citește răspunsul cu voce tare",
+  "queryAudioRetry": "Reîncercați redarea audio",
+  "queryAudioSetupDetails": "Detalii de configurare",
+  "queryAudioSetupRequired": "Fragmentele audio necesită un model de transcriere compatibil.",
+  "queryAudioStale": "Înregistrarea s-a schimbat. Pregătiți din nou marcajele temporale.",
+  "queryAudioStop": "Opriți redarea audio",
+  "queryAudioTimingUnavailable": "Pentru a pregăti fragmente, selectați Melious Whisper sau un model de transcriere Mistral Voxtral compatibil în profilul de inferență al acestui agent. Adresa URL a furnizorului trebuie să utilizeze HTTPS.",
+  "queryAudioTooLarge": "Puteți pregăti marcaje temporale pentru înregistrări de până la 25 MB. Alegeți o înregistrare mai mică.",
+  "queryAudioUploadNotice": "Pregătirea marcajelor temporale trimite această înregistrare furnizorului de transcriere configurat pentru acest agent.",
+  "queryCategoryAgent": "Agent de categorie",
+  "queryChat": "Chat",
+  "queryChats": "Conversații",
+  "queryChecked": "Surse verificate: {count}",
+  "queryCloseChat": "Închideți conversația",
+  "queryCollapseChat": "Restrângeți conversația",
+  "queryCopied": "Copiat",
+  "queryCopyQuote": "Copiați citatul",
+  "queryCoverage": "Ce s-a căutat",
+  "queryCoverageCategory": "Această categorie",
+  "queryCoverageExcluded": "Nu s-a căutat în alte categorii.",
+  "queryCoverageUnreadable": "Nu exista text căutabil la redactarea acestui răspuns. Deschideți înregistrarea audio pentru a o verifica.",
+  "queryCoverageWider": "Alte înregistrări din această categorie",
+  "queryDeleteChat": "Ștergeți conversația",
+  "queryDeleteExplanation": "Ștergeți această conversație? Alegeți ce se întâmplă cu concluziile partajate. Înregistrările sursă nu sunt afectate.",
+  "queryDeleteForget": "Ștergeți și eliminați concluziile",
+  "queryDeleteKeep": "Ștergeți și păstrați concluziile",
+  "queryDictated": "Puteți edita transcrierea înainte de a trimite întrebarea. Este posibil ca sunetul să fi fost deja trimis furnizorului dvs. de transcriere.",
+  "queryDraftProvisional": "Ciornă · încă neverificată",
+  "queryDraftRetracted": "Ciorna răspunsului nu a putut fi verificată. Încercați din nou.",
+  "queryEarlierTextOmitted": "[Textul anterior nu este afișat]",
+  "queryEmptyBody": "Întrebați despre decizii și activități anterioare. Răspunsurile disting rezumatele de pasajele exacte.",
+  "queryExactStoredText": "Textul exact salvat",
+  "queryExactText": "Afișați textul exact",
+  "queryExampleDecision": "Ce am convenit?",
+  "queryExampleMeeting": "În ce ședință am discutat acest lucru?",
+  "queryExampleSuggestion": "A fost o decizie sau o sugestie?",
+  "queryExpandChat": "Extindeți conversația",
+  "queryExpanding": "Se verifică alte înregistrări din această categorie…",
+  "queryFailed": "Căutarea nu s-a putut încheia. Reîncercați.",
+  "queryForgetConclusions": "Uitați concluziile",
+  "queryHideExactText": "Ascundeți textul exact",
+  "queryHideSurrounding": "Ascundeți textul din jur",
+  "queryHomeOnly": "Doar domeniul inițial",
+  "queryHomeScope": "Domeniu inițial",
+  "queryIncomplete": "Căutarea este incompletă. Lipsa dovezilor nu înseamnă că discuția nu a avut loc niciodată.",
+  "queryIncompleteShort": "Unele surse nu au putut fi verificate.",
+  "queryInferenceUnavailable": "Nu există o configurație AI utilizabilă. Configurați modelul agentului sau profilul implicit al categoriei, apoi reîncercați.",
+  "queryKeepConclusions": "Păstrați concluziile",
+  "queryLaterTextOmitted": "[Textul ulterior nu este afișat]",
+  "queryMachineTranscript": "Transcriere automată: formularea exactă salvată, neverificată cu sunetul.",
+  "queryMemoryCount": "Concluzii disponibile din conversații anterioare: {count}",
+  "queryMissingTranscripts": "{count, plural, one{1 înregistrare audio nu avea text căutabil la redactarea acestui răspuns.} few{{count} înregistrări audio nu aveau text căutabil la redactarea acestui răspuns.} other{{count} de înregistrări audio nu aveau text căutabil la redactarea acestui răspuns.}}",
+  "queryNewChat": "Conversație nouă",
+  "queryNoAgent": "Acest domeniu necesită agentul său obișnuit. Reveniți la detalii pentru a-l atribui.",
+  "queryNotes": "Note",
+  "queryOpenCurrentEntry": "Deschideți înregistrarea actuală",
+  "queryOpenEntry": "Deschideți înregistrarea",
+  "queryOriginalsHome": "Consultă doar această sarcină și înregistrările legate direct de ea.",
+  "queryOtherProject": "În afara domeniului inițial",
+  "queryPreparingAnswer": "Se pregătește un răspuns…",
+  "queryReachCategory": "Se caută în acest domeniu și în {category}.",
+  "queryReachCategoryOnly": "Se caută în {category}.",
+  "queryReachHome": "Se caută doar în acest domeniu și în înregistrările asociate.",
+  "queryReachUncategorized": "Se caută doar în această sarcină și în înregistrările fără categorie legate direct de ea.",
+  "queryRecall": "Acest răspuns a folosit concluzii salvate.",
+  "queryRecordings": "Înregistrări audio",
+  "queryRecordingTranscript": "Transcrierea înregistrării",
+  "queryRenameChat": "Redenumiți conversația",
+  "queryRestoreChat": "Restabiliți conversația",
+  "querySavedConclusion": "Concluzie salvată la {date}",
+  "querySavedQuote": "Acest citat salvat reflectă sursa din momentul redactării răspunsului.",
+  "querySavedVersion": "Versiune salvată: {version}",
+  "@querySavedVersion": {
+    "description": "Identifies the historical text version by edit date or short content fingerprint.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "querySavedVersionUnavailable": "Data versiunii nu este disponibilă",
+  "querySearching": "Se consultă informațiile disponibile…",
+  "querySearchScope": "Domeniul de căutare și filtre",
+  "querySourceAction": "{action}: {source}",
+  "querySourceChanged": "Sursa a fost modificată",
+  "querySourceDeleted": "Sursă ștearsă",
+  "querySourceMoved": "Sursă mutată în altă categorie",
+  "querySummaryBased": "Bazat pe rezumate",
+  "querySummaryCoverage": "Acest răspuns folosește rezumate ale sarcinilor sau proiectelor. Înregistrările originale nu au fost consultate.",
+  "querySummaryCurrent": "Deschideți o sarcină sau un proiect pentru a consulta rezumatul actual. Este posibil să se fi schimbat de la acest răspuns.",
+  "querySummaryIncomplete": "Unele informații lipsesc din rezumatele disponibile.",
+  "querySummaryOwners": "Despre acest răspuns",
+  "querySurroundingLimit": "Acesta este fragmentul salvat, care poate să nu includă întreaga discuție.",
+  "querySurroundingText": "Afișați textul din jur",
+  "queryTranscribing": "Se transcrie înregistrarea dvs. Este posibil ca furnizorul să fi primit deja sunetul.",
+  "queryUnavailable": "Acest domeniu nu mai este disponibil cu setările dvs. actuale de vizibilitate.",
+  "queryUnread": "Răspuns nou",
+  "queryWelcomeCategory": "Întrebați agentul {agentName} despre această categorie",
+  "queryWelcomeProject": "Întrebați agentul {agentName} despre acest proiect",
+  "queryWelcomeTask": "Întrebați agentul {agentName} despre această sarcină",
   "queueCatchUpNowButton": "Recuperați acum",
   "queueCatchUpNowDone": "Recuperare inițiată — coada se golește.",
   "queueCatchUpNowError": "Recuperare eșuată: {reason}",
@@ -4285,23 +4531,41 @@
   "relationshipActionFailed": "Nimic de pe acest dispozitiv nu poate deschide acest lucru",
   "relationshipActionMessage": "Mesaj",
   "relationshipAddChannelButton": "Adăugați o modalitate de contact",
-  "relationshipAsk": "Întreabă",
-  "@relationshipAsk": {
-    "description": "Relationships redesign label."
+  "relationshipAddChannelFromContacts": "sau din contacte",
+  "relationshipAgentAsOfBand": "{band} · actualizat {age}",
+  "relationshipAgentBriefNow": "Creați briefingul acum",
+  "relationshipAgentCall": "Sunați pe {name}",
+  "relationshipAgentFailedBody": "Furnizorul a returnat o eroare înainte ca briefingul să fie scris. Check-in-urile dvs. sunt neschimbate.",
+  "relationshipAgentFailedNoModel": "Nu este configurat niciun model pentru briefinguri. Alegeți unul în Setări AI › Agenți. Detaliile sunt în fila Activitate.",
+  "relationshipAgentFailedPlain": "Ultima rulare a eșuat",
+  "relationshipAgentLastRunFailed": "Ultima rulare a eșuat · {time}",
+  "relationshipAgentMarkImportant": "Marcați persoana ca importantă",
+  "relationshipAgentNoAgent": "Niciun agent pentru această persoană",
+  "relationshipAgentNoBriefingBody": "{count, plural, =0{Niciun briefing încă. „Creați briefingul acum“ scrie unul de îndată ce înregistrați un check-in; nu vede niciodată telefonul sau e-mailul.} =1{Niciun briefing încă. „Creați briefingul acum“ scrie unul din check-in-ul dumneavoastră; nu vede niciodată telefonul sau e-mailul.} few{Niciun briefing încă. „Creați briefingul acum“ scrie unul din cele {count} check-in-uri; nu vede niciodată telefonul sau e-mailul.} other{Niciun briefing încă. „Creați briefingul acum“ scrie unul din cele {count} de check-in-uri; nu vede niciodată telefonul sau e-mailul.}}",
+  "relationshipAgentNotEnrolledBody": "Marcați {name} ca important(ă) pentru a primi un chat, notificări când a trecut ceva timp și un briefing.",
+  "relationshipAgentOnlyYourStartsUseAi": "Doar ce porniți dvs. folosește IA",
+  "relationshipAgentOutOfDateNewCheckIn": "Depășit · check-in nou {day}",
+  "relationshipAgentOutOfDateNewCheckInShort": "Depășit · check-in nou",
+  "@relationshipAgentOutOfDateNewCheckInShort": {
+    "description": "The out-of-date status line's middle tier when the day does not fit beside the age pill."
   },
+  "relationshipAgentPausedBody": "Briefingurile sunt în pauză cât timp această persoană este inactivă sau arhivată.",
+  "relationshipAgentProposedCount": "{count, plural, =1{1 propunere} few{{count} propuneri} other{{count} de propuneri}}",
+  "relationshipAgentReadingBody": "{count, plural, =0{Se pregătește briefingul. De obicei sub un minut.} =1{Se citește 1 check-in. De obicei sub un minut.} few{Se citesc {count} check-in-uri. De obicei sub un minut.} other{Se citesc {count} de check-in-uri. De obicei sub un minut.}}",
+  "relationshipAgentSeeActivity": "Vedeți activitatea",
+  "relationshipAgentSources": "Surse: {count, plural, =1{1 check-in} few{{count} check-in-uri} other{{count} de check-in-uri}} · canalele de contact nu sunt trimise niciodată",
+  "relationshipAgentTryAgain": "Încercați din nou",
+  "relationshipAgentWatching": "Agentul urmărește",
+  "relationshipAgentWatchingNextLook": "Agentul urmărește · următoarea verificare {day}",
+  "relationshipAgentWriting": "Se scrie briefingul…",
   "relationshipBannerSemanticLabel": "Banner de relație pentru {personName}",
+  "relationshipBriefingAge": "{days, plural, =1{vechi de 1 zi} few{vechi de {days} zile} other{vechi de {days} de zile}}",
   "relationshipBriefingDisclosureBody": "Rezumatul rulează pe {provider}. Notițele despre această persoană vor fi trimise acolo pentru procesare.",
   "relationshipBriefingDisclosureConfirm": "Continuați",
   "relationshipBriefingDisclosureTitle": "Trimiteți la {provider}?",
-  "relationshipBriefingEmpty": "Niciun rezumat încă — Pune-mă la curent pregătește unul din check-inurile dvs.",
   "relationshipBriefingRequested": "Rezumat solicitat — va apărea aici în curând.",
   "relationshipBriefingRequestFailed": "Rezumatul nu a putut fi solicitat.",
   "relationshipBriefingTitle": "Rezumat",
-  "relationshipBriefMeAgain": "Pune-mă la curent din nou",
-  "@relationshipBriefMeAgain": {
-    "description": "Relationships redesign label."
-  },
-  "relationshipBriefMeButton": "Pune-mă la curent",
   "relationshipCadenceEveryNDays": "{days, plural, =1{În fiecare zi} few{La fiecare {days} zile} other{La fiecare {days} de zile}}",
   "relationshipCadenceFortnightly": "La două săptămâni",
   "relationshipCadenceLabel": "Ritmul contactului",
@@ -4315,18 +4579,13 @@
   "@relationshipCadenceOnTrack": {
     "description": "Relationships redesign label."
   },
+  "relationshipCadencePromptLabel": "Amintiți-mi la fiecare",
   "relationshipCadenceQuarterly": "Trimestrial",
   "relationshipCadenceWeekly": "Săptămânal",
+  "relationshipChatAgentSubtitle": "Cunoaște check-in-urile dvs., nu canalele de contact",
+  "relationshipChatAgentTitle": "{name} · agent de briefing",
   "relationshipChatTooltip": "Discutați despre această persoană",
   "relationshipChatUnavailable": "Niciun agent încă — marcați mai întâi această persoană ca importantă.",
-  "relationshipCheckedInLabel": "Înregistrare {date}",
-  "@relationshipCheckedInLabel": {
-    "placeholders": {
-      "date": {
-        "type": "String"
-      }
-    }
-  },
   "relationshipCheckInReminderBody": "Un moment bun pentru a lua legătura.",
   "relationshipCheckInReminderTitle": "Luați legătura cu {name}?",
   "@relationshipCheckInReminderTitle": {
@@ -4337,14 +4596,6 @@
     }
   },
   "relationshipCheckInsLabel": "Înregistrări",
-  "relationshipCheckInTitle": "Înregistrare · {name}",
-  "@relationshipCheckInTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "relationshipContactCardAction": "Card de contact",
   "@relationshipContactCardAction": {
     "description": "Relationships redesign label."
@@ -4355,6 +4606,14 @@
   "relationshipContactMissing": "Acel contact nu se află pe acest dispozitiv",
   "relationshipContactNoChanges": "Nu este nimic nou de copiat",
   "relationshipCreateTitle": "Adăugați o persoană",
+  "relationshipDaysOver": "{count, plural, =1{1 zi de întârziere} few{{count} zile de întârziere} other{{count} de zile de întârziere}}",
+  "@relationshipDaysOver": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "relationshipDeleteConfirmMessage": "Se vor șterge și toate înregistrările asociate. Acțiunea nu poate fi anulată.",
   "relationshipDeleteConfirmTitle": "Ștergeți {name}?",
   "relationshipDueDay": "Până {day}",
@@ -4365,11 +4624,54 @@
       }
     }
   },
+  "relationshipDueSince": "Scadent din {day} · {count, plural, =1{1 zi de întârziere} few{{count} zile de întârziere} other{{count} de zile de întârziere}}",
+  "@relationshipDueSince": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipDueToday": "Scadent astăzi",
+  "relationshipDurationHours": "{hours} h",
+  "@relationshipDurationHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipDurationHoursMinutes": "{hours} h {minutes}",
+  "@relationshipDurationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipDurationMinutes": "{count} min",
+  "@relationshipDurationMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "relationshipEditTitle": "Editați persoana",
   "relationshipErrorCreateFailed": "Persoana nu a putut fi salvată. Încercați din nou.",
   "relationshipErrorDeleteFailed": "Persoana nu a putut fi ștearsă. Încercați din nou.",
   "relationshipErrorLinkTaskFailed": "Sarcina nu a putut fi asociată. Încercați din nou.",
   "relationshipErrorUpdateFailed": "Modificările nu au putut fi salvate. Încercați din nou.",
+  "relationshipFormImportantBody": "Activează un briefing, memento-uri și un chat. Notele din check-in-uri ajung la agent; canalele de contact niciodată.",
+  "relationshipFormImportantBodyNamed": "Activează un briefing, memento-uri și un chat pentru {name}. Notele din check-in-uri ajung la agent; canalele de contact niciodată.",
+  "relationshipFormReachTitle": "Cum îi contactați",
+  "relationshipFormWhoTitle": "Cine",
   "relationshipHealthNeedsAttention": "Necesită atenție",
   "relationshipHealthSteady": "Stabilă",
   "relationshipHealthStrained": "Tensionată",
@@ -4382,11 +4684,13 @@
   "relationshipImportEmpty": "Niciun contact pe acest dispozitiv",
   "relationshipImportFailed": "Nu a putut fi adăugată nicio persoană",
   "relationshipImportGrantButton": "Permiteți accesul",
+  "relationshipImportImportantBody": "Briefinguri, memento-uri și un chat. Fără acestea, nimic nu pornește singur.",
   "relationshipImportNoMatches": "Niciun contact nu corespunde căutării dumneavoastră",
   "relationshipImportOpenSettings": "Deschideți setările",
   "relationshipImportPermissionBody": "Lotti vă citește contactele doar cât timp acest selector este deschis și copiază doar persoanele pe care le alegeți.",
   "relationshipImportRetry": "Încercați din nou",
   "relationshipImportReviewButton": "{count, plural, =1{Verificați 1} few{Verificați {count}} other{Verificați {count}}}",
+  "relationshipImportReviewSubtitle": "{count, plural, =1{1 persoană selectată · datele de contact rămân pe acest dispozitiv} few{{count} persoane selectate · datele de contact rămân pe acest dispozitiv} other{{count} de persoane selectate · datele de contact rămân pe acest dispozitiv}}",
   "relationshipImportReviewTitle": "Înainte de a le adăuga",
   "relationshipImportSearchHint": "Căutați contacte",
   "relationshipImportSettingsBody": "Accesul la contacte este dezactivat. Activați-l din setările sistemului pentru a importa persoane.",
@@ -4396,79 +4700,175 @@
   "@relationshipJustAdded": {
     "description": "Relationships redesign label."
   },
-  "relationshipLastCheckInLabel": "Ultima înregistrare {date}",
-  "relationshipLinkContact": "Asociați un contact",
-  "relationshipLinkedTasksLabel": "Sarcini",
-  "relationshipLinkTaskButton": "Asociați o sarcină",
-  "relationshipLogCheckIn": "Înregistrați un contact",
-  "relationshipLottisRead": "Părerea Lotti",
-  "@relationshipLottisRead": {
-    "description": "Relationships redesign label."
-  },
-  "relationshipLottisReadAsOf": "la {time}",
-  "@relationshipLottisReadAsOf": {
+  "relationshipLastSpoke": "ultima discuție {time}",
+  "@relationshipLastSpoke": {
     "placeholders": {
       "time": {
         "type": "String"
       }
     }
   },
+  "relationshipLinkContact": "Asociați un contact",
+  "relationshipLinkedTasksLabel": "Sarcini",
+  "relationshipLinkTaskButton": "Asociați o sarcină",
+  "relationshipLogCheckIn": "Înregistrați un contact",
+  "relationshipMoreActions": "Mai multe acțiuni",
   "relationshipNameLabel": "Nume",
   "relationshipNameRequired": "Numele este obligatoriu",
-  "relationshipNextByDay": "următorul până {day}",
-  "@relationshipNextByDay": {
+  "relationshipNextDueOn": "Următoarea scadență {day}",
+  "@relationshipNextDueOn": {
     "placeholders": {
       "day": {
         "type": "String"
       }
     }
   },
+  "relationshipNextTimeTitle": "Data viitoare",
   "relationshipNicknameLabel": "Poreclă",
   "relationshipNoCheckIns": "Nicio înregistrare încă — adăugați una după următoarea conversație.",
   "relationshipNoLinkedTasks": "Nicio sarcină asociată încă.",
+  "relationshipNotEnrolled": "Neurmărită",
   "relationshipNotFound": "Această persoană nu mai este urmărită.",
-  "relationshipNudgesOn": "memento-uri active",
-  "@relationshipNudgesOn": {
-    "description": "Relationships redesign label."
-  },
-  "relationshipPostCallBody": "Tocmai ați luat legătura. Doriți să notați un check-in cât este proaspăt?",
-  "relationshipPostCallConfirm": "Notați check-in",
-  "relationshipPostCallDismiss": "Nu acum",
-  "relationshipPostCallTitle": "Cum a fost cu {name}?",
-  "@relationshipPostCallTitle": {
+  "relationshipOnTrackCadence": "În ritm · {cadence}",
+  "@relationshipOnTrackCadence": {
     "placeholders": {
-      "name": {
-        "type": "String",
-        "example": "Anna"
+      "cadence": {
+        "type": "String"
       }
     }
   },
-  "relationshipQuietForDays": "Fără contact {count, plural, =1{de 1 zi} other{de {count} zile}}",
-  "@relationshipQuietForDays": {
+  "relationshipPayAttentionTo": "Fiți atent la",
+  "relationshipPhotoAddBanner": "Adăugați un banner",
+  "relationshipPhotoAdjustCrop": "Ajustați decuparea",
+  "relationshipPhotoBanner": "Banner",
+  "relationshipPhotoCardTitle": "Fotografie",
+  "relationshipPhotoChange": "Schimbați",
+  "relationshipPhotoChoose": "Alegeți din bibliotecă",
+  "relationshipPhotoDragToReposition": "Trageți pentru a repoziționa",
+  "relationshipPhotoFace": "Chip",
+  "relationshipPhotoPrivacy": "Doar pe dispozitivele dvs. · agentul nu o vede niciodată",
+  "relationshipPhotoRemove": "Eliminați fotografia",
+  "relationshipPhotoRemoveAction": "Eliminați",
+  "relationshipPhotoSaveFailed": "Fotografia nu a putut fi salvată",
+  "relationshipPhotoSheetTitle": "Fotografie – {name}",
+  "relationshipPostCallConfirm": "Notați check-in",
+  "relationshipPostCallDismiss": "Nu acum",
+  "relationshipPostCallMeta": "început la {time} · {minutes, plural, =0{sub un minut} =1{circa 1 min} other{circa {minutes} min}}",
+  "@relationshipPostCallMeta": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipPostCallOfferCall": "Ați sunat pe {name} acum {minutes, plural, =0{mai puțin de un minut} =1{1 minut} few{{minutes} minute} other{{minutes} de minute}} — notați cât este proaspăt?",
+  "@relationshipPostCallOfferCall": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipPostCallOfferMessage": "I-ați scris lui {name} acum {minutes, plural, =0{mai puțin de un minut} =1{1 minut} few{{minutes} minute} other{{minutes} de minute}} — notați cât este proaspăt?",
+  "@relationshipPostCallOfferMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipProposalAdded": "Adăugată → {title}",
+  "relationshipProposalEvidence": "Din interacțiunea din {date}",
+  "relationshipProposalUndoFailed": "Anularea nu a reușit. Este posibil ca sarcina să fi fost modificată.",
+  "relationshipReachPrivacy": "Rămâne pe acest dispozitiv · niciodată partajat cu AI-ul",
+  "relationshipReachTitle": "Contact",
+  "relationshipRelinkContact": "Asociați alt contact",
+  "relationshipsEmptyState": "Adăugați persoanele de care doriți să rămâneți aproape.",
+  "relationshipsGroupDue": "Scadente",
+  "relationshipsPageTitle": "Persoane",
+  "relationshipsSelectPersonHint": "Selectați o persoană pentru a-i vedea pagina.",
+  "relationshipsSummaryDueNow": "Scadente acum",
+  "relationshipsSummaryEnrolled": "{count, plural, =1{/ 1 urmărită} few{/ {count} urmărite} other{/ {count} de urmărite}}",
+  "@relationshipsSummaryEnrolled": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "relationshipRelinkContact": "Asociați alt contact",
-  "relationshipSeeAllCheckIns": "Vezi toate înregistrările",
-  "@relationshipSeeAllCheckIns": {
-    "description": "Relationships redesign label."
+  "relationshipsSummaryNextDue": "Urmează: {name} · {day}",
+  "@relationshipsSummaryNextDue": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
   },
-  "relationshipsEmptyState": "Adăugați persoanele de care doriți să rămâneți aproape.",
-  "relationshipsPageTitle": "Persoane",
+  "relationshipsSummaryNoneDue": "Nimeni nu este scadent",
+  "relationshipsSummaryNotEnrolled": "{count, plural, =1{1 persoană neurmărită} few{{count} persoane neurmărite} other{{count} de persoane neurmărite}}",
+  "@relationshipsSummaryNotEnrolled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "relationshipStatusActive": "Activă",
   "relationshipStatusArchived": "Arhivată",
   "relationshipStatusDormant": "Inactivă",
   "relationshipStatusFieldLabel": "Stare",
-  "relationshipStayingInTouch": "Menținerea contactului",
-  "@relationshipStayingInTouch": {
-    "description": "Relationships redesign label."
+  "relationshipStatusLineAdded": "Adăugat acum · {cadence}",
+  "@relationshipStatusLineAdded": {
+    "placeholders": {
+      "cadence": {
+        "type": "String"
+      }
+    }
   },
-  "relationshipStayInTouch": "Menține contactul",
-  "@relationshipStayInTouch": {
-    "description": "Relationships redesign label."
+  "relationshipStatusLineAddedFirstDue": "Adăugat acum · {cadence} · prima scadență {day}",
+  "@relationshipStatusLineAddedFirstDue": {
+    "placeholders": {
+      "cadence": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipStatusLineContacted": "{type} · {time} · {cadence}",
+  "@relationshipStatusLineContacted": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "cadence": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipTasksLinkedCount": "{count, plural, =1{1 asociată} few{{count} asociate} other{{count} de asociate}}",
+  "@relationshipTasksLinkedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "relationshipTimestampToday": "Azi",
   "relationshipTimestampYesterday": "Ieri",
@@ -4922,7 +5322,6 @@
   "settingsSyncConflictsSubtitle": "Rezolvați conflictele de sincronizare",
   "settingsSyncNodeProfileCapabilitiesEmpty": "Niciuna detectată — declanșarea automată a inferenței audio sincronizate nu va viza acest dispozitiv.",
   "settingsSyncNodeProfileCapabilitiesLabel": "Capabilități AI detectate",
-  "settingsSyncNodeProfileCapabilityMlxAudio": "MLX Audio (local)",
   "settingsSyncNodeProfileCapabilityOllamaLlm": "Ollama LLM",
   "settingsSyncNodeProfileCapabilityOmlxLlm": "oMLX LLM",
   "settingsSyncNodeProfileCapabilityVoxtral": "Voxtral (local)",
@@ -4937,6 +5336,8 @@
   "settingsSyncOutboxTitle": "Coadă de ieșire pentru sincronizare",
   "settingsSyncStatsSubtitle": "Inspectează metricile canalului de sincronizare",
   "settingsSyncSubtitle": "Configurați sincronizarea și vizualizați statisticile",
+  "settingsSystemHealthSubtitle": "Analizați jurnalele recente și copiați un raport care poate fi partajat",
+  "settingsSystemHealthTitle": "Starea sistemului",
   "settingsThemingAutomatic": "Automat",
   "settingsThemingDark": "Aspect întunecat",
   "settingsThemingLight": "Aspect luminos",
@@ -4949,6 +5350,51 @@
   "settingsV2UnimplementedTitle": "Panoul nu este încă implementat",
   "settingsWhatsNewSubtitle": "Vedeți cele mai recente actualizări și funcționalități",
   "settingsWhatsNewTitle": "Ce este nou",
+  "sherpaAllFamilies": "Toate familiile",
+  "sherpaCatalogMatches": "{count} din {total} modele",
+  "sherpaDeleteModel": "Eliminați {model} de pe acest dispozitiv",
+  "@sherpaDeleteModel": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaDownloadAction": "Descărcați",
+  "sherpaDownloadModel": "Descărcați {model}",
+  "@sherpaDownloadModel": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaInstalledModelsTitle": "Modele instalate",
+  "sherpaInstallingModel": "Se instalează modelul",
+  "sherpaLanguageCantonese": "Cantoneză",
+  "sherpaModelCatalogTitle": "Catalog de modele",
+  "sherpaModelConfigurationError": "Modelul a fost descărcat, dar configurația sa nu a putut fi salvată.",
+  "sherpaModelError": "Operațiunea asupra modelului a eșuat. Încercați din nou.",
+  "sherpaModelFamily": "Familie de modele",
+  "sherpaModelInstalled": "Descărcat",
+  "sherpaModelNotInstalled": "Descărcați un model pe acest dispozitiv",
+  "sherpaModelSizeGB": "{size} GB · Multilingv",
+  "@sherpaModelSizeGB": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaModelSizeMB": "{size} MB · Multilingv",
+  "@sherpaModelSizeMB": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaProviderDescription": "Transcrieți pe acest dispozitiv fără un server. Descărcați un model, apoi selectați-l în profilul dumneavoastră de inferență.",
   "sidebarActiveSectionTitle": "Activitate",
   "sidebarActivityCollapseTooltip": "Restrângeți activitatea",
   "sidebarActivityExpandTooltip": "Extindeți activitatea",
@@ -4977,6 +5423,9 @@
   "speechModalSelectLanguage": "Selectați limba",
   "speechModalTitle": "Recunoaștere vocală",
   "speechNoAudioRecorded": "Nu s-a înregistrat niciun sunet. Încercați din nou.",
+  "speechSettingsAutoPrepareChatAudio": "Pregătiți automat sunetul pentru chat",
+  "speechSettingsChatAudioDescription": "Pregătiți noile răspunsuri din chat pe acest dispozitiv pentru ca redarea să înceapă mai repede. Sunetul este redat doar când apăsați pe redare.",
+  "speechSettingsChatAudioLabel": "Audio pentru chat",
   "speechSettingsModelDescription": "Model de voce pe dispozitiv",
   "speechSettingsModelDownloadsOnce": "Se descarcă o singură dată",
   "speechSettingsModelLabel": "Model",
@@ -5251,6 +5700,33 @@
   "syncWizardStepConnect": "Conectați",
   "syncWizardStepGetCode": "Obțineți codul",
   "syncWizardStepStatus": "Pasul {step} din 3: {label}",
+  "systemHealthAnalyzedWindow": "Analizat {start} → {end}",
+  "systemHealthChooseModelTitle": "Alegeți modelul",
+  "systemHealthCopiedToast": "Raport copiat. Tiparele cunoscute de date personale au fost eliminate.",
+  "systemHealthCopyButton": "Copiați raportul",
+  "systemHealthCustomFromLabel": "De la",
+  "systemHealthCustomToLabel": "Până la",
+  "systemHealthDescription": "Parcurge fișierele jurnal de pe acest dispozitiv în căutarea erorilor, avertismentelor și interogărilor lente, elimină tiparele cunoscute de date personale și scrie un raport scurt pe care îl puteți lipi într-un asistent de programare.",
+  "systemHealthDomainsDescription": "Domeniile activate aici sunt cele analizate, aceeași setare care decide ce se jurnalizează. Interogările lente sunt incluse când jurnalizarea lor este activă.",
+  "systemHealthDomainsTitle": "Domenii de jurnalizare",
+  "systemHealthFailedTitle": "Analiza a eșuat",
+  "systemHealthGeneratedAt": "Generat {time}",
+  "systemHealthHideDigest": "Ascundeți rezumatul",
+  "systemHealthModelDescription": "Scrie constatările pe baza rezumatului anonimizat. Propune modelul de raționament al profilului dvs. implicit.",
+  "systemHealthModelNone": "Doar rezumat, fără model",
+  "systemHealthModelNoneDescription": "Setați un profil de inferență implicit sau adăugați un model text agentic pentru a obține constatări.",
+  "systemHealthModelTitle": "Model",
+  "systemHealthPresetCustom": "Personalizat",
+  "systemHealthPresetLast14Days": "14 zile",
+  "systemHealthPresetLast24Hours": "24 h",
+  "systemHealthPresetLast7Days": "7 zile",
+  "systemHealthPreviousReportsDescription": "Fiecare raport este păstrat pe acest dispozitiv. Atingeți unul pentru a-l afișa din nou.",
+  "systemHealthPreviousReportsTitle": "Rapoarte anterioare",
+  "systemHealthRangeTitle": "Interval de timp",
+  "systemHealthReportTitle": "Raport",
+  "systemHealthRunButton": "Rulați analiza",
+  "systemHealthSavedTo": "Salvat în {path}",
+  "systemHealthShowDigest": "Afișați rezumatul",
   "taskActionBarAudioRecordingActive": "Înregistrare audio în desfășurare",
   "taskActionBarMoreActions": "Mai multe acțiuni",
   "taskActionBarOpenRunningTimer": "Deschideți cronometrul activ",

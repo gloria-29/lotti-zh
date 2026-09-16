@@ -83,9 +83,47 @@ String relationshipTimestampLabelOf(
 DateTime _dayBefore(DateTime anchor) =>
     DateTime(anchor.year, anchor.month, anchor.day - 1);
 
-/// A mono time-only label (`14:20`), used in the detail beat header where
-/// the date is already implied by the beat's position.
-String relationshipTimeLabel(DateTime at) => _hhMm(at);
+/// A time-only label in the device's own clock format — `14:20`, or
+/// `2:20 PM` where the system prefers twelve hours — for a time whose date
+/// is implied: the composer's started chip, the post-call offer, the card's
+/// last failed run. Resolved the way `DesignSystemTimeWheel` resolves it, so
+/// a chip and the wheel that edits it never disagree.
+String relationshipTimeLabelOf(BuildContext context, DateTime at) =>
+    MaterialLocalizations.of(context).formatTimeOfDay(
+      TimeOfDay.fromDateTime(at),
+      alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),
+    );
+
+/// A mono day label without a time (`Thu 23 Jul`), for a date that is a
+/// deadline rather than an event — the summary card's next due day, the
+/// row's `first due` note.
+String relationshipDayLabel(DateTime at, {String? locale}) =>
+    _shortDayMonth(at, locale);
+
+/// [relationshipDayLabel] resolved against the widget tree's locale.
+String relationshipDayLabelOf(BuildContext context, DateTime at) =>
+    relationshipDayLabel(
+      at,
+      locale: Localizations.localeOf(context).toString(),
+    );
+
+/// A mono duration read-out for a check-in (`11 min`, `1 h`, `1 h 30`), or
+/// null for a check-in that has no duration — a message usually has none,
+/// and the row must then say nothing rather than `0 min`.
+String? relationshipDurationLabelOf(BuildContext context, Duration duration) {
+  final minutes = duration.inMinutes;
+  // Under a minute is not a duration worth a label — and never "0 min".
+  if (minutes <= 0) return null;
+  final messages = context.messages;
+  if (minutes < 60) return messages.relationshipDurationMinutes(minutes);
+  final hours = minutes ~/ 60;
+  final rest = minutes % 60;
+  if (rest == 0) return messages.relationshipDurationHours(hours);
+  return messages.relationshipDurationHoursMinutes(
+    hours,
+    rest.toString().padLeft(2, '0'),
+  );
+}
 
 /// A mono weekday-only label (`Thu`), used by the cadence due pill, in the
 /// locale's own abbreviation.

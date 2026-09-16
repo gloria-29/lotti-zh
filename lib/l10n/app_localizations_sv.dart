@@ -889,6 +889,11 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String agentSummaryAssignLabel(String label) {
+    return 'Tilldela etikett: ”$label”';
+  }
+
+  @override
   String agentSummaryCheckItem(Object title) {
     return 'Markera: ”$title”';
   }
@@ -1490,12 +1495,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get aiCardTitle => 'AI-sammanfattning';
 
   @override
-  String get aiChatAssistantResponding => 'Assistenten svarar';
-
-  @override
-  String get aiChatMessageCopied => 'Kopierat till skrivplatta';
-
-  @override
   String get aiConfigFailedToLoadModelsGeneric =>
       'Misslyckades med att ladda modellerna. Försök igen, tack.';
 
@@ -1816,64 +1815,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get aiModelCardDeleteTooltip => 'Radera modell';
 
   @override
-  String get aiModelDownloadCloseButton => 'Stäng';
-
-  @override
-  String aiModelDownloadDialogDescription(String modelName) {
-    return 'Lotti laddar ner $modelName till MLX Audio-cachen och använder den för lokal talbearbetning.';
-  }
-
-  @override
-  String aiModelDownloadDialogTitle(String modelName) {
-    return 'Installera $modelName';
-  }
-
-  @override
-  String get aiModelDownloadInstallTooltip => 'Installationsmodell';
-
-  @override
-  String get aiModelDownloadOpenProgressTooltip => 'Visa nedladdningsframsteg';
-
-  @override
-  String get aiModelDownloadStatusChecking => 'Kontrollerar modellstatus';
-
-  @override
-  String aiModelDownloadStatusDownloading(int percent) {
-    return 'Nedladdning av $percent%';
-  }
-
-  @override
-  String get aiModelDownloadStatusDownloadingIndeterminate => 'Nedladdning';
-
-  @override
-  String get aiModelDownloadStatusFailed => 'Nedladdning misslyckades';
-
-  @override
-  String get aiModelDownloadStatusInstalled => 'Installerat';
-
-  @override
-  String get aiModelDownloadStatusNotInstalled => 'Ej installerad';
-
-  @override
-  String get aiModelDownloadStatusUnsupported => 'Apple Silicon krävs';
-
-  @override
-  String get aiModelInstallChoiceCancelButton => 'Avbryt';
-
-  @override
-  String get aiModelInstallChoiceDescription =>
-      'Välj först den lokala tal-till-text-modellen att ladda ner. Du kan installera de andra senare från modelllistan.';
-
-  @override
-  String get aiModelInstallChoiceInstallButton => 'Installationsmodell';
-
-  @override
-  String get aiModelInstallChoiceRecommended => 'Rekommenderas';
-
-  @override
-  String get aiModelInstallChoiceTitle => 'Välj MLX Audio-modellen';
-
-  @override
   String get aiModelPickerByProviderLabel => 'Välj en leverantör';
 
   @override
@@ -2174,10 +2115,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get aiProviderDetailValueUnset => 'Inte inställt';
 
   @override
-  String get aiProviderEmbeddedRuntimeHint =>
-      'Körs inbäddad i Apple-appens process. Ingen lokal server eller bas-URL krävs.';
-
-  @override
   String get aiProviderGeminiName => 'Googla Gemini';
 
   @override
@@ -2188,9 +2125,6 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get aiProviderMistralName => 'Mistral';
-
-  @override
-  String get aiProviderMlxAudioName => 'MLX Audio (lokal)';
 
   @override
   String get aiProviderNebiusAiStudioName => 'Nebius AI Studio';
@@ -2208,6 +2142,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get aiProviderOpenRouterName => 'OpenRouter';
 
   @override
+  String get aiProviderSherpaName => 'sherpa-onnx (på enheten)';
+
+  @override
   String get aiProviderTaglineAlibaba =>
       'Qwen-modeller · Multimodal · Lång kontext';
 
@@ -2220,10 +2157,6 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get aiProviderTaglineMelious =>
       'EU-värd · Dynamisk katalog · Eco-ruttning';
-
-  @override
-  String get aiProviderTaglineMlxAudio =>
-      'Inbäddad · Apple Silicon · Lokalt ljud';
 
   @override
   String get aiProviderTaglineOllama => 'Körs lokalt · inga molnsamtal';
@@ -2315,6 +2248,10 @@ class AppLocalizationsSv extends AppLocalizations {
   String get aiSettingsCounterProviders => 'Leverantörer';
 
   @override
+  String get aiSettingsDefaultProfileDescription =>
+      'Reservprofil för agenter utan en konfigurerad modell på den här enheten.';
+
+  @override
   String get aiSettingsEmptyDescription =>
       'Lägg till en för att låsa upp transkription, bildigenkänning, bildgenerering och semantisk sökning.';
 
@@ -2353,6 +2290,9 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get aiSettingsModalityVision => 'Vision';
+
+  @override
+  String get aiSettingsNoDefaultProfile => 'Ingen standardprofil';
 
   @override
   String get aiSettingsNoModelsConfigured => 'Inga AI-modeller konfigurerade';
@@ -2685,6 +2625,18 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get audioRecordingStop => 'Stoppa';
+
+  @override
+  String get avatarCropHint => 'Dra för att flytta · nyp för att zooma';
+
+  @override
+  String get avatarCropPreviewLabel => 'Så här ser det ut i listan';
+
+  @override
+  String get avatarCropTitle => 'Välj ansiktet';
+
+  @override
+  String get avatarCropUse => 'Använd foto';
 
   @override
   String backfillAdvancedRecoveryActions(int count) {
@@ -3123,17 +3075,90 @@ class AppLocalizationsSv extends AppLocalizations {
       'Inspelningen gjordes, men transkriberingen misslyckades. Försök igen.';
 
   @override
+  String get checkInAddMoreButton => 'Lägg till mer';
+
+  @override
+  String checkInAudioSaved(String length) {
+    return '$length ljud sparat';
+  }
+
+  @override
+  String get checkInAudioSavedAsYouGo =>
+      'Ljudet sparas på den här enheten medan du spelar in';
+
+  @override
+  String checkInAudioSavedRoute(String length, String route) {
+    return '$length ljud sparat · $route';
+  }
+
+  @override
   String get checkInAvoidLabel => 'Bäst att undvika';
 
   @override
-  String get checkInDateLabel => 'När?';
+  String checkInComposerSubtitle(String name, String day) {
+    return 'med $name · senast $day';
+  }
+
+  @override
+  String checkInComposerSubtitleNoContact(String name) {
+    return 'med $name · ingen avstämning än';
+  }
+
+  @override
+  String checkInComposerWithName(String name) {
+    return 'med $name';
+  }
+
+  @override
+  String checkInContextSummary(String type, String time, String duration) {
+    return '$type · $time · $duration';
+  }
 
   @override
   String get checkInDeleteConfirmMessage =>
       'Ta bort den här avstämningen? Det går inte att ångra.';
 
   @override
-  String get checkInDone => 'Klart';
+  String get checkInDictateButton => 'Diktera';
+
+  @override
+  String get checkInDiscardDraftAudioKeptMessage =>
+      'Släng den här avstämningen? Inspelningen finns kvar i journalen.';
+
+  @override
+  String get checkInDiscardDraftMessage =>
+      'Släng den här avstämningen? Inget har sparats.';
+
+  @override
+  String get checkInDiscardDraftRecordingMessage =>
+      'Släng den här avstämningen och inspelningen? Inspelningen tas bort.';
+
+  @override
+  String get checkInDiscardRecording => 'Släng';
+
+  @override
+  String get checkInDiscardRecordingBody =>
+      'Ljudet raderas. Din avstämning förblir öppen.';
+
+  @override
+  String get checkInDismissButton => 'Stäng';
+
+  @override
+  String get checkInDurationChip => 'Längd';
+
+  @override
+  String checkInDurationChipSemantics(String duration) {
+    return 'Längd: $duration. Ändra';
+  }
+
+  @override
+  String get checkInDurationQuickPickHint =>
+      'Tryck på en längd för att spara den, eller snurra på hjulet.';
+
+  @override
+  String checkInDurationSemanticsLabel(String label) {
+    return 'Sätt längden till $label';
+  }
 
   @override
   String get checkInEditTitle => 'Redigera avstämning';
@@ -3145,12 +3170,6 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get checkInErrorDeleteFailed =>
       'Avstämningen kunde inte tas bort. Försök igen.';
-
-  @override
-  String get checkInHowDidItFeel => 'Hur kändes det?';
-
-  @override
-  String get checkInHowDidYouConnect => 'Hur hade ni kontakt?';
 
   @override
   String get checkInInteractionCall => 'Samtal';
@@ -3171,13 +3190,110 @@ class AppLocalizationsSv extends AppLocalizations {
   String get checkInInteractionVideoCall => 'Videosamtal';
 
   @override
-  String get checkInNarrativeLabel => 'Vad pratade ni om?';
+  String get checkInMicrophoneDeniedBody =>
+      'Slå på den för Lotti i systeminställningarna och tryck sedan på Diktera. Inget spelades in.';
+
+  @override
+  String get checkInMicrophoneDeniedCalloutTitle => 'Tillåt mikrofonåtkomst';
+
+  @override
+  String get checkInMoreCaptionFeeling => 'Känsla';
+
+  @override
+  String get checkInMoreCaptionNextTime => 'nästa gång';
+
+  @override
+  String get checkInMoreCaptionNextTimeSet => 'nästa gång noterat';
+
+  @override
+  String get checkInMoreCaptionTopics => 'ämnen';
+
+  @override
+  String checkInMoreCaptionTopicsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ämnen',
+      one: '1 ämne',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get checkInMoreSection => 'Mer';
+
+  @override
+  String get checkInNarrativeHint => 'Vad pratade ni om? En rad räcker.';
+
+  @override
+  String get checkInNoDuration => 'Ingen längd';
+
+  @override
+  String get checkInOpenSettingsButton => 'Öppna inställningar';
+
+  @override
+  String get checkInOrTypeHint => 'Eller skriv här…';
 
   @override
   String get checkInPayAttentionLabel => 'Nästa gång: var uppmärksam på';
 
   @override
-  String get checkInPreparedOverline => '✦ LOTTI · FÖRBEREDD I MORSE';
+  String get checkInPreparingLabel => 'Förbereder ljud…';
+
+  @override
+  String get checkInRecorderBusyBody =>
+      'Stoppa den först från inspelningsindikatorn och försök igen. Inget nytt spelades in.';
+
+  @override
+  String get checkInRecorderBusyTitle => 'En inspelning pågår redan';
+
+  @override
+  String get checkInRecordingFailedBody =>
+      'Mikrofonen kunde inte startas. Försök igen eller skriv avstämningen. Inget spelades in.';
+
+  @override
+  String get checkInRecordingFailedTitle => 'Inspelningen startade inte';
+
+  @override
+  String get checkInRecordingHint =>
+      'Prata som vanligt. Orden dyker upp här när du stoppar.';
+
+  @override
+  String get checkInRecordingNotSavedBody =>
+      'Inspelningen kunde inte sparas. Försök igen eller skriv avstämningen.';
+
+  @override
+  String get checkInRecordingNotSavedTitle => 'Inspelningen kunde inte sparas';
+
+  @override
+  String get checkInReRecordButton => 'Spela in igen';
+
+  @override
+  String get checkInReRecordReplaceMessage =>
+      'Ersätta dina redigerade ord med en ny inspelning?';
+
+  @override
+  String get checkInSaveBlockedEmpty => 'Lägg till några ord för att spara';
+
+  @override
+  String get checkInSaveBlockedRecording => 'Stoppa inspelningen för att spara';
+
+  @override
+  String get checkInSaveBlockedRetry => 'Skriv eller försök igen för att spara';
+
+  @override
+  String get checkInSaveBlockedTranscribing => 'Väntar på transkriptionen';
+
+  @override
+  String get checkInSaveButton => 'Spara avstämning';
+
+  @override
+  String get checkInSaveShortButton => 'Spara';
+
+  @override
+  String checkInSaveShortcutHint(String shortcut) {
+    return '$shortcut för att spara';
+  }
 
   @override
   String get checkInSentimentDelightful => 'Underbart';
@@ -3195,10 +3311,76 @@ class AppLocalizationsSv extends AppLocalizations {
   String get checkInSentimentNeutral => 'Neutralt';
 
   @override
+  String get checkInSentimentOptional => 'Valfritt. Fylls aldrig i av agenten.';
+
+  @override
   String get checkInSentimentStrained => 'Ansträngt';
 
   @override
+  String get checkInSourceCall =>
+      'Från samtalet du ringde från den här sidan. Allt går att ändra.';
+
+  @override
+  String get checkInSourceMessage =>
+      'Från meddelandet du skickade från den här sidan. Allt går att ändra.';
+
+  @override
   String get checkInSpeakButton => 'Tala in avstämning';
+
+  @override
+  String checkInSpokenMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count minuter',
+      one: '1 minut',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String checkInSpokenSeconds(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sekunder',
+      one: '1 sekund',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get checkInStartedLabel => 'Startade';
+
+  @override
+  String get checkInStatusMicrophoneDenied => 'Mikrofonen är inte tillgänglig';
+
+  @override
+  String get checkInStatusPaused => 'Pausad';
+
+  @override
+  String get checkInStatusRecorderBusy => 'Inspelaren är upptagen';
+
+  @override
+  String get checkInStatusRecording => 'Spelar in';
+
+  @override
+  String get checkInStatusRecordingFailed => 'Inspelningen startade inte';
+
+  @override
+  String get checkInStatusRecordingNotSaved => 'Inspelningen sparades inte';
+
+  @override
+  String get checkInStatusTranscriptionUnavailable =>
+      'Ingen transkriptionsmodell';
+
+  @override
+  String get checkInStatusTranscriptMissing => 'Ingen transkription mottagen';
+
+  @override
+  String checkInTimeChipSemantics(String time) {
+    return 'Start: $time. Ändra';
+  }
 
   @override
   String get checkInTopicsHint => 'Kommaseparerade, t.ex. jobb, resor';
@@ -3207,18 +3389,48 @@ class AppLocalizationsSv extends AppLocalizations {
   String get checkInTopicsLabel => 'Ämnen';
 
   @override
+  String get checkInTranscribingEta => 'oftast under en minut';
+
+  @override
   String get checkInTranscribingLabel => 'Transkriberar…';
 
   @override
-  String get checkInTranscriptFailed =>
-      'Ingen transkription kom tillbaka. Du kan skriva den själv.';
+  String get checkInTranscriptAdded => 'Transkription tillagd';
+
+  @override
+  String get checkInTranscriptionUnavailableTitle =>
+      'Ingen transkriptionsmodell inställd';
+
+  @override
+  String checkInTranscriptMissingBody(String length) {
+    return 'Din inspelning på $length finns kvar i journalen, även om du slänger den här avstämningen. Försök igen om en stund.';
+  }
+
+  @override
+  String get checkInTranscriptMissingCalloutTitle => 'Försök igen, eller skriv';
 
   @override
   String get checkInTranscriptUnavailable =>
-      'Transkription är inte uppsatt för den här personen. Lägg till en ljudmodell och slå på automatisk inferens för deras kategori, eller skriv avstämningen.';
+      'Välj en standardprofil för inferens med en transkriptionsmodell i AI-inställningarna, eller skriv din kontaktanteckning.';
 
   @override
-  String get checkInWriteInstead => 'Skriv istället';
+  String checkInTypeChipSemantics(String type) {
+    return 'Typ: $type. Ändra';
+  }
+
+  @override
+  String get checkInTypeInstead => 'Skriv istället';
+
+  @override
+  String checkInWordCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ord',
+      one: '1 ord',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get checklistAddItem => 'Lägg till ett nytt föremål';
@@ -3364,7 +3576,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get configFlagEnableAiSummaryTtsDescription =>
-      'Visa den lokala text-till-tal-knappen på sammanfattningar av uppgift-AI. Kräver en installerad MLX Audio TTS-modell.';
+      'Visa den lokala text-till-tal-knappen på sammanfattningar av uppgift-AI. Kräver en installerad Supertonic TTS-modell.';
 
   @override
   String get configFlagEnableDailyOs => 'Aktivera DailyOS';
@@ -3431,6 +3643,13 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get configFlagEnableProjectsDescription =>
       'Visa projektledningsfunktioner för att organisera uppgifter i projekt.';
+
+  @override
+  String get configFlagEnableQueryChat => 'Experimentell uppgiftschatt';
+
+  @override
+  String get configFlagEnableQueryChatDescription =>
+      'Visar chattar för uppgifter, projekt och kategorier. Avstängd som standard.';
 
   @override
   String get configFlagEnableRelationships => 'Aktivera sidan Personer';
@@ -5822,6 +6041,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get designSystemTextareaWithHelperLabel => 'Med hjälptext';
 
   @override
+  String get designSystemTieredTextTitle => 'Nivåtext i tre bredder';
+
+  @override
   String get designSystemTimePickerFormatsTitle => 'Tidsformat';
 
   @override
@@ -7747,6 +7969,13 @@ class AppLocalizationsSv extends AppLocalizations {
       'Kan väljas för nya poster när du är på';
 
   @override
+  String get inferenceProfileChat => 'Chattmodell';
+
+  @override
+  String get inferenceProfileChatUsesThinking =>
+      'Använder resonemangsmodellen om inget väljs';
+
+  @override
   String get inferenceProfileChooseModelTitle => 'Välj en modell';
 
   @override
@@ -9467,17 +9696,6 @@ class AppLocalizationsSv extends AppLocalizations {
   String get navSidebarManualLabel => 'Manuell';
 
   @override
-  String navTabMoreSemanticsLabel(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'Mer, $count ytterligare destinationer',
-      one: 'Mer, 1 ytterligare destination',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get navTabTitleCalendar => 'DailyOS';
 
   @override
@@ -9496,7 +9714,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get navTabTitleJournal => 'Loggbok';
 
   @override
-  String get navTabTitleMore => 'Mer';
+  String get navTabTitleNavigate => 'Navigera';
 
   @override
   String get navTabTitlePeople => 'Personer';
@@ -10124,6 +10342,160 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get panasScaleVerySlightlyOrNotAtAll =>
       'Mycket lite grann eller inte alls';
+
+  @override
+  String get plazaBlockedReason => 'blockerad — behöver ett beslut';
+
+  @override
+  String get plazaCategoryEmpty =>
+      'Den här kategorin har inga synliga projekt.';
+
+  @override
+  String get plazaClosedForNight => 'STÄNGT FÖR NATTEN';
+
+  @override
+  String get plazaCloseHint => 'Esc för att stänga';
+
+  @override
+  String get plazaControls =>
+      'WASD gå · håll Shift: 8× hastighet · dra för att se dig omkring · Tab nästa fyr · H hem · M översikt · / sök · T verktygsfält · Esc stäng · ⌘[ tillbaka';
+
+  @override
+  String plazaCornerAfter(String week) {
+    return 'Sväng efter $week';
+  }
+
+  @override
+  String get plazaDebug => 'Felsökning';
+
+  @override
+  String get plazaDecisionStrip => 'BEHÖVER ETT BESLUT';
+
+  @override
+  String plazaDoneCount(int done, int total) {
+    return '$done av $total klara';
+  }
+
+  @override
+  String plazaDueOn(String date) {
+    return 'förfaller $date';
+  }
+
+  @override
+  String plazaDueSoonReason(String date) {
+    return 'förfaller $date — slutför den';
+  }
+
+  @override
+  String get plazaEmpty =>
+      'Lägg till en uppgift för att börja bygga projektets torg.';
+
+  @override
+  String get plazaEnterProject => 'Gå in i projektet';
+
+  @override
+  String get plazaExploreCategory => 'Utforska kategori';
+
+  @override
+  String get plazaExploreProject => 'Utforska projekt';
+
+  @override
+  String get plazaFlyThere => 'Flyg dit ›';
+
+  @override
+  String plazaInProgressCount(int count) {
+    return 'Pågår: $count';
+  }
+
+  @override
+  String plazaLinks(int count) {
+    return 'länkar $count';
+  }
+
+  @override
+  String get plazaMeerkats => 'Surikater';
+
+  @override
+  String get plazaMorningWalk => 'Morgonpromenad';
+
+  @override
+  String plazaNeedsAttention(int count) {
+    return 'Behöver uppmärksamhet: $count';
+  }
+
+  @override
+  String get plazaOpeningSoon => 'ÖPPNAR SNART';
+
+  @override
+  String get plazaOpenLate => 'ÖPPET SENT';
+
+  @override
+  String plazaOverdueSince(String date) {
+    return 'försenad sedan $date — slutför eller flytta';
+  }
+
+  @override
+  String get plazaOverview => 'Överblick';
+
+  @override
+  String get plazaPaused => 'Pausad';
+
+  @override
+  String plazaProjectOverdue(int count) {
+    return 'Försenade uppgifter: $count';
+  }
+
+  @override
+  String get plazaSearchHint => 'Sök uppgifter, Enter för att flyga';
+
+  @override
+  String get plazaShowPenguins => 'Pingviner';
+
+  @override
+  String get plazaSkyDay => 'Dag';
+
+  @override
+  String get plazaSkyNight => 'Natt';
+
+  @override
+  String plazaStaleReason(int days) {
+    return 'ingen aktivitet på $days dagar — ta upp den igen';
+  }
+
+  @override
+  String plazaStats(int tasks, int weeks, int attention) {
+    return '$tasks uppgifter · $weeks veckor · $attention kräver uppmärksamhet';
+  }
+
+  @override
+  String plazaTaskCount(int count) {
+    return 'Uppgifter: $count';
+  }
+
+  @override
+  String get plazaTitle => 'Torg';
+
+  @override
+  String get plazaToggleToolbar => 'Visa / dölj verktygsfältet';
+
+  @override
+  String get plazaToLet => 'UTHYRES';
+
+  @override
+  String get plazaTourControls => 'Mellanslag: paus · rör dig för att avsluta';
+
+  @override
+  String get plazaUnavailable => 'Den här enheten kan inte visa 3D-världen.';
+
+  @override
+  String plazaWeek(int week, String date) {
+    return 'V$week · $date';
+  }
+
+  @override
+  String plazaWeekShort(int week) {
+    return 'V$week';
+  }
 
   @override
   String get privateLabel => 'Privat';
@@ -10770,6 +11142,415 @@ class AppLocalizationsSv extends AppLocalizations {
   String get provisionedSyncTitle => 'Enheter';
 
   @override
+  String get queryActionsAccept => 'Godkänn';
+
+  @override
+  String get queryActionsDismiss => 'Avfärda';
+
+  @override
+  String get queryActionsIncomplete =>
+      'Vissa ändringar kunde inte tillämpas. Redan tillämpade ändringar upprepas inte när du försöker igen.';
+
+  @override
+  String get queryActionsReview => 'Föreslagna ändringar';
+
+  @override
+  String queryActionsTarget(String target) {
+    return 'För: $target';
+  }
+
+  @override
+  String get queryAllSources => 'Alla';
+
+  @override
+  String get queryArchiveChat => 'Arkivera chatt';
+
+  @override
+  String get queryArchiveConfirmation =>
+      'Chatten har arkiverats. Slutsatserna är fortfarande tillgängliga.';
+
+  @override
+  String get queryArchivedChats => 'Arkiverade chattar';
+
+  @override
+  String get queryArchivedReadOnly =>
+      'Den här chatten är arkiverad. Återställ den för att fortsätta samtalet.';
+
+  @override
+  String get queryAsk => 'Fråga';
+
+  @override
+  String get queryAskCategory => 'Fråga om den här kategorin';
+
+  @override
+  String get queryAskProject => 'Fråga om det här projektet';
+
+  @override
+  String get queryAskTask => 'Fråga om den här uppgiften';
+
+  @override
+  String get queryAudioFailed =>
+      'Ljudet kunde inte förberedas eller spelas upp. Försök igen.';
+
+  @override
+  String queryAudioListen(String start, String end) {
+    return 'Lyssna · $start–$end';
+  }
+
+  @override
+  String get queryAudioMissingFile =>
+      'Inspelningen är ännu inte tillgänglig på den här enheten.';
+
+  @override
+  String get queryAudioNoMatch =>
+      'Citatet kunde inte entydigt kopplas till inspelningen. Du kan fortfarande öppna hela posten.';
+
+  @override
+  String get queryAudioOpenRecording => 'Öppna inspelning';
+
+  @override
+  String queryAudioPlaying(String start, String end) {
+    return 'Spelar $start–$end';
+  }
+
+  @override
+  String get queryAudioPrepare => 'Förbered ljudutdrag';
+
+  @override
+  String get queryAudioPreparing => 'Förbereder ljud…';
+
+  @override
+  String get queryAudioReadAloud => 'Läs upp svaret';
+
+  @override
+  String get queryAudioReading => 'Läser upp svaret';
+
+  @override
+  String get queryAudioRetry => 'Försök med ljud igen';
+
+  @override
+  String get queryAudioSetupDetails => 'Inställningsdetaljer';
+
+  @override
+  String get queryAudioSetupRequired =>
+      'Ljudutdrag kräver en kompatibel transkriptionsmodell.';
+
+  @override
+  String get queryAudioStale =>
+      'Inspelningen har ändrats. Förbered tidsstämplarna igen.';
+
+  @override
+  String get queryAudioStop => 'Stoppa ljudet';
+
+  @override
+  String get queryAudioTimingUnavailable =>
+      'Välj Melious Whisper eller en Mistral Voxtral-transkriptionsmodell som stöds i agentens inferensprofil för att förbereda ljudklipp. Leverantörens URL måste använda HTTPS.';
+
+  @override
+  String get queryAudioTooLarge =>
+      'Du kan förbereda tidsstämplar för inspelningar på upp till 25 MB. Välj en mindre inspelning.';
+
+  @override
+  String get queryAudioUploadNotice =>
+      'När tidsstämplar förbereds skickas inspelningen till transkriberingsleverantören som är inställd för den här agenten.';
+
+  @override
+  String get queryCategoryAgent => 'Kategoriagent';
+
+  @override
+  String get queryChat => 'Chatta';
+
+  @override
+  String get queryChats => 'Chattar';
+
+  @override
+  String queryChecked(int count) {
+    return 'Kontrollerade källor: $count';
+  }
+
+  @override
+  String get queryCloseChat => 'Stäng chatt';
+
+  @override
+  String get queryCollapseChat => 'Fäll ihop chatt';
+
+  @override
+  String get queryCopied => 'Kopierat';
+
+  @override
+  String get queryCopyQuote => 'Kopiera citat';
+
+  @override
+  String get queryCoverage => 'Vad genomsöktes?';
+
+  @override
+  String get queryCoverageCategory => 'Den här kategorin';
+
+  @override
+  String get queryCoverageExcluded => 'Andra kategorier genomsöktes inte.';
+
+  @override
+  String get queryCoverageUnreadable =>
+      'Ingen sökbar text när detta svar skrevs. Öppna inspelningen för att granska den.';
+
+  @override
+  String get queryCoverageWider => 'Andra poster i den här kategorin';
+
+  @override
+  String get queryDeleteChat => 'Ta bort chatt';
+
+  @override
+  String get queryDeleteExplanation =>
+      'Ta bort den här konversationen? Välj vad som händer med dess delade slutsatser. Källinläggen påverkas inte.';
+
+  @override
+  String get queryDeleteForget => 'Radera och glöm slutsatser';
+
+  @override
+  String get queryDeleteKeep => 'Radera och behåll slutsatser';
+
+  @override
+  String get queryDictated =>
+      'Du kan redigera transkriptionen innan du skickar din fråga. Ljudet kan redan ha skickats till din transkriberingsleverantör.';
+
+  @override
+  String get queryDraftProvisional => 'Utkast · ännu inte verifierat';
+
+  @override
+  String get queryDraftRetracted =>
+      'Svarsutkastet kunde inte verifieras. Försök igen.';
+
+  @override
+  String get queryEarlierTextOmitted => '[Tidigare text visas inte]';
+
+  @override
+  String get queryEmptyBody =>
+      'Fråga om beslut och tidigare arbete. Svaren skiljer sammanfattningar från exakta textavsnitt.';
+
+  @override
+  String get queryExactStoredText => 'Exakt sparad text';
+
+  @override
+  String get queryExactText => 'Visa exakt text';
+
+  @override
+  String get queryExampleDecision => 'Vad kom vi överens om?';
+
+  @override
+  String get queryExampleMeeting => 'På vilket möte diskuterade vi det här?';
+
+  @override
+  String get queryExampleSuggestion => 'Var det ett beslut eller ett förslag?';
+
+  @override
+  String get queryExpandChat => 'Expandera chatt';
+
+  @override
+  String get queryExpanding => 'Kontrollerar andra poster i den här kategorin…';
+
+  @override
+  String get queryFailed => 'Sökningen kunde inte slutföras. Försök igen.';
+
+  @override
+  String get queryForgetConclusions => 'Glöm slutsatser';
+
+  @override
+  String get queryHideExactText => 'Dölj exakt text';
+
+  @override
+  String get queryHideSurrounding => 'Dölj omgivande text';
+
+  @override
+  String get queryHomeOnly => 'Endast ursprungsområdet';
+
+  @override
+  String get queryHomeScope => 'Ursprungsområde';
+
+  @override
+  String get queryIncomplete =>
+      'Sökningen är ofullständig. Avsaknad av belägg betyder inte att diskussionen aldrig ägde rum.';
+
+  @override
+  String get queryIncompleteShort => 'Vissa källor kunde inte kontrolleras.';
+
+  @override
+  String get queryInferenceUnavailable =>
+      'Ingen användbar AI-konfiguration. Konfigurera agentens modell eller kategorins standardprofil och försök igen.';
+
+  @override
+  String get queryKeepConclusions => 'Behåll slutsatser';
+
+  @override
+  String get queryLaterTextOmitted => '[Senare text visas inte]';
+
+  @override
+  String get queryMachineTranscript =>
+      'Maskintranskription: exakt sparad ordalydelse, inte kontrollerad mot ljudet.';
+
+  @override
+  String queryMemoryCount(int count) {
+    return 'Tillgängliga slutsatser från tidigare chattar: $count';
+  }
+
+  @override
+  String queryMissingTranscripts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count inspelningar saknade sökbar text när detta svar skrevs.',
+      one: '1 inspelning saknade sökbar text när detta svar skrevs.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get queryNewChat => 'Ny chatt';
+
+  @override
+  String get queryNoAgent =>
+      'Det här området behöver sin vanliga agent. Gå tillbaka till detaljerna för att tilldela den.';
+
+  @override
+  String get queryNotes => 'Anteckningar';
+
+  @override
+  String get queryOpenCurrentEntry => 'Öppna aktuell post';
+
+  @override
+  String get queryOpenEntry => 'Öppna inlägg';
+
+  @override
+  String get queryOriginalsHome =>
+      'Granskar bara den här uppgiften och dess direkt länkade poster.';
+
+  @override
+  String get queryOtherProject => 'Utanför ursprungsområdet';
+
+  @override
+  String get queryPreparingAnswer => 'Förbereder ett svar…';
+
+  @override
+  String queryReachCategory(String category) {
+    return 'Söker i detta område och i $category.';
+  }
+
+  @override
+  String queryReachCategoryOnly(String category) {
+    return 'Söker inom $category.';
+  }
+
+  @override
+  String get queryReachHome =>
+      'Söker bara i detta område och dess länkade poster.';
+
+  @override
+  String get queryReachUncategorized =>
+      'Söker endast i den här uppgiften och dess direkt länkade inlägg utan kategori.';
+
+  @override
+  String get queryRecall => 'Det här svaret använde sparade slutsatser.';
+
+  @override
+  String get queryRecordings => 'Inspelningar';
+
+  @override
+  String get queryRecordingTranscript => 'Inspelningens transkription';
+
+  @override
+  String get queryRenameChat => 'Byt namn på chatten';
+
+  @override
+  String get queryRestoreChat => 'Återställ chatt';
+
+  @override
+  String querySavedConclusion(String date) {
+    return 'Slutsats sparad $date';
+  }
+
+  @override
+  String get querySavedQuote =>
+      'Det här sparade citatet återger källan när svaret skrevs.';
+
+  @override
+  String querySavedVersion(String version) {
+    return 'Sparad version: $version';
+  }
+
+  @override
+  String get querySavedVersionUnavailable => 'Versionsdatum saknas';
+
+  @override
+  String get querySearching => 'Granskar tillgänglig information…';
+
+  @override
+  String get querySearchScope => 'Sökområde och filter';
+
+  @override
+  String querySourceAction(String action, String source) {
+    return '$action: $source';
+  }
+
+  @override
+  String get querySourceChanged => 'Källan har ändrats';
+
+  @override
+  String get querySourceDeleted => 'Källan borttagen';
+
+  @override
+  String get querySourceMoved => 'Källan flyttad till en annan kategori';
+
+  @override
+  String get querySummaryBased => 'Baserat på sammanfattningar';
+
+  @override
+  String get querySummaryCoverage =>
+      'Det här svaret använder sammanfattningar av uppgifter eller projekt. De ursprungliga posterna granskades inte.';
+
+  @override
+  String get querySummaryCurrent =>
+      'Öppna en uppgift eller ett projekt för att läsa den aktuella sammanfattningen. Den kan ha ändrats sedan det här svaret.';
+
+  @override
+  String get querySummaryIncomplete =>
+      'Viss information saknas i de tillgängliga sammanfattningarna.';
+
+  @override
+  String get querySummaryOwners => 'Om det här svaret';
+
+  @override
+  String get querySurroundingLimit =>
+      'Det här är det sparade utdraget, som kanske inte innehåller hela diskussionen.';
+
+  @override
+  String get querySurroundingText => 'Visa omgivande text';
+
+  @override
+  String get queryTranscribing =>
+      'Transkriberar din inspelning. Ljudet kan redan finnas hos din leverantör.';
+
+  @override
+  String get queryUnavailable =>
+      'Det här området är inte längre tillgängligt med dina nuvarande synlighetsinställningar.';
+
+  @override
+  String get queryUnread => 'Nytt svar';
+
+  @override
+  String queryWelcomeCategory(String agentName) {
+    return 'Fråga $agentName om den här kategorin';
+  }
+
+  @override
+  String queryWelcomeProject(String agentName) {
+    return 'Fråga $agentName om det här projektet';
+  }
+
+  @override
+  String queryWelcomeTask(String agentName) {
+    return 'Fråga $agentName om den här uppgiften';
+  }
+
+  @override
   String get queueCatchUpNowButton => 'Ta igen nu';
 
   @override
@@ -10943,11 +11724,145 @@ class AppLocalizationsSv extends AppLocalizations {
   String get relationshipAddChannelButton => 'Lägg till kontaktuppgift';
 
   @override
-  String get relationshipAsk => 'Fråga';
+  String get relationshipAddChannelFromContacts => 'eller från kontakter';
+
+  @override
+  String relationshipAgentAsOfBand(String age, String band) {
+    return '$band · uppdaterad $age';
+  }
+
+  @override
+  String get relationshipAgentBriefNow => 'Briefa nu';
+
+  @override
+  String relationshipAgentCall(String name) {
+    return 'Ring $name';
+  }
+
+  @override
+  String get relationshipAgentFailedBody =>
+      'Leverantören svarade med ett fel innan briefingen skrevs. Dina avstämningar är oförändrade.';
+
+  @override
+  String get relationshipAgentFailedNoModel =>
+      'Ingen modell är inställd för briefingar. Välj en under AI-inställningar › Agenter. Detaljer finns under fliken Aktivitet.';
+
+  @override
+  String get relationshipAgentFailedPlain => 'Senaste körningen misslyckades';
+
+  @override
+  String relationshipAgentLastRunFailed(String time) {
+    return 'Senaste körningen misslyckades · $time';
+  }
+
+  @override
+  String get relationshipAgentMarkImportant => 'Markera som viktig';
+
+  @override
+  String get relationshipAgentNoAgent => 'Ingen agent för den här personen';
+
+  @override
+  String relationshipAgentNoBriefingBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Ingen briefing än. „Briefa nu“ skriver en utifrån dina $count avstämningar; den ser aldrig telefonnummer eller e-post.',
+      one:
+          'Ingen briefing än. „Briefa nu“ skriver en utifrån din avstämning; den ser aldrig telefonnummer eller e-post.',
+      zero:
+          'Ingen briefing än. „Briefa nu“ skriver en så fort du loggat en avstämning; den ser aldrig telefonnummer eller e-post.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String relationshipAgentNotEnrolledBody(String name) {
+    return 'Markera $name som viktig för att få en chatt, påminnelser när det gått ett tag och en briefing.';
+  }
+
+  @override
+  String get relationshipAgentOnlyYourStartsUseAi =>
+      'Bara det du själv startar använder AI';
+
+  @override
+  String relationshipAgentOutOfDateNewCheckIn(String day) {
+    return 'Inaktuell · ny avstämning $day';
+  }
+
+  @override
+  String get relationshipAgentOutOfDateNewCheckInShort =>
+      'Inaktuell · ny avstämning';
+
+  @override
+  String get relationshipAgentPausedBody =>
+      'Briefingar pausas så länge personen är vilande eller arkiverad.';
+
+  @override
+  String relationshipAgentProposedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count förslag',
+      one: '1 förslag',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String relationshipAgentReadingBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Läser $count avstämningar. Tar oftast under en minut.',
+      one: 'Läser 1 avstämning. Tar oftast under en minut.',
+      zero: 'Förbereder briefingen. Tar oftast under en minut.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get relationshipAgentSeeActivity => 'Visa aktivitet';
+
+  @override
+  String relationshipAgentSources(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count avstämningar',
+      one: '1 avstämning',
+    );
+    return 'Källor: $_temp0 · kontaktkanaler skickas aldrig';
+  }
+
+  @override
+  String get relationshipAgentTryAgain => 'Försök igen';
+
+  @override
+  String get relationshipAgentWatching => 'Agenten håller koll';
+
+  @override
+  String relationshipAgentWatchingNextLook(String day) {
+    return 'Agenten håller koll · nästa titt $day';
+  }
+
+  @override
+  String get relationshipAgentWriting => 'Skriver briefingen…';
 
   @override
   String relationshipBannerSemanticLabel(String personName) {
     return 'Relationsbanner för $personName';
+  }
+
+  @override
+  String relationshipBriefingAge(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days dagar gammal',
+      one: '1 dag gammal',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -10964,10 +11879,6 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
-  String get relationshipBriefingEmpty =>
-      'Ingen briefing än — Uppdatera mig tar fram en från dina avstämningar.';
-
-  @override
   String get relationshipBriefingRequested =>
       'Briefing begärd — den visas här strax.';
 
@@ -10977,12 +11888,6 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get relationshipBriefingTitle => 'Briefing';
-
-  @override
-  String get relationshipBriefMeAgain => 'Briefa igen';
-
-  @override
-  String get relationshipBriefMeButton => 'Uppdatera mig';
 
   @override
   String relationshipCadenceEveryNDays(int days) {
@@ -11015,10 +11920,22 @@ class AppLocalizationsSv extends AppLocalizations {
   String get relationshipCadenceOnTrack => 'i fas';
 
   @override
+  String get relationshipCadencePromptLabel => 'Påminn mig var';
+
+  @override
   String get relationshipCadenceQuarterly => 'Varje kvartal';
 
   @override
   String get relationshipCadenceWeekly => 'Varje vecka';
+
+  @override
+  String get relationshipChatAgentSubtitle =>
+      'Känner dina avstämningar, inte kontaktvägarna';
+
+  @override
+  String relationshipChatAgentTitle(String name) {
+    return '$name · briefingagent';
+  }
 
   @override
   String get relationshipChatTooltip => 'Chatta om den här personen';
@@ -11026,11 +11943,6 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get relationshipChatUnavailable =>
       'Ingen agent än — markera personen som viktig först.';
-
-  @override
-  String relationshipCheckedInLabel(String date) {
-    return 'Avstämning $date';
-  }
 
   @override
   String get relationshipCheckInReminderBody =>
@@ -11043,11 +11955,6 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get relationshipCheckInsLabel => 'Avstämningar';
-
-  @override
-  String relationshipCheckInTitle(String name) {
-    return 'Avstämning · $name';
-  }
 
   @override
   String get relationshipContactCardAction => 'Kontaktkort';
@@ -11073,6 +11980,17 @@ class AppLocalizationsSv extends AppLocalizations {
   String get relationshipCreateTitle => 'Lägg till person';
 
   @override
+  String relationshipDaysOver(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'försenad med $count dagar',
+      one: 'försenad med 1 dag',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get relationshipDeleteConfirmMessage =>
       'Alla avstämningar tas också bort. Det går inte att ångra.';
 
@@ -11084,6 +12002,35 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String relationshipDueDay(String day) {
     return 'Senast $day';
+  }
+
+  @override
+  String relationshipDueSince(String day, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dagar försenad',
+      one: '1 dag försenad',
+    );
+    return 'Försenad sedan $day · $_temp0';
+  }
+
+  @override
+  String get relationshipDueToday => 'Dags i dag';
+
+  @override
+  String relationshipDurationHours(int hours) {
+    return '$hours h';
+  }
+
+  @override
+  String relationshipDurationHoursMinutes(int hours, String minutes) {
+    return '$hours h $minutes';
+  }
+
+  @override
+  String relationshipDurationMinutes(int count) {
+    return '$count min';
   }
 
   @override
@@ -11104,6 +12051,21 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get relationshipErrorUpdateFailed =>
       'Ändringarna kunde inte sparas. Försök igen.';
+
+  @override
+  String get relationshipFormImportantBody =>
+      'Slår på en briefing, påminnelser och en chatt. Anteckningar från avstämningar går till agenten, men kontaktvägar skickas aldrig dit.';
+
+  @override
+  String relationshipFormImportantBodyNamed(String name) {
+    return 'Slår på en briefing, påminnelser och en chatt för $name. Anteckningar från avstämningar går till agenten, men kontaktvägar skickas aldrig dit.';
+  }
+
+  @override
+  String get relationshipFormReachTitle => 'Så når du dem';
+
+  @override
+  String get relationshipFormWhoTitle => 'Vem';
 
   @override
   String get relationshipHealthNeedsAttention => 'Behöver uppmärksamhet';
@@ -11159,6 +12121,10 @@ class AppLocalizationsSv extends AppLocalizations {
   String get relationshipImportGrantButton => 'Tillåt åtkomst';
 
   @override
+  String get relationshipImportImportantBody =>
+      'Briefingar, påminnelser och en chatt. Utan det händer inget av sig självt.';
+
+  @override
   String get relationshipImportNoMatches =>
       'Inga kontakter matchar din sökning';
 
@@ -11184,6 +12150,18 @@ class AppLocalizationsSv extends AppLocalizations {
   }
 
   @override
+  String relationshipImportReviewSubtitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count personer valda · kontaktuppgifterna stannar på den här enheten',
+      one: '1 person vald · kontaktuppgifterna stannar på den här enheten',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get relationshipImportReviewTitle => 'Innan du lägger till dem';
 
   @override
@@ -11204,8 +12182,8 @@ class AppLocalizationsSv extends AppLocalizations {
   String get relationshipJustAdded => 'Nyss tillagd';
 
   @override
-  String relationshipLastCheckInLabel(String date) {
-    return 'Senaste avstämning $date';
+  String relationshipLastSpoke(String time) {
+    return 'pratade senast $time';
   }
 
   @override
@@ -11221,12 +12199,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get relationshipLogCheckIn => 'Logga avstämning';
 
   @override
-  String get relationshipLottisRead => 'Lottis bedömning';
-
-  @override
-  String relationshipLottisReadAsOf(String time) {
-    return 'kl. $time';
-  }
+  String get relationshipMoreActions => 'Fler åtgärder';
 
   @override
   String get relationshipNameLabel => 'Namn';
@@ -11235,9 +12208,12 @@ class AppLocalizationsSv extends AppLocalizations {
   String get relationshipNameRequired => 'Namn krävs';
 
   @override
-  String relationshipNextByDay(String day) {
-    return 'nästa senast $day';
+  String relationshipNextDueOn(String day) {
+    return 'Nästa gång $day';
   }
+
+  @override
+  String get relationshipNextTimeTitle => 'Nästa gång';
 
   @override
   String get relationshipNicknameLabel => 'Smeknamn';
@@ -11250,14 +12226,60 @@ class AppLocalizationsSv extends AppLocalizations {
   String get relationshipNoLinkedTasks => 'Inga uppgifter länkade än.';
 
   @override
+  String get relationshipNotEnrolled => 'Följs inte';
+
+  @override
   String get relationshipNotFound => 'Den här personen följs inte längre.';
 
   @override
-  String get relationshipNudgesOn => 'påminnelser på';
+  String relationshipOnTrackCadence(String cadence) {
+    return 'I fas · $cadence';
+  }
 
   @override
-  String get relationshipPostCallBody =>
-      'Du hörde precis av dig. Vill du logga en avstämning medan det är färskt?';
+  String get relationshipPayAttentionTo => 'Var uppmärksam på';
+
+  @override
+  String get relationshipPhotoAddBanner => 'Lägg till banner';
+
+  @override
+  String get relationshipPhotoAdjustCrop => 'Justera beskärning';
+
+  @override
+  String get relationshipPhotoBanner => 'Banner';
+
+  @override
+  String get relationshipPhotoCardTitle => 'Foto';
+
+  @override
+  String get relationshipPhotoChange => 'Byt';
+
+  @override
+  String get relationshipPhotoChoose => 'Välj från biblioteket';
+
+  @override
+  String get relationshipPhotoDragToReposition => 'Dra för att flytta';
+
+  @override
+  String get relationshipPhotoFace => 'Ansikte';
+
+  @override
+  String get relationshipPhotoPrivacy =>
+      'Bara på dina enheter · agenten ser det aldrig';
+
+  @override
+  String get relationshipPhotoRemove => 'Ta bort foto';
+
+  @override
+  String get relationshipPhotoRemoveAction => 'Ta bort';
+
+  @override
+  String get relationshipPhotoSaveFailed => 'Det gick inte att spara fotot';
+
+  @override
+  String relationshipPhotoSheetTitle(String name) {
+    return 'Foto på $name';
+  }
 
   @override
   String get relationshipPostCallConfirm => 'Logga avstämning';
@@ -11266,33 +12288,111 @@ class AppLocalizationsSv extends AppLocalizations {
   String get relationshipPostCallDismiss => 'Inte nu';
 
   @override
-  String relationshipPostCallTitle(String name) {
-    return 'Hur gick det med $name?';
+  String relationshipPostCallMeta(String time, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'cirka $minutes min',
+      one: 'cirka 1 min',
+      zero: 'under en minut',
+    );
+    return 'började kl. $time · $_temp0';
   }
 
   @override
-  String relationshipQuietForDays(int count) {
+  String relationshipPostCallOfferCall(String name, int minutes) {
     String _temp0 = intl.Intl.pluralLogic(
-      count,
+      minutes,
       locale: localeName,
-      other: 'på $count dagar',
-      one: 'på 1 dag',
+      other: '$minutes minuter',
+      one: '1 minut',
+      zero: 'mindre än en minut',
     );
-    return 'Ingen kontakt $_temp0';
+    return 'Du ringde $name för $_temp0 sedan — anteckna medan det är färskt?';
   }
+
+  @override
+  String relationshipPostCallOfferMessage(String name, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minuter',
+      one: '1 minut',
+      zero: 'mindre än en minut',
+    );
+    return 'Du skrev till $name för $_temp0 sedan — anteckna medan det är färskt?';
+  }
+
+  @override
+  String relationshipProposalAdded(String title) {
+    return 'Tillagd → $title';
+  }
+
+  @override
+  String relationshipProposalEvidence(String date) {
+    return 'Från avstämningen den $date';
+  }
+
+  @override
+  String get relationshipProposalUndoFailed =>
+      'Kunde inte ångra. Uppgiften kan ha ändrats.';
+
+  @override
+  String get relationshipReachPrivacy =>
+      'Stannar på den här enheten · delas aldrig med AI:n';
+
+  @override
+  String get relationshipReachTitle => 'Kontakt';
 
   @override
   String get relationshipRelinkContact => 'Länka en annan kontakt';
-
-  @override
-  String get relationshipSeeAllCheckIns => 'Se alla avstämningar';
 
   @override
   String get relationshipsEmptyState =>
       'Lägg till människorna du vill hålla kontakten med.';
 
   @override
+  String get relationshipsGroupDue => 'Dags';
+
+  @override
   String get relationshipsPageTitle => 'Personer';
+
+  @override
+  String get relationshipsSelectPersonHint =>
+      'Välj en person för att se deras sida.';
+
+  @override
+  String get relationshipsSummaryDueNow => 'Dags nu';
+
+  @override
+  String relationshipsSummaryEnrolled(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '/ $count följda',
+      one: '/ 1 följd',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String relationshipsSummaryNextDue(String name, String day) {
+    return 'Nästa: $name · $day';
+  }
+
+  @override
+  String get relationshipsSummaryNoneDue => 'Ingen väntar';
+
+  @override
+  String relationshipsSummaryNotEnrolled(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count personer följs inte',
+      one: '1 person följs inte',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get relationshipStatusActive => 'Aktiv';
@@ -11307,10 +12407,34 @@ class AppLocalizationsSv extends AppLocalizations {
   String get relationshipStatusFieldLabel => 'Status';
 
   @override
-  String get relationshipStayingInTouch => 'Hålla kontakten';
+  String relationshipStatusLineAdded(String cadence) {
+    return 'Nyss tillagd · $cadence';
+  }
 
   @override
-  String get relationshipStayInTouch => 'Håll kontakten';
+  String relationshipStatusLineAddedFirstDue(String cadence, String day) {
+    return 'Nyss tillagd · $cadence · första gången senast $day';
+  }
+
+  @override
+  String relationshipStatusLineContacted(
+    String type,
+    String time,
+    String cadence,
+  ) {
+    return '$type · $time · $cadence';
+  }
+
+  @override
+  String relationshipTasksLinkedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count kopplade',
+      one: '1 kopplad',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get relationshipTimestampToday => 'Idag';
@@ -12582,9 +13706,6 @@ class AppLocalizationsSv extends AppLocalizations {
       'Upptäckta AI-förmågor';
 
   @override
-  String get settingsSyncNodeProfileCapabilityMlxAudio => 'MLX Audio (lokal)';
-
-  @override
   String get settingsSyncNodeProfileCapabilityOllamaLlm => 'Ollama LLM';
 
   @override
@@ -12629,6 +13750,13 @@ class AppLocalizationsSv extends AppLocalizations {
   String get settingsSyncSubtitle => 'Konfigurera synk och visa statistik';
 
   @override
+  String get settingsSystemHealthSubtitle =>
+      'Analysera de senaste loggarna och kopiera en delbar rapport';
+
+  @override
+  String get settingsSystemHealthTitle => 'Systemstatus';
+
+  @override
   String get settingsThemingAutomatic => 'Automatisk';
 
   @override
@@ -12667,6 +13795,70 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get settingsWhatsNewTitle => 'Vad är nytt';
+
+  @override
+  String get sherpaAllFamilies => 'Alla familjer';
+
+  @override
+  String sherpaCatalogMatches(int count, int total) {
+    return '$count av $total modeller';
+  }
+
+  @override
+  String sherpaDeleteModel(String model) {
+    return 'Ta bort $model från den här enheten';
+  }
+
+  @override
+  String get sherpaDownloadAction => 'Ladda ner';
+
+  @override
+  String sherpaDownloadModel(String model) {
+    return 'Ladda ner $model';
+  }
+
+  @override
+  String get sherpaInstalledModelsTitle => 'Installerade modeller';
+
+  @override
+  String get sherpaInstallingModel => 'Installerar modell';
+
+  @override
+  String get sherpaLanguageCantonese => 'Kantonesiska';
+
+  @override
+  String get sherpaModelCatalogTitle => 'Modellkatalog';
+
+  @override
+  String get sherpaModelConfigurationError =>
+      'Modellen har laddats ner, men dess konfiguration kunde inte sparas.';
+
+  @override
+  String get sherpaModelError => 'Modellåtgärden misslyckades. Försök igen.';
+
+  @override
+  String get sherpaModelFamily => 'Modellfamilj';
+
+  @override
+  String get sherpaModelInstalled => 'Nedladdad';
+
+  @override
+  String get sherpaModelNotInstalled =>
+      'Ladda ner en modell på den här enheten';
+
+  @override
+  String sherpaModelSizeGB(String size) {
+    return '$size GB · Flerspråkig';
+  }
+
+  @override
+  String sherpaModelSizeMB(String size) {
+    return '$size MB · Flerspråkig';
+  }
+
+  @override
+  String get sherpaProviderDescription =>
+      'Transkribera på den här enheten utan server. Ladda ner en modell och välj den sedan i din inferensprofil.';
 
   @override
   String get sidebarActiveSectionTitle => 'Verksamhet';
@@ -12771,6 +13963,17 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get speechNoAudioRecorded => 'No audio was recorded. Try again.';
+
+  @override
+  String get speechSettingsAutoPrepareChatAudio =>
+      'Förbered chattljud automatiskt';
+
+  @override
+  String get speechSettingsChatAudioDescription =>
+      'Förbered nya chattsvar på den här enheten så att uppspelningen börjar snabbare. Ljudet spelas bara upp när du trycker på spela upp.';
+
+  @override
+  String get speechSettingsChatAudioLabel => 'Chattljud';
 
   @override
   String get speechSettingsModelDescription => 'Talmodell på enheten';
@@ -13467,6 +14670,99 @@ class AppLocalizationsSv extends AppLocalizations {
   String syncWizardStepStatus(int step, String label) {
     return 'Steg $step av 3: $label';
   }
+
+  @override
+  String systemHealthAnalyzedWindow(String start, String end) {
+    return 'Analyserat $start → $end';
+  }
+
+  @override
+  String get systemHealthChooseModelTitle => 'Välj modell';
+
+  @override
+  String get systemHealthCopiedToast =>
+      'Rapporten är kopierad. Kända mönster av personuppgifter har maskerats.';
+
+  @override
+  String get systemHealthCopyButton => 'Kopiera rapport';
+
+  @override
+  String get systemHealthCustomFromLabel => 'Från';
+
+  @override
+  String get systemHealthCustomToLabel => 'Till';
+
+  @override
+  String get systemHealthDescription =>
+      'Söker igenom loggfilerna på den här enheten efter fel, varningar och långsamma frågor, maskerar kända mönster av personuppgifter och skriver en kort rapport som du kan klistra in i en kodassistent.';
+
+  @override
+  String get systemHealthDomainsDescription =>
+      'De domäner som är påslagna här analyseras – samma inställning som avgör vad som loggas. Långsamma frågor tas med när loggning av dem är på.';
+
+  @override
+  String get systemHealthDomainsTitle => 'Loggdomäner';
+
+  @override
+  String get systemHealthFailedTitle => 'Analysen misslyckades';
+
+  @override
+  String systemHealthGeneratedAt(String time) {
+    return 'Skapad $time';
+  }
+
+  @override
+  String get systemHealthHideDigest => 'Dölj sammanfattning';
+
+  @override
+  String get systemHealthModelDescription =>
+      'Skriver slutsatserna utifrån den anonymiserade sammanfattningen. Föreslår tankemodellen i din standardprofil.';
+
+  @override
+  String get systemHealthModelNone => 'Bara sammanfattning, ingen modell';
+
+  @override
+  String get systemHealthModelNoneDescription =>
+      'Ange en standardprofil för inferens eller lägg till en agentisk textmodell för att få slutsatser.';
+
+  @override
+  String get systemHealthModelTitle => 'Modell';
+
+  @override
+  String get systemHealthPresetCustom => 'Anpassat';
+
+  @override
+  String get systemHealthPresetLast14Days => '14 dagar';
+
+  @override
+  String get systemHealthPresetLast24Hours => '24 h';
+
+  @override
+  String get systemHealthPresetLast7Days => '7 dagar';
+
+  @override
+  String get systemHealthPreviousReportsDescription =>
+      'Varje rapport sparas på den här enheten. Tryck på en för att visa den igen.';
+
+  @override
+  String get systemHealthPreviousReportsTitle => 'Tidigare rapporter';
+
+  @override
+  String get systemHealthRangeTitle => 'Tidsintervall';
+
+  @override
+  String get systemHealthReportTitle => 'Rapport';
+
+  @override
+  String get systemHealthRunButton => 'Kör analys';
+
+  @override
+  String systemHealthSavedTo(String path) {
+    return 'Sparad i $path';
+  }
+
+  @override
+  String get systemHealthShowDigest => 'Visa sammanfattning';
 
   @override
   String get taskActionBarAudioRecordingActive => 'Ljudinspelning pågår';

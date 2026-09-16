@@ -1,10 +1,7 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotti/features/ai/model/ai_config.dart';
 import 'package:lotti/features/ai/ui/settings/provider/ai_provider_detail_widgets.dart';
 import 'package:lotti/features/ai/ui/settings/util/profile_usage.dart';
-import 'package:lotti/features/ai/ui/settings/widgets/mlx_audio_model_download_dialog.dart';
 import 'package:lotti/features/ai/ui/settings/widgets/v2/ai_settings_cards.dart';
-import 'package:lotti/features/ai/util/mlx_audio_model_progress_store.dart';
 import 'package:lotti/features/design_system/components/buttons/design_system_button.dart';
 import 'package:lotti/features/design_system/theme/design_tokens.dart';
 import 'package:lotti/l10n/app_localizations_context.dart';
@@ -12,8 +9,8 @@ import 'package:material_ui/material_ui.dart';
 
 /// Models section of the provider detail page.
 ///
-/// Lists the provider's configured [models] (with MLX-audio download status
-/// where applicable), an "Add model" affordance ([onAddModel]), and forwards
+/// Lists the provider's configured [models], an "Add model" affordance
+/// ([onAddModel]), and forwards
 /// row taps to [onModelTap] to open the model edit page. Each row also carries
 /// a trash action forwarding to [onDeleteModel], so a model can be removed
 /// right here instead of hunting it down on the Models tab — the page is
@@ -39,49 +36,37 @@ class ModelsSection extends StatelessWidget {
     final tokens = context.designTokens;
     final messages = context.messages;
     return Section(
-      title: messages.aiProviderDetailModelsTitle(models.length),
-      trailing: DesignSystemButton(
-        label: messages.aiProviderDetailAddModelButton,
-        variant: DesignSystemButtonVariant.secondary,
-        leadingIcon: LottiIcons.add,
-        onPressed: onAddModel,
-      ),
+      title: provider.inferenceProviderType == InferenceProviderType.sherpa
+          ? messages.sherpaInstalledModelsTitle
+          : messages.aiProviderDetailModelsTitle(models.length),
+      trailing: provider.inferenceProviderType == InferenceProviderType.sherpa
+          ? null
+          : DesignSystemButton(
+              label: messages.aiProviderDetailAddModelButton,
+              variant: DesignSystemButtonVariant.secondary,
+              leadingIcon: LottiIcons.add,
+              onPressed: onAddModel,
+            ),
       child: models.isEmpty
           ? EmptySectionCard(
-              message: messages.aiProviderDetailNoModelsMessage,
+              message:
+                  provider.inferenceProviderType == InferenceProviderType.sherpa
+                  ? messages.sherpaModelNotInstalled
+                  : messages.aiProviderDetailNoModelsMessage,
             )
           : Column(
               children: [
                 for (var i = 0; i < models.length; i++) ...[
                   if (i > 0) SizedBox(height: tokens.spacing.step3),
-                  Consumer(
-                    builder: (context, ref, _) {
-                      final model = models[i];
-                      final progress =
-                          provider.inferenceProviderType ==
-                              InferenceProviderType.mlxAudio
-                          ? ref.watch(
-                              mlxAudioModelProgressProvider(
-                                model.providerModelId,
-                              ),
-                            )
-                          : null;
-                      return AiModelCard(
-                        model: model,
-                        providerType: provider.inferenceProviderType,
-                        onTap: () => onModelTap(model),
-                        onDelete: () => onDeleteModel(model),
-                        modelDownloadProgress: progress,
-                        onInstallModel:
-                            provider.inferenceProviderType ==
-                                InferenceProviderType.mlxAudio
-                            ? () => MlxAudioModelDownloadDialog.show(
-                                context: context,
-                                model: model,
-                              )
-                            : null,
-                      );
-                    },
+                  AiModelCard(
+                    model: models[i],
+                    providerType: provider.inferenceProviderType,
+                    onTap: () => onModelTap(models[i]),
+                    onDelete:
+                        provider.inferenceProviderType ==
+                            InferenceProviderType.sherpa
+                        ? null
+                        : () => onDeleteModel(models[i]),
                   ),
                 ],
               ],

@@ -1,9 +1,13 @@
+import 'dart:math' as math;
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lotti/features/design_system/theme/design_tokens.dart';
 import 'package:lotti/features/plaza/domain/attention.dart';
 import 'package:lotti/features/plaza/domain/plaza_layout.dart';
 import 'package:lotti/features/plaza/domain/plaza_task.dart';
 import 'package:lotti/features/plaza/domain/street_layout.dart';
 import 'package:lotti/features/plaza/scene/plaza_world.dart';
+import 'package:lotti/features/plaza/ui/plaza_palette.dart';
 import 'package:lotti/features/plaza/ui/plaza_style.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -20,8 +24,35 @@ PlazaTask _task(PlazaTaskState state, {int color = 0xFF5C9DFF}) => PlazaTask(
   categoryColor: color,
 );
 
+/// WCAG relative contrast between two opaque colours.
+double _contrast(Color a, Color b) {
+  final lit = math.max(a.computeLuminance(), b.computeLuminance());
+  final dark = math.min(a.computeLuminance(), b.computeLuminance());
+  return (lit + 0.05) / (dark + 0.05);
+}
+
 void main() {
   final now = DateTime.utc(2026, 7, 15);
+
+  test(
+    'done is visibly green on billboards and roofs, cancelled is neutral',
+    () {
+      final done = _task(PlazaTaskState.done);
+      final cancelled = _task(PlazaTaskState.cancelled);
+      final success = dsTokensDark.colors.alert.success.defaultColor;
+      expect(PlazaStyle.chip(attentionFor(done, now)).fill, success);
+      expect(PlazaPalette.night.categoryRoof(done), success);
+      final wall = HSLColor.fromColor(PlazaPalette.night.categoryWall(done));
+      final roof = HSLColor.fromColor(success);
+      expect(wall.hue, closeTo(roof.hue, 2));
+      expect(wall.lightness, lessThan(roof.lightness));
+      expect(
+        PlazaStyle.chip(attentionFor(cancelled, now)).fill,
+        isNot(success),
+      );
+      expect(PlazaStyle.lightBar(attentionFor(cancelled, now)), isNot(success));
+    },
+  );
 
   test('the light bar is green on a finished shop, the state colour else', () {
     final done = attentionFor(_task(PlazaTaskState.done), now);
@@ -91,13 +122,55 @@ void main() {
   test('category colours: the category itself, then two darker tints', () {
     final task = _task(PlazaTaskState.open, color: 0xFFFF0000);
     expect(PlazaStyle.categoryBright(task), const Color(0xFFFF0000));
-    final wall = HSLColor.fromColor(PlazaStyle.categoryWall(task));
-    final roof = HSLColor.fromColor(PlazaStyle.categoryRoof(task));
+    final wall = HSLColor.fromColor(PlazaPalette.night.categoryWall(task));
+    final roof = HSLColor.fromColor(PlazaPalette.night.categoryRoof(task));
     // Still red: the hue sits at the top or the bottom of the wheel.
     bool red(double hue) => hue < 10 || hue > 350;
     expect(red(wall.hue), isTrue, reason: 'wall hue ${wall.hue}');
     expect(red(roof.hue), isTrue, reason: 'roof hue ${roof.hue}');
     expect(wall.lightness, greaterThan(roof.lightness));
     expect(wall.lightness, lessThan(0.5));
+  });
+
+  test(
+    'an attention beacon takes its lantern from the palette it is given',
+    () {
+      final tasks = syntheticPlazaTasks();
+      final world = PlazaWorld(
+        tasks: tasks,
+        now: syntheticNow(tasks),
+        projectLabel: 'Test',
+        layout: StreetLayout(projectSeed: 1337),
+      );
+      final beacon = world.beacons.firstWhere(
+        (b) => b.kind == BeaconKind.attention,
+      );
+      final attention = world.attention[beacon.taskId]!;
+      expect(
+        PlazaStyle.beaconColor(beacon, world),
+        PlazaPalette.night.lanterns.of(attention.lantern),
+        reason: 'the default is the sky the district was designed in',
+      );
+      expect(
+        PlazaStyle.beaconColor(beacon, world, palette: PlazaPalette.day),
+        PlazaPalette.day.lanterns.of(attention.lantern),
+        reason: 'a daylight beacon must not be a night lantern on a bright sky',
+      );
+    },
+  );
+
+  test('the brand teal carries the ink a lit control puts on it', () {
+    // A lit toggle is opaque teal, and the glyph on it is the ink the design
+    // system puts on any filled interactive surface. White would vanish.
+    // (The glass itself is a design-system token now; its contrast is held
+    // in `world_chrome_tokens_test.dart`.)
+    final lit = dsTokensDark.colors.text.onInteractiveAlert;
+    for (final teal in [PlazaStyle.teal, PlazaStyle.tealHover]) {
+      expect(
+        _contrast(teal, lit),
+        greaterThanOrEqualTo(4.5),
+        reason: '$teal is the fill a lit control wears',
+      );
+    }
   });
 }

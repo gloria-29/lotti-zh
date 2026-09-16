@@ -33,6 +33,7 @@ const _claimNegationCues = [
   "didn't", 'without', 'before', 'until', 'unless', 'pending', 'remains',
   'remain', 'still', 'yet', 'future', 'later', 'deferred', 'excluded',
   'out of scope', 'outside the scope', 'descoped', 'not in scope',
+  'nothing concrete to reference', 'nothing was recorded about',
   // Open-question markers. A report can be entirely correct while naming a
   // thing it has NOT committed to — "undecided on March vs. June", "weighing
   // whether to submit" — and none of the negation cues above see that.
@@ -55,6 +56,45 @@ final RegExp _claimNegationPattern = RegExp(
   r'(?<![\p{L}])(?:'
   '${_claimNegationCues.map(RegExp.escape).join('|')}'
   r')(?![\p{L}])',
+  unicode: true,
+);
+
+/// Negators that only count inside the claim's own comma clause.
+///
+/// These came from live reports ("die Newsletter-Idee bleibt bewusst außen
+/// vor", "keiner ist abgeschlossen"), but sentence-wide they excuse too much:
+/// "Keiner der vier Schritte fehlt, alle vier sind abgeschlossen" names a
+/// negative quantifier and still reports every step finished.
+const _clauseNegationCues = [
+  'keiner',
+  'keines',
+  'keinem',
+  'außen vor',
+  'ausgeklammert',
+  'weggelassen',
+];
+
+final RegExp _clauseNegationPattern = RegExp(
+  r'(?<![\p{L}])(?:'
+  '${_clauseNegationCues.map(RegExp.escape).join('|')}'
+  r')(?![\p{L}])',
+  unicode: true,
+);
+
+/// A comma, colon or dash ends a clause as well as a sentence — and so does
+/// an `und` that starts a new statement.
+///
+/// German coordinates independent clauses without a comma ("keiner der vier
+/// Schritte fehlt und alle vier sind abgeschlossen"), which would otherwise
+/// leave a clause cue and the claim it must not reach in one clause. Only an
+/// `und` followed by a fresh subject pronoun or quantifier counts: "die
+/// Newsletter-Idee und der Blog bleiben außen vor" is one statement about two
+/// things, and splitting it would lose the deferral.
+final RegExp _clauseBreakPattern = RegExp(
+  '[,:–—]|'
+  r'(?<![\p{L}])und\s+(?:alle|beide|keiner|keine|keines|keinem|nichts|jeder|'
+  'jede|jedes|man|es|sie|er|wir|ich)'
+  r'(?![\p{L}])',
   unicode: true,
 );
 
@@ -108,7 +148,16 @@ final RegExp _sentenceBreakPattern = RegExp(r'[.!?;\n\r]|\\n|\\r');
 /// is how a report may name deferred or unfinished work in order to rule it
 /// out. Exposed so the negation rules can be tested directly rather than
 /// only through a scenario's aggregate score.
-bool containsAffirmativeReportClaim(String text, String claim) {
+///
+/// [clauseScoped] narrows every cue to the claim's own comma clause, for a
+/// check whose claim is short and whose reports routinely pair it with an
+/// unrelated caveat ("the location was identified, but the fix remains
+/// pending").
+bool containsAffirmativeReportClaim(
+  String text,
+  String claim, {
+  bool clauseScoped = false,
+}) {
   final normalizedText = text.toLowerCase();
   final needle = claim.toLowerCase();
   var index = normalizedText.indexOf(needle);
@@ -131,15 +180,62 @@ bool containsAffirmativeReportClaim(String text, String claim) {
         _isLetterAt(normalizedText, stop)) {
       stop--;
     }
+    if (_isGovernedByGermanModalPassive(normalizedText, index, end)) {
+      index = normalizedText.indexOf(needle, end);
+      continue;
+    }
     // Skip the claim itself so a cue inside it cannot excuse the claim.
-    final context =
-        '${normalizedText.substring(start, index)} '
-        '${normalizedText.substring(end, stop)}';
-    if (!_claimNegationPattern.hasMatch(context)) return true;
+    final before = normalizedText.substring(start, index);
+    final after = normalizedText.substring(end, stop);
+    final clauseBefore = switch (_clauseBreakPattern
+        .allMatches(before)
+        .lastOrNull) {
+      final Match brk => before.substring(brk.end),
+      null => before,
+    };
+    final clauseAfter = switch (_clauseBreakPattern.firstMatch(after)) {
+      final Match brk => after.substring(0, brk.start),
+      null => after,
+    };
+    final clause = '$clauseBefore $clauseAfter';
+    final negated =
+        _claimNegationPattern.hasMatch(
+          clauseScoped ? clause : '$before $after',
+        ) ||
+        _clauseNegationPattern.hasMatch(clause);
+    if (!negated) return true;
     index = normalizedText.indexOf(needle, end);
   }
   return false;
 }
+
+/// A German modal earlier in the claim's own clause: "…, kann der Prototyp ".
+final RegExp _germanModalBeforeClaim = RegExp(
+  r'(?<![\p{L}])(?:kann|können|soll|sollen|muss|müssen)(?![\p{L}])'
+  r'[^,.;:!?\n\r]{0,60}$',
+  unicode: true,
+);
+
+/// The passive auxiliary closing that clause right after the claim, directly
+/// or after one coordinated participle: " werden", " und die Anmeldung
+/// umgesetzt werden".
+final RegExp _germanPassiveAfterClaim = RegExp(
+  r'^(?:\s+und[^,.;:!?\n\r]{0,60}?)?\s+werden(?![\p{L}])',
+  unicode: true,
+);
+
+/// Whether the participle at [start]..[end] is itself the verb of a German
+/// modal passive — "kann der Prototyp abgeschlossen werden" plans the work
+/// rather than reporting it done.
+///
+/// Scoped to the claimed participle on purpose. Modals as ordinary negation
+/// cues excused far too much: "Die Newsletter-Idee soll umgesetzt werden" is
+/// still a claim about the newsletter, and "wurde abgeschlossen und kann jetzt
+/// verwendet werden" is still a completion — the modal there governs another
+/// verb.
+bool _isGovernedByGermanModalPassive(String text, int start, int end) =>
+    _germanModalBeforeClaim.hasMatch(text.substring(0, start)) &&
+    _germanPassiveAfterClaim.hasMatch(text.substring(end));
 
 final RegExp _letterPattern = RegExp(r'\p{L}', unicode: true);
 

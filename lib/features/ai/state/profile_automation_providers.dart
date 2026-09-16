@@ -8,6 +8,7 @@ import 'package:lotti/features/ai/helpers/profile_automation_resolver.dart';
 import 'package:lotti/features/ai/model/ai_config.dart';
 import 'package:lotti/features/ai/repository/ai_config_repository.dart';
 import 'package:lotti/features/ai/services/profile_automation_service.dart';
+import 'package:lotti/features/ai/speech/sherpa_model_repository.dart';
 import 'package:lotti/features/ai/util/profile_resolver.dart';
 import 'package:lotti/providers/service_providers.dart' show journalDbProvider;
 
@@ -70,9 +71,8 @@ ProfileAutomationResolver profileAutomationResolver(Ref ref) {
 /// profile carries at least one `automate: true` skill assignment — the
 /// "profile is set to automatic" case — or when the direct transcription
 /// fallback could run, which needs no profile at all. Showing the switch in
-/// that second case is what keeps mobile recording (MLX Audio model, no
-/// desktop-only profile selectable) from losing automation with no way to
-/// turn it back on.
+/// that second case lets users control recording automation even without a
+/// configured profile.
 final FutureProviderFamily<bool, String?> categoryAutomationAvailableProvider =
     FutureProvider.family<bool, String?>(
       categoryAutomationAvailable,
@@ -99,6 +99,8 @@ final profileAutomationServiceProvider = Provider<ProfileAutomationService>(
 );
 ProfileAutomationService profileAutomationService(Ref ref) {
   return ProfileAutomationService(
+    isEmbeddedModelInstalled: (id) =>
+        ref.read(sherpaModelRepositoryProvider).isAvailable(id),
     resolver: ref.watch(profileAutomationResolverProvider),
     aiConfigRepository: ref.watch(aiConfigRepositoryProvider),
     categoryAutomationLookup: (subjectId) async {

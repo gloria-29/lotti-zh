@@ -38,6 +38,7 @@ import '../../../mocks/mocks.dart';
 import '../../../widget_test_utils.dart';
 import '../../agents/test_utils.dart';
 import '../../ai_consumption/test_utils.dart';
+import 'support/eval_text_matchers.dart';
 
 void main() {
   setUpAll(registerAllFallbackValues);
@@ -45,6 +46,12 @@ void main() {
   test(
     'executes the real task-agent workflow against the configured provider',
     () async {
+      // Live evaluation must bypass Flutter's HTTP 400 test client, just as
+      // the inference and penguin wake drivers do.
+      final previousHttpOverrides = HttpOverrides.current;
+      HttpOverrides.global = null;
+      addTearDown(() => HttpOverrides.global = previousHttpOverrides);
+
       final attribution = AiInteractionCaptureTestBench.create();
       await setUpTestGetIt(
         additionalSetup: () {
@@ -257,7 +264,18 @@ void main() {
       expect(normalizedReport, contains('release'));
       expect(normalizedReport, isNot(contains('workflow item')));
       expect(normalizedReport, isNot(contains('checklist')));
-      expect(normalizedReport, isNot(contains('identified')));
+      // A claim, not a word: "the relevant code location is not yet
+      // identified" is the honest state and must not fail the run. Clause
+      // scoped, so "was identified, but the fix remains pending" still fails.
+      expect(
+        containsAffirmativeReportClaim(
+          normalizedReport,
+          'identified',
+          clauseScoped: true,
+        ),
+        isFalse,
+        reason: 'The report claims something was identified.',
+      );
       expect(normalizedReport, isNot(contains('root cause')));
       expect(normalizedReport, isNot(contains('automated review')));
       expect(normalizedReport, isNot(contains('human reviewer')));

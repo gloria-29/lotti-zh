@@ -62,6 +62,23 @@ abstract final class TapTargets {
   /// 48×48 and grows the row it sits in — which is why it belongs in card
   /// headers and panel corners rather than dense rows.
   static const double minimum = 48;
+
+  /// 44 — the platform guidance for touch, and the floor for a dense row of
+  /// glyph-only controls that cannot afford [minimum].
+  ///
+  /// The one taker is `DesignSystemContactRow`: four targets sharing the
+  /// narrowest column the app has (a 184 px rail) do not fit at 48 and do at
+  /// 44. Anything with room for the recommended target takes [minimum].
+  static const double compact = 44;
+}
+
+/// Where the system text scale stops being "a little bigger" and a layout
+/// re-flows: an avatar steps aside for its title, an action bar stacks, a
+/// one-line meta row may take two. One number, so the composer, the modal
+/// bar and the selection rows change shape on the same setting.
+abstract final class TextScales {
+  /// 1.3 — above it, a component is on its large-text layout.
+  static const double large = 1.3;
 }
 
 /// Icon dimensions, smallest to largest.

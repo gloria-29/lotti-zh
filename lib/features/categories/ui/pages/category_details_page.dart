@@ -2,7 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotti/classes/entity_definitions.dart';
 import 'package:lotti/database/state/config_flag_provider.dart';
 import 'package:lotti/features/agents/model/agent_enums.dart';
+import 'package:lotti/features/agents/model/query_chat_models.dart';
 import 'package:lotti/features/agents/ui/profile_selector.dart';
+import 'package:lotti/features/agents/ui/query/query_ask_button.dart';
+import 'package:lotti/features/agents/ui/query/query_companion.dart';
 import 'package:lotti/features/agents/ui/template_selector.dart';
 import 'package:lotti/features/ai/state/profile_automation_providers.dart';
 import 'package:lotti/features/categories/domain/category_icon.dart';
@@ -48,7 +51,8 @@ part 'category_details_form_sections.dart';
 ///
 /// Both create and edit mode render inside the shared
 /// [SettingsDetailScaffold] (header with back affordance, Cmd/Ctrl+S,
-/// sticky glass [SettingsFormActionBar]).
+/// sticky glass [SettingsFormActionBar]). Saved categories keep that form
+/// mounted inside [QueryCompanion] while a scoped discussion is open.
 class CategoryDetailsPage extends ConsumerStatefulWidget {
   const CategoryDetailsPage({
     this.categoryId,
@@ -218,10 +222,16 @@ class _CategoryDetailsPageState extends ConsumerState<CategoryDetailsPage> {
       return _buildCreateMode(context);
     }
 
-    // For edit mode, watch the category details
     final state = ref.watch(
       categoryDetailsControllerProvider(widget.categoryId!),
     );
+    return QueryCompanion(
+      scope: QueryScope(kind: QueryScopeKind.category, id: widget.categoryId!),
+      child: _buildEditMode(context, state),
+    );
+  }
+
+  Widget _buildEditMode(BuildContext context, CategoryDetailsState state) {
     final category = state.category;
 
     if (category == null && !state.isLoading) {
@@ -270,6 +280,13 @@ class _CategoryDetailsPageState extends ConsumerState<CategoryDetailsPage> {
             child: CircularProgressIndicator(),
           )
         else if (category != null) ...[
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: QueryAskButton(
+              scope: QueryScope(kind: QueryScopeKind.category, id: category.id),
+              fullLabel: true,
+            ),
+          ),
           SettingsFormSection(
             title: context.messages.basicSettings,
             children: [

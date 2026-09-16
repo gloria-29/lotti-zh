@@ -437,6 +437,7 @@
   },
   "agentSummaryAddItem": "Toevoegen: \"{title}\"",
   "agentSummaryArchiveItem": "Archiveren: \"{title}\"",
+  "agentSummaryAssignLabel": "Label toewijzen: ‘{label}’",
   "agentSummaryCheckItem": "Afvinken: \"{title}\"",
   "agentSummaryCreateFollowUp": "Vervolgtaak maken: \"{title}\"",
   "agentSummaryCreateFollowUpRelated": "Vervolgtaak maken: \"{title}\" — {relation}",
@@ -702,8 +703,6 @@
   "aiCardReadMore": "Lees meer",
   "aiCardShowLess": "Minder tonen",
   "aiCardTitle": "Samenvatting van de AI",
-  "aiChatAssistantResponding": "De assistent antwoordt",
-  "aiChatMessageCopied": "Gekopieerd naar het klembord",
   "aiConfigFailedToLoadModelsGeneric": "Laden van modellen is mislukt. Probeer het opnieuw.",
   "aiConfigNoModelsAvailable": "Er zijn nog geen AI-modellen geconfigureerd. Voeg er een toe in instellingen.",
   "aiConfigNoSuitableModelsAvailable": "Geen modellen voldoen aan de eisen voor deze prompt. Stel modellen in die de vereiste mogelijkheden ondersteunen.",
@@ -903,44 +902,6 @@
   "aiInferenceErrorUnknownTitle": "Fout",
   "aiInternalsTitle": "Agent internals",
   "aiModelCardDeleteTooltip": "Model verwijderen",
-  "aiModelDownloadCloseButton": "Sluiten",
-  "aiModelDownloadDialogDescription": "Lotti zal downloaden {modelName} in de MLX Audio cache en gebruik het voor lokale spraakverwerking.",
-  "@aiModelDownloadDialogDescription": {
-    "placeholders": {
-      "modelName": {
-        "type": "String"
-      }
-    }
-  },
-  "aiModelDownloadDialogTitle": "Installeren {modelName}",
-  "@aiModelDownloadDialogTitle": {
-    "placeholders": {
-      "modelName": {
-        "type": "String"
-      }
-    }
-  },
-  "aiModelDownloadInstallTooltip": "Model installeren",
-  "aiModelDownloadOpenProgressTooltip": "Downloadvoortgang tonen",
-  "aiModelDownloadStatusChecking": "Modelstatus controleren",
-  "aiModelDownloadStatusDownloading": "Downloaden {percent}%",
-  "@aiModelDownloadStatusDownloading": {
-    "placeholders": {
-      "percent": {
-        "type": "int"
-      }
-    }
-  },
-  "aiModelDownloadStatusDownloadingIndeterminate": "Downloaden",
-  "aiModelDownloadStatusFailed": "Downloaden is mislukt",
-  "aiModelDownloadStatusInstalled": "Geïnstalleerd",
-  "aiModelDownloadStatusNotInstalled": "Niet geïnstalleerd",
-  "aiModelDownloadStatusUnsupported": "Apple Silicium vereist",
-  "aiModelInstallChoiceCancelButton": "Annuleren",
-  "aiModelInstallChoiceDescription": "Kies het lokale spraak-tekstmodel om eerst te downloaden. U kunt de anderen later installeren uit de lijst met modellen.",
-  "aiModelInstallChoiceInstallButton": "Model installeren",
-  "aiModelInstallChoiceRecommended": "Aanbevolen",
-  "aiModelInstallChoiceTitle": "Kies MLX Audio model",
   "aiModelPickerByProviderLabel": "Kies een provider",
   "aiModelPickerCurrentDefaultLabel": "Huidige standaard",
   "aiModelPickerProviderModelCount": "{count, plural, =1{1 model} other{{count} modellen}}",
@@ -1123,22 +1084,20 @@
   "aiProviderDetailRemoveDescription": "Verwijdert de provider en elk model dat ervan afhangt. Dit kan niet ongedaan worden gemaakt.",
   "aiProviderDetailRemoveTitle": "Deze provider verwijderen",
   "aiProviderDetailValueUnset": "Niet ingesteld",
-  "aiProviderEmbeddedRuntimeHint": "Runs ingebed in het Apple-appproces. Er is geen lokale server of basis-URL vereist.",
   "aiProviderGeminiName": "Google Gemini",
   "aiProviderGenericOpenAiName": "OpenAI Compatible",
   "aiProviderMeliousName": "Melious.ai",
   "aiProviderMistralName": "Mistral",
-  "aiProviderMlxAudioName": "MLX-audio (lokaal)",
   "aiProviderNebiusAiStudioName": "Nebius AI Studio",
   "aiProviderOllamaName": "Ollama",
   "aiProviderOmlxName": "oMLX (lokaal)",
   "aiProviderOpenAiName": "OpenAI",
   "aiProviderOpenRouterName": "OpenRouter",
+  "aiProviderSherpaName": "sherpa-onnx (op dit apparaat)",
   "aiProviderTaglineAlibaba": "Qwen modellen · multimodaal · lange context",
   "aiProviderTaglineAnthropic": "Claude familie · lange context",
   "aiProviderTaglineGemini": "Multimodal · audio transcriptie",
   "aiProviderTaglineMelious": "EU-gehoste · dynamische catalogus · eco routing",
-  "aiProviderTaglineMlxAudio": "Ingebed · Apple Silicon · lokale audio",
   "aiProviderTaglineOllama": "Lokaal draait · geen cloudgesprekken",
   "aiProviderTaglineOmlx": "Lokale MLX-inferentie · OpenAI-compatibel",
   "aiProviderTaglineOpenAi": "GPT-familie · zicht + redenering",
@@ -1167,6 +1126,7 @@
   "aiSettingsCounterModels": "Modellen",
   "aiSettingsCounterProfiles": "Profielen",
   "aiSettingsCounterProviders": "Aanbieders",
+  "aiSettingsDefaultProfileDescription": "Terugvalprofiel voor agents zonder ingesteld model op dit apparaat.",
   "aiSettingsEmptyDescription": "Voeg er een toe om transcriptie, beeldherkenning, beeldgeneratie en semantische zoekopdrachten te ontgrendelen.",
   "aiSettingsEmptyTitle": "Nog geen providers",
   "aiSettingsFilterByCapabilityTooltip": "Filteren op {capability} vermogen",
@@ -1192,6 +1152,7 @@
   "aiSettingsModalityAudio": "Audio",
   "aiSettingsModalityText": "Tekst",
   "aiSettingsModalityVision": "Gezicht",
+  "aiSettingsNoDefaultProfile": "Geen standaardprofiel",
   "aiSettingsNoModelsConfigured": "Geen AI-modellen geconfigureerd",
   "aiSettingsNoProvidersConfigured": "Geen AI providers geconfigureerd",
   "aiSettingsPageLead": "Configure AI providers, de modellen Lotti kunnen bellen, en de gevolgtrekkingen profielen die bepalen welke model verwerkt welke taak.",
@@ -1392,6 +1353,10 @@
   "audioRecordingResume": "Hervatten",
   "audioRecordings": "Audio-opnames",
   "audioRecordingStop": "Stoppen",
+  "avatarCropHint": "Sleep om te verplaatsen · knijp om te zoomen",
+  "avatarCropPreviewLabel": "Zo ziet het eruit in de lijst",
+  "avatarCropTitle": "Kies het gezicht",
+  "avatarCropUse": "Foto gebruiken",
   "backfillAdvancedRecoveryActions": "{count, plural, =1{1 actie} other{{count} acties}}",
   "@backfillAdvancedRecoveryActions": {
     "placeholders": {
@@ -1565,49 +1530,162 @@
   "chatInputStopRealtime": "Stop live transcriptie",
   "chatInputStopTranscribe": "Stoppen en transcriberen",
   "chatInputTranscriptionFailed": "De opname is gelukt, maar het transcriberen is mislukt. Probeer het opnieuw.",
+  "checkInAddMoreButton": "Meer toevoegen",
+  "checkInAudioSaved": "{length} audio opgeslagen",
+  "checkInAudioSavedAsYouGo": "Audio wordt tijdens de opname op dit apparaat opgeslagen",
+  "checkInAudioSavedRoute": "{length} audio opgeslagen · {route}",
   "checkInAvoidLabel": "Beter vermijden",
-  "checkInDateLabel": "Wanneer?",
-  "checkInDeleteConfirmMessage": "Deze check-in verwijderen? Dit kan niet ongedaan worden gemaakt.",
-  "checkInDone": "Klaar",
-  "@checkInDone": {
-    "description": "Relationships redesign label."
+  "checkInComposerSubtitle": "met {name} · laatst gesproken {day}",
+  "checkInComposerSubtitleNoContact": "met {name} · nog geen check-in",
+  "checkInComposerWithName": "met {name}",
+  "@checkInComposerWithName": {
+    "description": "The composer header's status line when only the person fits: the name is never shed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
+  "checkInContextSummary": "{type} · {time} · {duration}",
+  "checkInDeleteConfirmMessage": "Deze check-in verwijderen? Dit kan niet ongedaan worden gemaakt.",
+  "checkInDictateButton": "Dicteren",
+  "checkInDiscardDraftAudioKeptMessage": "Deze check-in weggooien? De opname blijft in het journaal.",
+  "@checkInDiscardDraftAudioKeptMessage": {
+    "description": "The discard confirmation while a saved recording exists: the check-in goes, the audio stays in the journal."
+  },
+  "checkInDiscardDraftMessage": "Deze check-in weggooien? Er is niets opgeslagen.",
+  "checkInDiscardDraftRecordingMessage": "Deze check-in en de opname weggooien? De opname wordt verwijderd.",
+  "checkInDiscardRecording": "Weggooien",
+  "checkInDiscardRecordingBody": "De audio wordt verwijderd. Je check-in blijft open.",
+  "@checkInDiscardRecordingBody": {
+    "description": "Body of the confirmation before discarding a check-in recording: the audio is deleted, the composer stays open."
+  },
+  "checkInDismissButton": "Sluiten",
+  "checkInDurationChip": "Duur",
+  "checkInDurationChipSemantics": "Duur: {duration}. Wijzigen",
+  "checkInDurationQuickPickHint": "Tik op een duur om die te bewaren, of draai aan het wiel.",
+  "checkInDurationSemanticsLabel": "Duur instellen op {label}",
   "checkInEditTitle": "Check-in bewerken",
   "checkInErrorCreateFailed": "Kon de check-in niet opslaan. Probeer het opnieuw.",
   "checkInErrorDeleteFailed": "Kon de check-in niet verwijderen. Probeer het opnieuw.",
-  "checkInHowDidItFeel": "Hoe voelde het?",
-  "@checkInHowDidItFeel": {
-    "description": "Relationships redesign label."
-  },
-  "checkInHowDidYouConnect": "Hoe was het contact?",
-  "@checkInHowDidYouConnect": {
-    "description": "Relationships redesign label."
-  },
   "checkInInteractionCall": "Telefoontje",
   "checkInInteractionInPerson": "In persoon",
   "checkInInteractionLabel": "Hoe hadden jullie contact?",
   "checkInInteractionMessage": "Bericht",
   "checkInInteractionOther": "Anders",
   "checkInInteractionVideoCall": "Videogesprek",
-  "checkInNarrativeLabel": "Waar hebben jullie het over gehad?",
+  "checkInMicrophoneDeniedBody": "Zet het aan voor Lotti in de systeeminstellingen en tik dan op Dicteren. Er is niets opgenomen.",
+  "checkInMicrophoneDeniedCalloutTitle": "Sta microfoontoegang toe",
+  "@checkInMicrophoneDeniedCalloutTitle": {
+    "description": "The refused-microphone card's title: the next step, since the header status already says the microphone is unavailable."
+  },
+  "checkInMoreCaptionFeeling": "Gevoel",
+  "@checkInMoreCaptionFeeling": {
+    "description": "Folded More row caption segment while no feeling is chosen."
+  },
+  "checkInMoreCaptionNextTime": "volgende keer",
+  "@checkInMoreCaptionNextTime": {
+    "description": "Folded More row caption segment while nothing is noted for next time."
+  },
+  "checkInMoreCaptionNextTimeSet": "volgende keer genoteerd",
+  "@checkInMoreCaptionNextTimeSet": {
+    "description": "Folded More row caption segment once something is noted for next time."
+  },
+  "checkInMoreCaptionTopics": "onderwerpen",
+  "@checkInMoreCaptionTopics": {
+    "description": "Folded More row caption segment while no topics are entered."
+  },
+  "checkInMoreCaptionTopicsCount": "{count, plural, =1{1 onderwerp} other{{count} onderwerpen}}",
+  "@checkInMoreCaptionTopicsCount": {
+    "description": "Folded More row caption segment: how many topics are entered.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkInMoreSection": "Meer",
+  "checkInNarrativeHint": "Waar hebben jullie het over gehad? Eén regel is genoeg.",
+  "checkInNoDuration": "Geen duur",
+  "checkInOpenSettingsButton": "Instellingen openen",
+  "checkInOrTypeHint": "Of typ het hier…",
   "checkInPayAttentionLabel": "Let de volgende keer op",
-  "checkInPreparedOverline": "✦ LOTTI · VANOCHTEND VOORBEREID",
+  "checkInPreparingLabel": "Audio voorbereiden…",
+  "checkInRecorderBusyBody": "Stop die eerst via de opname-indicator en probeer het opnieuw. Er is niets nieuws opgenomen.",
+  "checkInRecorderBusyTitle": "Er loopt al een opname",
+  "checkInRecordingFailedBody": "De microfoon kon niet worden gestart. Probeer het opnieuw of typ de check-in. Er is niets opgenomen.",
+  "checkInRecordingFailedTitle": "Opname niet gestart",
+  "checkInRecordingHint": "Praat gewoon. De woorden verschijnen hier zodra je stopt.",
+  "checkInRecordingNotSavedBody": "De opname kon niet worden opgeslagen. Probeer het opnieuw of typ de check-in.",
+  "checkInRecordingNotSavedTitle": "Opname kon niet worden opgeslagen",
+  "checkInReRecordButton": "Opnieuw opnemen",
+  "checkInReRecordReplaceMessage": "Je bewerkte woorden vervangen door een nieuwe opname?",
+  "@checkInReRecordReplaceMessage": {
+    "description": "Confirmation before Re-record when the transcript has been edited since it landed."
+  },
+  "checkInSaveBlockedEmpty": "Voeg een paar woorden toe om op te slaan",
+  "checkInSaveBlockedRecording": "Stop de opname om op te slaan",
+  "checkInSaveBlockedRetry": "Typ of probeer opnieuw om op te slaan",
+  "checkInSaveBlockedTranscribing": "Wachten op het transcript",
+  "checkInSaveButton": "Check-in opslaan",
+  "checkInSaveShortButton": "Opslaan",
+  "checkInSaveShortcutHint": "{shortcut} om op te slaan",
   "checkInSentimentDelightful": "Heerlijk",
   "checkInSentimentDifficult": "Moeilijk",
   "checkInSentimentGood": "Goed",
   "checkInSentimentLabel": "Hoe voelde het?",
   "checkInSentimentNeutral": "Neutraal",
+  "checkInSentimentOptional": "Optioneel. Wordt nooit door de agent ingevuld.",
   "checkInSentimentStrained": "Gespannen",
+  "checkInSourceCall": "Van het gesprek dat je vanaf deze pagina begon. Alles is aan te passen.",
+  "checkInSourceMessage": "Van het bericht dat je vanaf deze pagina stuurde. Alles is aan te passen.",
   "checkInSpeakButton": "Check-in inspreken",
+  "checkInSpokenMinutes": "{count, plural, =1{1 minuut} other{{count} minuten}}",
+  "@checkInSpokenMinutes": {
+    "description": "Minutes of a recording length, read by assistive technology.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkInSpokenSeconds": "{count, plural, =1{1 seconde} other{{count} seconden}}",
+  "@checkInSpokenSeconds": {
+    "description": "Seconds of a recording length, read by assistive technology.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkInStartedLabel": "Begonnen",
+  "checkInStatusMicrophoneDenied": "Microfoon niet beschikbaar",
+  "checkInStatusPaused": "Gepauzeerd",
+  "checkInStatusRecorderBusy": "Recorder bezet",
+  "checkInStatusRecording": "Opname loopt",
+  "checkInStatusRecordingFailed": "Opname niet gestart",
+  "checkInStatusRecordingNotSaved": "Opname niet opgeslagen",
+  "checkInStatusTranscriptionUnavailable": "Geen transcriptiemodel",
+  "checkInStatusTranscriptMissing": "Geen transcript ontvangen",
+  "checkInTimeChipSemantics": "Begin: {time}. Wijzigen",
   "checkInTopicsHint": "Kommagescheiden, bijv. werk, reizen",
   "checkInTopicsLabel": "Onderwerpen",
-  "checkInTranscribingLabel": "Bezig met transcriberen…",
-  "checkInTranscriptFailed": "Er kwam geen transcriptie terug. Je kunt het zelf typen.",
-  "checkInTranscriptUnavailable": "Transcriptie is niet ingesteld voor deze persoon. Voeg een audiomodel toe en zet automatische inferentie aan voor hun categorie, of typ de check-in.",
-  "checkInWriteInstead": "Liever schrijven",
-  "@checkInWriteInstead": {
-    "description": "Relationships redesign label."
+  "checkInTranscribingEta": "meestal binnen een minuut",
+  "@checkInTranscribingEta": {
+    "description": "The last, first-shed tier of the transcribing caption: a time expectation for the wait."
   },
+  "checkInTranscribingLabel": "Bezig met transcriberen…",
+  "checkInTranscriptAdded": "Transcript toegevoegd",
+  "checkInTranscriptionUnavailableTitle": "Geen transcriptiemodel ingesteld",
+  "checkInTranscriptMissingBody": "Je opname van {length} blijft in het journaal bewaard, ook als je deze check-in weggooit. Probeer het zo nog eens.",
+  "checkInTranscriptMissingCalloutTitle": "Probeer opnieuw, of typ het",
+  "@checkInTranscriptMissingCalloutTitle": {
+    "description": "The transcript-not-received card's title: the next step, since the header status already names the state."
+  },
+  "checkInTranscriptUnavailable": "Kies in de AI-instellingen een standaard inferentieprofiel met een transcriptiemodel, of schrijf je contactmoment op.",
+  "checkInTypeChipSemantics": "Soort: {type}. Wijzigen",
+  "checkInTypeInstead": "Liever typen",
+  "checkInWordCount": "{count, plural, =1{1 woord} other{{count} woorden}}",
   "checklistAddItem": "Een nieuw item toevoegen",
   "checklistAiConfidenceLabel": "Vertrouwen: {level}",
   "@checklistAiConfidenceLabel": {
@@ -1671,7 +1749,7 @@
   "configFlagEnableAiStreaming": "AI-streaming inschakelen voor taakacties",
   "configFlagEnableAiStreamingDescription": "Stream AI-responsen voor taakgerelateerde acties. Schakel de bufferresponsen uit en houd de UI soepeler.",
   "configFlagEnableAiSummaryTts": "AI samenvatting afspelen",
-  "configFlagEnableAiSummaryTtsDescription": "Toon de lokale tekst-naar-spraak-knop op taak AI samenvattingen. Vereist een geïnstalleerd MLX Audio TTS model.",
+  "configFlagEnableAiSummaryTtsDescription": "Toon de lokale tekst-naar-spraak-knop op taak AI samenvattingen. Vereist een geïnstalleerd Supertonic TTS model.",
   "configFlagEnableDailyOs": "DailyOS inschakelen",
   "configFlagEnableDailyOsDescription": "Toon DailyOS in de hoofdnavigatie.",
   "configFlagEnableDashboardsPage": "Dashboards-pagina inschakelen",
@@ -1691,6 +1769,8 @@
   "configFlagEnableNotificationsDescription": "Ontvang meldingen voor herinneringen, updates en belangrijke gebeurtenissen.",
   "configFlagEnableProjects": "Projecten inschakelen",
   "configFlagEnableProjectsDescription": "Functies voor projectbeheer tonen voor het organiseren van taken in projecten.",
+  "configFlagEnableQueryChat": "Experimentele taakchat",
+  "configFlagEnableQueryChatDescription": "Toont chats voor taken, projecten en categorieën. Standaard uitgeschakeld.",
   "configFlagEnableRelationships": "Mensen-pagina inschakelen",
   "configFlagEnableRelationshipsDescription": "Toon het tabblad Mensen om je persoonlijke relaties te onderhouden.",
   "configFlagEnableSessionRatings": "Sessie-waarderingen inschakelen",
@@ -2738,6 +2818,7 @@
   "designSystemTextareaWithCounterLabel": "met teller",
   "designSystemTextareaWithErrorLabel": "Met fout",
   "designSystemTextareaWithHelperLabel": "Met hulptekst",
+  "designSystemTieredTextTitle": "Getrapte tekst in drie breedtes",
   "designSystemTimePickerFormatsTitle": "Tijdsformaten",
   "designSystemTimePickerTwelveHourLabel": "12 uur",
   "designSystemTimePickerTwentyFourHourLabel": "24 uur",
@@ -3389,6 +3470,8 @@
   "imageViewerPreviousTooltip": "Vorige afbeelding",
   "inactiveLabel": "Inactief",
   "inactiveSwitchDescription": "Kan worden gekozen voor nieuwe items wanneer op",
+  "inferenceProfileChat": "Chatmodel",
+  "inferenceProfileChatUsesThinking": "Gebruikt het denkmodel als er niets is ingesteld",
   "inferenceProfileChooseModelTitle": "Kies een model",
   "inferenceProfileChooseTitle": "Kies een inferentieprofiel",
   "inferenceProfileCreateTitle": "Profiel aanmaken",
@@ -4061,21 +4144,13 @@
   "multiSelectNoItemsFound": "Geen items gevonden",
   "navSidebarManualBrowserHint": "Opent in uw browser",
   "navSidebarManualLabel": "Handmatig",
-  "navTabMoreSemanticsLabel": "{count, plural, =1{Meer, 1 extra bestemming} other{Meer. {count} aanvullende bestemmingen}}",
-  "@navTabMoreSemanticsLabel": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "navTabTitleCalendar": "DailyOS",
   "navTabTitleEvents": "Gebeurtenissen",
   "navTabTitleGoals": "Doelen",
   "navTabTitleHabits": "Gewoontes",
   "navTabTitleInsights": "Inzichten",
   "navTabTitleJournal": "Logboek",
-  "navTabTitleMore": "Meer",
+  "navTabTitleNavigate": "Navigeren",
   "navTabTitlePeople": "Mensen",
   "navTabTitleProjects": "Projecten",
   "navTabTitleSettings": "Instellingen",
@@ -4347,6 +4422,47 @@
   "panasScaleModerately": "Matig",
   "panasScaleQuiteABit": "Nogal een beetje.",
   "panasScaleVerySlightlyOrNotAtAll": "Zeer licht of helemaal niet",
+  "plazaBlockedReason": "geblokkeerd — een beslissing is nodig",
+  "plazaCategoryEmpty": "Deze categorie heeft geen zichtbare projecten.",
+  "plazaClosedForNight": "GESLOTEN VOOR DE NACHT",
+  "plazaCloseHint": "Esc om te sluiten",
+  "plazaControls": "WASD lopen · houd Shift ingedrukt: 8× snelheid · sleep om rond te kijken · Tab volgend baken · H start · M overzicht · / zoeken · T werkbalk · Esc sluiten · ⌘[ terug",
+  "plazaCornerAfter": "Bocht na {week}",
+  "plazaDebug": "Debuggen",
+  "plazaDecisionStrip": "BESLISSING NODIG",
+  "plazaDoneCount": "{done} van {total} afgerond",
+  "plazaDueOn": "deadline {date}",
+  "plazaDueSoonReason": "deadline {date} — rond het af",
+  "plazaEmpty": "Voeg een taak toe om het plein van dit project op te bouwen.",
+  "plazaEnterProject": "Project betreden",
+  "plazaExploreCategory": "Categorie verkennen",
+  "plazaExploreProject": "Project verkennen",
+  "plazaFlyThere": "Vlieg erheen ›",
+  "plazaInProgressCount": "Bezig: {count}",
+  "plazaLinks": "koppelingen {count}",
+  "plazaMeerkats": "Stokstaartjes",
+  "plazaMorningWalk": "Ochtendwandeling",
+  "plazaNeedsAttention": "Aandacht nodig: {count}",
+  "plazaOpeningSoon": "BINNENKORT OPEN",
+  "plazaOpenLate": "LAAT OPEN",
+  "plazaOverdueSince": "te laat sinds {date} — rond af of verplaats",
+  "plazaOverview": "Overzicht",
+  "plazaPaused": "Gepauzeerd",
+  "plazaProjectOverdue": "Achterstallige taken: {count}",
+  "plazaSearchHint": "Zoek taken, Enter om erheen te vliegen",
+  "plazaShowPenguins": "Pinguïns",
+  "plazaSkyDay": "Dag",
+  "plazaSkyNight": "Nacht",
+  "plazaStaleReason": "al {days} dagen stil — pak het weer op",
+  "plazaStats": "{tasks} taken · {weeks} weken · {attention} vragen aandacht",
+  "plazaTaskCount": "Taken: {count}",
+  "plazaTitle": "Plein",
+  "plazaToggleToolbar": "Werkbalk tonen / verbergen",
+  "plazaToLet": "TE HUUR",
+  "plazaTourControls": "Spatie: pauze · beweeg om te stoppen",
+  "plazaUnavailable": "Dit apparaat kan de 3D-wereld niet weergeven.",
+  "plazaWeek": "W{week} · {date}",
+  "plazaWeekShort": "W{week}",
   "privateLabel": "Privé",
   "privateSwitchDescription": "Alleen zichtbaar wanneer privé-items getoond worden",
   "projectActionAddTask": "Taak toevoegen",
@@ -4678,6 +4794,129 @@
   "provisionedSyncSummaryHomeserver": "Synchronisatieserver",
   "provisionedSyncSummaryUser": "Sync-account",
   "provisionedSyncTitle": "Apparaten",
+  "queryActionsAccept": "Accepteren",
+  "queryActionsDismiss": "Afwijzen",
+  "queryActionsIncomplete": "Sommige wijzigingen konden niet worden toegepast. Reeds toegepaste wijzigingen worden niet herhaald wanneer je het opnieuw probeert.",
+  "queryActionsReview": "Voorgestelde wijzigingen",
+  "queryActionsTarget": "Voor: {target}",
+  "queryAllSources": "Alles",
+  "queryArchiveChat": "Chat archiveren",
+  "queryArchiveConfirmation": "Chat gearchiveerd. De conclusies blijven beschikbaar.",
+  "queryArchivedChats": "Gearchiveerde chats",
+  "queryArchivedReadOnly": "Deze chat is gearchiveerd. Herstel deze om het gesprek voort te zetten.",
+  "queryAsk": "Vragen",
+  "queryAskCategory": "Vraag over deze categorie",
+  "queryAskProject": "Vraag over dit project",
+  "queryAskTask": "Vraag over deze taak",
+  "queryAudioFailed": "De audio kon niet worden voorbereid of afgespeeld. Probeer het opnieuw.",
+  "queryAudioListen": "Luisteren · {start}–{end}",
+  "queryAudioMissingFile": "De opname is nog niet beschikbaar op dit apparaat.",
+  "queryAudioNoMatch": "Dit citaat kon niet eenduidig aan de opname worden gekoppeld. Je kunt nog steeds het volledige item openen.",
+  "queryAudioOpenRecording": "Opname openen",
+  "queryAudioPlaying": "Speelt {start}–{end} af",
+  "queryAudioPrepare": "Audiofragment voorbereiden",
+  "queryAudioPreparing": "Audio voorbereiden…",
+  "queryAudioReadAloud": "Antwoord voorlezen",
+  "queryAudioReading": "Antwoord wordt voorgelezen",
+  "queryAudioRetry": "Audio opnieuw proberen",
+  "queryAudioSetupDetails": "Instellingsdetails",
+  "queryAudioSetupRequired": "Audiofragmenten vereisen een compatibel transcriptiemodel.",
+  "queryAudioStale": "De opname is gewijzigd. Bereid de tijdstempels opnieuw voor.",
+  "queryAudioStop": "Audio stoppen",
+  "queryAudioTimingUnavailable": "Selecteer Melious Whisper of een ondersteund Mistral Voxtral-transcriptiemodel in het inferentieprofiel van deze agent om audiofragmenten voor te bereiden. De URL van de provider moet HTTPS gebruiken.",
+  "queryAudioTooLarge": "Je kunt tijdstempels voorbereiden voor opnamen tot 25 MB. Kies een kleinere opname.",
+  "queryAudioUploadNotice": "Bij het voorbereiden van tijdstempels wordt deze opname naar de transcriptieprovider gestuurd die voor deze agent is ingesteld.",
+  "queryCategoryAgent": "Categorie-agent",
+  "queryChat": "Chat",
+  "queryChats": "Chats",
+  "queryChecked": "Gecontroleerde bronnen: {count}",
+  "queryCloseChat": "Chat sluiten",
+  "queryCollapseChat": "Chat inklappen",
+  "queryCopied": "Gekopieerd",
+  "queryCopyQuote": "Citaat kopiëren",
+  "queryCoverage": "Wat is doorzocht?",
+  "queryCoverageCategory": "Deze categorie",
+  "queryCoverageExcluded": "Andere categorieën zijn niet doorzocht.",
+  "queryCoverageUnreadable": "Geen doorzoekbare tekst toen dit antwoord werd geschreven. Open de opname om deze te bekijken.",
+  "queryCoverageWider": "Andere items in deze categorie",
+  "queryDeleteChat": "Chat verwijderen",
+  "queryDeleteExplanation": "Deze conversatie verwijderen? Kies wat er met de gedeelde conclusies gebeurt. Bronitems blijven intact.",
+  "queryDeleteForget": "Verwijderen en conclusies vergeten",
+  "queryDeleteKeep": "Verwijderen en conclusies bewaren",
+  "queryDictated": "Je kunt de transcriptie bewerken voordat je je vraag verstuurt. De audio kan al naar je transcriptieaanbieder zijn verstuurd.",
+  "queryDraftProvisional": "Concept · nog niet geverifieerd",
+  "queryDraftRetracted": "Het conceptantwoord kon niet worden geverifieerd. Probeer het opnieuw.",
+  "queryEarlierTextOmitted": "[Eerdere tekst niet getoond]",
+  "queryEmptyBody": "Vraag naar beslissingen en eerder werk. Antwoorden maken onderscheid tussen samenvattingen en exacte passages.",
+  "queryExactStoredText": "Exact opgeslagen tekst",
+  "queryExactText": "Exacte tekst tonen",
+  "queryExampleDecision": "Wat hebben we afgesproken?",
+  "queryExampleMeeting": "In welke vergadering hebben we dit besproken?",
+  "queryExampleSuggestion": "Was dat een besluit of een voorstel?",
+  "queryExpandChat": "Chat uitklappen",
+  "queryExpanding": "Andere items in deze categorie controleren…",
+  "queryFailed": "De zoekopdracht kon niet worden voltooid. Probeer opnieuw.",
+  "queryForgetConclusions": "Conclusies vergeten",
+  "queryHideExactText": "Exacte tekst verbergen",
+  "queryHideSurrounding": "Omringende tekst verbergen",
+  "queryHomeOnly": "Alleen eigen bereik",
+  "queryHomeScope": "Eigen bereik",
+  "queryIncomplete": "De zoekdekking is onvolledig. Ontbrekend bewijs betekent niet dat het gesprek nooit heeft plaatsgevonden.",
+  "queryIncompleteShort": "Sommige bronnen konden niet worden gecontroleerd.",
+  "queryInferenceUnavailable": "Geen bruikbare AI-configuratie. Stel het model van de agent of het standaardprofiel van de categorie in en probeer opnieuw.",
+  "queryKeepConclusions": "Conclusies bewaren",
+  "queryLaterTextOmitted": "[Latere tekst niet getoond]",
+  "queryMachineTranscript": "Automatische transcriptie: exacte opgeslagen tekst, niet gecontroleerd aan de hand van de audio.",
+  "queryMemoryCount": "Beschikbare conclusies uit eerdere chats: {count}",
+  "queryMissingTranscripts": "{count, plural, one{1 opname had geen doorzoekbare tekst toen dit antwoord werd geschreven.} other{{count} opnamen hadden geen doorzoekbare tekst toen dit antwoord werd geschreven.}}",
+  "queryNewChat": "Nieuwe chat",
+  "queryNoAgent": "Dit bereik heeft zijn gebruikelijke agent nodig. Ga terug naar de details om die toe te wijzen.",
+  "queryNotes": "Notities",
+  "queryOpenCurrentEntry": "Huidig item openen",
+  "queryOpenEntry": "Item openen",
+  "queryOriginalsHome": "Raadpleegt alleen deze taak en de direct gekoppelde items.",
+  "queryOtherProject": "Buiten het eigen bereik",
+  "queryPreparingAnswer": "Antwoord voorbereiden…",
+  "queryReachCategory": "Zoekt binnen dit bereik en in {category}.",
+  "queryReachCategoryOnly": "Zoekt binnen {category}.",
+  "queryReachHome": "Zoekt alleen binnen dit bereik en de gekoppelde items.",
+  "queryReachUncategorized": "Zoekt alleen in deze taak en de rechtstreeks gekoppelde items zonder categorie.",
+  "queryRecall": "Dit antwoord gebruikte opgeslagen conclusies.",
+  "queryRecordings": "Opnamen",
+  "queryRecordingTranscript": "Transcript van de opname",
+  "queryRenameChat": "Chat hernoemen",
+  "queryRestoreChat": "Chat herstellen",
+  "querySavedConclusion": "Conclusie opgeslagen op {date}",
+  "querySavedQuote": "Dit opgeslagen citaat geeft de bron weer op het moment van het antwoord.",
+  "querySavedVersion": "Opgeslagen versie: {version}",
+  "@querySavedVersion": {
+    "description": "Identifies the historical text version by edit date or short content fingerprint.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "querySavedVersionUnavailable": "Versiedatum niet beschikbaar",
+  "querySearching": "Beschikbare informatie raadplegen…",
+  "querySearchScope": "Zoekbereik en filters",
+  "querySourceAction": "{action}: {source}",
+  "querySourceChanged": "Bron is gewijzigd",
+  "querySourceDeleted": "Bron verwijderd",
+  "querySourceMoved": "Bron verplaatst naar een andere categorie",
+  "querySummaryBased": "Gebaseerd op samenvattingen",
+  "querySummaryCoverage": "Dit antwoord gebruikt taak- of projectsamenvattingen. De oorspronkelijke items zijn niet geraadpleegd.",
+  "querySummaryCurrent": "Open een taak of project om de huidige samenvatting te bekijken. Die kan sinds dit antwoord zijn gewijzigd.",
+  "querySummaryIncomplete": "Er ontbreekt informatie in de beschikbare samenvattingen.",
+  "querySummaryOwners": "Over dit antwoord",
+  "querySurroundingLimit": "Dit is het opgeslagen fragment, dat mogelijk niet het hele gesprek bevat.",
+  "querySurroundingText": "Omringende tekst tonen",
+  "queryTranscribing": "Je opname wordt uitgeschreven. Je aanbieder heeft de audio mogelijk al ontvangen.",
+  "queryUnavailable": "Dit bereik is niet meer beschikbaar met je huidige zichtbaarheidsinstellingen.",
+  "queryUnread": "Nieuw antwoord",
+  "queryWelcomeCategory": "Vraag {agentName} naar deze categorie",
+  "queryWelcomeProject": "Vraag {agentName} naar dit project",
+  "queryWelcomeTask": "Vraag {agentName} naar deze taak",
   "queueCatchUpNowButton": "Inhalen nu",
   "queueCatchUpNowDone": "De inhaalslag is aan het draineren.",
   "queueCatchUpNowError": "Inhaalactie mislukt: {reason}",
@@ -4787,23 +5026,41 @@
   "relationshipActionFailed": "Niets op dit apparaat kan dat openen",
   "relationshipActionMessage": "Bericht",
   "relationshipAddChannelButton": "Contactgegeven toevoegen",
-  "relationshipAsk": "Vraag",
-  "@relationshipAsk": {
-    "description": "Relationships redesign label."
+  "relationshipAddChannelFromContacts": "of uit contacten",
+  "relationshipAgentAsOfBand": "{band} · bijgewerkt {age}",
+  "relationshipAgentBriefNow": "Nu briefen",
+  "relationshipAgentCall": "{name} bellen",
+  "relationshipAgentFailedBody": "De provider gaf een fout voordat de briefing geschreven was. Je check-ins zijn ongewijzigd.",
+  "relationshipAgentFailedNoModel": "Er is geen model ingesteld voor briefings. Kies er een onder AI-instellingen › Agents. Details staan op het tabblad Activiteit.",
+  "relationshipAgentFailedPlain": "Laatste run mislukt",
+  "relationshipAgentLastRunFailed": "Laatste run mislukt · {time}",
+  "relationshipAgentMarkImportant": "Als belangrijk markeren",
+  "relationshipAgentNoAgent": "Geen agent voor deze persoon",
+  "relationshipAgentNoBriefingBody": "{count, plural, =0{Nog geen briefing. „Nu briefen“ schrijft er een zodra je een check-in hebt gelogd; het ziet nooit het telefoonnummer of het e-mailadres.} =1{Nog geen briefing. „Nu briefen“ schrijft er een op basis van je check-in; het ziet nooit het telefoonnummer of het e-mailadres.} other{Nog geen briefing. „Nu briefen“ schrijft er een op basis van je {count} check-ins; het ziet nooit het telefoonnummer of het e-mailadres.}}",
+  "relationshipAgentNotEnrolledBody": "Markeer {name} als belangrijk voor een chat, een seintje als het even geleden is, en een briefing.",
+  "relationshipAgentOnlyYourStartsUseAi": "Alleen wat je zelf start gebruikt AI",
+  "relationshipAgentOutOfDateNewCheckIn": "Verouderd · nieuwe check-in {day}",
+  "relationshipAgentOutOfDateNewCheckInShort": "Verouderd · nieuwe check-in",
+  "@relationshipAgentOutOfDateNewCheckInShort": {
+    "description": "The out-of-date status line's middle tier when the day does not fit beside the age pill."
   },
+  "relationshipAgentPausedBody": "Briefings pauzeren zolang deze persoon slapend of gearchiveerd is.",
+  "relationshipAgentProposedCount": "{count, plural, =1{1 voorstel} other{{count} voorstellen}}",
+  "relationshipAgentReadingBody": "{count, plural, =0{Bereidt de briefing voor. Meestal binnen een minuut.} =1{Leest 1 check-in. Meestal binnen een minuut.} other{Leest {count} check-ins. Meestal binnen een minuut.}}",
+  "relationshipAgentSeeActivity": "Activiteit bekijken",
+  "relationshipAgentSources": "Bronnen: {count, plural, =1{1 check-in} other{{count} check-ins}} · contactkanalen worden nooit verstuurd",
+  "relationshipAgentTryAgain": "Opnieuw proberen",
+  "relationshipAgentWatching": "Agent houdt het in de gaten",
+  "relationshipAgentWatchingNextLook": "Agent houdt het in de gaten · volgende blik {day}",
+  "relationshipAgentWriting": "Briefing wordt geschreven…",
   "relationshipBannerSemanticLabel": "Relatiebanner voor {personName}",
+  "relationshipBriefingAge": "{days, plural, =1{1 dag oud} other{{days} dagen oud}}",
   "relationshipBriefingDisclosureBody": "De briefing draait op {provider}. Notities over deze persoon worden daarheen gestuurd voor verwerking.",
   "relationshipBriefingDisclosureConfirm": "Doorgaan",
   "relationshipBriefingDisclosureTitle": "Naar {provider} sturen?",
-  "relationshipBriefingEmpty": "Nog geen briefing — Praat me bij maakt er een van je check-ins.",
   "relationshipBriefingRequested": "Briefing aangevraagd — verschijnt hier zo.",
   "relationshipBriefingRequestFailed": "Kon de briefing niet aanvragen.",
   "relationshipBriefingTitle": "Briefing",
-  "relationshipBriefMeAgain": "Opnieuw vatten",
-  "@relationshipBriefMeAgain": {
-    "description": "Relationships redesign label."
-  },
-  "relationshipBriefMeButton": "Praat me bij",
   "relationshipCadenceEveryNDays": "{days, plural, =1{Elke dag} other{Elke {days} dagen}}",
   "relationshipCadenceFortnightly": "Om de twee weken",
   "relationshipCadenceLabel": "Contactritme",
@@ -4817,18 +5074,13 @@
   "@relationshipCadenceOnTrack": {
     "description": "Relationships redesign label."
   },
+  "relationshipCadencePromptLabel": "Herinner me elke",
   "relationshipCadenceQuarterly": "Elk kwartaal",
   "relationshipCadenceWeekly": "Wekelijks",
+  "relationshipChatAgentSubtitle": "Kent je check-ins, niet de contactgegevens",
+  "relationshipChatAgentTitle": "{name} · briefingagent",
   "relationshipChatTooltip": "Chat over deze persoon",
   "relationshipChatUnavailable": "Nog geen agent — markeer deze persoon eerst als belangrijk.",
-  "relationshipCheckedInLabel": "Check-in {date}",
-  "@relationshipCheckedInLabel": {
-    "placeholders": {
-      "date": {
-        "type": "String"
-      }
-    }
-  },
   "relationshipCheckInReminderBody": "Een goed moment om contact op te nemen.",
   "relationshipCheckInReminderTitle": "Even contact met {name}?",
   "@relationshipCheckInReminderTitle": {
@@ -4839,14 +5091,6 @@
     }
   },
   "relationshipCheckInsLabel": "Check-ins",
-  "relationshipCheckInTitle": "Check-in · {name}",
-  "@relationshipCheckInTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "relationshipContactCardAction": "Contactkaart",
   "@relationshipContactCardAction": {
     "description": "Relationships redesign label."
@@ -4857,6 +5101,14 @@
   "relationshipContactMissing": "Dat contact staat niet op dit apparaat",
   "relationshipContactNoChanges": "Niets nieuws om te kopiëren",
   "relationshipCreateTitle": "Persoon toevoegen",
+  "relationshipDaysOver": "{count, plural, =1{1 dag te laat} other{{count} dagen te laat}}",
+  "@relationshipDaysOver": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "relationshipDeleteConfirmMessage": "Ook alle check-ins worden verwijderd. Dit kan niet ongedaan worden gemaakt.",
   "relationshipDeleteConfirmTitle": "{name} verwijderen?",
   "relationshipDueDay": "Voor {day}",
@@ -4867,11 +5119,54 @@
       }
     }
   },
+  "relationshipDueSince": "Te laat sinds {day} · {count, plural, =1{1 dag te laat} other{{count} dagen te laat}}",
+  "@relationshipDueSince": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipDueToday": "Vandaag aan de beurt",
+  "relationshipDurationHours": "{hours} u",
+  "@relationshipDurationHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipDurationHoursMinutes": "{hours} u {minutes}",
+  "@relationshipDurationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipDurationMinutes": "{count} min",
+  "@relationshipDurationMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "relationshipEditTitle": "Persoon bewerken",
   "relationshipErrorCreateFailed": "Kon de persoon niet opslaan. Probeer het opnieuw.",
   "relationshipErrorDeleteFailed": "Kon de persoon niet verwijderen. Probeer het opnieuw.",
   "relationshipErrorLinkTaskFailed": "Kon de taak niet koppelen. Probeer het opnieuw.",
   "relationshipErrorUpdateFailed": "Kon de wijzigingen niet opslaan. Probeer het opnieuw.",
+  "relationshipFormImportantBody": "Zet een briefing, seintjes en een chat aan. Notities van check-ins gaan naar de agent, contactgegevens nooit.",
+  "relationshipFormImportantBodyNamed": "Zet een briefing, seintjes en een chat aan voor {name}. Notities van check-ins gaan naar de agent, contactgegevens nooit.",
+  "relationshipFormReachTitle": "Hoe je ze bereikt",
+  "relationshipFormWhoTitle": "Wie",
   "relationshipHealthNeedsAttention": "Vraagt aandacht",
   "relationshipHealthSteady": "Stabiel",
   "relationshipHealthStrained": "Gespannen",
@@ -4884,11 +5179,13 @@
   "relationshipImportEmpty": "Geen contacten op dit apparaat",
   "relationshipImportFailed": "Kon niemand toevoegen",
   "relationshipImportGrantButton": "Toegang toestaan",
+  "relationshipImportImportantBody": "Briefings, seintjes en een chat. Zonder dit loopt er niets vanzelf.",
   "relationshipImportNoMatches": "Geen contacten komen overeen met je zoekopdracht",
   "relationshipImportOpenSettings": "Instellingen openen",
   "relationshipImportPermissionBody": "Lotti leest je contacten alleen zolang deze kiezer open is en kopieert alleen de personen die je kiest.",
   "relationshipImportRetry": "Opnieuw proberen",
   "relationshipImportReviewButton": "{count, plural, =1{1 nakijken} other{{count} nakijken}}",
+  "relationshipImportReviewSubtitle": "{count, plural, =1{1 persoon geselecteerd · contactgegevens blijven op dit apparaat} other{{count} personen geselecteerd · contactgegevens blijven op dit apparaat}}",
   "relationshipImportReviewTitle": "Voordat je ze toevoegt",
   "relationshipImportSearchHint": "Contacten zoeken",
   "relationshipImportSettingsBody": "Toegang tot contacten staat uit. Zet het aan in de systeeminstellingen om personen te importeren.",
@@ -4898,79 +5195,175 @@
   "@relationshipJustAdded": {
     "description": "Relationships redesign label."
   },
-  "relationshipLastCheckInLabel": "Laatste check-in {date}",
-  "relationshipLinkContact": "Contact koppelen",
-  "relationshipLinkedTasksLabel": "Taken",
-  "relationshipLinkTaskButton": "Taak koppelen",
-  "relationshipLogCheckIn": "Check-in vastleggen",
-  "relationshipLottisRead": "Lotti's inschatting",
-  "@relationshipLottisRead": {
-    "description": "Relationships redesign label."
-  },
-  "relationshipLottisReadAsOf": "van {time}",
-  "@relationshipLottisReadAsOf": {
+  "relationshipLastSpoke": "laatst gesproken {time}",
+  "@relationshipLastSpoke": {
     "placeholders": {
       "time": {
         "type": "String"
       }
     }
   },
+  "relationshipLinkContact": "Contact koppelen",
+  "relationshipLinkedTasksLabel": "Taken",
+  "relationshipLinkTaskButton": "Taak koppelen",
+  "relationshipLogCheckIn": "Check-in vastleggen",
+  "relationshipMoreActions": "Meer acties",
   "relationshipNameLabel": "Naam",
   "relationshipNameRequired": "Een naam is verplicht",
-  "relationshipNextByDay": "volgende voor {day}",
-  "@relationshipNextByDay": {
+  "relationshipNextDueOn": "Volgende keer {day}",
+  "@relationshipNextDueOn": {
     "placeholders": {
       "day": {
         "type": "String"
       }
     }
   },
+  "relationshipNextTimeTitle": "Volgende keer",
   "relationshipNicknameLabel": "Bijnaam",
   "relationshipNoCheckIns": "Nog geen check-ins — leg er een vast na jullie volgende gesprek.",
   "relationshipNoLinkedTasks": "Nog geen gekoppelde taken.",
+  "relationshipNotEnrolled": "Niet gevolgd",
   "relationshipNotFound": "Deze persoon staat niet meer in je lijst.",
-  "relationshipNudgesOn": "herinneringen aan",
-  "@relationshipNudgesOn": {
-    "description": "Relationships redesign label."
-  },
-  "relationshipPostCallBody": "Je hebt net contact gehad. Wil je een check-in vastleggen nu het nog vers is?",
-  "relationshipPostCallConfirm": "Check-in vastleggen",
-  "relationshipPostCallDismiss": "Niet nu",
-  "relationshipPostCallTitle": "Hoe ging het met {name}?",
-  "@relationshipPostCallTitle": {
+  "relationshipOnTrackCadence": "Op schema · {cadence}",
+  "@relationshipOnTrackCadence": {
     "placeholders": {
-      "name": {
-        "type": "String",
-        "example": "Anna"
+      "cadence": {
+        "type": "String"
       }
     }
   },
-  "relationshipQuietForDays": "{count, plural, =1{1 dag} other{{count} dagen}} geen contact",
-  "@relationshipQuietForDays": {
+  "relationshipPayAttentionTo": "Let op",
+  "relationshipPhotoAddBanner": "Banner toevoegen",
+  "relationshipPhotoAdjustCrop": "Uitsnede aanpassen",
+  "relationshipPhotoBanner": "Banner",
+  "relationshipPhotoCardTitle": "Foto",
+  "relationshipPhotoChange": "Wijzigen",
+  "relationshipPhotoChoose": "Kiezen uit bibliotheek",
+  "relationshipPhotoDragToReposition": "Sleep om te verplaatsen",
+  "relationshipPhotoFace": "Gezicht",
+  "relationshipPhotoPrivacy": "Alleen op je apparaten · de agent ziet hem nooit",
+  "relationshipPhotoRemove": "Foto verwijderen",
+  "relationshipPhotoRemoveAction": "Verwijderen",
+  "relationshipPhotoSaveFailed": "Kon de foto niet opslaan",
+  "relationshipPhotoSheetTitle": "Foto van {name}",
+  "relationshipPostCallConfirm": "Check-in vastleggen",
+  "relationshipPostCallDismiss": "Niet nu",
+  "relationshipPostCallMeta": "begonnen om {time} · {minutes, plural, =0{minder dan een minuut} =1{ongeveer 1 min} other{ongeveer {minutes} min}}",
+  "@relationshipPostCallMeta": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipPostCallOfferCall": "Je hebt {name} {minutes, plural, =0{minder dan een minuut} =1{1 minuut} other{{minutes} minuten}} geleden gebeld — nu vastleggen zolang het vers is?",
+  "@relationshipPostCallOfferCall": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipPostCallOfferMessage": "Je hebt {name} {minutes, plural, =0{minder dan een minuut} =1{1 minuut} other{{minutes} minuten}} geleden geschreven — nu vastleggen zolang het vers is?",
+  "@relationshipPostCallOfferMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipProposalAdded": "Toegevoegd → {title}",
+  "relationshipProposalEvidence": "Uit de check-in van {date}",
+  "relationshipProposalUndoFailed": "Ongedaan maken is mislukt. De taak is mogelijk gewijzigd.",
+  "relationshipReachPrivacy": "Blijft op dit apparaat · nooit gedeeld met de AI",
+  "relationshipReachTitle": "Contact",
+  "relationshipRelinkContact": "Ander contact koppelen",
+  "relationshipsEmptyState": "Voeg de mensen toe met wie je dichtbij wilt blijven.",
+  "relationshipsGroupDue": "Aan de beurt",
+  "relationshipsPageTitle": "Mensen",
+  "relationshipsSelectPersonHint": "Kies iemand om de pagina te zien.",
+  "relationshipsSummaryDueNow": "Nu aan de beurt",
+  "relationshipsSummaryEnrolled": "/ {count} gevolgd",
+  "@relationshipsSummaryEnrolled": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "relationshipRelinkContact": "Ander contact koppelen",
-  "relationshipSeeAllCheckIns": "Alle check-ins bekijken",
-  "@relationshipSeeAllCheckIns": {
-    "description": "Relationships redesign label."
+  "relationshipsSummaryNextDue": "Volgende: {name} · {day}",
+  "@relationshipsSummaryNextDue": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
   },
-  "relationshipsEmptyState": "Voeg de mensen toe met wie je dichtbij wilt blijven.",
-  "relationshipsPageTitle": "Mensen",
+  "relationshipsSummaryNoneDue": "Niemand aan de beurt",
+  "relationshipsSummaryNotEnrolled": "{count, plural, =1{1 persoon niet gevolgd} other{{count} personen niet gevolgd}}",
+  "@relationshipsSummaryNotEnrolled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "relationshipStatusActive": "Actief",
   "relationshipStatusArchived": "Gearchiveerd",
   "relationshipStatusDormant": "Sluimerend",
   "relationshipStatusFieldLabel": "Status",
-  "relationshipStayingInTouch": "Contact houden",
-  "@relationshipStayingInTouch": {
-    "description": "Relationships redesign label."
+  "relationshipStatusLineAdded": "Net toegevoegd · {cadence}",
+  "@relationshipStatusLineAdded": {
+    "placeholders": {
+      "cadence": {
+        "type": "String"
+      }
+    }
   },
-  "relationshipStayInTouch": "Contact houden",
-  "@relationshipStayInTouch": {
-    "description": "Relationships redesign label."
+  "relationshipStatusLineAddedFirstDue": "Net toegevoegd · {cadence} · eerste keer voor {day}",
+  "@relationshipStatusLineAddedFirstDue": {
+    "placeholders": {
+      "cadence": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipStatusLineContacted": "{type} · {time} · {cadence}",
+  "@relationshipStatusLineContacted": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "cadence": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipTasksLinkedCount": "{count, plural, =1{1 gekoppeld} other{{count} gekoppeld}}",
+  "@relationshipTasksLinkedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "relationshipTimestampToday": "Vandaag",
   "relationshipTimestampYesterday": "Gisteren",
@@ -5457,7 +5850,6 @@
   "settingsSyncConflictsSubtitle": "Synchronisatieconflicten oplossen",
   "settingsSyncNodeProfileCapabilitiesEmpty": "Geen enkele gedetecteerde .. auto-trigger van gesynchroniseerde audio-inferentie zal niet gericht op dit apparaat.",
   "settingsSyncNodeProfileCapabilitiesLabel": "Gedetecteerde AI-mogelijkheden",
-  "settingsSyncNodeProfileCapabilityMlxAudio": "MLX-audio (lokaal)",
   "settingsSyncNodeProfileCapabilityOllamaLlm": "Ollama LLM",
   "settingsSyncNodeProfileCapabilityOmlxLlm": "oMLX LLM",
   "settingsSyncNodeProfileCapabilityVoxtral": "Voxtral (lokaal)",
@@ -5472,6 +5864,8 @@
   "settingsSyncOutboxTitle": "Synchronisatie-uitbox",
   "settingsSyncStatsSubtitle": "Synchronisatiepijplijngegevens inspecteren",
   "settingsSyncSubtitle": "Synchronisatie- en weergavestatistieken instellen",
+  "settingsSystemHealthSubtitle": "Recente logs analyseren en een deelbaar rapport kopiëren",
+  "settingsSystemHealthTitle": "Systeemstatus",
   "settingsThemingAutomatic": "Automatisch",
   "settingsThemingDark": "Donker uiterlijk",
   "settingsThemingLight": "Licht uiterlijk",
@@ -5484,6 +5878,51 @@
   "settingsV2UnimplementedTitle": "Panel nog niet geïmplementeerd",
   "settingsWhatsNewSubtitle": "Zie de laatste updates en functies",
   "settingsWhatsNewTitle": "Wat is er nieuw?",
+  "sherpaAllFamilies": "Alle families",
+  "sherpaCatalogMatches": "{count} van {total} modellen",
+  "sherpaDeleteModel": "{model} van dit apparaat verwijderen",
+  "@sherpaDeleteModel": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaDownloadAction": "Downloaden",
+  "sherpaDownloadModel": "{model} downloaden",
+  "@sherpaDownloadModel": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaInstalledModelsTitle": "Geïnstalleerde modellen",
+  "sherpaInstallingModel": "Model installeren",
+  "sherpaLanguageCantonese": "Kantonees",
+  "sherpaModelCatalogTitle": "Modelcatalogus",
+  "sherpaModelConfigurationError": "Het model is gedownload, maar de configuratie kon niet worden opgeslagen.",
+  "sherpaModelError": "Modelbewerking mislukt. Probeer het opnieuw.",
+  "sherpaModelFamily": "Modelfamilie",
+  "sherpaModelInstalled": "Gedownload",
+  "sherpaModelNotInstalled": "Download een model op dit apparaat",
+  "sherpaModelSizeGB": "{size} GB · Meertalig",
+  "@sherpaModelSizeGB": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaModelSizeMB": "{size} MB · Meertalig",
+  "@sherpaModelSizeMB": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaProviderDescription": "Transcribeer op dit apparaat zonder server. Download een model en selecteer het vervolgens in je inferentieprofiel.",
   "sidebarActiveSectionTitle": "Activiteit",
   "sidebarActivityCollapseTooltip": "Inklappen",
   "sidebarActivityExpandTooltip": "Activiteiten uitbreiden",
@@ -5525,6 +5964,9 @@
   "speechDictionaryWarning": "Groot woordenboek ({count} voorwaarden) kan de API kosten verhogen",
   "speechModalSelectLanguage": "Taal selecteren",
   "speechModalTitle": "Erkenning van spraak",
+  "speechSettingsAutoPrepareChatAudio": "Chataudio automatisch voorbereiden",
+  "speechSettingsChatAudioDescription": "Bereid nieuwe chatantwoorden op dit apparaat voor, zodat het afspelen sneller begint. Audio speelt pas af als je op afspelen tikt.",
+  "speechSettingsChatAudioLabel": "Chataudio",
   "speechSettingsModelDescription": "Speechmodel voor het apparaat",
   "speechSettingsModelDownloadsOnce": "Eenmaal downloaden",
   "speechSettingsModelLabel": "Model",
@@ -5799,6 +6241,33 @@
   "syncWizardStepConnect": "Verbinden",
   "syncWizardStepGetCode": "Code ophalen",
   "syncWizardStepStatus": "Stap {step} van 3: {label}",
+  "systemHealthAnalyzedWindow": "Geanalyseerd {start} → {end}",
+  "systemHealthChooseModelTitle": "Model kiezen",
+  "systemHealthCopiedToast": "Rapport gekopieerd. Bekende patronen van persoonlijke gegevens zijn weggelaten.",
+  "systemHealthCopyButton": "Rapport kopiëren",
+  "systemHealthCustomFromLabel": "Van",
+  "systemHealthCustomToLabel": "Tot",
+  "systemHealthDescription": "Doorzoekt de logbestanden op dit apparaat op fouten, waarschuwingen en trage query's, laat bekende patronen van persoonlijke gegevens weg en schrijft een kort rapport dat je in een codeerassistent kunt plakken.",
+  "systemHealthDomainsDescription": "De domeinen die hier aanstaan worden geanalyseerd, dezelfde instelling die bepaalt wat er wordt gelogd. Trage query's worden meegenomen als het loggen daarvan aanstaat.",
+  "systemHealthDomainsTitle": "Logdomeinen",
+  "systemHealthFailedTitle": "Analyse mislukt",
+  "systemHealthGeneratedAt": "Gemaakt {time}",
+  "systemHealthHideDigest": "Samenvatting verbergen",
+  "systemHealthModelDescription": "Schrijft de bevindingen op basis van de geanonimiseerde samenvatting. Stelt het denkmodel van je standaardprofiel voor.",
+  "systemHealthModelNone": "Alleen samenvatting, geen model",
+  "systemHealthModelNoneDescription": "Stel een standaard inferentieprofiel in of voeg een agentisch tekstmodel toe om bevindingen te krijgen.",
+  "systemHealthModelTitle": "Model",
+  "systemHealthPresetCustom": "Aangepast",
+  "systemHealthPresetLast14Days": "14 dagen",
+  "systemHealthPresetLast24Hours": "24 u",
+  "systemHealthPresetLast7Days": "7 dagen",
+  "systemHealthPreviousReportsDescription": "Elk rapport blijft op dit apparaat bewaard. Tik op een rapport om het opnieuw te tonen.",
+  "systemHealthPreviousReportsTitle": "Eerdere rapporten",
+  "systemHealthRangeTitle": "Periode",
+  "systemHealthReportTitle": "Rapport",
+  "systemHealthRunButton": "Analyse starten",
+  "systemHealthSavedTo": "Opgeslagen in {path}",
+  "systemHealthShowDigest": "Samenvatting tonen",
   "taskActionBarAudioRecordingActive": "Audio-opname in uitvoering",
   "taskActionBarMoreActions": "Meer acties",
   "taskActionBarOpenRunningTimer": "Openen van de lopende timer",

@@ -17,6 +17,9 @@ import 'package:record/record.dart' show Amplitude;
 /// Interval in milliseconds for amplitude updates from the recorder.
 const intervalMs = 20;
 
+/// A failed start is returned to the recording surface for localized feedback.
+enum AudioRecordingFailure { permissionDenied, startFailed, busy }
+
 /// Main controller for audio recording functionality.
 ///
 /// This Riverpod controller manages the complete recording lifecycle including:
@@ -39,7 +42,9 @@ class AudioRecorderController extends Notifier<AudioRecorderState> {
   String? _linkedId;
   String? _categoryId;
   AudioNote? _audioNote;
+  bool _transcriptionHandledByCaller = false;
   bool _terminalActionInProgress = false;
+  bool _startInProgress = false;
 
   /// Sliding-window VU meter driving the live level display.
   final VuMeter _vuMeter = VuMeter(
@@ -110,23 +115,46 @@ class AudioRecorderController extends Notifier<AudioRecorderState> {
   /// - Resume if paused, stop if recording, or start new recording
   /// - Setting the linked entry ID for the recording
   ///
+  /// Returns null after a successful action, or a typed failure the caller
+  /// can display. Overlapping starts are refused before changing the subject.
+  /// [transcriptionHandledByCaller] suppresses automation for this recording,
+  /// including when it is stopped after its original sheet is dismissed.
+  /// [shouldCancel] lets a dismissed caller abort pending startup; any file
+  /// returned by a late platform start is stopped and discarded.
   /// [linkedId] Optional ID to link this recording to an existing journal entry.
-  Future<void> record({
+  Future<AudioRecordingFailure?> record({
     String? linkedId,
+    bool transcriptionHandledByCaller = false,
+    bool Function()? shouldCancel,
   }) async {
+    if (_startInProgress || _terminalActionInProgress) {
+      return AudioRecordingFailure.busy;
+    }
+    _startInProgress = true;
     _linkedId = linkedId;
 
     try {
       await _pauseAudioPlayer();
+      if (shouldCancel?.call() ?? false) return null;
 
       if (await _recorderRepository.hasPermission()) {
-        if (await _recorderRepository.isPaused()) {
+        final isPaused = await _recorderRepository.isPaused();
+        final isRecording =
+            !isPaused && await _recorderRepository.isRecording();
+        if (shouldCancel?.call() ?? false) return null;
+        if (isPaused) {
           await resume();
-        } else if (await _recorderRepository.isRecording()) {
+        } else if (isRecording) {
           await stop();
         } else {
           _audioNote = await _recorderRepository.startRecording();
-          if (_audioNote != null) {
+          if (_audioNote == null) return AudioRecordingFailure.startFailed;
+          if (shouldCancel?.call() ?? false) {
+            await cancel();
+            return null;
+          }
+          _transcriptionHandledByCaller = transcriptionHandledByCaller;
+          if (ref.mounted) {
             // Update state to recording while keeping existing inference preferences
             state = state.copyWith(
               status: AudioRecorderStatus.recording,
@@ -140,8 +168,7 @@ class AudioRecorderController extends Notifier<AudioRecorderState> {
           'No audio recording permission available. Flatpak=${PortalService.isRunningInFlatpak}',
           subDomain: 'record_permission_denied',
         );
-        // User will see no recording starts - this is the expected behavior
-        // The UI remains available for user interaction
+        return AudioRecordingFailure.permissionDenied;
       }
     } catch (exception, stackTrace) {
       _loggingService.error(
@@ -150,7 +177,11 @@ class AudioRecorderController extends Notifier<AudioRecorderState> {
         stackTrace: stackTrace,
         subDomain: 'recorder_controller',
       );
+      return AudioRecordingFailure.startFailed;
+    } finally {
+      _startInProgress = false;
     }
+    return null;
   }
 
   /// Stops the current recording and creates a journal entry.
@@ -168,10 +199,12 @@ class AudioRecorderController extends Notifier<AudioRecorderState> {
     _terminalActionInProgress = true;
     final note = _audioNote;
     final linkedSubjectId = _linkedId;
+    final transcriptionHandledByCaller = _transcriptionHandledByCaller;
     final categoryId = _categoryId;
     final duration = state.progress;
     _audioNote = null;
     _linkedId = null;
+    _transcriptionHandledByCaller = false;
 
     try {
       await _recorderRepository.stopRecording();
@@ -200,7 +233,9 @@ class AudioRecorderController extends Notifier<AudioRecorderState> {
         final entryId = journalAudio?.meta.id;
 
         // Trigger automatic prompts in the background via profile-driven automation
-        if (entryId != null && linkedSubjectId != null) {
+        if (entryId != null &&
+            linkedSubjectId != null &&
+            !transcriptionHandledByCaller) {
           // Don't await - let it run in the background so the modal can close immediately
           unawaited(
             _triggerAutomaticPrompts(
@@ -259,6 +294,7 @@ class AudioRecorderController extends Notifier<AudioRecorderState> {
     // clear immediately rather than lingering through the async file deletion.
     _audioNote = null;
     _linkedId = null;
+    _transcriptionHandledByCaller = false;
     _vuMeter.reset();
 
     // Preserve the inference preferences before resetting state.

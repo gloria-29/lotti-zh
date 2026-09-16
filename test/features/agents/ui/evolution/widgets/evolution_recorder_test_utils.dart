@@ -1,4 +1,4 @@
-import 'package:lotti/features/ai_chat/ui/controllers/chat_recorder_controller.dart';
+import 'package:lotti/features/agents/ui/chat/chat_recorder_controller.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Controller that starts in recording state.
@@ -20,16 +20,23 @@ class RecordingCallbackController extends ChatRecorderController {
   RecordingCallbackController({
     this.onCancelCalled,
     this.onStopCalled,
+    this.initialElapsed = Duration.zero,
   });
 
   final VoidCallback? onCancelCalled;
   final VoidCallback? onStopCalled;
+  final Duration initialElapsed;
+
+  void updateElapsed(Duration elapsed) {
+    state = state.copyWith(elapsed: elapsed);
+  }
 
   @override
   ChatRecorderState build() {
-    return const ChatRecorderState(
+    return ChatRecorderState(
       status: ChatRecorderStatus.recording,
-      amplitudeHistory: [],
+      amplitudeHistory: const [],
+      elapsed: initialElapsed,
     );
   }
 
@@ -51,7 +58,18 @@ class RecordingCallbackController extends ChatRecorderController {
 
 /// Controller that starts in processing state.
 class ProcessingTestController extends ChatRecorderController {
-  ProcessingTestController({required this._partialTranscript});
+  ProcessingTestController({
+    required this._partialTranscript,
+    this.onCancelCalled,
+  });
+
+  final VoidCallback? onCancelCalled;
+
+  @override
+  Future<void> cancel() async {
+    onCancelCalled?.call();
+    state = const ChatRecorderState.initial();
+  }
 
   final String? _partialTranscript;
 
@@ -65,7 +83,7 @@ class ProcessingTestController extends ChatRecorderController {
   }
 }
 
-/// Idle controller that can emit a transcript.
+/// Controller that starts idle and can emit a recording state or transcript.
 class TranscriptEmittingController extends ChatRecorderController {
   int clearResultCalls = 0;
 
@@ -82,6 +100,10 @@ class TranscriptEmittingController extends ChatRecorderController {
       status: ChatRecorderStatus.idle,
       transcript: transcript,
     );
+  }
+
+  void emitRecording() {
+    state = state.copyWith(status: ChatRecorderStatus.recording);
   }
 
   void emitError(String error, {ChatRecorderErrorKind? kind}) {
@@ -107,6 +129,7 @@ class IdleCallbackController extends ChatRecorderController {
   IdleCallbackController({this.onStartCalled});
 
   final VoidCallback? onStartCalled;
+  ChatTranscriptionTargetResolver? lastTranscriptionTargetResolver;
 
   @override
   ChatRecorderState build() {
@@ -117,7 +140,10 @@ class IdleCallbackController extends ChatRecorderController {
   }
 
   @override
-  Future<void> start() async {
+  Future<void> start({
+    ChatTranscriptionTargetResolver? resolveTranscriptionTarget,
+  }) async {
+    lastTranscriptionTargetResolver = resolveTranscriptionTarget;
     onStartCalled?.call();
   }
 }

@@ -17,8 +17,16 @@ import 'package:lotti/utils/consts.dart';
 /// (null when no check-in exists yet).
 typedef RelationshipListItem = ({
   RelationshipEntry relationship,
-  DateTime? lastCheckInAt,
+
+  /// The newest check-in, so the list can say what the last contact was
+  /// (`Call · Today 12:44`), not only when.
+  CheckInEntry? lastCheckIn,
 });
+
+/// The instant of the newest check-in, or null for a person without one.
+extension RelationshipListItemRecency on RelationshipListItem {
+  DateTime? get lastCheckInAt => lastCheckIn?.meta.dateFrom;
+}
 
 /// Repository for relationship and check-in CRUD (ADR 0038).
 ///
@@ -78,13 +86,13 @@ class RelationshipRepository {
     return entity is RelationshipEntry ? entity : null;
   }
 
-  /// Returns all non-deleted relationships with their latest check-in time,
+  /// Returns all non-deleted relationships with their newest check-in,
   /// most recently interacted-with first (plan v2 phase 2). People without a
   /// check-in yet sort by tracking start instead, so a freshly added person
   /// starts at the top rather than the bottom.
   Future<List<RelationshipListItem>> getRelationshipsByRecency() async {
     final relationships = await _journalDb.getRelationships();
-    final latestByRelationship = await _journalDb.latestCheckInTimes();
+    final latestByRelationship = await _journalDb.latestCheckIns();
 
     DateTime recency(RelationshipListItem item) =>
         item.lastCheckInAt ?? item.relationship.meta.dateFrom;
@@ -93,7 +101,7 @@ class RelationshipRepository {
       for (final relationship in relationships)
         (
           relationship: relationship,
-          lastCheckInAt: latestByRelationship[relationship.id],
+          lastCheckIn: latestByRelationship[relationship.id],
         ),
     ]..sort((a, b) => recency(b).compareTo(recency(a)));
   }
@@ -147,12 +155,19 @@ class RelationshipRepository {
   /// starts (ADR 0038) — the baseline for the first cadence reminder until a
   /// check-in exists (ADR 0039).
   ///
+  /// [id], when given, is the entity id the person is created under instead
+  /// of a freshly minted one. The contact import mints a person's id the
+  /// moment the contact is ticked, so the review step can draw them in the
+  /// persona accent that id hashes to — the colour they keep once created —
+  /// and hands the same id here. Left null, the id is minted as usual.
+  ///
   /// Persisted via [PersistenceLogic], which handles vector clocks, sync
   /// outbox enqueuing, and notification emission.
   Future<RelationshipEntry?> createRelationship({
     required RelationshipData data,
     EntryText? entryText,
     String? categoryId,
+    String? id,
   }) async {
     final started = clock.now();
     final meta = await _persistenceLogic.createMetadata(
@@ -161,8 +176,8 @@ class RelationshipRepository {
       categoryId: categoryId,
     );
     final relationship = RelationshipEntry(
-      meta: meta,
-      data: data,
+      meta: id == null ? meta : meta.copyWith(id: id),
+      data: data.withClampedImageFraming,
       entryText: entryText,
     );
     final success = await _persistenceLogic.createDbEntity(relationship);
@@ -298,11 +313,20 @@ class RelationshipRepository {
   /// No manual notification: `updateDbEntity` already emits the entity's
   /// `affectedIds`, which carry both the relationship id (the detail
   /// provider's token) and [relationshipNotification] (the list provider's).
+  ///
+  /// Avatar and banner framing is clamped on the way through
+  /// ([RelationshipImageFraming]): this method is the single write path for
+  /// an edited person, so a crop that came out of a gesture with a rounding
+  /// slip is corrected once here rather than defended against at every size
+  /// the avatar is later drawn at.
   Future<bool> updateRelationship(RelationshipEntry relationship) async {
     final updatedMeta = await _persistenceLogic.updateMetadata(
       relationship.meta,
     );
-    final updated = relationship.copyWith(meta: updatedMeta);
+    final updated = relationship.copyWith(
+      meta: updatedMeta,
+      data: relationship.data.withClampedImageFraming,
+    );
     final result = await _persistenceLogic.updateDbEntity(updated);
     return result ?? false;
   }

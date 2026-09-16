@@ -235,7 +235,15 @@ void main() {
       );
       expect(
         (properties['blocks'] as Map<String, dynamic>)['description'],
-        allOf(contains('closed'), contains('baseline'), contains('unchanged')),
+        allOf(
+          contains('closed'),
+          contains('baseline'),
+          contains('unchanged'),
+          // The writer rejects an empty draft while the window is open; the
+          // schema must say so and name the non-inventive way out.
+          contains('While planning_window is open it must not be empty'),
+          contains('one buffer block whose note says why'),
+        ),
       );
       expect(blockSchema['additionalProperties'], isFalse);
       expect(
@@ -259,7 +267,10 @@ void main() {
       );
     });
 
-    test('draft_day_plan taskId references drafting.decidedTasks', () {
+    test('draft_day_plan taskId covers corpus work, not only decided', () {
+      // A gym run planned three corpus tasks with no taskId at all and read
+      // the old wording fairly: the scenario had no decided tasks, so the
+      // field looked inapplicable. Those blocks persist linked to nothing.
       final properties =
           parametersFor(DayAgentToolNames.draftDayPlan)['properties']
               as Map<String, dynamic>;
@@ -272,8 +283,75 @@ void main() {
       expect(taskIdSchema['description'], isA<String>());
       expect(
         taskIdSchema['description'] as String,
-        contains('drafting.decidedTasks'),
+        allOf(
+          contains('drafting.decidedTasks'),
+          contains('task corpus'),
+          contains('tracks no time'),
+        ),
       );
+    });
+
+    test('draft_day_plan states the reason rule without requiring it', () {
+      // A gym run lost six drafts to a missing reason, but requiring the
+      // field unconditionally breaks the other end: a closed-window wake
+      // echoes its baseline exactly, and a legacy block may carry a null
+      // reason, which would then have no schema-valid representation.
+      final blockItems =
+          ((parametersFor(DayAgentToolNames.draftDayPlan)['properties']
+                      as Map<String, dynamic>)['blocks']
+                  as Map<String, dynamic>)['items']
+              as Map<String, dynamic>;
+
+      expect(
+        blockItems['required'],
+        isNot(contains('reason')),
+        reason: 'a null-reason baseline echo must stay representable',
+      );
+      expect(
+        ((blockItems['properties'] as Map<String, dynamic>)['reason']
+            as Map<String, dynamic>)['description'],
+        allOf(contains('ai'), contains('rejects the whole draft')),
+      );
+    });
+
+    test('day-scoped tools say which day id to send', () {
+      // An empty dayId was the single commonest rejection in a gym run, and
+      // the field carried no description at all.
+      for (final tool in [
+        DayAgentToolNames.draftDayPlan,
+        DayAgentToolNames.proposePlanDiff,
+        DayAgentToolNames.surfacePendingDecisions,
+      ]) {
+        final dayIdSchema =
+            (parametersFor(tool)['properties'] as Map<String, dynamic>)['dayId']
+                as Map<String, dynamic>;
+        expect(
+          dayIdSchema['description'],
+          allOf(contains('<day>.dayId'), contains('never blank')),
+          reason: tool,
+        );
+      }
+    });
+
+    test('draft_day_plan energy bands state the time format', () {
+      // The band fields were the only times in the schema with no format
+      // note, and models wrote "09:00" for them while getting every block
+      // right — which the writer rejects, losing the whole draft.
+      final properties =
+          parametersFor(DayAgentToolNames.draftDayPlan)['properties']
+              as Map<String, dynamic>;
+      final bandProps =
+          ((properties['energyBands'] as Map<String, dynamic>)['items']
+                  as Map<String, dynamic>)['properties']
+              as Map<String, dynamic>;
+
+      for (final key in ['start', 'end']) {
+        expect(
+          (bandProps[key] as Map<String, dynamic>)['description'],
+          contains('ISO-8601'),
+          reason: key,
+        );
+      }
     });
 
     test('propose_plan_diff documents change-shape schema', () {

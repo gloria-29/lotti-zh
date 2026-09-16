@@ -4,14 +4,16 @@ import 'package:lotti/features/agents/model/agent_constants.dart';
 import 'package:lotti/features/agents/model/agent_domain_entity.dart';
 import 'package:lotti/features/agents/state/agent_query_providers.dart';
 import 'package:lotti/features/agents/state/template_query_providers.dart';
-import 'package:lotti/features/agents/util/inference_provider_resolver.dart';
 import 'package:lotti/features/ai/model/ai_config.dart';
 import 'package:lotti/features/ai/model/resolved_profile.dart';
 import 'package:lotti/features/ai/repository/ai_config_repository.dart';
+import 'package:lotti/features/ai/state/ai_runtime_settings_controller.dart';
 import 'package:lotti/features/ai/state/profile_automation_providers.dart';
 import 'package:lotti/features/ai/util/known_models.dart';
+import 'package:lotti/features/relationships/state/relationship_agent_providers.dart';
 
-/// Shared detailed inference resolution used by the task-agent header.
+/// Shared detailed inference resolution used by agent headers and setup sheets.
+/// Relationship agents resolve their standalone defaults before template lookup.
 final FutureProviderFamily<ResolvedAgentSetup?, String>
 taskAgentResolvedSetupProvider = FutureProvider.autoDispose
     .family<ResolvedAgentSetup?, String>(
@@ -43,44 +45,15 @@ Future<ResolvedAgentSetup?> goalAgentResolvedSetup(
   final identity = identityEntity?.mapOrNull(agent: (value) => value);
   if (identity == null || identity.kind != AgentKinds.goalAgent) return null;
 
-  final profileId = identity.config.profileId;
-  if (profileId != null) {
-    final profile = await ref
-        .watch(profileResolverProvider)
-        .resolveByProfileId(profileId);
-    if (profile != null) {
-      return ResolvedAgentSetup(
-        status: AgentSetupResolutionStatus.resolved,
-        profile: profile,
-        source: identity.config.inferenceSetup == null
-            ? AgentSetupResolutionSource.legacyAgentProfile
-            : AgentSetupResolutionSource.baseProfile,
-        setupOrigin: identity.config.inferenceSetup?.origin,
+  ref.watch(
+    defaultInferenceProfileControllerProvider.select((value) => value.value),
+  );
+  return ref
+      .watch(profileResolverProvider)
+      .resolveStandalone(
+        agentConfig: identity.config,
+        legacyModelId: meliousGlm52ModelId,
       );
-    }
-  }
-
-  final direct = await resolveInferenceProviderWithModel(
-    modelId: meliousGlm52ModelId,
-    aiConfigRepository: ref.watch(aiConfigRepositoryProvider),
-    logTag: 'GoalAgentResolvedSetup',
-  );
-  if (direct != null) {
-    return ResolvedAgentSetup(
-      status: AgentSetupResolutionStatus.resolved,
-      profile: ResolvedProfile(
-        thinkingModelId: direct.model.providerModelId,
-        thinkingProvider: direct.provider,
-        thinkingModel: direct.model,
-      ),
-      source: AgentSetupResolutionSource.directModel,
-      setupOrigin: identity.config.inferenceSetup?.origin,
-    );
-  }
-  return ResolvedAgentSetup(
-    status: AgentSetupResolutionStatus.broken,
-    setupOrigin: identity.config.inferenceSetup?.origin,
-  );
 }
 
 Future<ResolvedAgentSetup?> taskAgentResolvedSetup(
@@ -90,6 +63,9 @@ Future<ResolvedAgentSetup?> taskAgentResolvedSetup(
   final identityEntity = await ref.watch(agentIdentityProvider(agentId).future);
   final identity = identityEntity?.mapOrNull(agent: (value) => value);
   if (identity == null) return null;
+  if (identity.kind == AgentKinds.relationshipAgent) {
+    return ref.watch(relationshipAgentResolvedSetupProvider(agentId).future);
+  }
 
   final templateEntity = await ref.watch(
     templateForAgentProvider(agentId).future,
@@ -104,6 +80,10 @@ Future<ResolvedAgentSetup?> taskAgentResolvedSetup(
     agentTemplateVersion: (value) => value,
   );
   if (version == null) return null;
+
+  ref.watch(
+    defaultInferenceProfileControllerProvider.select((value) => value.value),
+  );
 
   return ref
       .watch(profileResolverProvider)
@@ -126,12 +106,23 @@ class TaskAgentSetupOptions {
   final List<AiConfigInferenceProvider> providers;
 }
 
+/// Live AI configs of one type, the stream every catalog below derives from.
+///
+/// Kept alive alongside [taskAgentSetupOptionsProvider]; a new emission —
+/// a model added, a provider deleted, a profile edited, on this device or
+/// arriving through sync — recomputes the catalog without a restart.
+final StreamProviderFamily<List<AiConfig>, AiConfigType>
+aiConfigsByTypeProvider = StreamProvider.family<List<AiConfig>, AiConfigType>(
+  (ref, type) => ref.watch(aiConfigRepositoryProvider).watchConfigsByType(type),
+  name: 'aiConfigsByTypeProvider',
+);
+
 /// Cached setup catalog shared by every page of the adaptive agent sheet.
 ///
 /// This deliberately is not auto-disposed: Wolt pages mount independently,
 /// and rebuilding the same repository query between pages causes a visible
-/// empty-state flash. Repository dependency changes still recompute the value,
-/// while consumers use the previous snapshot during that refresh.
+/// empty-state flash. A change to any of the three config streams recomputes
+/// the value, while consumers use the previous snapshot during that refresh.
 final FutureProvider<TaskAgentSetupOptions> taskAgentSetupOptionsProvider =
     FutureProvider<TaskAgentSetupOptions>(
       taskAgentSetupOptions,
@@ -143,11 +134,10 @@ final FutureProvider<TaskAgentSetupOptions> agentSetupOptionsProvider =
     taskAgentSetupOptionsProvider;
 
 Future<TaskAgentSetupOptions> taskAgentSetupOptions(Ref ref) async {
-  final repository = ref.watch(aiConfigRepositoryProvider);
   final values = await Future.wait([
-    repository.getConfigsByType(AiConfigType.inferenceProfile),
-    repository.getConfigsByType(AiConfigType.model),
-    repository.getConfigsByType(AiConfigType.inferenceProvider),
+    ref.watch(aiConfigsByTypeProvider(AiConfigType.inferenceProfile).future),
+    ref.watch(aiConfigsByTypeProvider(AiConfigType.model).future),
+    ref.watch(aiConfigsByTypeProvider(AiConfigType.inferenceProvider).future),
   ]);
   return TaskAgentSetupOptions(
     profiles: values[0].whereType<AiConfigInferenceProfile>().toList(),

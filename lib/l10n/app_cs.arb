@@ -420,6 +420,7 @@
   "agentSuggestionTimeEntryUpdateUnavailable": "Původní záznam není k dispozici",
   "agentSummaryAddItem": "Přidat: „{title}“",
   "agentSummaryArchiveItem": "Archivovat: „{title}“",
+  "agentSummaryAssignLabel": "Přiřadit štítek: „{label}“",
   "agentSummaryCheckItem": "Odškrtnout: „{title}“",
   "agentSummaryCreateFollowUp": "Vytvořit navazující úkol: „{title}“",
   "agentSummaryCreateFollowUpRelated": "Vytvořit navazující úkol: „{title}“ — {relation}",
@@ -628,8 +629,6 @@
   "aiCardReadMore": "Číst více",
   "aiCardShowLess": "Skrýt podrobnosti",
   "aiCardTitle": "Souhrn AI",
-  "aiChatAssistantResponding": "Asistent odpovídá",
-  "aiChatMessageCopied": "Zkopírováno do schránky",
   "aiConfigFailedToLoadModelsGeneric": "Nepodařilo se načíst modely. Prosím, zkuste to znovu.",
   "aiConfigNoModelsAvailable": "Žádné AI modely zatím nejsou konfigurovány. Prosím, přidejte je v nastavení.",
   "aiConfigNoSuitableModelsAvailable": "Žádný model nesplňuje požadavky pro tento prompt. Prosím, nakonfigurujte modely, které podporují požadované schopnosti.",
@@ -743,44 +742,6 @@
   "aiInferenceErrorUnknownTitle": "Chyba",
   "aiInternalsTitle": "Interní informace agenta",
   "aiModelCardDeleteTooltip": "Smazat model",
-  "aiModelDownloadCloseButton": "Zavřít",
-  "aiModelDownloadDialogDescription": "Lotti stáhne {modelName} do cache MLX Audio a použije ho pro lokální zpracování řeči.",
-  "@aiModelDownloadDialogDescription": {
-    "placeholders": {
-      "modelName": {
-        "type": "String"
-      }
-    }
-  },
-  "aiModelDownloadDialogTitle": "Instalovat {modelName}",
-  "@aiModelDownloadDialogTitle": {
-    "placeholders": {
-      "modelName": {
-        "type": "String"
-      }
-    }
-  },
-  "aiModelDownloadInstallTooltip": "Instalovat model",
-  "aiModelDownloadOpenProgressTooltip": "Zobrazit průběh stahování",
-  "aiModelDownloadStatusChecking": "Kontroluje se stav modelu",
-  "aiModelDownloadStatusDownloading": "Stahování {percent} %",
-  "@aiModelDownloadStatusDownloading": {
-    "placeholders": {
-      "percent": {
-        "type": "int"
-      }
-    }
-  },
-  "aiModelDownloadStatusDownloadingIndeterminate": "Stahování",
-  "aiModelDownloadStatusFailed": "Stahování selhalo",
-  "aiModelDownloadStatusInstalled": "Nainstalováno",
-  "aiModelDownloadStatusNotInstalled": "Nenainstalováno",
-  "aiModelDownloadStatusUnsupported": "Vyžaduje Apple Silicon",
-  "aiModelInstallChoiceCancelButton": "Zrušit",
-  "aiModelInstallChoiceDescription": "Nejdřív vyber lokální model pro převod řeči na text, který se má stáhnout. Ostatní můžeš nainstalovat později ze seznamu modelů.",
-  "aiModelInstallChoiceInstallButton": "Instalovat model",
-  "aiModelInstallChoiceRecommended": "Doporučeno",
-  "aiModelInstallChoiceTitle": "Vybrat model MLX Audio",
   "aiModelPickerByProviderLabel": "Vyber poskytovatele",
   "aiModelPickerCurrentDefaultLabel": "Aktuální výchozí",
   "aiModelPickerProviderModelCount": "{count, plural, =1{1 model} few{{count} modely} other{{count} modelů}}",
@@ -948,22 +909,20 @@
   "aiProviderDetailRemoveDescription": "Smaže poskytovatele a všechny modely, které jej používají. Tuto akci nelze vrátit.",
   "aiProviderDetailRemoveTitle": "Odstranit tohoto poskytovatele",
   "aiProviderDetailValueUnset": "Nenastaveno",
-  "aiProviderEmbeddedRuntimeHint": "Běží přímo v procesu aplikace Apple. Není potřeba lokální server ani základní URL.",
   "aiProviderGeminiName": "Google Gemini",
   "aiProviderGenericOpenAiName": "Kompatibilní s OpenAI",
   "aiProviderMeliousName": "Melious.ai",
   "aiProviderMistralName": "Mistral",
-  "aiProviderMlxAudioName": "MLX Audio (lokálně)",
   "aiProviderNebiusAiStudioName": "Nebius AI Studio",
   "aiProviderOllamaName": "Ollama",
   "aiProviderOmlxName": "oMLX (lokálně)",
   "aiProviderOpenAiName": "OpenAI",
   "aiProviderOpenRouterName": "OpenRouter",
+  "aiProviderSherpaName": "sherpa-onnx (v zařízení)",
   "aiProviderTaglineAlibaba": "Modely Qwen · multimodální · dlouhý kontext",
   "aiProviderTaglineAnthropic": "Rodina Claude · dlouhý kontext",
   "aiProviderTaglineGemini": "Multimodální · přepis zvuku",
   "aiProviderTaglineMelious": "Hostováno v EU · dynamický katalog · eko směrování",
-  "aiProviderTaglineMlxAudio": "Vestavěné · Apple Silicon · lokální audio",
   "aiProviderTaglineOllama": "Běží lokálně · bez cloudových volání",
   "aiProviderTaglineOmlx": "Lokální MLX inference · kompatibilní s OpenAI",
   "aiProviderTaglineOpenAi": "Rodina GPT · vize + uvažování",
@@ -992,6 +951,7 @@
   "aiSettingsCounterModels": "Modely",
   "aiSettingsCounterProfiles": "Profily",
   "aiSettingsCounterProviders": "Poskytovatelé",
+  "aiSettingsDefaultProfileDescription": "Záložní profil pro agenty bez nastaveného modelu na tomto zařízení.",
   "aiSettingsEmptyDescription": "Přidej jednoho a odemkni přepis, rozpoznávání obrázků, generování obrázků a sémantické vyhledávání.",
   "aiSettingsEmptyTitle": "Zatím žádní poskytovatelé",
   "aiSettingsFilterByCapabilityTooltip": "Filtrovat podle schopnosti {capability}",
@@ -1017,6 +977,7 @@
   "aiSettingsModalityAudio": "Audio",
   "aiSettingsModalityText": "Text",
   "aiSettingsModalityVision": "Obraz",
+  "aiSettingsNoDefaultProfile": "Žádný výchozí profil",
   "aiSettingsNoModelsConfigured": "Nejsou nakonfigurovány žádné AI modely",
   "aiSettingsNoProvidersConfigured": "Nejsou nakonfigurovány žádní poskytovatelé AI",
   "aiSettingsPageLead": "Nakonfiguruj AI poskytovatele, modely, které Lotti může volat, a inferenční profily, které rozhodují, který model zpracovává který úkol.",
@@ -1217,6 +1178,10 @@
   "audioRecordingResume": "Pokračovat",
   "audioRecordings": "Audiozáznamy",
   "audioRecordingStop": "Stop",
+  "avatarCropHint": "Tažením posuneš · stažením přiblížíš",
+  "avatarCropPreviewLabel": "Takhle to bude vypadat v seznamu",
+  "avatarCropTitle": "Vyber obličej",
+  "avatarCropUse": "Použít fotku",
   "backfillAdvancedRecoveryActions": "{count, plural, =1{1 akce} few{{count} akce} other{{count} akcí}}",
   "@backfillAdvancedRecoveryActions": {
     "placeholders": {
@@ -1395,49 +1360,162 @@
   "chatInputStopRealtime": "Zastavit živý přepis",
   "chatInputStopTranscribe": "Zastavit a přepsat",
   "chatInputTranscriptionFailed": "Nahrávka se pořídila, ale přepis se nezdařil. Zkus to prosím znovu.",
+  "checkInAddMoreButton": "Přidat další",
+  "checkInAudioSaved": "{length} zvuku uloženo",
+  "checkInAudioSavedAsYouGo": "Zvuk se průběžně ukládá na toto zařízení",
+  "checkInAudioSavedRoute": "{length} zvuku uloženo · {route}",
   "checkInAvoidLabel": "Raději se vyhnout",
-  "checkInDateLabel": "Kdy?",
-  "checkInDeleteConfirmMessage": "Smazat tento záznam? Tohle nelze vrátit zpět.",
-  "checkInDone": "Hotovo",
-  "@checkInDone": {
-    "description": "Relationships redesign label."
+  "checkInComposerSubtitle": "s {name} · naposledy {day}",
+  "checkInComposerSubtitleNoContact": "s {name} · zatím žádný check-in",
+  "checkInComposerWithName": "s {name}",
+  "@checkInComposerWithName": {
+    "description": "The composer header's status line when only the person fits: the name is never shed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
+  "checkInContextSummary": "{type} · {time} · {duration}",
+  "checkInDeleteConfirmMessage": "Smazat tento záznam? Tohle nelze vrátit zpět.",
+  "checkInDictateButton": "Diktovat",
+  "checkInDiscardDraftAudioKeptMessage": "Zahodit tento check-in? Nahrávka zůstane v deníku.",
+  "@checkInDiscardDraftAudioKeptMessage": {
+    "description": "The discard confirmation while a saved recording exists: the check-in goes, the audio stays in the journal."
+  },
+  "checkInDiscardDraftMessage": "Zahodit tento check-in? Nic se neuložilo.",
+  "checkInDiscardDraftRecordingMessage": "Zahodit tento check-in i nahrávku? Nahrávka se smaže.",
+  "checkInDiscardRecording": "Zahodit",
+  "checkInDiscardRecordingBody": "Zvuk se smaže. Tvůj check-in zůstane otevřený.",
+  "@checkInDiscardRecordingBody": {
+    "description": "Body of the confirmation before discarding a check-in recording: the audio is deleted, the composer stays open."
+  },
+  "checkInDismissButton": "Zavřít",
+  "checkInDurationChip": "Délka",
+  "checkInDurationChipSemantics": "Délka: {duration}. Změnit",
+  "checkInDurationQuickPickHint": "Klepni na délku a uloží se, nebo otoč kolečkem.",
+  "checkInDurationSemanticsLabel": "Nastavit délku na {label}",
   "checkInEditTitle": "Upravit záznam",
   "checkInErrorCreateFailed": "Záznam se nepodařilo uložit. Zkus to prosím znovu.",
   "checkInErrorDeleteFailed": "Záznam se nepodařilo smazat. Zkus to prosím znovu.",
-  "checkInHowDidItFeel": "Jaké to bylo?",
-  "@checkInHowDidItFeel": {
-    "description": "Relationships redesign label."
-  },
-  "checkInHowDidYouConnect": "Jak proběhl kontakt?",
-  "@checkInHowDidYouConnect": {
-    "description": "Relationships redesign label."
-  },
   "checkInInteractionCall": "Hovor",
   "checkInInteractionInPerson": "Osobně",
   "checkInInteractionLabel": "Jak jste se spojili?",
   "checkInInteractionMessage": "Zpráva",
   "checkInInteractionOther": "Jinak",
   "checkInInteractionVideoCall": "Videohovor",
-  "checkInNarrativeLabel": "O čem jste mluvili?",
+  "checkInMicrophoneDeniedBody": "Zapni ho pro Lotti v nastavení systému a pak klepni na Diktovat. Nic se nenahrálo.",
+  "checkInMicrophoneDeniedCalloutTitle": "Povol přístup k mikrofonu",
+  "@checkInMicrophoneDeniedCalloutTitle": {
+    "description": "The refused-microphone card's title: the next step, since the header status already says the microphone is unavailable."
+  },
+  "checkInMoreCaptionFeeling": "Pocit",
+  "@checkInMoreCaptionFeeling": {
+    "description": "Folded More row caption segment while no feeling is chosen."
+  },
+  "checkInMoreCaptionNextTime": "příště",
+  "@checkInMoreCaptionNextTime": {
+    "description": "Folded More row caption segment while nothing is noted for next time."
+  },
+  "checkInMoreCaptionNextTimeSet": "příště poznamenáno",
+  "@checkInMoreCaptionNextTimeSet": {
+    "description": "Folded More row caption segment once something is noted for next time."
+  },
+  "checkInMoreCaptionTopics": "témata",
+  "@checkInMoreCaptionTopics": {
+    "description": "Folded More row caption segment while no topics are entered."
+  },
+  "checkInMoreCaptionTopicsCount": "{count, plural, =1{1 téma} few{{count} témata} other{{count} témat}}",
+  "@checkInMoreCaptionTopicsCount": {
+    "description": "Folded More row caption segment: how many topics are entered.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkInMoreSection": "Více",
+  "checkInNarrativeHint": "O čem jste mluvili? Stačí jeden řádek.",
+  "checkInNoDuration": "Bez délky",
+  "checkInOpenSettingsButton": "Otevřít nastavení",
+  "checkInOrTypeHint": "Nebo to napiš sem…",
   "checkInPayAttentionLabel": "Příště se zaměřit na",
-  "checkInPreparedOverline": "✦ LOTTI · PŘIPRAVENO DNES RÁNO",
+  "checkInPreparingLabel": "Příprava zvuku…",
+  "checkInRecorderBusyBody": "Nejdřív ji zastav v indikátoru nahrávání a pak to zkus znovu. Nic nového se nenahrálo.",
+  "checkInRecorderBusyTitle": "Už běží jiná nahrávka",
+  "checkInRecordingFailedBody": "Mikrofon se nepodařilo spustit. Zkus to znovu, nebo check-in napiš. Nic se nenahrálo.",
+  "checkInRecordingFailedTitle": "Nahrávání se nespustilo",
+  "checkInRecordingHint": "Mluv normálně. Slova se tu objeví, jakmile zastavíš.",
+  "checkInRecordingNotSavedBody": "Nahrávku se nepodařilo uložit. Zkus to znovu, nebo check-in napiš.",
+  "checkInRecordingNotSavedTitle": "Nahrávku se nepodařilo uložit",
+  "checkInReRecordButton": "Nahrát znovu",
+  "checkInReRecordReplaceMessage": "Nahradit upravená slova novou nahrávkou?",
+  "@checkInReRecordReplaceMessage": {
+    "description": "Confirmation before Re-record when the transcript has been edited since it landed."
+  },
+  "checkInSaveBlockedEmpty": "Napiš pár slov, aby šlo uložit",
+  "checkInSaveBlockedRecording": "Pro uložení zastav nahrávání",
+  "checkInSaveBlockedRetry": "Napiš to nebo to zkus znovu, pak můžeš uložit",
+  "checkInSaveBlockedTranscribing": "Čeká se na přepis",
+  "checkInSaveButton": "Uložit check-in",
+  "checkInSaveShortButton": "Uložit",
+  "checkInSaveShortcutHint": "{shortcut} pro uložení",
   "checkInSentimentDelightful": "Skvělé",
   "checkInSentimentDifficult": "Těžké",
   "checkInSentimentGood": "Dobré",
   "checkInSentimentLabel": "Jaké to bylo?",
   "checkInSentimentNeutral": "Neutrální",
+  "checkInSentimentOptional": "Volitelné. Agent to nikdy nevyplňuje.",
   "checkInSentimentStrained": "Napjaté",
+  "checkInSourceCall": "Z hovoru, který jsi zahájil/a z této stránky. Vše jde upravit.",
+  "checkInSourceMessage": "Ze zprávy, kterou jsi poslal/a z této stránky. Vše jde upravit.",
   "checkInSpeakButton": "Namluvit kontakt",
+  "checkInSpokenMinutes": "{count, plural, =1{1 minuta} few{{count} minuty} other{{count} minut}}",
+  "@checkInSpokenMinutes": {
+    "description": "Minutes of a recording length, read by assistive technology.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkInSpokenSeconds": "{count, plural, =1{1 sekunda} few{{count} sekundy} other{{count} sekund}}",
+  "@checkInSpokenSeconds": {
+    "description": "Seconds of a recording length, read by assistive technology.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkInStartedLabel": "Začátek",
+  "checkInStatusMicrophoneDenied": "Mikrofon není k dispozici",
+  "checkInStatusPaused": "Pozastaveno",
+  "checkInStatusRecorderBusy": "Rekordér je obsazený",
+  "checkInStatusRecording": "Nahrává se",
+  "checkInStatusRecordingFailed": "Nahrávání se nespustilo",
+  "checkInStatusRecordingNotSaved": "Nahrávka neuložena",
+  "checkInStatusTranscriptionUnavailable": "Žádný model pro přepis",
+  "checkInStatusTranscriptMissing": "Přepis nedorazil",
+  "checkInTimeChipSemantics": "Začátek: {time}. Změnit",
   "checkInTopicsHint": "Oddělená čárkami, např. práce, cestování",
   "checkInTopicsLabel": "Témata",
-  "checkInTranscribingLabel": "Přepisuje se…",
-  "checkInTranscriptFailed": "Přepis nedorazil. Můžeš text napsat sám.",
-  "checkInTranscriptUnavailable": "Přepis pro tuto osobu není nastavený. Přidej zvukový model a zapni automatické odvozování pro její kategorii, nebo napiš záznam ručně.",
-  "checkInWriteInstead": "Spíše psát",
-  "@checkInWriteInstead": {
-    "description": "Relationships redesign label."
+  "checkInTranscribingEta": "obvykle do minuty",
+  "@checkInTranscribingEta": {
+    "description": "The last, first-shed tier of the transcribing caption: a time expectation for the wait."
   },
+  "checkInTranscribingLabel": "Přepisuje se…",
+  "checkInTranscriptAdded": "Přepis přidán",
+  "checkInTranscriptionUnavailableTitle": "Není nastavený žádný model pro přepis",
+  "checkInTranscriptMissingBody": "Tvoje nahrávka ({length}) zůstane uložená v deníku, i když tento check-in zahodíš. Zkus to za chvíli znovu.",
+  "checkInTranscriptMissingCalloutTitle": "Zkus to znovu, nebo to napiš",
+  "@checkInTranscriptMissingCalloutTitle": {
+    "description": "The transcript-not-received card's title: the next step, since the header status already names the state."
+  },
+  "checkInTranscriptUnavailable": "V nastavení AI vyber výchozí inferenční profil s modelem pro přepis, nebo svůj kontakt zapiš.",
+  "checkInTypeChipSemantics": "Typ: {type}. Změnit",
+  "checkInTypeInstead": "Raději napsat",
+  "checkInWordCount": "{count, plural, =1{1 slovo} few{{count} slova} other{{count} slov}}",
   "checklistAddItem": "Přidat novou položku",
   "checklistAiConfidenceLabel": "Jistota: {level}",
   "@checklistAiConfidenceLabel": {
@@ -1501,7 +1579,7 @@
   "configFlagEnableAiStreaming": "Povolit AI streamování pro akce úkolů",
   "configFlagEnableAiStreamingDescription": "Streamujte AI odpovědi pro akce související s úkoly. Vypněte, pokud chcete odpovědi bufferovat a udržet plynulejší rozhraní.",
   "configFlagEnableAiSummaryTts": "Přehrávání AI souhrnů",
-  "configFlagEnableAiSummaryTtsDescription": "Zobrazí tlačítko místního převodu textu na řeč u AI souhrnů úkolů. Vyžaduje nainstalovaný model MLX Audio TTS.",
+  "configFlagEnableAiSummaryTtsDescription": "Zobrazí tlačítko místního převodu textu na řeč u AI souhrnů úkolů. Vyžaduje nainstalovaný model Supertonic TTS.",
   "configFlagEnableDailyOs": "Povolit DailyOS",
   "configFlagEnableDailyOsDescription": "Zobrazit DailyOS v hlavní navigaci.",
   "configFlagEnableDashboardsPage": "Povolit stránku Dashboardů",
@@ -1521,6 +1599,8 @@
   "configFlagEnableNotificationsDescription": "Přijímejte upozornění na připomínky, aktualizace a důležité události.",
   "configFlagEnableProjects": "Povolit projekty",
   "configFlagEnableProjectsDescription": "Zobrazit funkce správy projektů pro organizaci úkolů do projektů.",
+  "configFlagEnableQueryChat": "Experimentální chat k úkolům",
+  "configFlagEnableQueryChatDescription": "Zobrazí chaty pro úkoly, projekty a kategorie. Ve výchozím stavu je vypnutý.",
   "configFlagEnableRelationships": "Zapnout stránku Lidé",
   "configFlagEnableRelationshipsDescription": "Zobrazit záložku Lidé pro péči o tvoje osobní vztahy.",
   "configFlagEnableSessionRatings": "Povolit hodnocení relací",
@@ -2499,6 +2579,7 @@
   "designSystemTextareaWithCounterLabel": "S počítadlem",
   "designSystemTextareaWithErrorLabel": "S chybou",
   "designSystemTextareaWithHelperLabel": "S nápovědou",
+  "designSystemTieredTextTitle": "Stupňovitý text ve třech šířkách",
   "designSystemTimePickerFormatsTitle": "Formáty času",
   "designSystemTimePickerTwelveHourLabel": "12hodinový",
   "designSystemTimePickerTwentyFourHourLabel": "24hodinový",
@@ -3044,6 +3125,8 @@
   "imageViewerPreviousTooltip": "Předchozí obrázek",
   "inactiveLabel": "Neaktivní",
   "inactiveSwitchDescription": "Lze vybrat pro nové záznamy, když je zapnuto",
+  "inferenceProfileChat": "Model pro chat",
+  "inferenceProfileChatUsesThinking": "Pokud není nastaven, použije se model pro uvažování",
   "inferenceProfileChooseModelTitle": "Vyber model",
   "inferenceProfileChooseTitle": "Vyber profil inference",
   "inferenceProfileCreateTitle": "Vytvořit profil",
@@ -3677,14 +3760,13 @@
   "multiSelectNoItemsFound": "Žádné položky nenalezeny",
   "navSidebarManualBrowserHint": "Otevře se v prohlížeči",
   "navSidebarManualLabel": "Příručka",
-  "navTabMoreSemanticsLabel": "{count, plural, =1{Více, 1 další sekce} few{Více, {count} další sekce} other{Více, {count} dalších sekcí}}",
   "navTabTitleCalendar": "DailyOS",
   "navTabTitleEvents": "Události",
   "navTabTitleGoals": "Cíle",
   "navTabTitleHabits": "Zvyky",
   "navTabTitleInsights": "Přehledy",
   "navTabTitleJournal": "Zápisník",
-  "navTabTitleMore": "Více",
+  "navTabTitleNavigate": "Navigovat",
   "navTabTitlePeople": "Lidé",
   "navTabTitleProjects": "Projekty",
   "navTabTitleSettings": "Nastavení",
@@ -3881,6 +3963,47 @@
   "panasScaleModerately": "Středně",
   "panasScaleQuiteABit": "Docela hodně",
   "panasScaleVerySlightlyOrNotAtAll": "Vůbec nebo jen velmi málo",
+  "plazaBlockedReason": "blokováno — čeká na rozhodnutí",
+  "plazaCategoryEmpty": "V této kategorii nejsou žádné viditelné projekty.",
+  "plazaClosedForNight": "NA NOC ZAVŘENO",
+  "plazaCloseHint": "Esc zavře",
+  "plazaControls": "WASD chůze · drž Shift: 8× rychlost · tažením se rozhlížej · Tab další maják · H domů · M přehled · / hledat · T panel nástrojů · Esc zavře · ⌘[ zpět",
+  "plazaCornerAfter": "Odbočka za {week}",
+  "plazaDebug": "Ladění",
+  "plazaDecisionStrip": "ČEKÁ NA ROZHODNUTÍ",
+  "plazaDoneCount": "Hotovo: {done} z {total}",
+  "plazaDueOn": "termín {date}",
+  "plazaDueSoonReason": "termín {date} — dokonči to",
+  "plazaEmpty": "Přidej úkol a začni budovat náměstí tohoto projektu.",
+  "plazaEnterProject": "Vstoupit do projektu",
+  "plazaExploreCategory": "Prozkoumat kategorii",
+  "plazaExploreProject": "Prozkoumat projekt",
+  "plazaFlyThere": "Přeletět sem ›",
+  "plazaInProgressCount": "Probíhá: {count}",
+  "plazaLinks": "odkazy {count}",
+  "plazaMeerkats": "Surikaty",
+  "plazaMorningWalk": "Ranní procházka",
+  "plazaNeedsAttention": "Vyžaduje pozornost: {count}",
+  "plazaOpeningSoon": "BRZY OTEVŘEME",
+  "plazaOpenLate": "OTEVŘENO DO NOCI",
+  "plazaOverdueSince": "po termínu od {date} — dokonči nebo přesuň",
+  "plazaOverview": "Přehled",
+  "plazaPaused": "Pozastaveno",
+  "plazaProjectOverdue": "Úkoly po termínu: {count}",
+  "plazaSearchHint": "Hledej úkoly, Enter pro přelet",
+  "plazaShowPenguins": "Tučňáci",
+  "plazaSkyDay": "Den",
+  "plazaSkyNight": "Noc",
+  "plazaStaleReason": "bez aktivity {days} dní — vrať se k tomu",
+  "plazaStats": "{tasks} úkolů · {weeks} týdnů · {attention} vyžaduje pozornost",
+  "plazaTaskCount": "Úkoly: {count}",
+  "plazaTitle": "Náměstí",
+  "plazaToggleToolbar": "Zobrazit / skrýt panel nástrojů",
+  "plazaToLet": "K PRONÁJMU",
+  "plazaTourControls": "Mezerník: pauza · pohybem ukončíš",
+  "plazaUnavailable": "Toto zařízení nedokáže zobrazit 3D svět.",
+  "plazaWeek": "T{week} · {date}",
+  "plazaWeekShort": "T{week}",
   "privateLabel": "Soukromé",
   "privateSwitchDescription": "Viditelné pouze při zobrazení soukromých záznamů",
   "projectActionAddTask": "Přidat úkol",
@@ -4212,6 +4335,129 @@
   "provisionedSyncSummaryHomeserver": "Server synchronizace",
   "provisionedSyncSummaryUser": "Synchronizační účet",
   "provisionedSyncTitle": "Zařízení",
+  "queryActionsAccept": "Přijmout",
+  "queryActionsDismiss": "Zamítnout",
+  "queryActionsIncomplete": "Některé změny se nepodařilo provést. Při dalším pokusu se již provedené změny nebudou opakovat.",
+  "queryActionsReview": "Navržené změny",
+  "queryActionsTarget": "Pro: {target}",
+  "queryAllSources": "Vše",
+  "queryArchiveChat": "Archivovat chat",
+  "queryArchiveConfirmation": "Chat archivován. Jeho závěry zůstávají dostupné.",
+  "queryArchivedChats": "Archivované chaty",
+  "queryArchivedReadOnly": "Tento chat je archivovaný. Obnov ho, pokud chceš pokračovat.",
+  "queryAsk": "Zeptat se",
+  "queryAskCategory": "Zeptat se na tuto kategorii",
+  "queryAskProject": "Zeptat se na tento projekt",
+  "queryAskTask": "Zeptat se na tento úkol",
+  "queryAudioFailed": "Zvuk se nepodařilo připravit nebo přehrát. Zkus to znovu.",
+  "queryAudioListen": "Poslechnout · {start}–{end}",
+  "queryAudioMissingFile": "Nahrávka na tomto zařízení zatím není dostupná.",
+  "queryAudioNoMatch": "Tento citát se nepodařilo jednoznačně přiřadit k nahrávce. Stále můžeš otevřít celý záznam.",
+  "queryAudioOpenRecording": "Otevřít nahrávku",
+  "queryAudioPlaying": "Přehrávání {start}–{end}",
+  "queryAudioPrepare": "Připravit zvukový úryvek",
+  "queryAudioPreparing": "Připravuji zvuk…",
+  "queryAudioReadAloud": "Přečíst odpověď nahlas",
+  "queryAudioReading": "Odpověď se čte nahlas",
+  "queryAudioRetry": "Zkusit zvuk znovu",
+  "queryAudioSetupDetails": "Podrobnosti nastavení",
+  "queryAudioSetupRequired": "Zvukové úryvky vyžadují kompatibilní model přepisu.",
+  "queryAudioStale": "Nahrávka se změnila. Připrav časové značky znovu.",
+  "queryAudioStop": "Zastavit zvuk",
+  "queryAudioTimingUnavailable": "Pro přípravu úryvků vyber v inferenčním profilu tohoto agenta Melious Whisper nebo podporovaný přepisovací model Mistral Voxtral. URL poskytovatele musí používat HTTPS.",
+  "queryAudioTooLarge": "Časové značky lze připravit pro nahrávky do 25 MB. Vyber menší nahrávku.",
+  "queryAudioUploadNotice": "Při přípravě časových značek se tato nahrávka odešle poskytovateli přepisu nastavenému pro tohoto agenta.",
+  "queryCategoryAgent": "Agent kategorie",
+  "queryChat": "Chat",
+  "queryChats": "Chaty",
+  "queryChecked": "Zkontrolované zdroje: {count}",
+  "queryCloseChat": "Zavřít chat",
+  "queryCollapseChat": "Sbalit chat",
+  "queryCopied": "Zkopírováno",
+  "queryCopyQuote": "Kopírovat citaci",
+  "queryCoverage": "Co bylo prohledáno",
+  "queryCoverageCategory": "Tato kategorie",
+  "queryCoverageExcluded": "Ostatní kategorie nebyly prohledány.",
+  "queryCoverageUnreadable": "Při vytvoření této odpovědi nebyl dostupný prohledávatelný text. Otevři nahrávku a prohlédni si ji.",
+  "queryCoverageWider": "Další záznamy v této kategorii",
+  "queryDeleteChat": "Smazat chat",
+  "queryDeleteExplanation": "Smazat tuto konverzaci? Vyber, co se stane se sdílenými závěry. Zdrojové záznamy zůstanou zachovány.",
+  "queryDeleteForget": "Smazat a zapomenout závěry",
+  "queryDeleteKeep": "Smazat a ponechat závěry",
+  "queryDictated": "Přepis můžeš upravit před odesláním otázky. Zvuk už mohl být odeslán tvému poskytovateli přepisu.",
+  "queryDraftProvisional": "Návrh · zatím neověřený",
+  "queryDraftRetracted": "Návrh odpovědi se nepodařilo ověřit. Zkus to znovu.",
+  "queryEarlierTextOmitted": "[Dřívější text není zobrazen]",
+  "queryEmptyBody": "Ptej se na rozhodnutí a dřívější práci. Odpovědi rozlišují souhrny od přesných pasáží.",
+  "queryExactStoredText": "Přesný uložený text",
+  "queryExactText": "Zobrazit přesný text",
+  "queryExampleDecision": "Na čem jsme se dohodli?",
+  "queryExampleMeeting": "Na které schůzce jsme to probírali?",
+  "queryExampleSuggestion": "Bylo to rozhodnutí, nebo návrh?",
+  "queryExpandChat": "Rozbalit chat",
+  "queryExpanding": "Kontrola dalších záznamů v této kategorii…",
+  "queryFailed": "Hledání se nepodařilo dokončit. Zkus to znovu.",
+  "queryForgetConclusions": "Zapomenout závěry",
+  "queryHideExactText": "Skrýt přesný text",
+  "queryHideSurrounding": "Skrýt okolní text",
+  "queryHomeOnly": "Jen základní rozsah",
+  "queryHomeScope": "Základní rozsah",
+  "queryIncomplete": "Hledání není úplné. Chybějící důkazy neznamenají, že diskuze nikdy neproběhla.",
+  "queryIncompleteShort": "Některé zdroje se nepodařilo zkontrolovat.",
+  "queryInferenceUnavailable": "Chybí použitelná konfigurace AI. Nastav model agenta nebo výchozí profil kategorie a zkus to znovu.",
+  "queryKeepConclusions": "Ponechat závěry",
+  "queryLaterTextOmitted": "[Pozdější text není zobrazen]",
+  "queryMachineTranscript": "Strojový přepis: přesné uložené znění, neověřené podle zvuku.",
+  "queryMemoryCount": "Dostupné závěry z dřívějších chatů: {count}",
+  "queryMissingTranscripts": "{count, plural, one{1 nahrávka při vytvoření této odpovědi neměla prohledávatelný text.} few{{count} nahrávky při vytvoření této odpovědi neměly prohledávatelný text.} other{{count} nahrávek při vytvoření této odpovědi nemělo prohledávatelný text.}}",
+  "queryNewChat": "Nový chat",
+  "queryNoAgent": "Tento rozsah potřebuje svého obvyklého agenta. Vrať se do detailů a přiřaď ho.",
+  "queryNotes": "Poznámky",
+  "queryOpenCurrentEntry": "Otevřít aktuální záznam",
+  "queryOpenEntry": "Otevřít záznam",
+  "queryOriginalsHome": "Prohlíží pouze tento úkol a jeho přímo propojené záznamy.",
+  "queryOtherProject": "Mimo základní rozsah",
+  "queryPreparingAnswer": "Připravuji odpověď…",
+  "queryReachCategory": "Prohledává tuto oblast a kategorii {category}.",
+  "queryReachCategoryOnly": "Hledá v kategorii {category}.",
+  "queryReachHome": "Prohledává pouze tuto oblast a její propojené záznamy.",
+  "queryReachUncategorized": "Hledá pouze v tomto úkolu a přímo propojených záznamech bez kategorie.",
+  "queryRecall": "Tato odpověď využila uložené závěry.",
+  "queryRecordings": "Nahrávky",
+  "queryRecordingTranscript": "Přepis nahrávky",
+  "queryRenameChat": "Přejmenovat chat",
+  "queryRestoreChat": "Obnovit chat",
+  "querySavedConclusion": "Závěr uložen {date}",
+  "querySavedQuote": "Tato uložená citace odpovídá zdroji v době odpovědi.",
+  "querySavedVersion": "Uložená verze: {version}",
+  "@querySavedVersion": {
+    "description": "Identifies the historical text version by edit date or short content fingerprint.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "querySavedVersionUnavailable": "Datum verze není k dispozici",
+  "querySearching": "Prohlížení dostupných informací…",
+  "querySearchScope": "Rozsah hledání a filtry",
+  "querySourceAction": "{action}: {source}",
+  "querySourceChanged": "Zdroj byl změněn",
+  "querySourceDeleted": "Zdroj smazán",
+  "querySourceMoved": "Zdroj přesunut do jiné kategorie",
+  "querySummaryBased": "Na základě souhrnů",
+  "querySummaryCoverage": "Tato odpověď využívá souhrny úkolů nebo projektů. Původní záznamy nebyly prohlédnuty.",
+  "querySummaryCurrent": "Otevři úkol nebo projekt a prohlédni si jeho aktuální souhrn. Od této odpovědi se mohl změnit.",
+  "querySummaryIncomplete": "V dostupných souhrnech chybí některé informace.",
+  "querySummaryOwners": "O této odpovědi",
+  "querySurroundingLimit": "Toto je uložený úryvek, který nemusí obsahovat celou diskusi.",
+  "querySurroundingText": "Zobrazit okolní text",
+  "queryTranscribing": "Přepisování tvé nahrávky. Poskytovatel už mohl zvuk obdržet.",
+  "queryUnavailable": "Tento rozsah už není s tvým nastavením viditelnosti dostupný.",
+  "queryUnread": "Nová odpověď",
+  "queryWelcomeCategory": "Zeptej se agenta {agentName} na tuto kategorii",
+  "queryWelcomeProject": "Zeptej se agenta {agentName} na tento projekt",
+  "queryWelcomeTask": "Zeptej se agenta {agentName} na tento úkol",
   "queueCatchUpNowButton": "Dohnat nyní",
   "queueCatchUpNowDone": "Dohánění spuštěno — fronta se vyprazdňuje.",
   "queueCatchUpNowError": "Dohánění selhalo: {reason}",
@@ -4292,23 +4538,41 @@
   "relationshipActionFailed": "Nic v tomto zařízení to nedokáže otevřít",
   "relationshipActionMessage": "Zpráva",
   "relationshipAddChannelButton": "Přidat kontakt",
-  "relationshipAsk": "Zeptat",
-  "@relationshipAsk": {
-    "description": "Relationships redesign label."
+  "relationshipAddChannelFromContacts": "nebo z kontaktů",
+  "relationshipAgentAsOfBand": "{band} · aktualizováno {age}",
+  "relationshipAgentBriefNow": "Vytvořit briefing teď",
+  "relationshipAgentCall": "Zavolat {name}",
+  "relationshipAgentFailedBody": "Poskytovatel vrátil chybu dřív, než se briefing napsal. Tvoje check-iny zůstaly beze změny.",
+  "relationshipAgentFailedNoModel": "Pro briefingy není nastaven žádný model. Vyber ho v Nastavení AI › Agenti. Podrobnosti najdeš na kartě Aktivita.",
+  "relationshipAgentFailedPlain": "Poslední běh selhal",
+  "relationshipAgentLastRunFailed": "Poslední běh selhal · {time}",
+  "relationshipAgentMarkImportant": "Označit jako důležité",
+  "relationshipAgentNoAgent": "Pro tuto osobu není žádný agent",
+  "relationshipAgentNoBriefingBody": "{count, plural, =0{Zatím žádný briefing. „Vytvořit briefing teď“ ho napíše, jakmile zaznamenáš check-in; telefon ani e-mail nikdy nevidí.} =1{Zatím žádný briefing. „Vytvořit briefing teď“ ho napíše z tvého check-inu; telefon ani e-mail nikdy nevidí.} few{Zatím žádný briefing. „Vytvořit briefing teď“ ho napíše z tvých {count} check-inů; telefon ani e-mail nikdy nevidí.} other{Zatím žádný briefing. „Vytvořit briefing teď“ ho napíše z tvých {count} check-inů; telefon ani e-mail nikdy nevidí.}}",
+  "relationshipAgentNotEnrolledBody": "Označ {name} jako důležitou osobu a získáš chat, připomínky po delší odmlce a briefing.",
+  "relationshipAgentOnlyYourStartsUseAi": "AI používá jen to, co spustíš sám",
+  "relationshipAgentOutOfDateNewCheckIn": "Zastaralé · nový check-in {day}",
+  "relationshipAgentOutOfDateNewCheckInShort": "Zastaralé · nový check-in",
+  "@relationshipAgentOutOfDateNewCheckInShort": {
+    "description": "The out-of-date status line's middle tier when the day does not fit beside the age pill."
   },
+  "relationshipAgentPausedBody": "Briefingy se pozastaví, dokud je tato osoba neaktivní nebo archivovaná.",
+  "relationshipAgentProposedCount": "{count, plural, =1{1 návrh} few{{count} návrhy} other{{count} návrhů}}",
+  "relationshipAgentReadingBody": "{count, plural, =0{Připravuje briefing. Obvykle do minuty.} =1{Čte 1 check-in. Obvykle do minuty.} few{Čte {count} check-iny. Obvykle do minuty.} other{Čte {count} check-inů. Obvykle do minuty.}}",
+  "relationshipAgentSeeActivity": "Zobrazit aktivitu",
+  "relationshipAgentSources": "Zdroje: {count, plural, =1{1 check-in} few{{count} check-iny} other{{count} check-inů}} · kontaktní kanály se nikdy neposílají",
+  "relationshipAgentTryAgain": "Zkusit znovu",
+  "relationshipAgentWatching": "Agent sleduje",
+  "relationshipAgentWatchingNextLook": "Agent sleduje · příště {day}",
+  "relationshipAgentWriting": "Píše se briefing…",
   "relationshipBannerSemanticLabel": "Banner vztahu s {personName}",
+  "relationshipBriefingAge": "{days, plural, =1{1 den starý} few{{days} dny starý} other{{days} dní starý}}",
   "relationshipBriefingDisclosureBody": "Briefing běží na {provider}. Poznámky o této osobě tam budou odeslány ke zpracování.",
   "relationshipBriefingDisclosureConfirm": "Pokračovat",
   "relationshipBriefingDisclosureTitle": "Odeslat do {provider}?",
-  "relationshipBriefingEmpty": "Zatím žádný briefing — Shrň mi to ho připraví z tvých check-inů.",
   "relationshipBriefingRequested": "Briefing vyžádán — za chvíli se tu objeví.",
   "relationshipBriefingRequestFailed": "Briefing se nepodařilo vyžádat.",
   "relationshipBriefingTitle": "Briefing",
-  "relationshipBriefMeAgain": "Shrnout znovu",
-  "@relationshipBriefMeAgain": {
-    "description": "Relationships redesign label."
-  },
-  "relationshipBriefMeButton": "Shrň mi to",
   "relationshipCadenceEveryNDays": "{days, plural, =1{Každý den} few{Každé {days} dny} other{Každých {days} dní}}",
   "relationshipCadenceFortnightly": "Každé dva týdny",
   "relationshipCadenceLabel": "Frekvence kontaktu",
@@ -4322,18 +4586,13 @@
   "@relationshipCadenceOnTrack": {
     "description": "Relationships redesign label."
   },
+  "relationshipCadencePromptLabel": "Připomínej mi každý",
   "relationshipCadenceQuarterly": "Každé čtvrtletí",
   "relationshipCadenceWeekly": "Každý týden",
+  "relationshipChatAgentSubtitle": "Zná tvé check-iny, ne kontaktní údaje",
+  "relationshipChatAgentTitle": "{name} · briefingový agent",
   "relationshipChatTooltip": "Chatovat o této osobě",
   "relationshipChatUnavailable": "Zatím žádný agent — nejprve označ tuto osobu jako důležitou.",
-  "relationshipCheckedInLabel": "Záznam {date}",
-  "@relationshipCheckedInLabel": {
-    "placeholders": {
-      "date": {
-        "type": "String"
-      }
-    }
-  },
   "relationshipCheckInReminderBody": "Dobrá chvíle se ozvat.",
   "relationshipCheckInReminderTitle": "Ozvat se: {name}?",
   "@relationshipCheckInReminderTitle": {
@@ -4344,14 +4603,6 @@
     }
   },
   "relationshipCheckInsLabel": "Záznamy kontaktů",
-  "relationshipCheckInTitle": "Záznam · {name}",
-  "@relationshipCheckInTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "relationshipContactCardAction": "Vizitka",
   "@relationshipContactCardAction": {
     "description": "Relationships redesign label."
@@ -4362,6 +4613,14 @@
   "relationshipContactMissing": "Tento kontakt v tomto zařízení není",
   "relationshipContactNoChanges": "Není co nového zkopírovat",
   "relationshipCreateTitle": "Přidat osobu",
+  "relationshipDaysOver": "{count, plural, =1{1 den po termínu} few{{count} dny po termínu} other{{count} dní po termínu}}",
+  "@relationshipDaysOver": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "relationshipDeleteConfirmMessage": "Smažou se i všechny záznamy kontaktů. Tohle nelze vrátit zpět.",
   "relationshipDeleteConfirmTitle": "Smazat {name}?",
   "relationshipDueDay": "Do {day}",
@@ -4372,11 +4631,54 @@
       }
     }
   },
+  "relationshipDueSince": "Po termínu od {day} · {count, plural, =1{1 den po termínu} few{{count} dny po termínu} other{{count} dní po termínu}}",
+  "@relationshipDueSince": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipDueToday": "Dnes na řadě",
+  "relationshipDurationHours": "{hours} h",
+  "@relationshipDurationHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipDurationHoursMinutes": "{hours} h {minutes}",
+  "@relationshipDurationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipDurationMinutes": "{count} min",
+  "@relationshipDurationMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "relationshipEditTitle": "Upravit osobu",
   "relationshipErrorCreateFailed": "Osobu se nepodařilo uložit. Zkus to prosím znovu.",
   "relationshipErrorDeleteFailed": "Osobu se nepodařilo smazat. Zkus to prosím znovu.",
   "relationshipErrorLinkTaskFailed": "Úkol se nepodařilo propojit. Zkus to prosím znovu.",
   "relationshipErrorUpdateFailed": "Změny se nepodařilo uložit. Zkus to prosím znovu.",
+  "relationshipFormImportantBody": "Zapne briefing, připomínky a chat. Poznámky z check-inů jdou agentovi, kontaktní údaje nikdy.",
+  "relationshipFormImportantBodyNamed": "Zapne briefing, připomínky a chat pro osobu {name}. Poznámky z check-inů jdou agentovi, kontaktní údaje nikdy.",
+  "relationshipFormReachTitle": "Jak je zastihnout",
+  "relationshipFormWhoTitle": "Kdo",
   "relationshipHealthNeedsAttention": "Vyžaduje pozornost",
   "relationshipHealthSteady": "Stabilní",
   "relationshipHealthStrained": "Napjatý",
@@ -4389,11 +4691,13 @@
   "relationshipImportEmpty": "V tomto zařízení nejsou žádné kontakty",
   "relationshipImportFailed": "Nepodařilo se přidat nikoho",
   "relationshipImportGrantButton": "Povolit přístup",
+  "relationshipImportImportantBody": "Briefingy, připomínky a chat. Bez toho se nic nespustí samo.",
   "relationshipImportNoMatches": "Tvému hledání neodpovídají žádné kontakty",
   "relationshipImportOpenSettings": "Otevřít nastavení",
   "relationshipImportPermissionBody": "Lotti čte tvé kontakty jen po dobu, kdy je tento výběr otevřený, a zkopíruje jen lidi, které vybereš.",
   "relationshipImportRetry": "Zkusit znovu",
   "relationshipImportReviewButton": "{count, plural, =1{Zkontrolovat 1} few{Zkontrolovat {count}} other{Zkontrolovat {count}}}",
+  "relationshipImportReviewSubtitle": "{count, plural, =1{1 vybraná osoba · kontaktní údaje zůstanou v tomto zařízení} few{{count} vybrané osoby · kontaktní údaje zůstanou v tomto zařízení} other{{count} vybraných osob · kontaktní údaje zůstanou v tomto zařízení}}",
   "relationshipImportReviewTitle": "Než je přidáš",
   "relationshipImportSearchHint": "Hledat kontakty",
   "relationshipImportSettingsBody": "Přístup ke kontaktům je vypnutý. Zapni ho v nastavení systému, abys mohl lidi importovat.",
@@ -4403,79 +4707,175 @@
   "@relationshipJustAdded": {
     "description": "Relationships redesign label."
   },
-  "relationshipLastCheckInLabel": "Poslední záznam {date}",
-  "relationshipLinkContact": "Propojit kontakt",
-  "relationshipLinkedTasksLabel": "Úkoly",
-  "relationshipLinkTaskButton": "Propojit úkol",
-  "relationshipLogCheckIn": "Zaznamenat kontakt",
-  "relationshipLottisRead": "Lottiho odhad",
-  "@relationshipLottisRead": {
-    "description": "Relationships redesign label."
-  },
-  "relationshipLottisReadAsOf": "k {time}",
-  "@relationshipLottisReadAsOf": {
+  "relationshipLastSpoke": "naposledy mluvili {time}",
+  "@relationshipLastSpoke": {
     "placeholders": {
       "time": {
         "type": "String"
       }
     }
   },
+  "relationshipLinkContact": "Propojit kontakt",
+  "relationshipLinkedTasksLabel": "Úkoly",
+  "relationshipLinkTaskButton": "Propojit úkol",
+  "relationshipLogCheckIn": "Zaznamenat kontakt",
+  "relationshipMoreActions": "Další akce",
   "relationshipNameLabel": "Jméno",
   "relationshipNameRequired": "Jméno je povinné",
-  "relationshipNextByDay": "příští do {day}",
-  "@relationshipNextByDay": {
+  "relationshipNextDueOn": "Příště {day}",
+  "@relationshipNextDueOn": {
     "placeholders": {
       "day": {
         "type": "String"
       }
     }
   },
+  "relationshipNextTimeTitle": "Příště",
   "relationshipNicknameLabel": "Přezdívka",
   "relationshipNoCheckIns": "Zatím žádné záznamy — přidej první po dalším rozhovoru.",
   "relationshipNoLinkedTasks": "Zatím žádné propojené úkoly.",
+  "relationshipNotEnrolled": "Nesledováno",
   "relationshipNotFound": "Tahle osoba už není sledovaná.",
-  "relationshipNudgesOn": "připomínky zapnuty",
-  "@relationshipNudgesOn": {
-    "description": "Relationships redesign label."
-  },
-  "relationshipPostCallBody": "Právě jsi se ozval. Chceš si zapsat check-in, dokud je to čerstvé?",
-  "relationshipPostCallConfirm": "Zapsat check-in",
-  "relationshipPostCallDismiss": "Teď ne",
-  "relationshipPostCallTitle": "Jak to šlo s {name}?",
-  "@relationshipPostCallTitle": {
+  "relationshipOnTrackCadence": "V rytmu · {cadence}",
+  "@relationshipOnTrackCadence": {
     "placeholders": {
-      "name": {
-        "type": "String",
-        "example": "Anna"
+      "cadence": {
+        "type": "String"
       }
     }
   },
-  "relationshipQuietForDays": "{count, plural, =1{1 den} few{{count} dny} other{{count} dní}} bez kontaktu",
-  "@relationshipQuietForDays": {
+  "relationshipPayAttentionTo": "Dávej pozor na",
+  "relationshipPhotoAddBanner": "Přidat banner",
+  "relationshipPhotoAdjustCrop": "Upravit ořez",
+  "relationshipPhotoBanner": "Banner",
+  "relationshipPhotoCardTitle": "Fotka",
+  "relationshipPhotoChange": "Změnit",
+  "relationshipPhotoChoose": "Vybrat z knihovny",
+  "relationshipPhotoDragToReposition": "Tažením posuneš",
+  "relationshipPhotoFace": "Obličej",
+  "relationshipPhotoPrivacy": "Jen na tvých zařízeních · agent ji nikdy nevidí",
+  "relationshipPhotoRemove": "Odebrat fotku",
+  "relationshipPhotoRemoveAction": "Odebrat",
+  "relationshipPhotoSaveFailed": "Fotku se nepodařilo uložit",
+  "relationshipPhotoSheetTitle": "Fotka – {name}",
+  "relationshipPostCallConfirm": "Zapsat check-in",
+  "relationshipPostCallDismiss": "Teď ne",
+  "relationshipPostCallMeta": "začátek v {time} · {minutes, plural, =0{necelá minuta} =1{asi 1 min} other{asi {minutes} min}}",
+  "@relationshipPostCallMeta": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipPostCallOfferCall": "Hovor s {name} před {minutes, plural, =0{necelou minutou} =1{1 minutou} other{{minutes} minutami}} — zapíšeme to, dokud je to čerstvé?",
+  "@relationshipPostCallOfferCall": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipPostCallOfferMessage": "Zpráva pro {name} před {minutes, plural, =0{necelou minutou} =1{1 minutou} other{{minutes} minutami}} — zapíšeme to, dokud je to čerstvé?",
+  "@relationshipPostCallOfferMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipProposalAdded": "Přidáno → {title}",
+  "relationshipProposalEvidence": "Z kontaktu dne {date}",
+  "relationshipProposalUndoFailed": "Akci se nepodařilo vrátit. Úkol se možná změnil.",
+  "relationshipReachPrivacy": "Zůstává v tomto zařízení · nikdy se nesdílí s AI",
+  "relationshipReachTitle": "Kontakt",
+  "relationshipRelinkContact": "Propojit jiný kontakt",
+  "relationshipsEmptyState": "Přidej lidi, se kterými chceš zůstat v kontaktu.",
+  "relationshipsGroupDue": "Na řadě",
+  "relationshipsPageTitle": "Lidé",
+  "relationshipsSelectPersonHint": "Vyber osobu a zobrazí se její stránka.",
+  "relationshipsSummaryDueNow": "Teď na řadě",
+  "relationshipsSummaryEnrolled": "{count, plural, =1{/ 1 sledovaná} few{/ {count} sledované} other{/ {count} sledovaných}}",
+  "@relationshipsSummaryEnrolled": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "relationshipRelinkContact": "Propojit jiný kontakt",
-  "relationshipSeeAllCheckIns": "Zobrazit všechny záznamy",
-  "@relationshipSeeAllCheckIns": {
-    "description": "Relationships redesign label."
+  "relationshipsSummaryNextDue": "Další: {name} · {day}",
+  "@relationshipsSummaryNextDue": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
   },
-  "relationshipsEmptyState": "Přidej lidi, se kterými chceš zůstat v kontaktu.",
-  "relationshipsPageTitle": "Lidé",
+  "relationshipsSummaryNoneDue": "Nikdo není na řadě",
+  "relationshipsSummaryNotEnrolled": "{count, plural, =1{1 nesledovaná osoba} few{{count} nesledované osoby} other{{count} nesledovaných osob}}",
+  "@relationshipsSummaryNotEnrolled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "relationshipStatusActive": "Aktivní",
   "relationshipStatusArchived": "Archivované",
   "relationshipStatusDormant": "Spící",
   "relationshipStatusFieldLabel": "Stav",
-  "relationshipStayingInTouch": "Udržovat kontakt",
-  "@relationshipStayingInTouch": {
-    "description": "Relationships redesign label."
+  "relationshipStatusLineAdded": "Právě přidáno · {cadence}",
+  "@relationshipStatusLineAdded": {
+    "placeholders": {
+      "cadence": {
+        "type": "String"
+      }
+    }
   },
-  "relationshipStayInTouch": "Udržovat kontakt",
-  "@relationshipStayInTouch": {
-    "description": "Relationships redesign label."
+  "relationshipStatusLineAddedFirstDue": "Právě přidáno · {cadence} · poprvé do {day}",
+  "@relationshipStatusLineAddedFirstDue": {
+    "placeholders": {
+      "cadence": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipStatusLineContacted": "{type} · {time} · {cadence}",
+  "@relationshipStatusLineContacted": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "cadence": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipTasksLinkedCount": "{count, plural, =1{1 propojený} few{{count} propojené} other{{count} propojených}}",
+  "@relationshipTasksLinkedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "relationshipTimestampToday": "Dnes",
   "relationshipTimestampYesterday": "Včera",
@@ -4929,7 +5329,6 @@
   "settingsSyncConflictsSubtitle": "Vyřeš konflikty synchronizace",
   "settingsSyncNodeProfileCapabilitiesEmpty": "Žádné detekovány — automatické spuštění inference pro synchronizovaný zvuk nebude na toto zařízení směrováno.",
   "settingsSyncNodeProfileCapabilitiesLabel": "Detekované AI schopnosti",
-  "settingsSyncNodeProfileCapabilityMlxAudio": "MLX Audio (lokální)",
   "settingsSyncNodeProfileCapabilityOllamaLlm": "Ollama LLM",
   "settingsSyncNodeProfileCapabilityOmlxLlm": "oMLX LLM",
   "settingsSyncNodeProfileCapabilityVoxtral": "Voxtral (lokální)",
@@ -4944,6 +5343,8 @@
   "settingsSyncOutboxTitle": "Synchronizace odeslané pošty",
   "settingsSyncStatsSubtitle": "Prohlédněte si metriky synchronizačního procesu",
   "settingsSyncSubtitle": "Nastavte synchronizaci a zobrazte statistiky",
+  "settingsSystemHealthSubtitle": "Analyzovat nedávné logy a zkopírovat sdílitelnou zprávu",
+  "settingsSystemHealthTitle": "Stav systému",
   "settingsThemingAutomatic": "Automaticky",
   "settingsThemingDark": "Tmavé prostředí",
   "settingsThemingLight": "Světlé prostředí",
@@ -4956,6 +5357,51 @@
   "settingsV2UnimplementedTitle": "Panel zatím není k dispozici",
   "settingsWhatsNewSubtitle": "Podívej se na nejnovější aktualizace a funkce",
   "settingsWhatsNewTitle": "Co je nového",
+  "sherpaAllFamilies": "Všechny rodiny",
+  "sherpaCatalogMatches": "{count} z {total} modelů",
+  "sherpaDeleteModel": "Odebrat {model} z tohoto zařízení",
+  "@sherpaDeleteModel": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaDownloadAction": "Stáhnout",
+  "sherpaDownloadModel": "Stáhnout {model}",
+  "@sherpaDownloadModel": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaInstalledModelsTitle": "Nainstalované modely",
+  "sherpaInstallingModel": "Instalace modelu",
+  "sherpaLanguageCantonese": "Kantonština",
+  "sherpaModelCatalogTitle": "Katalog modelů",
+  "sherpaModelConfigurationError": "Model je stažený, ale jeho konfiguraci se nepodařilo uložit.",
+  "sherpaModelError": "Operace s modelem se nezdařila. Zkus to znovu.",
+  "sherpaModelFamily": "Rodina modelů",
+  "sherpaModelInstalled": "Staženo",
+  "sherpaModelNotInstalled": "Stáhni si model do tohoto zařízení",
+  "sherpaModelSizeGB": "{size} GB · Vícejazyčný",
+  "@sherpaModelSizeGB": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaModelSizeMB": "{size} MB · Vícejazyčný",
+  "@sherpaModelSizeMB": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaProviderDescription": "Přepisuj na tomto zařízení bez serveru. Stáhni model a pak ho vyber ve svém inferenčním profilu.",
   "sidebarActiveSectionTitle": "Aktivita",
   "sidebarActivityCollapseTooltip": "Sbalit aktivitu",
   "sidebarActivityExpandTooltip": "Rozbalit aktivitu",
@@ -4984,6 +5430,9 @@
   "speechModalSelectLanguage": "Vyberte jazyk",
   "speechModalTitle": "Rozpoznávání řeči",
   "speechNoAudioRecorded": "Nebyl nahrán žádný zvuk. Zkus to znovu.",
+  "speechSettingsAutoPrepareChatAudio": "Automaticky připravovat zvuk chatu",
+  "speechSettingsChatAudioDescription": "Připrav nové odpovědi chatu v tomto zařízení, aby přehrávání začalo dříve. Zvuk se přehraje až po klepnutí na přehrát.",
+  "speechSettingsChatAudioLabel": "Zvuk chatu",
   "speechSettingsModelDescription": "Hlasový model v zařízení",
   "speechSettingsModelDownloadsOnce": "Stáhne se jednou",
   "speechSettingsModelLabel": "Model",
@@ -5258,6 +5707,33 @@
   "syncWizardStepConnect": "Připojit",
   "syncWizardStepGetCode": "Získat kód",
   "syncWizardStepStatus": "Krok {step} ze 3: {label}",
+  "systemHealthAnalyzedWindow": "Analyzováno {start} → {end}",
+  "systemHealthChooseModelTitle": "Vybrat model",
+  "systemHealthCopiedToast": "Zpráva zkopírována. Známé vzory osobních údajů byly odstraněny.",
+  "systemHealthCopyButton": "Kopírovat zprávu",
+  "systemHealthCustomFromLabel": "Od",
+  "systemHealthCustomToLabel": "Do",
+  "systemHealthDescription": "Prohledá soubory logů v tomto zařízení a najde chyby, varování a pomalé dotazy, odstraní známé vzory osobních údajů a napíše krátkou zprávu, kterou můžeš vložit do programovacího asistenta.",
+  "systemHealthDomainsDescription": "Analyzují se domény, které jsou zde zapnuté – stejné nastavení určuje, co se loguje. Pomalé dotazy jsou zahrnuty, když je zapnuté jejich logování.",
+  "systemHealthDomainsTitle": "Domény logování",
+  "systemHealthFailedTitle": "Analýza selhala",
+  "systemHealthGeneratedAt": "Vytvořeno {time}",
+  "systemHealthHideDigest": "Skrýt přehled",
+  "systemHealthModelDescription": "Napíše zjištění z anonymizovaného přehledu. Navrhuje myslicí model tvého výchozího profilu.",
+  "systemHealthModelNone": "Jen přehled, bez modelu",
+  "systemHealthModelNoneDescription": "Nastav výchozí inferenční profil nebo přidej agentní textový model, abys získal zjištění.",
+  "systemHealthModelTitle": "Model",
+  "systemHealthPresetCustom": "Vlastní",
+  "systemHealthPresetLast14Days": "14 dní",
+  "systemHealthPresetLast24Hours": "24 h",
+  "systemHealthPresetLast7Days": "7 dní",
+  "systemHealthPreviousReportsDescription": "Každá zpráva zůstává v tomto zařízení. Klepni na některou a zobrazí se znovu.",
+  "systemHealthPreviousReportsTitle": "Předchozí zprávy",
+  "systemHealthRangeTitle": "Časové období",
+  "systemHealthReportTitle": "Zpráva",
+  "systemHealthRunButton": "Spustit analýzu",
+  "systemHealthSavedTo": "Uloženo do {path}",
+  "systemHealthShowDigest": "Zobrazit přehled",
   "taskActionBarAudioRecordingActive": "Probíhá nahrávání zvuku",
   "taskActionBarMoreActions": "Další akce",
   "taskActionBarOpenRunningTimer": "Otevřít aktivní časovač",

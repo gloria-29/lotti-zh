@@ -891,6 +891,11 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String agentSummaryAssignLabel(String label) {
+    return 'Atribuir etiqueta: «$label»';
+  }
+
+  @override
   String agentSummaryCheckItem(Object title) {
     return 'Marcar: \"$title\"';
   }
@@ -1494,12 +1499,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get aiCardTitle => 'Resumo de IA';
 
   @override
-  String get aiChatAssistantResponding => 'O assistente está respondendo';
-
-  @override
-  String get aiChatMessageCopied => 'Copiado para a área de transferência';
-
-  @override
   String get aiConfigFailedToLoadModelsGeneric =>
       'Falha ao carregar modelos. Por favor, tente novamente.';
 
@@ -1823,65 +1822,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get aiModelCardDeleteTooltip => 'Excluir modelo';
 
   @override
-  String get aiModelDownloadCloseButton => 'Fechar';
-
-  @override
-  String aiModelDownloadDialogDescription(String modelName) {
-    return 'Lotti fará o download de $modelName no cache de áudio MLX e o usará para processamento de fala local.';
-  }
-
-  @override
-  String aiModelDownloadDialogTitle(String modelName) {
-    return 'Instale $modelName';
-  }
-
-  @override
-  String get aiModelDownloadInstallTooltip => 'Instalar modelo';
-
-  @override
-  String get aiModelDownloadOpenProgressTooltip =>
-      'Mostrar progresso do download';
-
-  @override
-  String get aiModelDownloadStatusChecking => 'Verificando o status do modelo';
-
-  @override
-  String aiModelDownloadStatusDownloading(int percent) {
-    return 'Baixando $percent%';
-  }
-
-  @override
-  String get aiModelDownloadStatusDownloadingIndeterminate => 'Baixando';
-
-  @override
-  String get aiModelDownloadStatusFailed => 'Falha no download';
-
-  @override
-  String get aiModelDownloadStatusInstalled => 'Instalado';
-
-  @override
-  String get aiModelDownloadStatusNotInstalled => 'Não instalado';
-
-  @override
-  String get aiModelDownloadStatusUnsupported => 'Apple Silicon necessário';
-
-  @override
-  String get aiModelInstallChoiceCancelButton => 'Cancelar';
-
-  @override
-  String get aiModelInstallChoiceDescription =>
-      'Escolha o modelo local de fala para texto para fazer o download primeiro. Você pode instalar os outros posteriormente na lista de modelos.';
-
-  @override
-  String get aiModelInstallChoiceInstallButton => 'Instalar modelo';
-
-  @override
-  String get aiModelInstallChoiceRecommended => 'Recomendado';
-
-  @override
-  String get aiModelInstallChoiceTitle => 'Escolha o modelo de áudio MLX';
-
-  @override
   String get aiModelPickerByProviderLabel => 'Escolha um provedor';
 
   @override
@@ -2184,10 +2124,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get aiProviderDetailValueUnset => 'Não definido';
 
   @override
-  String get aiProviderEmbeddedRuntimeHint =>
-      'É executado integrado no processo do aplicativo Apple. Nenhum servidor local ou URL base é necessário.';
-
-  @override
   String get aiProviderGeminiName => 'Google Gêmeos';
 
   @override
@@ -2198,9 +2134,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get aiProviderMistralName => 'Mistral';
-
-  @override
-  String get aiProviderMlxAudioName => 'Áudio MLX (local)';
 
   @override
   String get aiProviderNebiusAiStudioName => 'Estúdio de IA Nebius';
@@ -2218,6 +2151,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get aiProviderOpenRouterName => 'OpenRouter';
 
   @override
+  String get aiProviderSherpaName => 'sherpa-onnx (no dispositivo)';
+
+  @override
   String get aiProviderTaglineAlibaba =>
       'Modelos Qwen · multimodal · contexto longo';
 
@@ -2230,10 +2166,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get aiProviderTaglineMelious =>
       'Hospedado na UE · catálogo dinâmico · roteamento ecológico';
-
-  @override
-  String get aiProviderTaglineMlxAudio =>
-      'Incorporado · Apple Silicon · áudio local';
 
   @override
   String get aiProviderTaglineOllama =>
@@ -2329,6 +2261,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get aiSettingsCounterProviders => 'Provedores';
 
   @override
+  String get aiSettingsDefaultProfileDescription =>
+      'Perfil alternativo para agentes sem um modelo configurado neste dispositivo.';
+
+  @override
   String get aiSettingsEmptyDescription =>
       'Adicione um para desbloquear transcrição, reconhecimento de imagem, geração de imagem e pesquisa semântica.';
 
@@ -2368,6 +2304,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get aiSettingsModalityVision => 'Visão';
+
+  @override
+  String get aiSettingsNoDefaultProfile => 'Sem perfil predefinido';
 
   @override
   String get aiSettingsNoModelsConfigured => 'Nenhum modelo de IA configurado';
@@ -2703,6 +2642,18 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get audioRecordingStop => 'Parar';
+
+  @override
+  String get avatarCropHint => 'Arrasta para mover · belisca para ampliar';
+
+  @override
+  String get avatarCropPreviewLabel => 'Assim vai ficar na lista';
+
+  @override
+  String get avatarCropTitle => 'Escolhe o rosto';
+
+  @override
+  String get avatarCropUse => 'Usar a foto';
 
   @override
   String backfillAdvancedRecoveryActions(int count) {
@@ -3144,17 +3095,90 @@ class AppLocalizationsPt extends AppLocalizations {
       'A gravação foi captada, mas a transcrição falhou. Tenta de novo.';
 
   @override
+  String get checkInAddMoreButton => 'Acrescentar';
+
+  @override
+  String checkInAudioSaved(String length) {
+    return '$length de áudio guardado';
+  }
+
+  @override
+  String get checkInAudioSavedAsYouGo =>
+      'O áudio fica guardado neste dispositivo à medida que gravas';
+
+  @override
+  String checkInAudioSavedRoute(String length, String route) {
+    return '$length de áudio guardado · $route';
+  }
+
+  @override
   String get checkInAvoidLabel => 'Melhor evitar';
 
   @override
-  String get checkInDateLabel => 'Quando?';
+  String checkInComposerSubtitle(String name, String day) {
+    return 'com $name · última conversa $day';
+  }
+
+  @override
+  String checkInComposerSubtitleNoContact(String name) {
+    return 'com $name · ainda sem check-in';
+  }
+
+  @override
+  String checkInComposerWithName(String name) {
+    return 'com $name';
+  }
+
+  @override
+  String checkInContextSummary(String type, String time, String duration) {
+    return '$type · $time · $duration';
+  }
 
   @override
   String get checkInDeleteConfirmMessage =>
       'Excluir este registro? Isso não pode ser desfeito.';
 
   @override
-  String get checkInDone => 'Pronto';
+  String get checkInDictateButton => 'Ditar';
+
+  @override
+  String get checkInDiscardDraftAudioKeptMessage =>
+      'Descartar este check-in? A gravação fica no diário.';
+
+  @override
+  String get checkInDiscardDraftMessage =>
+      'Descartar este check-in? Nada foi guardado.';
+
+  @override
+  String get checkInDiscardDraftRecordingMessage =>
+      'Descartar este check-in e a gravação? A gravação será eliminada.';
+
+  @override
+  String get checkInDiscardRecording => 'Descartar';
+
+  @override
+  String get checkInDiscardRecordingBody =>
+      'O áudio é apagado. O teu check-in continua aberto.';
+
+  @override
+  String get checkInDismissButton => 'Fechar';
+
+  @override
+  String get checkInDurationChip => 'Duração';
+
+  @override
+  String checkInDurationChipSemantics(String duration) {
+    return 'Duração: $duration. Alterar';
+  }
+
+  @override
+  String get checkInDurationQuickPickHint =>
+      'Toca numa duração para a guardar, ou roda a roda.';
+
+  @override
+  String checkInDurationSemanticsLabel(String label) {
+    return 'Definir a duração para $label';
+  }
 
   @override
   String get checkInEditTitle => 'Editar registro';
@@ -3166,12 +3190,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get checkInErrorDeleteFailed =>
       'Não foi possível excluir o registro. Tente novamente.';
-
-  @override
-  String get checkInHowDidItFeel => 'Como você se sentiu?';
-
-  @override
-  String get checkInHowDidYouConnect => 'Como foi o contato?';
 
   @override
   String get checkInInteractionCall => 'Ligação';
@@ -3192,13 +3210,113 @@ class AppLocalizationsPt extends AppLocalizations {
   String get checkInInteractionVideoCall => 'Videochamada';
 
   @override
-  String get checkInNarrativeLabel => 'Sobre o que vocês conversaram?';
+  String get checkInMicrophoneDeniedBody =>
+      'Ativa-o para a Lotti nas definições do sistema e depois toca em Ditar. Nada foi gravado.';
+
+  @override
+  String get checkInMicrophoneDeniedCalloutTitle =>
+      'Permite o acesso ao microfone';
+
+  @override
+  String get checkInMoreCaptionFeeling => 'Sensação';
+
+  @override
+  String get checkInMoreCaptionNextTime => 'da próxima vez';
+
+  @override
+  String get checkInMoreCaptionNextTimeSet => 'próxima vez anotada';
+
+  @override
+  String get checkInMoreCaptionTopics => 'temas';
+
+  @override
+  String checkInMoreCaptionTopicsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count temas',
+      one: '1 tema',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get checkInMoreSection => 'Mais';
+
+  @override
+  String get checkInNarrativeHint => 'Sobre o que falaram? Uma linha chega.';
+
+  @override
+  String get checkInNoDuration => 'Sem duração';
+
+  @override
+  String get checkInOpenSettingsButton => 'Abrir definições';
+
+  @override
+  String get checkInOrTypeHint => 'Ou escreve aqui…';
 
   @override
   String get checkInPayAttentionLabel => 'Na próxima vez, preste atenção em';
 
   @override
-  String get checkInPreparedOverline => '✦ LOTTI · PREPARADO ESTA MANHÃ';
+  String get checkInPreparingLabel => 'A preparar o áudio…';
+
+  @override
+  String get checkInRecorderBusyBody =>
+      'Para-a primeiro no indicador de gravação e tenta de novo. Nada de novo foi gravado.';
+
+  @override
+  String get checkInRecorderBusyTitle => 'Já há uma gravação a decorrer';
+
+  @override
+  String get checkInRecordingFailedBody =>
+      'Não foi possível iniciar o microfone. Tenta de novo ou escreve o check-in. Nada foi gravado.';
+
+  @override
+  String get checkInRecordingFailedTitle => 'A gravação não começou';
+
+  @override
+  String get checkInRecordingHint =>
+      'Fala normalmente. As palavras aparecem aqui quando parares.';
+
+  @override
+  String get checkInRecordingNotSavedBody =>
+      'A gravação não pôde ser guardada. Tenta de novo ou escreve o check-in.';
+
+  @override
+  String get checkInRecordingNotSavedTitle =>
+      'Não foi possível guardar a gravação';
+
+  @override
+  String get checkInReRecordButton => 'Gravar de novo';
+
+  @override
+  String get checkInReRecordReplaceMessage =>
+      'Substituir as tuas palavras editadas por uma nova gravação?';
+
+  @override
+  String get checkInSaveBlockedEmpty =>
+      'Acrescenta algumas palavras para guardar';
+
+  @override
+  String get checkInSaveBlockedRecording => 'Para a gravação para guardar';
+
+  @override
+  String get checkInSaveBlockedRetry => 'Escreve ou tenta de novo para guardar';
+
+  @override
+  String get checkInSaveBlockedTranscribing => 'À espera da transcrição';
+
+  @override
+  String get checkInSaveButton => 'Guardar check-in';
+
+  @override
+  String get checkInSaveShortButton => 'Guardar';
+
+  @override
+  String checkInSaveShortcutHint(String shortcut) {
+    return '$shortcut para guardar';
+  }
 
   @override
   String get checkInSentimentDelightful => 'Maravilhoso';
@@ -3216,10 +3334,77 @@ class AppLocalizationsPt extends AppLocalizations {
   String get checkInSentimentNeutral => 'Neutro';
 
   @override
+  String get checkInSentimentOptional =>
+      'Opcional. Nunca é preenchido pelo agente.';
+
+  @override
   String get checkInSentimentStrained => 'Tenso';
 
   @override
+  String get checkInSourceCall =>
+      'Da chamada que fizeste a partir desta página. Tudo é editável.';
+
+  @override
+  String get checkInSourceMessage =>
+      'Da mensagem que enviaste a partir desta página. Tudo é editável.';
+
+  @override
   String get checkInSpeakButton => 'Ditar o contato';
+
+  @override
+  String checkInSpokenMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count minutos',
+      one: '1 minuto',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String checkInSpokenSeconds(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count segundos',
+      one: '1 segundo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get checkInStartedLabel => 'Começou';
+
+  @override
+  String get checkInStatusMicrophoneDenied => 'Microfone indisponível';
+
+  @override
+  String get checkInStatusPaused => 'Em pausa';
+
+  @override
+  String get checkInStatusRecorderBusy => 'Gravador ocupado';
+
+  @override
+  String get checkInStatusRecording => 'A gravar';
+
+  @override
+  String get checkInStatusRecordingFailed => 'A gravação não começou';
+
+  @override
+  String get checkInStatusRecordingNotSaved => 'Gravação não guardada';
+
+  @override
+  String get checkInStatusTranscriptionUnavailable =>
+      'Sem modelo de transcrição';
+
+  @override
+  String get checkInStatusTranscriptMissing => 'Transcrição não recebida';
+
+  @override
+  String checkInTimeChipSemantics(String time) {
+    return 'Início: $time. Alterar';
+  }
 
   @override
   String get checkInTopicsHint =>
@@ -3229,18 +3414,50 @@ class AppLocalizationsPt extends AppLocalizations {
   String get checkInTopicsLabel => 'Assuntos';
 
   @override
+  String get checkInTranscribingEta => 'normalmente menos de um minuto';
+
+  @override
   String get checkInTranscribingLabel => 'Transcrevendo…';
 
   @override
-  String get checkInTranscriptFailed =>
-      'Nenhuma transcrição voltou. Você pode escrever você mesmo.';
+  String get checkInTranscriptAdded => 'Transcrição adicionada';
+
+  @override
+  String get checkInTranscriptionUnavailableTitle =>
+      'Sem modelo de transcrição configurado';
+
+  @override
+  String checkInTranscriptMissingBody(String length) {
+    return 'A tua gravação de $length fica guardada no diário, mesmo que descartes este check-in. Tenta de novo daqui a pouco.';
+  }
+
+  @override
+  String get checkInTranscriptMissingCalloutTitle =>
+      'Tenta de novo, ou escreve';
 
   @override
   String get checkInTranscriptUnavailable =>
-      'A transcrição não está configurada para esta pessoa. Adicione um modelo de áudio e ative a inferência automática na categoria dela, ou escreva o registro.';
+      'Escolha um perfil de inferência padrão com um modelo de transcrição nas configurações de IA, ou escreva seu registro de contato.';
 
   @override
-  String get checkInWriteInstead => 'Escrever antes';
+  String checkInTypeChipSemantics(String type) {
+    return 'Tipo: $type. Alterar';
+  }
+
+  @override
+  String get checkInTypeInstead => 'Escrever em vez disso';
+
+  @override
+  String checkInWordCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count palavras',
+      one: '1 palavra',
+      zero: '0 palavras',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get checklistAddItem => 'Adicionar um novo item';
@@ -3388,7 +3605,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get configFlagEnableAiSummaryTtsDescription =>
-      'Mostre o botão de conversão de texto em fala local nos resumos de IA de tarefas. Requer um modelo MLX Audio TTS instalado.';
+      'Mostre o botão de conversão de texto em fala local nos resumos de IA de tarefas. Requer um modelo Supertonic TTS instalado.';
 
   @override
   String get configFlagEnableDailyOs => 'Ativar DailyOS';
@@ -3455,6 +3672,13 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get configFlagEnableProjectsDescription =>
       'Mostre recursos de gerenciamento de projetos para organizar tarefas em projetos.';
+
+  @override
+  String get configFlagEnableQueryChat => 'Chat de tarefas experimental';
+
+  @override
+  String get configFlagEnableQueryChatDescription =>
+      'Mostra chats de tarefas, projetos e categorias. Desativado por padrão.';
 
   @override
   String get configFlagEnableRelationships => 'Ativar a página Pessoas';
@@ -5872,6 +6096,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get designSystemTextareaWithHelperLabel => 'Com texto auxiliar';
 
   @override
+  String get designSystemTieredTextTitle => 'Texto escalonado em três larguras';
+
+  @override
   String get designSystemTimePickerFormatsTitle => 'Formatos de hora';
 
   @override
@@ -7812,6 +8039,13 @@ class AppLocalizationsPt extends AppLocalizations {
       'Pode ser escolhido para novas entradas quando ativado';
 
   @override
+  String get inferenceProfileChat => 'Modelo de chat';
+
+  @override
+  String get inferenceProfileChatUsesThinking =>
+      'Se não definido, usa o modelo de raciocínio';
+
+  @override
   String get inferenceProfileChooseModelTitle => 'Escolha um modelo';
 
   @override
@@ -9551,17 +9785,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get navSidebarManualLabel => 'Manuais';
 
   @override
-  String navTabMoreSemanticsLabel(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'Mais, $count destinos adicionais',
-      one: 'Mais, 1 destino adicional',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get navTabTitleCalendar => 'DailyOS';
 
   @override
@@ -9580,7 +9803,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get navTabTitleJournal => 'Diário de bordo';
 
   @override
-  String get navTabTitleMore => 'Mais';
+  String get navTabTitleNavigate => 'Navegar';
 
   @override
   String get navTabTitlePeople => 'Pessoas';
@@ -10211,6 +10434,160 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get panasScaleVerySlightlyOrNotAtAll => 'Muito pouco ou nada';
+
+  @override
+  String get plazaBlockedReason => 'bloqueada — precisa de uma decisão';
+
+  @override
+  String get plazaCategoryEmpty => 'Esta categoria não tem projetos visíveis.';
+
+  @override
+  String get plazaClosedForNight => 'FECHADO DURANTE A NOITE';
+
+  @override
+  String get plazaCloseHint => 'Esc para fechar';
+
+  @override
+  String get plazaControls =>
+      'WASD caminhar · mantém Shift: velocidade ×8 · arrasta para olhar · Tab próximo sinal · H início · M visão geral · / procurar · T barra de ferramentas · Esc fecha · ⌘[ voltar';
+
+  @override
+  String plazaCornerAfter(String week) {
+    return 'Curva depois de $week';
+  }
+
+  @override
+  String get plazaDebug => 'Depuração';
+
+  @override
+  String get plazaDecisionStrip => 'PRECISA DE UMA DECISÃO';
+
+  @override
+  String plazaDoneCount(int done, int total) {
+    return '$done de $total concluídas';
+  }
+
+  @override
+  String plazaDueOn(String date) {
+    return 'prazo $date';
+  }
+
+  @override
+  String plazaDueSoonReason(String date) {
+    return 'prazo $date — termina-a';
+  }
+
+  @override
+  String get plazaEmpty =>
+      'Adiciona uma tarefa para começar a construir a praça deste projeto.';
+
+  @override
+  String get plazaEnterProject => 'Entrar no projeto';
+
+  @override
+  String get plazaExploreCategory => 'Explorar categoria';
+
+  @override
+  String get plazaExploreProject => 'Explorar projeto';
+
+  @override
+  String get plazaFlyThere => 'Voar até lá ›';
+
+  @override
+  String plazaInProgressCount(int count) {
+    return 'Em curso: $count';
+  }
+
+  @override
+  String plazaLinks(int count) {
+    return 'ligações $count';
+  }
+
+  @override
+  String get plazaMeerkats => 'Suricatas';
+
+  @override
+  String get plazaMorningWalk => 'Passeio matinal';
+
+  @override
+  String plazaNeedsAttention(int count) {
+    return 'Precisam de atenção: $count';
+  }
+
+  @override
+  String get plazaOpeningSoon => 'ABERTURA EM BREVE';
+
+  @override
+  String get plazaOpenLate => 'ABERTO ATÉ TARDE';
+
+  @override
+  String plazaOverdueSince(String date) {
+    return 'em atraso desde $date — termina ou adia';
+  }
+
+  @override
+  String get plazaOverview => 'Visão geral';
+
+  @override
+  String get plazaPaused => 'Em pausa';
+
+  @override
+  String plazaProjectOverdue(int count) {
+    return 'Tarefas em atraso: $count';
+  }
+
+  @override
+  String get plazaSearchHint => 'Procura tarefas, Enter para voar';
+
+  @override
+  String get plazaShowPenguins => 'Pinguins';
+
+  @override
+  String get plazaSkyDay => 'Dia';
+
+  @override
+  String get plazaSkyNight => 'Noite';
+
+  @override
+  String plazaStaleReason(int days) {
+    return 'sem atividade há $days dias — retoma-a';
+  }
+
+  @override
+  String plazaStats(int tasks, int weeks, int attention) {
+    return '$tasks tarefas · $weeks semanas · $attention precisam de atenção';
+  }
+
+  @override
+  String plazaTaskCount(int count) {
+    return 'Tarefas: $count';
+  }
+
+  @override
+  String get plazaTitle => 'Praça';
+
+  @override
+  String get plazaToggleToolbar => 'Mostrar / ocultar a barra de ferramentas';
+
+  @override
+  String get plazaToLet => 'PARA ALUGAR';
+
+  @override
+  String get plazaTourControls => 'Espaço: pausa · move-te para sair';
+
+  @override
+  String get plazaUnavailable =>
+      'Este dispositivo não consegue mostrar o mundo 3D.';
+
+  @override
+  String plazaWeek(int week, String date) {
+    return 'S$week · $date';
+  }
+
+  @override
+  String plazaWeekShort(int week) {
+    return 'S$week';
+  }
 
   @override
   String get privateLabel => 'Privado';
@@ -10863,6 +11240,419 @@ class AppLocalizationsPt extends AppLocalizations {
   String get provisionedSyncTitle => 'Dispositivos';
 
   @override
+  String get queryActionsAccept => 'Aceitar';
+
+  @override
+  String get queryActionsDismiss => 'Descartar';
+
+  @override
+  String get queryActionsIncomplete =>
+      'Não foi possível aplicar algumas alterações. As alterações já aplicadas não serão repetidas quando tentares novamente.';
+
+  @override
+  String get queryActionsReview => 'Alterações propostas';
+
+  @override
+  String queryActionsTarget(String target) {
+    return 'Para: $target';
+  }
+
+  @override
+  String get queryAllSources => 'Todos';
+
+  @override
+  String get queryArchiveChat => 'Arquivar chat';
+
+  @override
+  String get queryArchiveConfirmation =>
+      'Conversa arquivada. As conclusões continuam disponíveis.';
+
+  @override
+  String get queryArchivedChats => 'Chats arquivados';
+
+  @override
+  String get queryArchivedReadOnly =>
+      'Este chat está arquivado. Restaura-o para continuar a conversa.';
+
+  @override
+  String get queryAsk => 'Perguntar';
+
+  @override
+  String get queryAskCategory => 'Perguntar sobre esta categoria';
+
+  @override
+  String get queryAskProject => 'Perguntar sobre este projeto';
+
+  @override
+  String get queryAskTask => 'Perguntar sobre esta tarefa';
+
+  @override
+  String get queryAudioFailed =>
+      'Não foi possível preparar ou reproduzir o áudio. Tenta novamente.';
+
+  @override
+  String queryAudioListen(String start, String end) {
+    return 'Ouvir · $start–$end';
+  }
+
+  @override
+  String get queryAudioMissingFile =>
+      'A gravação ainda não está disponível neste dispositivo.';
+
+  @override
+  String get queryAudioNoMatch =>
+      'Não foi possível associar esta citação de forma inequívoca à gravação. Ainda podes abrir a entrada completa.';
+
+  @override
+  String get queryAudioOpenRecording => 'Abrir gravação';
+
+  @override
+  String queryAudioPlaying(String start, String end) {
+    return 'A reproduzir $start–$end';
+  }
+
+  @override
+  String get queryAudioPrepare => 'Preparar trecho de áudio';
+
+  @override
+  String get queryAudioPreparing => 'Preparando áudio…';
+
+  @override
+  String get queryAudioReadAloud => 'Ler resposta em voz alta';
+
+  @override
+  String get queryAudioReading => 'A ler a resposta em voz alta';
+
+  @override
+  String get queryAudioRetry => 'Tentar áudio novamente';
+
+  @override
+  String get queryAudioSetupDetails => 'Detalhes de configuração';
+
+  @override
+  String get queryAudioSetupRequired =>
+      'Os excertos de áudio precisam de um modelo de transcrição compatível.';
+
+  @override
+  String get queryAudioStale =>
+      'A gravação mudou. Prepare as marcas de tempo novamente.';
+
+  @override
+  String get queryAudioStop => 'Parar áudio';
+
+  @override
+  String get queryAudioTimingUnavailable =>
+      'Para preparares excertos, seleciona Melious Whisper ou um modelo de transcrição Mistral Voxtral compatível no perfil de inferência deste agente. O URL do fornecedor tem de usar HTTPS.';
+
+  @override
+  String get queryAudioTooLarge =>
+      'Podes preparar marcas temporais para gravações até 25 MB. Escolhe uma gravação mais pequena.';
+
+  @override
+  String get queryAudioUploadNotice =>
+      'A preparação das marcas de tempo envia esta gravação ao provedor de transcrição configurado para este agente.';
+
+  @override
+  String get queryCategoryAgent => 'Agente de categoria';
+
+  @override
+  String get queryChat => 'Conversar';
+
+  @override
+  String get queryChats => 'Chats';
+
+  @override
+  String queryChecked(int count) {
+    return 'Fontes verificadas: $count';
+  }
+
+  @override
+  String get queryCloseChat => 'Fechar chat';
+
+  @override
+  String get queryCollapseChat => 'Recolher chat';
+
+  @override
+  String get queryCopied => 'Copiado';
+
+  @override
+  String get queryCopyQuote => 'Copiar citação';
+
+  @override
+  String get queryCoverage => 'O que foi pesquisado';
+
+  @override
+  String get queryCoverageCategory => 'Esta categoria';
+
+  @override
+  String get queryCoverageExcluded =>
+      'As outras categorias não foram pesquisadas.';
+
+  @override
+  String get queryCoverageUnreadable =>
+      'Não havia texto pesquisável quando esta resposta foi escrita. Abre a gravação para a consultar.';
+
+  @override
+  String get queryCoverageWider => 'Outras entradas desta categoria';
+
+  @override
+  String get queryDeleteChat => 'Eliminar chat';
+
+  @override
+  String get queryDeleteExplanation =>
+      'Eliminar esta conversa? Escolhe o que acontece às conclusões partilhadas. As entradas de origem mantêm-se.';
+
+  @override
+  String get queryDeleteForget => 'Eliminar e esquecer as conclusões';
+
+  @override
+  String get queryDeleteKeep => 'Eliminar e manter as conclusões';
+
+  @override
+  String get queryDictated =>
+      'Podes editar a transcrição antes de enviares a pergunta. O áudio pode já ter sido enviado ao teu fornecedor de transcrição.';
+
+  @override
+  String get queryDraftProvisional => 'Rascunho · ainda não verificado';
+
+  @override
+  String get queryDraftRetracted =>
+      'Não foi possível verificar o rascunho da resposta. Tenta novamente.';
+
+  @override
+  String get queryEarlierTextOmitted => '[Texto anterior não apresentado]';
+
+  @override
+  String get queryEmptyBody =>
+      'Pergunta sobre decisões e trabalhos anteriores. As respostas distinguem resumos de trechos exatos.';
+
+  @override
+  String get queryExactStoredText => 'Texto exato guardado';
+
+  @override
+  String get queryExactText => 'Mostrar texto exato';
+
+  @override
+  String get queryExampleDecision => 'O que acordámos?';
+
+  @override
+  String get queryExampleMeeting => 'Em que reunião discutimos isto?';
+
+  @override
+  String get queryExampleSuggestion => 'Foi uma decisão ou uma sugestão?';
+
+  @override
+  String get queryExpandChat => 'Expandir chat';
+
+  @override
+  String get queryExpanding => 'A verificar outras entradas desta categoria…';
+
+  @override
+  String get queryFailed => 'A pesquisa não terminou. Tenta novamente.';
+
+  @override
+  String get queryForgetConclusions => 'Esquecer conclusões';
+
+  @override
+  String get queryHideExactText => 'Ocultar texto exato';
+
+  @override
+  String get queryHideSurrounding => 'Ocultar contexto';
+
+  @override
+  String get queryHomeOnly => 'Só âmbito de origem';
+
+  @override
+  String get queryHomeScope => 'Âmbito de origem';
+
+  @override
+  String get queryIncomplete =>
+      'A pesquisa está incompleta. A falta de provas não significa que a conversa nunca aconteceu.';
+
+  @override
+  String get queryIncompleteShort =>
+      'Não foi possível verificar algumas fontes.';
+
+  @override
+  String get queryInferenceUnavailable =>
+      'Não há configuração de IA utilizável. Configura o modelo do agente ou o perfil predefinido da categoria e tenta novamente.';
+
+  @override
+  String get queryKeepConclusions => 'Manter conclusões';
+
+  @override
+  String get queryLaterTextOmitted => '[Texto posterior não apresentado]';
+
+  @override
+  String get queryMachineTranscript =>
+      'Transcrição automática: texto guardado exato, não verificado com o áudio.';
+
+  @override
+  String queryMemoryCount(int count) {
+    return 'Conclusões disponíveis de chats anteriores: $count';
+  }
+
+  @override
+  String queryMissingTranscripts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count gravações não tinham texto pesquisável quando esta resposta foi escrita.',
+      one:
+          '1 gravação não tinha texto pesquisável quando esta resposta foi escrita.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get queryNewChat => 'Novo chat';
+
+  @override
+  String get queryNoAgent =>
+      'Este âmbito precisa do teu agente habitual. Volta aos detalhes para o atribuir.';
+
+  @override
+  String get queryNotes => 'Notas';
+
+  @override
+  String get queryOpenCurrentEntry => 'Abrir a entrada atual';
+
+  @override
+  String get queryOpenEntry => 'Abrir entrada';
+
+  @override
+  String get queryOriginalsHome =>
+      'Consulta apenas esta tarefa e suas entradas diretamente vinculadas.';
+
+  @override
+  String get queryOtherProject => 'Fora do âmbito de origem';
+
+  @override
+  String get queryPreparingAnswer => 'A preparar uma resposta…';
+
+  @override
+  String queryReachCategory(String category) {
+    return 'Pesquisa neste âmbito e em $category.';
+  }
+
+  @override
+  String queryReachCategoryOnly(String category) {
+    return 'Pesquisa em $category.';
+  }
+
+  @override
+  String get queryReachHome =>
+      'Pesquisa apenas neste âmbito e nas entradas associadas.';
+
+  @override
+  String get queryReachUncategorized =>
+      'Pesquisa apenas nesta tarefa e nas suas entradas sem categoria diretamente ligadas.';
+
+  @override
+  String get queryRecall => 'Esta resposta utilizou conclusões guardadas.';
+
+  @override
+  String get queryRecordings => 'Gravações';
+
+  @override
+  String get queryRecordingTranscript => 'Transcrição da gravação';
+
+  @override
+  String get queryRenameChat => 'Renomear chat';
+
+  @override
+  String get queryRestoreChat => 'Restaurar chat';
+
+  @override
+  String querySavedConclusion(String date) {
+    return 'Conclusão guardada em $date';
+  }
+
+  @override
+  String get querySavedQuote =>
+      'Esta citação guardada reflete a fonte no momento da resposta.';
+
+  @override
+  String querySavedVersion(String version) {
+    return 'Versão guardada: $version';
+  }
+
+  @override
+  String get querySavedVersionUnavailable => 'Data da versão indisponível';
+
+  @override
+  String get querySearching => 'A consultar as informações disponíveis…';
+
+  @override
+  String get querySearchScope => 'Escopo da pesquisa e filtros';
+
+  @override
+  String querySourceAction(String action, String source) {
+    return '$action: $source';
+  }
+
+  @override
+  String get querySourceChanged => 'A fonte foi alterada';
+
+  @override
+  String get querySourceDeleted => 'Fonte eliminada';
+
+  @override
+  String get querySourceMoved => 'Fonte movida para outra categoria';
+
+  @override
+  String get querySummaryBased => 'Baseada em resumos';
+
+  @override
+  String get querySummaryCoverage =>
+      'Esta resposta usa resumos de tarefas ou projetos. As entradas originais não foram consultadas.';
+
+  @override
+  String get querySummaryCurrent =>
+      'Abre uma tarefa ou um projeto para consultar o resumo atual. Pode ter mudado desde esta resposta.';
+
+  @override
+  String get querySummaryIncomplete =>
+      'Faltam informações nos resumos disponíveis.';
+
+  @override
+  String get querySummaryOwners => 'Sobre esta resposta';
+
+  @override
+  String get querySurroundingLimit =>
+      'Este é o excerto guardado, que pode não incluir toda a conversa.';
+
+  @override
+  String get querySurroundingText => 'Mostrar contexto';
+
+  @override
+  String get queryTranscribing =>
+      'A transcrever a tua gravação. O teu fornecedor pode já ter recebido o áudio.';
+
+  @override
+  String get queryUnavailable =>
+      'Este âmbito já não está disponível com as tuas definições de visibilidade atuais.';
+
+  @override
+  String get queryUnread => 'Nova resposta';
+
+  @override
+  String queryWelcomeCategory(String agentName) {
+    return 'Pergunta a $agentName sobre esta categoria';
+  }
+
+  @override
+  String queryWelcomeProject(String agentName) {
+    return 'Pergunta a $agentName sobre este projeto';
+  }
+
+  @override
+  String queryWelcomeTask(String agentName) {
+    return 'Pergunta a $agentName sobre esta tarefa';
+  }
+
+  @override
   String get queueCatchUpNowButton => 'Acompanhe agora';
 
   @override
@@ -11037,11 +11827,148 @@ class AppLocalizationsPt extends AppLocalizations {
   String get relationshipAddChannelButton => 'Adicionar meio de contato';
 
   @override
-  String get relationshipAsk => 'Perguntar';
+  String get relationshipAddChannelFromContacts => 'ou dos contactos';
+
+  @override
+  String relationshipAgentAsOfBand(String age, String band) {
+    return '$band · atualizado $age';
+  }
+
+  @override
+  String get relationshipAgentBriefNow => 'Criar briefing agora';
+
+  @override
+  String relationshipAgentCall(String name) {
+    return 'Ligar a $name';
+  }
+
+  @override
+  String get relationshipAgentFailedBody =>
+      'O fornecedor devolveu um erro antes de o briefing ser escrito. Os teus check-ins estão inalterados.';
+
+  @override
+  String get relationshipAgentFailedNoModel =>
+      'Não há nenhum modelo configurado para briefings. Escolhe um em Definições de IA › Agentes. Os detalhes estão no separador Atividade.';
+
+  @override
+  String get relationshipAgentFailedPlain => 'Última execução falhou';
+
+  @override
+  String relationshipAgentLastRunFailed(String time) {
+    return 'Última execução falhou · $time';
+  }
+
+  @override
+  String get relationshipAgentMarkImportant => 'Marcar como importante';
+
+  @override
+  String get relationshipAgentNoAgent => 'Sem agente para esta pessoa';
+
+  @override
+  String relationshipAgentNoBriefingBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Ainda sem briefing. „Criar briefing agora“ escreve um a partir dos teus $count check-ins; nunca vê o telefone nem o e-mail.',
+      one:
+          'Ainda sem briefing. „Criar briefing agora“ escreve um a partir do teu check-in; nunca vê o telefone nem o e-mail.',
+      zero:
+          'Ainda sem briefing. „Criar briefing agora“ escreve um assim que registares um check-in; nunca vê o telefone nem o e-mail.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String relationshipAgentNotEnrolledBody(String name) {
+    return 'Marca $name como importante para ter um chat, lembretes quando já passou algum tempo e um briefing.';
+  }
+
+  @override
+  String get relationshipAgentOnlyYourStartsUseAi =>
+      'Só o que tu próprio inicias usa IA';
+
+  @override
+  String relationshipAgentOutOfDateNewCheckIn(String day) {
+    return 'Desatualizado · novo check-in $day';
+  }
+
+  @override
+  String get relationshipAgentOutOfDateNewCheckInShort =>
+      'Desatualizado · novo check-in';
+
+  @override
+  String get relationshipAgentPausedBody =>
+      'Os briefings ficam em pausa enquanto esta pessoa estiver inativa ou arquivada.';
+
+  @override
+  String relationshipAgentProposedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count propostas',
+      one: '1 proposta',
+      zero: '0 propostas',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String relationshipAgentReadingBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'A ler $count check-ins. Costuma demorar menos de um minuto.',
+      one: 'A ler 1 check-in. Costuma demorar menos de um minuto.',
+      zero: 'A preparar o briefing. Costuma demorar menos de um minuto.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get relationshipAgentSeeActivity => 'Ver atividade';
+
+  @override
+  String relationshipAgentSources(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count check-ins',
+      one: '1 check-in',
+      zero: '0 check-ins',
+    );
+    return 'Fontes: $_temp0 · os canais de contacto nunca são enviados';
+  }
+
+  @override
+  String get relationshipAgentTryAgain => 'Tentar de novo';
+
+  @override
+  String get relationshipAgentWatching => 'Agente atento';
+
+  @override
+  String relationshipAgentWatchingNextLook(String day) {
+    return 'Agente atento · próxima verificação $day';
+  }
+
+  @override
+  String get relationshipAgentWriting => 'A escrever o briefing…';
 
   @override
   String relationshipBannerSemanticLabel(String personName) {
     return 'Banner de relacionamento com $personName';
+  }
+
+  @override
+  String relationshipBriefingAge(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days dias',
+      one: '1 dia',
+      zero: 'de hoje',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -11058,10 +11985,6 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get relationshipBriefingEmpty =>
-      'Ainda sem briefing — Atualiza-me prepara um a partir dos teus check-ins.';
-
-  @override
   String get relationshipBriefingRequested =>
       'Briefing pedido — vai aparecer aqui em breve.';
 
@@ -11071,12 +11994,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get relationshipBriefingTitle => 'Briefing';
-
-  @override
-  String get relationshipBriefMeAgain => 'Atualiza-me de novo';
-
-  @override
-  String get relationshipBriefMeButton => 'Atualiza-me';
 
   @override
   String relationshipCadenceEveryNDays(int days) {
@@ -11109,10 +12026,22 @@ class AppLocalizationsPt extends AppLocalizations {
   String get relationshipCadenceOnTrack => 'em dia';
 
   @override
+  String get relationshipCadencePromptLabel => 'Lembra-me a cada';
+
+  @override
   String get relationshipCadenceQuarterly => 'Trimestral';
 
   @override
   String get relationshipCadenceWeekly => 'Semanal';
+
+  @override
+  String get relationshipChatAgentSubtitle =>
+      'Conhece os teus contactos, não os canais';
+
+  @override
+  String relationshipChatAgentTitle(String name) {
+    return '$name · agente de resumos';
+  }
 
   @override
   String get relationshipChatTooltip => 'Conversar sobre esta pessoa';
@@ -11120,11 +12049,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get relationshipChatUnavailable =>
       'Ainda sem agente — marca primeiro esta pessoa como importante.';
-
-  @override
-  String relationshipCheckedInLabel(String date) {
-    return 'Registro $date';
-  }
 
   @override
   String get relationshipCheckInReminderBody =>
@@ -11137,11 +12061,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get relationshipCheckInsLabel => 'Registros';
-
-  @override
-  String relationshipCheckInTitle(String name) {
-    return 'Registrar · $name';
-  }
 
   @override
   String get relationshipContactCardAction => 'Cartão de contato';
@@ -11167,6 +12086,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get relationshipCreateTitle => 'Adicionar pessoa';
 
   @override
+  String relationshipDaysOver(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dias de atraso',
+      one: '1 dia de atraso',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get relationshipDeleteConfirmMessage =>
       'Todos os registros dessa pessoa também serão excluídos. Isso não pode ser desfeito.';
 
@@ -11178,6 +12108,35 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String relationshipDueDay(String day) {
     return 'Até $day';
+  }
+
+  @override
+  String relationshipDueSince(String day, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dias de atraso',
+      one: '1 dia de atraso',
+    );
+    return 'Pendente desde $day · $_temp0';
+  }
+
+  @override
+  String get relationshipDueToday => 'Pendente hoje';
+
+  @override
+  String relationshipDurationHours(int hours) {
+    return '$hours h';
+  }
+
+  @override
+  String relationshipDurationHoursMinutes(int hours, String minutes) {
+    return '$hours h $minutes';
+  }
+
+  @override
+  String relationshipDurationMinutes(int count) {
+    return '$count min';
   }
 
   @override
@@ -11198,6 +12157,21 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get relationshipErrorUpdateFailed =>
       'Não foi possível salvar as alterações. Tente novamente.';
+
+  @override
+  String get relationshipFormImportantBody =>
+      'Ativa um resumo, lembretes e uma conversa. As notas dos contactos vão para o agente; os canais nunca.';
+
+  @override
+  String relationshipFormImportantBodyNamed(String name) {
+    return 'Ativa um resumo, lembretes e uma conversa para $name. As notas dos contactos vão para o agente; os canais nunca.';
+  }
+
+  @override
+  String get relationshipFormReachTitle => 'Como falar com eles';
+
+  @override
+  String get relationshipFormWhoTitle => 'Quem';
 
   @override
   String get relationshipHealthNeedsAttention => 'Precisa de atenção';
@@ -11252,6 +12226,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get relationshipImportGrantButton => 'Permitir acesso';
 
   @override
+  String get relationshipImportImportantBody =>
+      'Resumos, lembretes e uma conversa. Sem isto, nada corre sozinho.';
+
+  @override
   String get relationshipImportNoMatches =>
       'Nenhum contacto corresponde à tua pesquisa';
 
@@ -11277,6 +12255,19 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String relationshipImportReviewSubtitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count pessoas selecionadas · os dados de contacto ficam neste dispositivo',
+      one:
+          '1 pessoa selecionada · os dados de contacto ficam neste dispositivo',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get relationshipImportReviewTitle => 'Antes de as adicionares';
 
   @override
@@ -11297,8 +12288,8 @@ class AppLocalizationsPt extends AppLocalizations {
   String get relationshipJustAdded => 'Recém-adicionado';
 
   @override
-  String relationshipLastCheckInLabel(String date) {
-    return 'Último registro $date';
+  String relationshipLastSpoke(String time) {
+    return 'última conversa $time';
   }
 
   @override
@@ -11314,12 +12305,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get relationshipLogCheckIn => 'Registrar contato';
 
   @override
-  String get relationshipLottisRead => 'Leitura do Lotti';
-
-  @override
-  String relationshipLottisReadAsOf(String time) {
-    return 'às $time';
-  }
+  String get relationshipMoreActions => 'Mais ações';
 
   @override
   String get relationshipNameLabel => 'Nome';
@@ -11328,9 +12314,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get relationshipNameRequired => 'O nome é obrigatório';
 
   @override
-  String relationshipNextByDay(String day) {
-    return 'próximo até $day';
+  String relationshipNextDueOn(String day) {
+    return 'Próximo prazo $day';
   }
+
+  @override
+  String get relationshipNextTimeTitle => 'Da próxima vez';
 
   @override
   String get relationshipNicknameLabel => 'Apelido';
@@ -11343,14 +12332,60 @@ class AppLocalizationsPt extends AppLocalizations {
   String get relationshipNoLinkedTasks => 'Nenhuma tarefa vinculada ainda.';
 
   @override
+  String get relationshipNotEnrolled => 'Sem acompanhamento';
+
+  @override
   String get relationshipNotFound => 'Esta pessoa não está mais na sua lista.';
 
   @override
-  String get relationshipNudgesOn => 'lembretes ativos';
+  String relationshipOnTrackCadence(String cadence) {
+    return 'Em dia · $cadence';
+  }
 
   @override
-  String get relationshipPostCallBody =>
-      'Acabaste de entrar em contacto. Queres registar um check-in enquanto está fresco?';
+  String get relationshipPayAttentionTo => 'Prestar atenção a';
+
+  @override
+  String get relationshipPhotoAddBanner => 'Adicionar banner';
+
+  @override
+  String get relationshipPhotoAdjustCrop => 'Ajustar o recorte';
+
+  @override
+  String get relationshipPhotoBanner => 'Banner';
+
+  @override
+  String get relationshipPhotoCardTitle => 'Foto';
+
+  @override
+  String get relationshipPhotoChange => 'Alterar';
+
+  @override
+  String get relationshipPhotoChoose => 'Escolher da biblioteca';
+
+  @override
+  String get relationshipPhotoDragToReposition => 'Arrasta para reposicionar';
+
+  @override
+  String get relationshipPhotoFace => 'Rosto';
+
+  @override
+  String get relationshipPhotoPrivacy =>
+      'Só nos teus dispositivos · o agente nunca a vê';
+
+  @override
+  String get relationshipPhotoRemove => 'Remover a foto';
+
+  @override
+  String get relationshipPhotoRemoveAction => 'Remover';
+
+  @override
+  String get relationshipPhotoSaveFailed => 'Não foi possível guardar a foto';
+
+  @override
+  String relationshipPhotoSheetTitle(String name) {
+    return 'Foto de $name';
+  }
 
   @override
   String get relationshipPostCallConfirm => 'Registar check-in';
@@ -11359,33 +12394,105 @@ class AppLocalizationsPt extends AppLocalizations {
   String get relationshipPostCallDismiss => 'Agora não';
 
   @override
-  String relationshipPostCallTitle(String name) {
-    return 'Como foi com $name?';
+  String relationshipPostCallMeta(String time, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'cerca de $minutes min',
+      one: 'cerca de 1 min',
+      zero: 'menos de um minuto',
+    );
+    return 'começou às $time · $_temp0';
   }
 
   @override
-  String relationshipQuietForDays(int count) {
+  String relationshipPostCallOfferCall(String name, int minutes) {
     String _temp0 = intl.Intl.pluralLogic(
-      count,
+      minutes,
       locale: localeName,
-      other: 'há $count dias',
-      one: 'há 1 dia',
+      other: '$minutes minutos',
+      one: '1 minuto',
+      zero: 'menos de um minuto',
     );
-    return 'Sem contato $_temp0';
+    return 'Ligaste a $name há $_temp0 — registamos enquanto está fresco?';
   }
+
+  @override
+  String relationshipPostCallOfferMessage(String name, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minutos',
+      one: '1 minuto',
+      zero: 'menos de um minuto',
+    );
+    return 'Escreveste a $name há $_temp0 — registamos enquanto está fresco?';
+  }
+
+  @override
+  String relationshipProposalAdded(String title) {
+    return 'Adicionada → $title';
+  }
+
+  @override
+  String relationshipProposalEvidence(String date) {
+    return 'Do check-in de $date';
+  }
+
+  @override
+  String get relationshipProposalUndoFailed =>
+      'Não foi possível desfazer. A tarefa pode ter sido alterada.';
+
+  @override
+  String get relationshipReachPrivacy =>
+      'Fica neste dispositivo · nunca partilhado com a IA';
+
+  @override
+  String get relationshipReachTitle => 'Contactar';
 
   @override
   String get relationshipRelinkContact => 'Associar outro contacto';
-
-  @override
-  String get relationshipSeeAllCheckIns => 'Ver todos os registros';
 
   @override
   String get relationshipsEmptyState =>
       'Adicione as pessoas de quem você quer ficar perto.';
 
   @override
+  String get relationshipsGroupDue => 'Pendentes';
+
+  @override
   String get relationshipsPageTitle => 'Pessoas';
+
+  @override
+  String get relationshipsSelectPersonHint =>
+      'Escolhe uma pessoa para ver a página dela.';
+
+  @override
+  String get relationshipsSummaryDueNow => 'Pendentes agora';
+
+  @override
+  String relationshipsSummaryEnrolled(int count) {
+    return '/ $count em acompanhamento';
+  }
+
+  @override
+  String relationshipsSummaryNextDue(String name, String day) {
+    return 'A seguir: $name · $day';
+  }
+
+  @override
+  String get relationshipsSummaryNoneDue => 'Ninguém pendente';
+
+  @override
+  String relationshipsSummaryNotEnrolled(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pessoas sem acompanhamento',
+      one: '1 pessoa sem acompanhamento',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get relationshipStatusActive => 'Ativo';
@@ -11400,10 +12507,34 @@ class AppLocalizationsPt extends AppLocalizations {
   String get relationshipStatusFieldLabel => 'Status';
 
   @override
-  String get relationshipStayingInTouch => 'Manter contato';
+  String relationshipStatusLineAdded(String cadence) {
+    return 'Adicionado agora · $cadence';
+  }
 
   @override
-  String get relationshipStayInTouch => 'Manter contato';
+  String relationshipStatusLineAddedFirstDue(String cadence, String day) {
+    return 'Adicionado agora · $cadence · primeiro prazo $day';
+  }
+
+  @override
+  String relationshipStatusLineContacted(
+    String type,
+    String time,
+    String cadence,
+  ) {
+    return '$type · $time · $cadence';
+  }
+
+  @override
+  String relationshipTasksLinkedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ligadas',
+      one: '1 ligada',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get relationshipTimestampToday => 'Hoje';
@@ -12684,9 +13815,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'Capacidades de IA detectadas';
 
   @override
-  String get settingsSyncNodeProfileCapabilityMlxAudio => 'Áudio MLX (local)';
-
-  @override
   String get settingsSyncNodeProfileCapabilityOllamaLlm => 'Ollama LLM';
 
   @override
@@ -12736,6 +13864,13 @@ class AppLocalizationsPt extends AppLocalizations {
       'Configurar sincronização e visualizar estatísticas';
 
   @override
+  String get settingsSystemHealthSubtitle =>
+      'Analise os registros recentes e copie um relatório compartilhável';
+
+  @override
+  String get settingsSystemHealthTitle => 'Estado do sistema';
+
+  @override
   String get settingsThemingAutomatic => 'Automático';
 
   @override
@@ -12775,6 +13910,71 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get settingsWhatsNewTitle => 'Novidades';
+
+  @override
+  String get sherpaAllFamilies => 'Todas as famílias';
+
+  @override
+  String sherpaCatalogMatches(int count, int total) {
+    return '$count de $total modelos';
+  }
+
+  @override
+  String sherpaDeleteModel(String model) {
+    return 'Remover $model deste dispositivo';
+  }
+
+  @override
+  String get sherpaDownloadAction => 'Baixar';
+
+  @override
+  String sherpaDownloadModel(String model) {
+    return 'Baixar $model';
+  }
+
+  @override
+  String get sherpaInstalledModelsTitle => 'Modelos instalados';
+
+  @override
+  String get sherpaInstallingModel => 'Instalando modelo';
+
+  @override
+  String get sherpaLanguageCantonese => 'Cantonês';
+
+  @override
+  String get sherpaModelCatalogTitle => 'Catálogo de modelos';
+
+  @override
+  String get sherpaModelConfigurationError =>
+      'O modelo foi descarregado, mas não foi possível guardar a sua configuração.';
+
+  @override
+  String get sherpaModelError =>
+      'A operação do modelo falhou. Tenta novamente.';
+
+  @override
+  String get sherpaModelFamily => 'Família de modelos';
+
+  @override
+  String get sherpaModelInstalled => 'Descarregado';
+
+  @override
+  String get sherpaModelNotInstalled =>
+      'Transfere um modelo para este dispositivo';
+
+  @override
+  String sherpaModelSizeGB(String size) {
+    return '$size GB · Multilíngue';
+  }
+
+  @override
+  String sherpaModelSizeMB(String size) {
+    return '$size MB · Multilíngue';
+  }
+
+  @override
+  String get sherpaProviderDescription =>
+      'Transcreva neste dispositivo sem servidor. Baixe um modelo e selecione-o no seu perfil de inferência.';
 
   @override
   String get sidebarActiveSectionTitle => 'Atividade';
@@ -12880,6 +14080,17 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get speechNoAudioRecorded => 'No audio was recorded. Try again.';
+
+  @override
+  String get speechSettingsAutoPrepareChatAudio =>
+      'Preparar o áudio do chat automaticamente';
+
+  @override
+  String get speechSettingsChatAudioDescription =>
+      'Prepara as novas respostas do chat neste dispositivo para que a reprodução comece mais cedo. O áudio só é reproduzido quando tocas em reproduzir.';
+
+  @override
+  String get speechSettingsChatAudioLabel => 'Áudio do chat';
 
   @override
   String get speechSettingsModelDescription => 'Modelo de fala no dispositivo';
@@ -13584,6 +14795,99 @@ class AppLocalizationsPt extends AppLocalizations {
   String syncWizardStepStatus(int step, String label) {
     return 'Passo $step de 3: $label';
   }
+
+  @override
+  String systemHealthAnalyzedWindow(String start, String end) {
+    return 'Analisado $start → $end';
+  }
+
+  @override
+  String get systemHealthChooseModelTitle => 'Escolher modelo';
+
+  @override
+  String get systemHealthCopiedToast =>
+      'Relatório copiado. Padrões conhecidos de dados pessoais foram removidos.';
+
+  @override
+  String get systemHealthCopyButton => 'Copiar relatório';
+
+  @override
+  String get systemHealthCustomFromLabel => 'De';
+
+  @override
+  String get systemHealthCustomToLabel => 'Até';
+
+  @override
+  String get systemHealthDescription =>
+      'Examina os arquivos de registro deste dispositivo em busca de erros, avisos e consultas lentas, remove padrões conhecidos de dados pessoais e escreve um relatório curto que você pode colar em um assistente de programação.';
+
+  @override
+  String get systemHealthDomainsDescription =>
+      'Os domínios ativados aqui são os analisados, a mesma configuração que decide o que é registrado. As consultas lentas são incluídas quando o registro delas está ativado.';
+
+  @override
+  String get systemHealthDomainsTitle => 'Domínios de registro';
+
+  @override
+  String get systemHealthFailedTitle => 'A análise falhou';
+
+  @override
+  String systemHealthGeneratedAt(String time) {
+    return 'Gerado $time';
+  }
+
+  @override
+  String get systemHealthHideDigest => 'Ocultar resumo';
+
+  @override
+  String get systemHealthModelDescription =>
+      'Escreve as conclusões a partir do resumo anonimizado. Propõe o modelo de raciocínio do seu perfil padrão.';
+
+  @override
+  String get systemHealthModelNone => 'Apenas resumo, sem modelo';
+
+  @override
+  String get systemHealthModelNoneDescription =>
+      'Defina um perfil de inferência padrão ou adicione um modelo de texto agêntico para obter conclusões.';
+
+  @override
+  String get systemHealthModelTitle => 'Modelo';
+
+  @override
+  String get systemHealthPresetCustom => 'Personalizado';
+
+  @override
+  String get systemHealthPresetLast14Days => '14 dias';
+
+  @override
+  String get systemHealthPresetLast24Hours => '24 h';
+
+  @override
+  String get systemHealthPresetLast7Days => '7 dias';
+
+  @override
+  String get systemHealthPreviousReportsDescription =>
+      'Cada relatório fica guardado neste dispositivo. Toque em um para mostrá-lo de novo.';
+
+  @override
+  String get systemHealthPreviousReportsTitle => 'Relatórios anteriores';
+
+  @override
+  String get systemHealthRangeTitle => 'Período';
+
+  @override
+  String get systemHealthReportTitle => 'Relatório';
+
+  @override
+  String get systemHealthRunButton => 'Executar análise';
+
+  @override
+  String systemHealthSavedTo(String path) {
+    return 'Salvo em $path';
+  }
+
+  @override
+  String get systemHealthShowDigest => 'Mostrar resumo';
 
   @override
   String get taskActionBarAudioRecordingActive =>

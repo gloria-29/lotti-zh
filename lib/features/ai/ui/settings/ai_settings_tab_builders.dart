@@ -20,10 +20,24 @@ extension _AiSettingsTabBuilders on _AiSettingsPageState {
     }
 
     AiProviderCard buildCard(AiConfigInferenceProvider provider) {
-      final modelCount = modelsByProvider[provider.id] ?? 0;
+      final isEmbedded =
+          provider.inferenceProviderType == InferenceProviderType.sherpa;
+      final installed = isEmbedded
+          ? ref.watch(sherpaInstalledModelIdsProvider).value ?? <String>{}
+          : const <String>{};
+      final modelCount = isEmbedded
+          ? models
+                .where(
+                  (model) =>
+                      model.inferenceProviderId == provider.id &&
+                      installed.contains(model.providerModelId),
+                )
+                .length
+          : modelsByProvider[provider.id] ?? 0;
       final status = AiProviderCard.statusFor(
         provider: provider,
         modelCount: modelCount,
+        installedEmbeddedModelCount: isEmbedded ? modelCount : 0,
       );
       return AiProviderCard(
         provider: provider,
@@ -75,24 +89,11 @@ extension _AiSettingsTabBuilders on _AiSettingsPageState {
           // null and let the card render neutral chrome instead of
           // misbranding a model as Gemini.
           final providerType = providerTypeById[model.inferenceProviderId];
-          return Consumer(
-            builder: (context, ref, _) {
-              final progress = providerType == InferenceProviderType.mlxAudio
-                  ? ref.watch(
-                      mlxAudioModelProgressProvider(model.providerModelId),
-                    )
-                  : null;
-              return AiModelCard(
-                model: model,
-                providerType: providerType,
-                onTap: () => _handleConfigTap(model),
-                menuActions: _buildCardMenu(model),
-                modelDownloadProgress: progress,
-                onInstallModel: providerType == InferenceProviderType.mlxAudio
-                    ? () => _handleInstallMlxAudioModel(model)
-                    : null,
-              );
-            },
+          return AiModelCard(
+            model: model,
+            providerType: providerType,
+            onTap: () => _handleConfigTap(model),
+            menuActions: _buildCardMenu(model),
           );
         },
       ),
@@ -211,8 +212,8 @@ extension _AiSettingsTabBuilders on _AiSettingsPageState {
 
   /// Best-guess provider type for a profile card. The profile schema
   /// doesn't carry a provider id — it just references model rows. Walk
-  /// the five skill slots in priority order
-  /// (thinking → thinking-high-end → image recognition → transcription
+  /// the model slots in priority order
+  /// (thinking → chat → thinking-high-end → image recognition → transcription
   /// → image generation) and pick the first model whose owning provider
   /// we can resolve. Returns null when none of the slots resolve — the
   /// card paints neutral chrome in that case rather than impersonating
@@ -224,6 +225,7 @@ extension _AiSettingsTabBuilders on _AiSettingsPageState {
   ) {
     final candidates = <String?>[
       profile.thinkingModelId,
+      profile.chatModelId,
       profile.thinkingHighEndModelId,
       profile.imageRecognitionModelId,
       profile.transcriptionModelId,

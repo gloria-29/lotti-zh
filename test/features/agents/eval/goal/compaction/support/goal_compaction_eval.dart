@@ -19,13 +19,19 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
+import 'package:lotti/features/agents/model/agent_domain_entity.dart';
+import 'package:lotti/features/agents/sync/agent_sync_service.dart';
 import 'package:lotti/features/ai/conversation/conversation_manager.dart';
 import 'package:lotti/features/ai/conversation/conversation_repository.dart';
 import 'package:lotti/features/ai/model/ai_config.dart';
 import 'package:lotti/features/ai/model/inference_usage.dart';
 import 'package:lotti/features/ai/repository/inference_repository_interface.dart';
+import 'package:lotti/features/ai/util/forced_tool_choice.dart';
 import 'package:lotti/features/goals/logic/goal_checkin_compaction_strategy.dart';
 import 'package:lotti/features/goals/workflow/goal_agent_contract.dart';
+import 'package:lotti/features/goals/workflow/goal_agent_strategy.dart';
+import 'package:lotti/features/goals/workflow/goal_agent_workflow.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:openai_dart/openai_dart.dart';
 
 import '../../../../../../../tool/goal_compaction_eval_report.dart';
@@ -218,6 +224,9 @@ class GoalCompactionCaseResult {
     this.wakeUsage,
     this.probeUsage,
     this.errorMessage,
+    this.reportedStatus,
+    this.forcedReportRetry = false,
+    this.forcedReportError,
   });
 
   final GoalCompactionFixture fixture;
@@ -234,17 +243,18 @@ class GoalCompactionCaseResult {
   final InferenceUsage? probeUsage;
   final String? errorMessage;
 
-  /// The status the wake reported, from the last `update_goal_report`.
-  String? get reportedStatus {
-    for (final call in toolCalls.reversed) {
-      if (call.name == GoalAgentToolNames.updateGoalReport &&
-          call.exchangeIndex == 0) {
-        final status = call.jsonObjectArguments?['status'];
-        if (status is String) return status;
-      }
-    }
-    return null;
-  }
+  /// The status of the last wake report `GoalAgentStrategy` accepted.
+  ///
+  /// Accepted, not merely called: production rejects a report with a
+  /// mismatched status, a status token in prose, a missing aggregate or an
+  /// incomplete structure, and such a report never persists.
+  final String? reportedStatus;
+
+  /// Whether this wake needed production's pinned forced-report retry.
+  final bool forcedReportRetry;
+
+  /// Why that retry produced nothing, when it failed outright.
+  final String? forcedReportError;
 
   String? get reportOneLiner {
     for (final call in toolCalls.reversed) {
@@ -291,6 +301,8 @@ class GoalCompactionCaseResult {
     'wake': {
       'expectedStatus': fixture.truth.expectedStatus.name,
       'reportedStatus': reportedStatus,
+      'forcedReportRetry': forcedReportRetry,
+      'forcedReportError': ?forcedReportError,
       'statusCorrect': reportedStatus == fixture.truth.expectedStatus.name,
       'oneLiner': reportOneLiner,
       'reply': wakeReply,
@@ -538,7 +550,14 @@ class GoalCompactionEvalRunner {
         for (var sample = 1; sample <= samples; sample++) {
           log?.call('${fixture.id} × ${strategy.id} × s$sample');
           cases.add(
-            await _runCase(fixture, strategy.id, sample, facts, context),
+            await _runCase(
+              fixture,
+              strategy.id,
+              sample,
+              facts,
+              context,
+              derivation: derivation,
+            ),
           );
         }
       }
@@ -562,8 +581,10 @@ class GoalCompactionEvalRunner {
     String strategyId,
     int sample,
     String facts,
-    GoalUserVoiceContext context,
-  ) async {
+    GoalUserVoiceContext context, {
+    required GoalCompactionDerivation derivation,
+  }) async {
+    final statusTransitioned = derivation.facts.statusTransitioned;
     final stopwatch = Stopwatch()..start();
     final strategy = GoalAgentEvalStrategy();
     final conversationId = conversationRepository.createConversation(
@@ -589,7 +610,11 @@ class GoalCompactionEvalRunner {
           ),
     ];
 
-    Future<InferenceUsage?> exchange(int index, String message) {
+    Future<InferenceUsage?> exchange(
+      int index,
+      String message, {
+      bool forceReport = false,
+    }) {
       strategy.beginExchange(index);
       return conversationRepository.sendMessage(
         conversationId: conversationId,
@@ -597,7 +622,19 @@ class GoalCompactionEvalRunner {
         model: modelId,
         provider: provider,
         inferenceRepo: inferenceRepository,
-        tools: tools,
+        tools: forceReport
+            ? [
+                for (final tool in tools)
+                  if (tool.function.name == GoalAgentToolNames.updateGoalReport)
+                    tool,
+              ]
+            : tools,
+        toolChoice: forceReport
+            ? forcedToolChoiceFor(
+                modelId: modelId,
+                toolName: GoalAgentToolNames.updateGoalReport,
+              )
+            : null,
         temperature: temperature,
         strategy: strategy,
         consumptionAgentId: 'goal_agent:compaction-eval',
@@ -610,8 +647,37 @@ class GoalCompactionEvalRunner {
 
     InferenceUsage? wakeUsage;
     InferenceUsage? probeUsage;
+    var forcedReportRetry = false;
+    String? forcedReportError;
     try {
       wakeUsage = await exchange(0, facts);
+      // Production's pinned retry: a status-transition wake whose response
+      // carried no report gets one forced update_goal_report call (named tool
+      // choice, report tool only). Scoring the first response alone failed
+      // wakes the app would have recovered. Like production, a failed retry
+      // leaves the partial wake standing.
+      if (statusTransitioned &&
+          await acceptedGoalReportStatus(strategy.toolCalls, derivation) ==
+              null) {
+        forcedReportRetry = true;
+        try {
+          final retryUsage = await exchange(
+            0,
+            goalStatusTransitionReportInstruction,
+            forceReport: true,
+          );
+          if (retryUsage != null) {
+            wakeUsage = wakeUsage == null
+                ? retryUsage
+                : wakeUsage.merge(retryUsage);
+          }
+        } on Object catch (error) {
+          // Best-effort, exactly as `GoalAgentWorkflow._forceReport` — but
+          // recorded, so a retry that never reached the model is not read as
+          // a model that declined to report.
+          forcedReportError = error.toString();
+        }
+      }
       probeUsage = await exchange(
         1,
         goalCompactionProbeMessage(fixture.truth.probes),
@@ -623,7 +689,14 @@ class GoalCompactionEvalRunner {
             if (call.jsonObjectArguments?['message'] case final String m) m,
       ].join('\n');
       final content = assistantText(manager);
+      final reportedStatus = await acceptedGoalReportStatus(
+        strategy.toolCalls,
+        derivation,
+      );
       return GoalCompactionCaseResult(
+        reportedStatus: reportedStatus,
+        forcedReportRetry: forcedReportRetry,
+        forcedReportError: forcedReportError,
         fixture: fixture,
         strategyId: strategyId,
         modelId: modelId,
@@ -655,6 +728,12 @@ class GoalCompactionEvalRunner {
         wakeUsage: wakeUsage,
         probeUsage: probeUsage,
         errorMessage: error.toString(),
+        reportedStatus: await acceptedGoalReportStatus(
+          strategy.toolCalls,
+          derivation,
+        ),
+        forcedReportRetry: forcedReportRetry,
+        forcedReportError: forcedReportError,
       );
     } finally {
       conversationRepository.deleteConversation(conversationId);
@@ -670,3 +749,60 @@ List<GoalCheckInCompactionStrategy> goalCompactionEvalArms(
   const TruncatingCheckInCompaction(),
   HierarchicalCheckInCompaction(digestWriter: digestWriter),
 ];
+
+/// The status of the last wake (exchange 0) `update_goal_report` that the
+/// production [GoalAgentStrategy] accepts, or null when none is accepted.
+///
+/// Replays the recorded calls through the real strategy, configured the way
+/// `GoalAgentWorkflow` configures it for these facts, so both the forced
+/// retry decision and the status score follow what production would persist
+/// rather than what the model merely attempted.
+Future<String?> acceptedGoalReportStatus(
+  List<GoalAgentEvalToolCall> toolCalls,
+  GoalCompactionDerivation derivation,
+) async {
+  final strategy = GoalAgentStrategy(
+    syncService: _DiscardingAgentSyncService(),
+    agentId: 'goal_agent:compaction-eval',
+    threadId: 'compaction-eval',
+    runKey: 'compaction-eval',
+    knownAdIds: const {},
+    expectedStatus: derivation.facts.trackStatus,
+    expectedRollingAggregates: goalRollingAggregateStrings(
+      derivation.version.criteria,
+      derivation.facts.evaluation.results,
+    ),
+  );
+  final manager = ConversationManager();
+  String? accepted;
+  for (final (index, call) in toolCalls.indexed) {
+    if (call.exchangeIndex != 0 ||
+        call.name != GoalAgentToolNames.updateGoalReport) {
+      continue;
+    }
+    await strategy.processToolCalls(
+      toolCalls: [
+        ChatCompletionMessageToolCall(
+          id: 'replay-$index',
+          type: ChatCompletionMessageToolCallType.function,
+          function: ChatCompletionMessageFunctionCall(
+            name: call.name,
+            arguments: call.argumentsJson,
+          ),
+        ),
+      ],
+      manager: manager,
+    );
+    accepted = strategy.reportStatus?.name ?? accepted;
+  }
+  return accepted;
+}
+
+/// The replay persists nothing: agent messages go nowhere.
+class _DiscardingAgentSyncService extends Fake implements AgentSyncService {
+  @override
+  Future<void> upsertEntity(
+    AgentDomainEntity entity, {
+    bool fromSync = false,
+  }) async {}
+}

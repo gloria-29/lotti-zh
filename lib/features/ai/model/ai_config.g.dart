@@ -53,7 +53,6 @@ const _$InferenceProviderTypeEnumMap = {
   InferenceProviderType.genericOpenAi: 'genericOpenAi',
   InferenceProviderType.melious: 'melious',
   InferenceProviderType.mistral: 'mistral',
-  InferenceProviderType.mlxAudio: 'mlxAudio',
   InferenceProviderType.nebiusAiStudio: 'nebiusAiStudio',
   InferenceProviderType.omlx: 'omlx',
   InferenceProviderType.openAi: 'openAi',
@@ -61,6 +60,7 @@ const _$InferenceProviderTypeEnumMap = {
   InferenceProviderType.ollama: 'ollama',
   InferenceProviderType.voxtral: 'voxtral',
   InferenceProviderType.whisper: 'whisper',
+  InferenceProviderType.sherpa: 'sherpa',
 };
 
 AiConfigModel _$AiConfigModelFromJson(Map<String, dynamic> json) =>
@@ -222,6 +222,7 @@ AiConfigInferenceProfile _$AiConfigInferenceProfileFromJson(
   name: json['name'] as String,
   createdAt: DateTime.parse(json['createdAt'] as String),
   thinkingModelId: json['thinkingModelId'] as String,
+  chatModelId: json['chatModelId'] as String?,
   thinkingHighEndModelId: json['thinkingHighEndModelId'] as String?,
   imageRecognitionModelId: json['imageRecognitionModelId'] as String?,
   transcriptionModelId: json['transcriptionModelId'] as String?,
@@ -252,6 +253,7 @@ Map<String, dynamic> _$AiConfigInferenceProfileToJson(
   'name': instance.name,
   'createdAt': instance.createdAt.toIso8601String(),
   'thinkingModelId': instance.thinkingModelId,
+  'chatModelId': instance.chatModelId,
   'thinkingHighEndModelId': instance.thinkingHighEndModelId,
   'imageRecognitionModelId': instance.imageRecognitionModelId,
   'transcriptionModelId': instance.transcriptionModelId,

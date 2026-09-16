@@ -27,6 +27,7 @@ class _FakeMeliousInferenceRepository extends MeliousInferenceRepository {
           String model,
           String baseUrl,
           ReasoningEffort? reasoningEffort,
+          bool preferStreaming,
         })
       >[];
   final imageCalls =
@@ -45,12 +46,14 @@ class _FakeMeliousInferenceRepository extends MeliousInferenceRepository {
     ChatCompletionToolChoiceOption? toolChoice,
     ReasoningEffort? reasoningEffort,
     InferenceImpactCollector? impactCollector,
+    bool preferStreaming = false,
   }) {
     textCalls.add((
       prompt: prompt,
       model: model,
       baseUrl: baseUrl,
       reasoningEffort: reasoningEffort,
+      preferStreaming: preferStreaming,
     ));
     return Stream.value(_chunk('melious text'));
   }
@@ -223,6 +226,41 @@ void main() {
     mistralOcrRepo.close();
   });
 
+  test(
+    'sherpa rejects text and image input without invoking an HTTP client',
+    () {
+      final provider = providerOfType(InferenceProviderType.sherpa);
+      expect(
+        () => generate.generate(
+          prompt,
+          model: 'tiny',
+          temperature: null,
+          baseUrl: baseUrl,
+          apiKey: apiKey,
+          provider: provider,
+          overrideClient: client,
+        ),
+        throwsUnsupportedError,
+      );
+      expect(
+        () => generate.generateWithImages(
+          prompt,
+          model: 'tiny',
+          temperature: null,
+          baseUrl: baseUrl,
+          apiKey: apiKey,
+          images: ['image'],
+          provider: provider,
+          overrideClient: client,
+        ),
+        throwsUnsupportedError,
+      );
+      verifyNever(
+        () => client.createChatCompletionStream(request: any(named: 'request')),
+      );
+    },
+  );
+
   group('generate', () {
     test(
       'OpenAI-compatible path builds a user request and filters pings into a '
@@ -334,11 +372,13 @@ void main() {
             systemMessage: 'be brief',
             maxCompletionTokens: 512,
             reasoningEffort: ReasoningEffort.high,
+            preferStreaming: true,
           )
           .toList();
 
       expect(chunks.single.choices?.single.delta?.content, 'melious text');
       expect(fakeMeliousRepo.textCalls, hasLength(1));
+      expect(fakeMeliousRepo.textCalls.single.preferStreaming, isTrue);
       expect(fakeMeliousRepo.textCalls.single.prompt, prompt);
       expect(fakeMeliousRepo.textCalls.single.model, 'qwen/qwen3-vl-plus');
       expect(

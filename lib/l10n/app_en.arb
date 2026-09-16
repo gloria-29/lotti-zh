@@ -464,6 +464,15 @@
       "title": {}
     }
   },
+  "agentSummaryAssignLabel": "Assign label: \"{label}\"",
+  "@agentSummaryAssignLabel": {
+    "description": "Review sentence for assigning a visible label to a task.",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
   "agentSummaryCheckItem": "Check: \"{title}\"",
   "@agentSummaryCheckItem": {
     "placeholders": {
@@ -996,8 +1005,6 @@
   "aiCardReadMore": "Read more",
   "aiCardShowLess": "Show less",
   "aiCardTitle": "AI summary",
-  "aiChatAssistantResponding": "Assistant is responding",
-  "aiChatMessageCopied": "Copied to clipboard",
   "aiConfigFailedToLoadModelsGeneric": "Failed to load models. Please try again.",
   "aiConfigNoModelsAvailable": "No AI models are configured yet. Please add one in settings.",
   "aiConfigNoSuitableModelsAvailable": "No models meet the requirements for this prompt. Please configure models that support the required capabilities.",
@@ -1214,44 +1221,6 @@
   "aiInferenceErrorUnknownTitle": "Error",
   "aiInternalsTitle": "Agent internals",
   "aiModelCardDeleteTooltip": "Delete model",
-  "aiModelDownloadCloseButton": "Close",
-  "aiModelDownloadDialogDescription": "Lotti will download {modelName} into the MLX Audio cache and use it for local speech processing.",
-  "@aiModelDownloadDialogDescription": {
-    "placeholders": {
-      "modelName": {
-        "type": "String"
-      }
-    }
-  },
-  "aiModelDownloadDialogTitle": "Install {modelName}",
-  "@aiModelDownloadDialogTitle": {
-    "placeholders": {
-      "modelName": {
-        "type": "String"
-      }
-    }
-  },
-  "aiModelDownloadInstallTooltip": "Install model",
-  "aiModelDownloadOpenProgressTooltip": "Show download progress",
-  "aiModelDownloadStatusChecking": "Checking model status",
-  "aiModelDownloadStatusDownloading": "Downloading {percent}%",
-  "@aiModelDownloadStatusDownloading": {
-    "placeholders": {
-      "percent": {
-        "type": "int"
-      }
-    }
-  },
-  "aiModelDownloadStatusDownloadingIndeterminate": "Downloading",
-  "aiModelDownloadStatusFailed": "Download failed",
-  "aiModelDownloadStatusInstalled": "Installed",
-  "aiModelDownloadStatusNotInstalled": "Not installed",
-  "aiModelDownloadStatusUnsupported": "Apple Silicon required",
-  "aiModelInstallChoiceCancelButton": "Cancel",
-  "aiModelInstallChoiceDescription": "Pick the local speech-to-text model to download first. You can install the others later from the model list.",
-  "aiModelInstallChoiceInstallButton": "Install model",
-  "aiModelInstallChoiceRecommended": "Recommended",
-  "aiModelInstallChoiceTitle": "Choose MLX Audio model",
   "aiModelPickerByProviderLabel": "Choose a provider",
   "aiModelPickerCurrentDefaultLabel": "Current default",
   "aiModelPickerProviderModelCount": "{count, plural, =1{1 model} other{{count} models}}",
@@ -1434,22 +1403,20 @@
   "aiProviderDetailRemoveDescription": "Deletes the provider and every model that depends on it. This cannot be undone.",
   "aiProviderDetailRemoveTitle": "Remove this provider",
   "aiProviderDetailValueUnset": "Not set",
-  "aiProviderEmbeddedRuntimeHint": "Runs embedded in the Apple app process. No local server or Base URL is required.",
   "aiProviderGeminiName": "Google Gemini",
   "aiProviderGenericOpenAiName": "OpenAI Compatible",
   "aiProviderMeliousName": "Melious.ai",
   "aiProviderMistralName": "Mistral",
-  "aiProviderMlxAudioName": "MLX Audio (local)",
   "aiProviderNebiusAiStudioName": "Nebius AI Studio",
   "aiProviderOllamaName": "Ollama",
   "aiProviderOmlxName": "oMLX (local)",
   "aiProviderOpenAiName": "OpenAI",
   "aiProviderOpenRouterName": "OpenRouter",
+  "aiProviderSherpaName": "sherpa-onnx (on device)",
   "aiProviderTaglineAlibaba": "Qwen models · multimodal · long context",
   "aiProviderTaglineAnthropic": "Claude family · long context",
   "aiProviderTaglineGemini": "Multimodal · audio transcription",
   "aiProviderTaglineMelious": "EU-hosted · dynamic catalog · eco routing",
-  "aiProviderTaglineMlxAudio": "Embedded · Apple Silicon · local audio",
   "aiProviderTaglineOllama": "Runs locally · no cloud calls",
   "aiProviderTaglineOmlx": "Local MLX inference · OpenAI-compatible",
   "aiProviderTaglineOpenAi": "GPT family · vision + reasoning",
@@ -1478,6 +1445,7 @@
   "aiSettingsCounterModels": "Models",
   "aiSettingsCounterProfiles": "Profiles",
   "aiSettingsCounterProviders": "Providers",
+  "aiSettingsDefaultProfileDescription": "Fallback for agents without a configured inference route on this device.",
   "aiSettingsEmptyDescription": "Add one to unlock transcription, image recognition, image generation, and semantic search.",
   "aiSettingsEmptyTitle": "No providers yet",
   "aiSettingsFilterByCapabilityTooltip": "Filter by {capability} capability",
@@ -1503,6 +1471,7 @@
   "aiSettingsModalityAudio": "Audio",
   "aiSettingsModalityText": "Text",
   "aiSettingsModalityVision": "Vision",
+  "aiSettingsNoDefaultProfile": "No default profile",
   "aiSettingsNoModelsConfigured": "No AI models configured",
   "aiSettingsNoProvidersConfigured": "No AI providers configured",
   "aiSettingsPageLead": "Configure AI providers, the models Lotti can call, and the inference profiles that decide which model handles which task.",
@@ -1726,6 +1695,10 @@
   "audioRecordingResume": "Resume",
   "audioRecordings": "Audio Recordings",
   "audioRecordingStop": "Stop",
+  "avatarCropHint": "Drag to move · pinch to zoom",
+  "avatarCropPreviewLabel": "How it will look on the list",
+  "avatarCropTitle": "Choose the face",
+  "avatarCropUse": "Use photo",
   "backfillAdvancedRecoveryActions": "{count, plural, =1{1 action} other{{count} actions}}",
   "@backfillAdvancedRecoveryActions": {
     "placeholders": {
@@ -1904,60 +1877,266 @@
   "chatInputStopRealtime": "Stop live transcription",
   "chatInputStopTranscribe": "Stop and transcribe",
   "chatInputTranscriptionFailed": "The recording was captured, but transcribing it failed. Please try again.",
+  "checkInAddMoreButton": "Add more",
+  "checkInAudioSaved": "{length} of audio saved",
+  "@checkInAudioSaved": {
+    "placeholders": {
+      "length": {
+        "type": "String"
+      }
+    }
+  },
+  "checkInAudioSavedAsYouGo": "Audio saved to this device as you go",
+  "checkInAudioSavedRoute": "{length} of audio saved · {route}",
+  "@checkInAudioSavedRoute": {
+    "placeholders": {
+      "length": {
+        "type": "String"
+      },
+      "route": {
+        "type": "String"
+      }
+    }
+  },
   "checkInAvoidLabel": "Better to avoid",
-  "checkInDateLabel": "When?",
+  "checkInComposerSubtitle": "with {name} · last spoke {day}",
+  "@checkInComposerSubtitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "checkInComposerSubtitleNoContact": "with {name} · no check-in yet",
+  "@checkInComposerSubtitleNoContact": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "checkInComposerWithName": "with {name}",
+  "@checkInComposerWithName": {
+    "description": "The composer header's status line when only the person fits: the name is never shed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "checkInContextSummary": "{type} · {time} · {duration}",
+  "@checkInContextSummary": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
   "checkInDeleteConfirmMessage": "Delete this check-in? This cannot be undone.",
-  "checkInDone": "Done",
-  "@checkInDone": {
-    "description": "Relationships redesign label."
+  "checkInDictateButton": "Dictate",
+  "checkInDiscardDraftAudioKeptMessage": "Discard this check-in? The recording stays in the journal.",
+  "@checkInDiscardDraftAudioKeptMessage": {
+    "description": "The discard confirmation while a saved recording exists: the check-in goes, the audio stays in the journal."
+  },
+  "checkInDiscardDraftMessage": "Discard this check-in? Nothing has been saved.",
+  "checkInDiscardDraftRecordingMessage": "Discard this check-in and the recording? The recording will be deleted.",
+  "checkInDiscardRecording": "Discard",
+  "checkInDiscardRecordingBody": "The audio is deleted. Your check-in stays open.",
+  "@checkInDiscardRecordingBody": {
+    "description": "Body of the confirmation before discarding a check-in recording: the audio is deleted, the composer stays open."
+  },
+  "checkInDismissButton": "Dismiss",
+  "checkInDurationChip": "Duration",
+  "checkInDurationChipSemantics": "Duration: {duration}. Change",
+  "@checkInDurationChipSemantics": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "checkInDurationQuickPickHint": "Tap a length to save it, or spin the wheel.",
+  "checkInDurationSemanticsLabel": "Set duration to {label}",
+  "@checkInDurationSemanticsLabel": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
   },
   "checkInEditTitle": "Edit check-in",
   "checkInErrorCreateFailed": "Could not save the check-in. Please try again.",
   "checkInErrorDeleteFailed": "Could not delete the check-in. Please try again.",
-  "checkInHowDidItFeel": "How did it feel?",
-  "@checkInHowDidItFeel": {
-    "description": "Relationships redesign label."
-  },
-  "checkInHowDidYouConnect": "How did you connect?",
-  "@checkInHowDidYouConnect": {
-    "description": "Relationships redesign label."
-  },
   "checkInInteractionCall": "Call",
   "checkInInteractionInPerson": "In person",
   "checkInInteractionLabel": "How did you connect?",
   "checkInInteractionMessage": "Message",
   "checkInInteractionOther": "Other",
   "checkInInteractionVideoCall": "Video call",
-  "checkInNarrativeLabel": "What did you talk about?",
+  "checkInMicrophoneDeniedBody": "Turn it on for Lotti in system settings, then tap Dictate. Nothing was recorded.",
+  "checkInMicrophoneDeniedCalloutTitle": "Allow microphone access",
+  "@checkInMicrophoneDeniedCalloutTitle": {
+    "description": "The refused-microphone card's title: the next step, since the header status already says the microphone is unavailable."
+  },
+  "checkInMoreCaptionFeeling": "Feeling",
+  "@checkInMoreCaptionFeeling": {
+    "description": "Folded More row caption segment while no feeling is chosen."
+  },
+  "checkInMoreCaptionNextTime": "next time",
+  "@checkInMoreCaptionNextTime": {
+    "description": "Folded More row caption segment while nothing is noted for next time."
+  },
+  "checkInMoreCaptionNextTimeSet": "next time noted",
+  "@checkInMoreCaptionNextTimeSet": {
+    "description": "Folded More row caption segment once something is noted for next time."
+  },
+  "checkInMoreCaptionTopics": "topics",
+  "@checkInMoreCaptionTopics": {
+    "description": "Folded More row caption segment while no topics are entered."
+  },
+  "checkInMoreCaptionTopicsCount": "{count, plural, =1{1 topic} other{{count} topics}}",
+  "@checkInMoreCaptionTopicsCount": {
+    "description": "Folded More row caption segment: how many topics are entered.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkInMoreSection": "More",
+  "checkInNarrativeHint": "What did you talk about? One line is enough.",
+  "checkInNoDuration": "No duration",
+  "checkInOpenSettingsButton": "Open settings",
+  "checkInOrTypeHint": "Or type it here…",
   "checkInPayAttentionLabel": "Next time, pay attention to",
-  "checkInPreparedOverline": "✦ LOTTI · PREPARED THIS MORNING",
+  "checkInPreparingLabel": "Preparing audio…",
+  "checkInRecorderBusyBody": "Stop it from the recording indicator first, then try again. Nothing new was recorded.",
+  "checkInRecorderBusyTitle": "A recording is already running",
+  "checkInRecordingFailedBody": "The microphone could not be started. Try again, or type the check-in. Nothing was recorded.",
+  "checkInRecordingFailedTitle": "Recording didn't start",
+  "checkInRecordingHint": "Speak normally. Words appear here when you stop.",
+  "checkInRecordingNotSavedBody": "The recording could not be saved. Try again, or type the check-in.",
+  "checkInRecordingNotSavedTitle": "Recording couldn't be saved",
+  "checkInReRecordButton": "Re-record",
+  "checkInReRecordReplaceMessage": "Replace your edited words with a new take?",
+  "@checkInReRecordReplaceMessage": {
+    "description": "Confirmation before Re-record when the transcript has been edited since it landed."
+  },
+  "checkInSaveBlockedEmpty": "Add a few words to save",
+  "checkInSaveBlockedRecording": "Stop recording to save",
+  "checkInSaveBlockedRetry": "Type or retry to save",
+  "checkInSaveBlockedTranscribing": "Waiting for the transcript",
+  "checkInSaveButton": "Save check-in",
+  "checkInSaveShortButton": "Save",
+  "checkInSaveShortcutHint": "{shortcut} to save",
+  "@checkInSaveShortcutHint": {
+    "placeholders": {
+      "shortcut": {
+        "type": "String"
+      }
+    }
+  },
   "checkInSentimentDelightful": "Delightful",
   "checkInSentimentDifficult": "Difficult",
   "checkInSentimentGood": "Good",
   "checkInSentimentLabel": "How did it feel?",
   "checkInSentimentNeutral": "Neutral",
+  "checkInSentimentOptional": "Optional. Never filled in by the agent.",
   "checkInSentimentStrained": "Strained",
+  "checkInSourceCall": "From the call you placed from this page. Everything is editable.",
+  "checkInSourceMessage": "From the message you sent from this page. Everything is editable.",
   "checkInSpeakButton": "Speak check-in",
   "@checkInSpeakButton": {
     "description": "Button on the check-in sheet that records a spoken check-in and prefills the narrative with its transcript."
   },
+  "checkInSpokenMinutes": "{count, plural, =1{1 minute} other{{count} minutes}}",
+  "@checkInSpokenMinutes": {
+    "description": "Minutes of a recording length, read by assistive technology.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkInSpokenSeconds": "{count, plural, =1{1 second} other{{count} seconds}}",
+  "@checkInSpokenSeconds": {
+    "description": "Seconds of a recording length, read by assistive technology.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkInStartedLabel": "Started",
+  "checkInStatusMicrophoneDenied": "Microphone unavailable",
+  "checkInStatusPaused": "Paused",
+  "checkInStatusRecorderBusy": "Recorder busy",
+  "checkInStatusRecording": "Recording",
+  "checkInStatusRecordingFailed": "Recording didn't start",
+  "checkInStatusRecordingNotSaved": "Recording not saved",
+  "checkInStatusTranscriptionUnavailable": "No transcription model",
+  "checkInStatusTranscriptMissing": "Transcript not received",
+  "checkInTimeChipSemantics": "Started: {time}. Change",
+  "@checkInTimeChipSemantics": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "checkInTopicsHint": "Comma-separated, e.g. work, travel",
   "checkInTopicsLabel": "Topics",
+  "checkInTranscribingEta": "usually under a minute",
+  "@checkInTranscribingEta": {
+    "description": "The last, first-shed tier of the transcribing caption: a time expectation for the wait."
+  },
   "checkInTranscribingLabel": "Transcribing…",
   "@checkInTranscribingLabel": {
     "description": "Progress label shown on the check-in sheet while a spoken check-in is being transcribed."
   },
-  "checkInTranscriptFailed": "No transcript came back. You can type it instead.",
-  "@checkInTranscriptFailed": {
-    "description": "Message shown when a spoken check-in produced no transcript and the user has to type the narrative."
+  "checkInTranscriptAdded": "Transcript added",
+  "checkInTranscriptionUnavailableTitle": "No transcription model set up",
+  "checkInTranscriptMissingBody": "Your {length} recording is saved in the journal, even if you cancel this check-in. Try again in a moment.",
+  "@checkInTranscriptMissingBody": {
+    "placeholders": {
+      "length": {
+        "type": "String"
+      }
+    }
   },
-  "checkInTranscriptUnavailable": "Transcription is not set up for this person. Add an audio model and turn on automatic inference for their category, or type the check-in.",
+  "checkInTranscriptMissingCalloutTitle": "Try again, or type it",
+  "@checkInTranscriptMissingCalloutTitle": {
+    "description": "The transcript-not-received card's title: the next step, since the header status already names the state."
+  },
+  "checkInTranscriptUnavailable": "Choose a default inference profile with a transcription model in AI settings, or write your check-in.",
   "@checkInTranscriptUnavailable": {
     "description": "Shown when a spoken check-in cannot run at all because no transcription is configured for the person or their category."
   },
-  "checkInWriteInstead": "Write instead",
-  "@checkInWriteInstead": {
-    "description": "Relationships redesign label."
+  "checkInTypeChipSemantics": "Interaction: {type}. Change",
+  "@checkInTypeChipSemantics": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "checkInTypeInstead": "Type instead",
+  "checkInWordCount": "{count, plural, =1{1 word} other{{count} words}}",
+  "@checkInWordCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "checklistAddItem": "Add a new item",
   "checklistAiConfidenceLabel": "Confidence: {level}",
@@ -2022,7 +2201,7 @@
   "configFlagEnableAiStreaming": "Enable AI streaming for task actions",
   "configFlagEnableAiStreamingDescription": "Stream AI responses for task-related actions. Turn off to buffer responses and keep the UI smoother.",
   "configFlagEnableAiSummaryTts": "AI summary playback",
-  "configFlagEnableAiSummaryTtsDescription": "Show the local text-to-speech button on task AI summaries. Requires an installed MLX Audio TTS model.",
+  "configFlagEnableAiSummaryTtsDescription": "Show the local text-to-speech button on task AI summaries. Requires an installed Supertonic TTS model.",
   "configFlagEnableDailyOs": "Enable DailyOS",
   "configFlagEnableDailyOsDescription": "Show the DailyOS page in the main navigation.",
   "configFlagEnableDashboardsPage": "Enable Dashboards page",
@@ -2042,6 +2221,8 @@
   "configFlagEnableNotificationsDescription": "Receive notifications for reminders, updates, and important events.",
   "configFlagEnableProjects": "Enable Projects",
   "configFlagEnableProjectsDescription": "Show project management features for organizing tasks into projects.",
+  "configFlagEnableQueryChat": "Experimental task chat",
+  "configFlagEnableQueryChatDescription": "Show chat for tasks, projects and categories. Disabled by default.",
   "configFlagEnableRelationships": "Enable People page",
   "configFlagEnableRelationshipsDescription": "Show the People tab for nurturing your personal relationships.",
   "configFlagEnableSessionRatings": "Enable Session Ratings",
@@ -3199,6 +3380,7 @@
   "designSystemTextareaWithCounterLabel": "With counter",
   "designSystemTextareaWithErrorLabel": "With error",
   "designSystemTextareaWithHelperLabel": "With helper text",
+  "designSystemTieredTextTitle": "Tiered text at three widths",
   "designSystemTimePickerFormatsTitle": "Time Formats",
   "designSystemTimePickerTwelveHourLabel": "12-hour",
   "designSystemTimePickerTwentyFourHourLabel": "24-hour",
@@ -4650,6 +4832,8 @@
   "imageViewerPreviousTooltip": "Previous image",
   "inactiveLabel": "Inactive",
   "inactiveSwitchDescription": "Can be chosen for new entries when on",
+  "inferenceProfileChat": "Chat model",
+  "inferenceProfileChatUsesThinking": "Uses thinking model when unset",
   "inferenceProfileChooseModelTitle": "Choose a model",
   "inferenceProfileChooseTitle": "Choose an inference profile",
   "inferenceProfileCreateTitle": "Create Profile",
@@ -5505,14 +5689,6 @@
   "multiSelectNoItemsFound": "No items found",
   "navSidebarManualBrowserHint": "Opens in your browser",
   "navSidebarManualLabel": "Manual",
-  "navTabMoreSemanticsLabel": "{count, plural, =1{More, 1 additional destination} other{More, {count} additional destinations}}",
-  "@navTabMoreSemanticsLabel": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "navTabTitleCalendar": "DailyOS",
   "navTabTitleEvents": "Events",
   "navTabTitleGoals": "Goals",
@@ -5522,7 +5698,7 @@
   "navTabTitleHabits": "Habits",
   "navTabTitleInsights": "Insights",
   "navTabTitleJournal": "Logbook",
-  "navTabTitleMore": "More",
+  "navTabTitleNavigate": "Navigate",
   "navTabTitlePeople": "People",
   "navTabTitleProjects": "Projects",
   "navTabTitleSettings": "Settings",
@@ -5806,6 +5982,169 @@
   "panasScaleModerately": "Moderately",
   "panasScaleQuiteABit": "Quite a bit",
   "panasScaleVerySlightlyOrNotAtAll": "Very slightly or not at all",
+  "plazaBlockedReason": "blocked — needs a decision",
+  "plazaCategoryEmpty": "This category has no visible projects.",
+  "plazaClosedForNight": "CLOSED FOR THE NIGHT",
+  "plazaCloseHint": "Esc to close",
+  "plazaControls": "WASD walk · hold Shift: 8× speed · drag to look · Tab next beacon · H home · M overview · / search · T toolbar · Esc dismiss · ⌘[ back",
+  "plazaCornerAfter": "Corner after {week}",
+  "@plazaCornerAfter": {
+    "placeholders": {
+      "week": {
+        "type": "String"
+      }
+    }
+  },
+  "plazaDebug": "Debug",
+  "plazaDecisionStrip": "NEEDS A DECISION",
+  "plazaDoneCount": "{done} of {total} done",
+  "@plazaDoneCount": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "plazaDueOn": "due {date}",
+  "@plazaDueOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "plazaDueSoonReason": "due {date} — finish it",
+  "@plazaDueSoonReason": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "plazaEmpty": "Add a task to start building this project’s plaza.",
+  "plazaEnterProject": "Enter project",
+  "plazaExploreCategory": "Explore category",
+  "plazaExploreProject": "Explore project",
+  "plazaFlyThere": "Fly there ›",
+  "plazaInProgressCount": "{count} in progress",
+  "@plazaInProgressCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "plazaLinks": "links {count}",
+  "@plazaLinks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "plazaMeerkats": "Meerkats",
+  "@plazaMeerkats": {
+    "description": "Checkbox label for showing meerkat characters in Plaza."
+  },
+  "plazaMorningWalk": "Morning walk",
+  "plazaNeedsAttention": "{count} need attention",
+  "@plazaNeedsAttention": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "plazaOpeningSoon": "OPENING SOON",
+  "plazaOpenLate": "OPEN LATE",
+  "plazaOverdueSince": "overdue since {date} — finish or move it",
+  "@plazaOverdueSince": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "plazaOverview": "Overview",
+  "plazaPaused": "Paused",
+  "plazaProjectOverdue": "Overdue tasks: {count}",
+  "@plazaProjectOverdue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "plazaSearchHint": "Search tasks, Enter to fly",
+  "plazaShowPenguins": "Penguins",
+  "plazaSkyDay": "Day",
+  "@plazaSkyDay": {
+    "description": "Segment label for the daylight sky in the Plaza world."
+  },
+  "plazaSkyNight": "Night",
+  "@plazaSkyNight": {
+    "description": "Segment label for the night sky in the Plaza world."
+  },
+  "plazaStaleReason": "quiet for {days} days — pick it back up",
+  "@plazaStaleReason": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "plazaStats": "{tasks} tasks · {weeks} weeks · {attention} need attention",
+  "@plazaStats": {
+    "placeholders": {
+      "tasks": {
+        "type": "int"
+      },
+      "weeks": {
+        "type": "int"
+      },
+      "attention": {
+        "type": "int"
+      }
+    }
+  },
+  "plazaTaskCount": "Tasks: {count}",
+  "@plazaTaskCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "plazaTitle": "Plaza",
+  "plazaToggleToolbar": "Show / hide toolbar",
+  "@plazaToggleToolbar": {
+    "description": "Tooltip on the Plaza top bar's toolbar button, which shows and hides the toolbar."
+  },
+  "plazaToLet": "TO LET",
+  "plazaTourControls": "Space: pause · move to exit",
+  "plazaUnavailable": "This device cannot display the 3D world.",
+  "plazaWeek": "W{week} · {date}",
+  "@plazaWeek": {
+    "placeholders": {
+      "week": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "plazaWeekShort": "W{week}",
+  "@plazaWeekShort": {
+    "placeholders": {
+      "week": {
+        "type": "int"
+      }
+    }
+  },
   "privateLabel": "Private",
   "privateSwitchDescription": "Only visible when private entries are shown",
   "projectActionAddTask": "Add task",
@@ -6147,6 +6486,234 @@
   "provisionedSyncSummaryHomeserver": "Sync server",
   "provisionedSyncSummaryUser": "Sync account",
   "provisionedSyncTitle": "Devices",
+  "queryActionsAccept": "Accept",
+  "queryActionsDismiss": "Dismiss",
+  "queryActionsIncomplete": "Some changes could not be applied. Applied changes will not be repeated when you retry.",
+  "queryActionsReview": "Proposed changes",
+  "queryActionsTarget": "For: {target}",
+  "@queryActionsTarget": {
+    "description": "Identifies the existing target of an inline chat action.",
+    "placeholders": {
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "queryAllSources": "All",
+  "queryArchiveChat": "Archive chat",
+  "queryArchiveConfirmation": "Chat archived. Its conclusions remain available.",
+  "queryArchivedChats": "Archived chats",
+  "queryArchivedReadOnly": "This chat is archived. Restore it to continue the conversation.",
+  "queryAsk": "Ask",
+  "queryAskCategory": "Ask about this category",
+  "queryAskProject": "Ask about this project",
+  "queryAskTask": "Ask about this task",
+  "queryAudioFailed": "Audio could not be prepared or played. Try again.",
+  "queryAudioListen": "Listen · {start}–{end}",
+  "@queryAudioListen": {
+    "description": "Play the original recording between these timestamps",
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "queryAudioMissingFile": "The recording isn’t available on this device yet.",
+  "queryAudioNoMatch": "This quote could not be matched unambiguously to the recording. You can still open the full entry.",
+  "queryAudioOpenRecording": "Open recording",
+  "queryAudioPlaying": "Playing {start}–{end}",
+  "@queryAudioPlaying": {
+    "description": "The fixed excerpt interval being played, not elapsed playback progress.",
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "queryAudioPrepare": "Prepare audio excerpt",
+  "queryAudioPreparing": "Preparing audio…",
+  "queryAudioReadAloud": "Read answer aloud",
+  "queryAudioReading": "Reading answer aloud",
+  "queryAudioRetry": "Retry audio",
+  "queryAudioSetupDetails": "Setup details",
+  "queryAudioSetupRequired": "Audio excerpts need a compatible transcription model.",
+  "queryAudioStale": "The recording has changed. Prepare the timestamps again.",
+  "queryAudioStop": "Stop audio",
+  "queryAudioTimingUnavailable": "To prepare excerpts, select Melious Whisper or a supported Mistral Voxtral transcription model in this agent’s inference profile. The provider URL must use HTTPS.",
+  "queryAudioTooLarge": "Preparing timestamps supports recordings up to 25 MB. Choose a smaller recording.",
+  "queryAudioUploadNotice": "Preparing timestamps sends this recording to the transcription provider configured for this agent.",
+  "queryCategoryAgent": "Category agent",
+  "queryChat": "Chat",
+  "queryChats": "Chats",
+  "queryChecked": "Sources checked: {count}",
+  "@queryChecked": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "queryCloseChat": "Close chat",
+  "queryCollapseChat": "Collapse chat",
+  "queryCopied": "Copied",
+  "queryCopyQuote": "Copy quote",
+  "queryCoverage": "What was searched",
+  "queryCoverageCategory": "This category",
+  "queryCoverageExcluded": "Other categories were not searched.",
+  "queryCoverageUnreadable": "No searchable text when this answer was written. Open the recording to inspect it.",
+  "queryCoverageWider": "Other entries in this category",
+  "queryDeleteChat": "Delete chat",
+  "queryDeleteExplanation": "Delete this conversation? Choose what happens to its shared conclusions. Source entries are unaffected.",
+  "queryDeleteForget": "Delete and forget conclusions",
+  "queryDeleteKeep": "Delete and keep conclusions",
+  "queryDictated": "You can edit the transcript before sending your question. Audio may already have been sent to your transcription provider.",
+  "queryDraftProvisional": "Draft · not yet verified",
+  "queryDraftRetracted": "The draft answer could not be verified. Try again.",
+  "queryEarlierTextOmitted": "[Earlier text not shown]",
+  "queryEmptyBody": "Ask about decisions and earlier work. Answers distinguish summaries from exact passages.",
+  "queryExactStoredText": "Exact stored text",
+  "queryExactText": "Show exact text",
+  "queryExampleDecision": "What did we agree on?",
+  "queryExampleMeeting": "In which meeting did we discuss this?",
+  "queryExampleSuggestion": "Was that a decision or a suggestion?",
+  "queryExpandChat": "Expand chat",
+  "queryExpanding": "Checking other entries in this category…",
+  "queryFailed": "The search could not finish. Try again.",
+  "queryForgetConclusions": "Forget conclusions",
+  "queryHideExactText": "Hide exact text",
+  "queryHideSurrounding": "Hide surrounding text",
+  "queryHomeOnly": "Home scope only",
+  "queryHomeScope": "Home scope",
+  "queryIncomplete": "Coverage is incomplete. Missing evidence does not mean the discussion never happened.",
+  "queryIncompleteShort": "Some sources could not be checked.",
+  "queryInferenceUnavailable": "No usable inference setup. Configure the agent’s model or the category’s default profile, then retry.",
+  "queryKeepConclusions": "Keep conclusions",
+  "queryLaterTextOmitted": "[Later text not shown]",
+  "queryMachineTranscript": "Machine transcript: exact stored wording, not checked against the audio.",
+  "queryMemoryCount": "Conclusions available from earlier chats: {count}",
+  "@queryMemoryCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "queryMissingTranscripts": "{count, plural, one{1 recording had no searchable text when this answer was written.} other{{count} recordings had no searchable text when this answer was written.}}",
+  "@queryMissingTranscripts": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "queryNewChat": "New chat",
+  "queryNoAgent": "This scope needs its usual agent assignment before you can chat. Return to details to configure it.",
+  "queryNotes": "Notes",
+  "queryOpenCurrentEntry": "Open current entry",
+  "queryOpenEntry": "Open entry",
+  "queryOriginalsHome": "Checks this task and its directly linked entries only.",
+  "queryOtherProject": "Beyond the home scope",
+  "queryPreparingAnswer": "Preparing an answer…",
+  "queryReachCategory": "Searches this scope and {category}.",
+  "@queryReachCategory": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "queryReachCategoryOnly": "Searches within {category}.",
+  "@queryReachCategoryOnly": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "queryReachHome": "Searches only this scope and its linked entries.",
+  "queryReachUncategorized": "Searches this task and its directly linked uncategorized entries only.",
+  "queryRecall": "This answer used saved conclusions.",
+  "queryRecordings": "Recordings",
+  "queryRecordingTranscript": "Recording transcript",
+  "queryRenameChat": "Rename chat",
+  "queryRestoreChat": "Restore chat",
+  "querySavedConclusion": "Conclusion saved {date}",
+  "@querySavedConclusion": {
+    "description": "Creation time of an accessible saved conclusion; makes no assertion about its origin chat availability.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "querySavedQuote": "This saved quote reflects the source when the answer was written.",
+  "querySavedVersion": "Saved version: {version}",
+  "@querySavedVersion": {
+    "description": "Identifies the historical text version by edit date or short content fingerprint.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "querySavedVersionUnavailable": "Version date unavailable",
+  "querySearching": "Checking available information…",
+  "querySearchScope": "Search scope and filters",
+  "querySourceAction": "{action}: {source}",
+  "@querySourceAction": {
+    "description": "Accessible action label identifying its evidence source or selected chat.",
+    "placeholders": {
+      "action": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "querySourceChanged": "Source has changed",
+  "querySourceDeleted": "Source deleted",
+  "querySourceMoved": "Source moved to another category",
+  "querySummaryBased": "Based on summaries",
+  "querySummaryCoverage": "This answer uses task or project summaries. Original entries were not inspected.",
+  "querySummaryCurrent": "Open a task or project to inspect its current summary. It may have changed since this answer.",
+  "querySummaryIncomplete": "Some information is missing from the available summaries.",
+  "querySummaryOwners": "About this answer",
+  "querySurroundingLimit": "This is the saved excerpt, which may not include the full discussion.",
+  "querySurroundingText": "Show surrounding text",
+  "queryTranscribing": "Transcribing your recording. Audio may already be with your provider.",
+  "queryUnavailable": "This scope is no longer available with your current visibility settings.",
+  "queryUnread": "New answer",
+  "queryWelcomeCategory": "Ask {agentName} about this category",
+  "@queryWelcomeCategory": {
+    "placeholders": {
+      "agentName": {
+        "type": "String"
+      }
+    }
+  },
+  "queryWelcomeProject": "Ask {agentName} about this project",
+  "@queryWelcomeProject": {
+    "placeholders": {
+      "agentName": {
+        "type": "String"
+      }
+    }
+  },
+  "queryWelcomeTask": "Ask {agentName} about this task",
+  "@queryWelcomeTask": {
+    "placeholders": {
+      "agentName": {
+        "type": "String"
+      }
+    }
+  },
   "queueCatchUpNowButton": "Catch up now",
   "queueCatchUpNowDone": "Catch-up kicked — queue is draining.",
   "queueCatchUpNowError": "Catch-up failed: {reason}",
@@ -6275,16 +6842,120 @@
     "description": "Tooltip on the button that opens a message composer"
   },
   "relationshipAddChannelButton": "Add channel",
-  "relationshipAsk": "Ask",
-  "@relationshipAsk": {
-    "description": "Relationships redesign label."
+  "relationshipAddChannelFromContacts": "or from contacts",
+  "relationshipAgentAsOfBand": "{band} · as of {age}",
+  "@relationshipAgentAsOfBand": {
+    "placeholders": {
+      "age": {
+        "type": "String"
+      },
+      "band": {
+        "type": "String"
+      }
+    }
   },
+  "relationshipAgentBriefNow": "Brief now",
+  "relationshipAgentCall": "Call {name}",
+  "@relationshipAgentCall": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipAgentFailedBody": "The provider returned an error before the briefing was written. Your check-ins are unchanged.",
+  "relationshipAgentFailedNoModel": "No model is set up for briefings. Choose one under AI Settings › Agents. Details are in the Activity tab.",
+  "relationshipAgentFailedPlain": "Last run failed",
+  "relationshipAgentLastRunFailed": "Last run failed · {time}",
+  "@relationshipAgentLastRunFailed": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipAgentMarkImportant": "Mark important",
+  "relationshipAgentNoAgent": "No agent for this person",
+  "relationshipAgentNoBriefingBody": "{count, plural, =0{No briefing yet. Brief now writes one once you have logged a check-in; it never sees the phone number or email.} =1{No briefing yet. Brief now writes one from your check-in; it never sees the phone number or email.} other{No briefing yet. Brief now writes one from your {count} check-ins; it never sees the phone number or email.}}",
+  "@relationshipAgentNoBriefingBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipAgentNotEnrolledBody": "Mark {name} as important to get a chat, nudges when it has been a while, and a briefing.",
+  "@relationshipAgentNotEnrolledBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipAgentOnlyYourStartsUseAi": "Only what you start yourself uses AI",
+  "relationshipAgentOutOfDateNewCheckIn": "Out of date · new check-in {day}",
+  "@relationshipAgentOutOfDateNewCheckIn": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipAgentOutOfDateNewCheckInShort": "Out of date · new check-in",
+  "@relationshipAgentOutOfDateNewCheckInShort": {
+    "description": "The out-of-date status line's middle tier when the day does not fit beside the age pill."
+  },
+  "relationshipAgentPausedBody": "Briefings pause while this person is dormant or archived.",
+  "relationshipAgentProposedCount": "{count, plural, =1{1 proposed} other{{count} proposed}}",
+  "@relationshipAgentProposedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipAgentReadingBody": "{count, plural, =0{Preparing the briefing. Usually under a minute.} =1{Reading 1 check-in. Usually under a minute.} other{Reading {count} check-ins. Usually under a minute.}}",
+  "@relationshipAgentReadingBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipAgentSeeActivity": "See activity",
+  "relationshipAgentSources": "Sources: {count, plural, =1{1 check-in} other{{count} check-ins}} · contact channels never sent",
+  "@relationshipAgentSources": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipAgentTryAgain": "Try again",
+  "relationshipAgentWatching": "Agent watching",
+  "relationshipAgentWatchingNextLook": "Agent watching · next look {day}",
+  "@relationshipAgentWatchingNextLook": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipAgentWriting": "Writing the briefing…",
   "relationshipBannerSemanticLabel": "Relationship banner for {personName}",
   "@relationshipBannerSemanticLabel": {
     "description": "Accessibility label of one relationship nudge banner; personName is the person's name.",
     "placeholders": {
       "personName": {
         "type": "String"
+      }
+    }
+  },
+  "relationshipBriefingAge": "{days, plural, =1{1 day old} other{{days} days old}}",
+  "@relationshipBriefingAge": {
+    "placeholders": {
+      "days": {
+        "type": "int"
       }
     }
   },
@@ -6307,15 +6978,9 @@
       }
     }
   },
-  "relationshipBriefingEmpty": "No briefing yet — Brief me prepares one from your check-ins.",
   "relationshipBriefingRequested": "Briefing requested — it will appear here shortly.",
   "relationshipBriefingRequestFailed": "Could not request the briefing.",
   "relationshipBriefingTitle": "Briefing",
-  "relationshipBriefMeAgain": "Brief me again",
-  "@relationshipBriefMeAgain": {
-    "description": "Relationships redesign label."
-  },
-  "relationshipBriefMeButton": "Brief me",
   "relationshipCadenceEveryNDays": "{days, plural, =1{Every day} other{Every {days} days}}",
   "@relationshipCadenceEveryNDays": {
     "placeholders": {
@@ -6336,18 +7001,21 @@
   "@relationshipCadenceOnTrack": {
     "description": "Relationships redesign label."
   },
+  "relationshipCadencePromptLabel": "Nudge me every",
   "relationshipCadenceQuarterly": "Quarterly",
   "relationshipCadenceWeekly": "Weekly",
-  "relationshipChatTooltip": "Chat about this person",
-  "relationshipChatUnavailable": "No agent yet — mark this person as important first.",
-  "relationshipCheckedInLabel": "Checked in {date}",
-  "@relationshipCheckedInLabel": {
+  "relationshipChatAgentSubtitle": "Knows your check-ins, not the channels",
+  "relationshipChatAgentTitle": "{name} · briefing agent",
+  "@relationshipChatAgentTitle": {
+    "description": "Title of the per-person chat header: the person's name and what the agent is",
     "placeholders": {
-      "date": {
+      "name": {
         "type": "String"
       }
     }
   },
+  "relationshipChatTooltip": "Chat about this person",
+  "relationshipChatUnavailable": "No agent yet — mark this person as important first.",
   "relationshipCheckInReminderBody": "A good moment to reach out.",
   "relationshipCheckInReminderTitle": "Check in with {name}?",
   "@relationshipCheckInReminderTitle": {
@@ -6358,14 +7026,6 @@
     }
   },
   "relationshipCheckInsLabel": "Check-ins",
-  "relationshipCheckInTitle": "Check in · {name}",
-  "@relationshipCheckInTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "relationshipContactCardAction": "Contact card",
   "@relationshipContactCardAction": {
     "description": "Relationships redesign label."
@@ -6388,6 +7048,14 @@
     "description": "Toast shown when the linked contact held nothing the person did not already have"
   },
   "relationshipCreateTitle": "Add person",
+  "relationshipDaysOver": "{count, plural, =1{1 day over} other{{count} days over}}",
+  "@relationshipDaysOver": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "relationshipDeleteConfirmMessage": "Their check-ins are deleted too. This cannot be undone.",
   "relationshipDeleteConfirmTitle": "Delete {name}?",
   "@relationshipDeleteConfirmTitle": {
@@ -6405,11 +7073,62 @@
       }
     }
   },
+  "relationshipDueSince": "Due since {day} · {count, plural, =1{1 day over} other{{count} days over}}",
+  "@relationshipDueSince": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipDueToday": "Due today",
+  "relationshipDurationHours": "{hours} h",
+  "@relationshipDurationHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipDurationHoursMinutes": "{hours} h {minutes}",
+  "@relationshipDurationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipDurationMinutes": "{count} min",
+  "@relationshipDurationMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "relationshipEditTitle": "Edit person",
   "relationshipErrorCreateFailed": "Could not save this person. Please try again.",
   "relationshipErrorDeleteFailed": "Could not delete this person. Please try again.",
   "relationshipErrorLinkTaskFailed": "Could not link the task. Please try again.",
   "relationshipErrorUpdateFailed": "Could not save the changes. Please try again.",
+  "relationshipFormImportantBody": "Turns on a briefing, nudges and a chat. Check-in notes go to the agent; contact channels never do.",
+  "relationshipFormImportantBodyNamed": "Turns on a briefing, nudges and a chat for {name}. Check-in notes go to the agent; contact channels never do.",
+  "@relationshipFormImportantBodyNamed": {
+    "description": "Explains what marking a named person important turns on",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipFormReachTitle": "How to reach them",
+  "relationshipFormWhoTitle": "Who",
   "relationshipHealthNeedsAttention": "Needs attention",
   "relationshipHealthSteady": "Steady",
   "relationshipHealthStrained": "Strained",
@@ -6450,6 +7169,7 @@
   "@relationshipImportGrantButton": {
     "description": "Requests contact permission from the import screen"
   },
+  "relationshipImportImportantBody": "Briefings, nudges and a chat. Without it, nothing runs on its own.",
   "relationshipImportNoMatches": "No contacts match your search",
   "@relationshipImportNoMatches": {
     "description": "Shown when the contact search matches nothing"
@@ -6469,6 +7189,15 @@
   "relationshipImportReviewButton": "{count, plural, =1{Review 1} other{Review {count}}}",
   "@relationshipImportReviewButton": {
     "description": "Advances from contact selection to the review step",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipImportReviewSubtitle": "{count, plural, =1{1 person selected · contact details stay on this device} other{{count} people selected · contact details stay on this device}}",
+  "@relationshipImportReviewSubtitle": {
+    "description": "Subtitle of the contact import review step, naming how many contacts were chosen",
     "placeholders": {
       "count": {
         "type": "int"
@@ -6499,10 +7228,10 @@
   "@relationshipJustAdded": {
     "description": "Relationships redesign label."
   },
-  "relationshipLastCheckInLabel": "Last check-in {date}",
-  "@relationshipLastCheckInLabel": {
+  "relationshipLastSpoke": "last spoke {time}",
+  "@relationshipLastSpoke": {
     "placeholders": {
-      "date": {
+      "time": {
         "type": "String"
       }
     }
@@ -6514,39 +7243,54 @@
   "relationshipLinkedTasksLabel": "Tasks",
   "relationshipLinkTaskButton": "Link task",
   "relationshipLogCheckIn": "Log check-in",
-  "relationshipLottisRead": "Lotti's read",
-  "@relationshipLottisRead": {
-    "description": "Relationships redesign label."
-  },
-  "relationshipLottisReadAsOf": "as of {time}",
-  "@relationshipLottisReadAsOf": {
-    "placeholders": {
-      "time": {
-        "type": "String"
-      }
-    }
+  "relationshipMoreActions": "More actions",
+  "@relationshipMoreActions": {
+    "description": "Tooltip of the person page's overflow menu (link contact, delete)"
   },
   "relationshipNameLabel": "Name",
   "relationshipNameRequired": "A name is required",
-  "relationshipNextByDay": "next by {day}",
-  "@relationshipNextByDay": {
+  "relationshipNextDueOn": "Next due {day}",
+  "@relationshipNextDueOn": {
     "placeholders": {
       "day": {
         "type": "String"
       }
     }
   },
+  "relationshipNextTimeTitle": "Next time",
   "relationshipNicknameLabel": "Nickname",
   "relationshipNoCheckIns": "No check-ins yet — log one after you next talk.",
   "relationshipNoLinkedTasks": "No tasks linked yet.",
+  "relationshipNotEnrolled": "Not enrolled",
   "relationshipNotFound": "This person is no longer tracked.",
-  "relationshipNudgesOn": "nudges on",
-  "@relationshipNudgesOn": {
-    "description": "Relationships redesign label."
+  "relationshipOnTrackCadence": "On track · {cadence}",
+  "@relationshipOnTrackCadence": {
+    "placeholders": {
+      "cadence": {
+        "type": "String"
+      }
+    }
   },
-  "relationshipPostCallBody": "You reached out a moment ago. Log a check-in while it is fresh?",
-  "@relationshipPostCallBody": {
-    "description": "Body of the prompt offered after returning from a call or message"
+  "relationshipPayAttentionTo": "Pay attention to",
+  "relationshipPhotoAddBanner": "Add banner",
+  "relationshipPhotoAdjustCrop": "Adjust crop",
+  "relationshipPhotoBanner": "Banner",
+  "relationshipPhotoCardTitle": "Photo",
+  "relationshipPhotoChange": "Change",
+  "relationshipPhotoChoose": "Choose from library",
+  "relationshipPhotoDragToReposition": "Drag to reposition",
+  "relationshipPhotoFace": "Face",
+  "relationshipPhotoPrivacy": "Only on your devices · the agent never sees it",
+  "relationshipPhotoRemove": "Remove photo",
+  "relationshipPhotoRemoveAction": "Remove",
+  "relationshipPhotoSaveFailed": "Could not save the photo",
+  "relationshipPhotoSheetTitle": "Photo of {name}",
+  "@relationshipPhotoSheetTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
   "relationshipPostCallConfirm": "Log check-in",
   "@relationshipPostCallConfirm": {
@@ -6556,45 +7300,139 @@
   "@relationshipPostCallDismiss": {
     "description": "Button that dismisses the post-call prompt without a trace"
   },
-  "relationshipPostCallTitle": "How did it go with {name}?",
-  "@relationshipPostCallTitle": {
-    "description": "Title of the prompt offered after returning from a call or message",
+  "relationshipPostCallMeta": "started {time} · {minutes, plural, =0{under a minute} =1{about 1 min} other{about {minutes} min}}",
+  "@relationshipPostCallMeta": {
     "placeholders": {
-      "name": {
-        "type": "String",
-        "example": "Anna"
+      "time": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
       }
     }
   },
-  "relationshipQuietForDays": "Quiet for {count, plural, =1{1 day} other{{count} days}}",
-  "@relationshipQuietForDays": {
+  "relationshipPostCallOfferCall": "You called {name} {minutes, plural, =0{less than a minute} =1{1 minute} other{{minutes} minutes}} ago — log it while it is fresh?",
+  "@relationshipPostCallOfferCall": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipPostCallOfferMessage": "You wrote to {name} {minutes, plural, =0{less than a minute} =1{1 minute} other{{minutes} minutes}} ago — log it while it is fresh?",
+  "@relationshipPostCallOfferMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipProposalAdded": "Added → {title}",
+  "@relationshipProposalAdded": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipProposalEvidence": "From the check-in on {date}",
+  "@relationshipProposalEvidence": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipProposalUndoFailed": "Could not undo. The task may have changed.",
+  "relationshipReachPrivacy": "Stays on this device · never shared with the AI",
+  "relationshipReachTitle": "Reach",
+  "relationshipRelinkContact": "Link a different contact",
+  "@relationshipRelinkContact": {
+    "description": "Menu action that replaces the OS contact a person is linked to"
+  },
+  "relationshipsEmptyState": "Add the people you want to stay close to.",
+  "relationshipsGroupDue": "Due",
+  "relationshipsPageTitle": "People",
+  "relationshipsSelectPersonHint": "Select a person to see their page.",
+  "relationshipsSummaryDueNow": "Due now",
+  "relationshipsSummaryEnrolled": "/ {count} enrolled",
+  "@relationshipsSummaryEnrolled": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "relationshipRelinkContact": "Link a different contact",
-  "@relationshipRelinkContact": {
-    "description": "Menu action that replaces the OS contact a person is linked to"
+  "relationshipsSummaryNextDue": "Next due {name} · {day}",
+  "@relationshipsSummaryNextDue": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
   },
-  "relationshipSeeAllCheckIns": "See all check-ins",
-  "@relationshipSeeAllCheckIns": {
-    "description": "Relationships redesign label."
+  "relationshipsSummaryNoneDue": "No one due",
+  "relationshipsSummaryNotEnrolled": "{count, plural, =1{1 person not enrolled} other{{count} people not enrolled}}",
+  "@relationshipsSummaryNotEnrolled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
-  "relationshipsEmptyState": "Add the people you want to stay close to.",
-  "relationshipsPageTitle": "People",
   "relationshipStatusActive": "Active",
   "relationshipStatusArchived": "Archived",
   "relationshipStatusDormant": "Dormant",
   "relationshipStatusFieldLabel": "Status",
-  "relationshipStayingInTouch": "Staying in touch",
-  "@relationshipStayingInTouch": {
-    "description": "Relationships redesign label."
+  "relationshipStatusLineAdded": "Just added · {cadence}",
+  "@relationshipStatusLineAdded": {
+    "placeholders": {
+      "cadence": {
+        "type": "String"
+      }
+    }
   },
-  "relationshipStayInTouch": "Stay in touch",
-  "@relationshipStayInTouch": {
-    "description": "Relationships redesign label."
+  "relationshipStatusLineAddedFirstDue": "Just added · {cadence} · first due {day}",
+  "@relationshipStatusLineAddedFirstDue": {
+    "placeholders": {
+      "cadence": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipStatusLineContacted": "{type} · {time} · {cadence}",
+  "@relationshipStatusLineContacted": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "cadence": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipTasksLinkedCount": "{count, plural, =1{1 linked} other{{count} linked}}",
+  "@relationshipTasksLinkedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "relationshipTimestampToday": "Today",
   "@relationshipTimestampToday": {
@@ -7098,7 +7936,6 @@
   "settingsSyncConflictsSubtitle": "Resolve sync conflicts",
   "settingsSyncNodeProfileCapabilitiesEmpty": "None detected — auto-trigger of synced audio inference will not target this device.",
   "settingsSyncNodeProfileCapabilitiesLabel": "Detected AI capabilities",
-  "settingsSyncNodeProfileCapabilityMlxAudio": "MLX Audio (local)",
   "settingsSyncNodeProfileCapabilityOllamaLlm": "Ollama LLM",
   "settingsSyncNodeProfileCapabilityOmlxLlm": "oMLX LLM",
   "settingsSyncNodeProfileCapabilityVoxtral": "Voxtral (local)",
@@ -7113,6 +7950,8 @@
   "settingsSyncOutboxTitle": "Sync Outbox",
   "settingsSyncStatsSubtitle": "Inspect sync pipeline metrics",
   "settingsSyncSubtitle": "Configure sync and view stats",
+  "settingsSystemHealthSubtitle": "Analyze recent logs and copy a shareable report",
+  "settingsSystemHealthTitle": "System health",
   "settingsThemingAutomatic": "Automatic",
   "settingsThemingDark": "Dark Appearance",
   "settingsThemingLight": "Light Appearance",
@@ -7125,6 +7964,62 @@
   "settingsV2UnimplementedTitle": "Panel not yet implemented",
   "settingsWhatsNewSubtitle": "See the latest updates and features",
   "settingsWhatsNewTitle": "What's New",
+  "sherpaAllFamilies": "All families",
+  "sherpaCatalogMatches": "{count} of {total} models",
+  "@sherpaCatalogMatches": {
+    "description": "Number of search matches in the downloadable model catalog.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "sherpaDeleteModel": "Remove {model} from this device",
+  "@sherpaDeleteModel": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaDownloadAction": "Download",
+  "sherpaDownloadModel": "Download {model}",
+  "@sherpaDownloadModel": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaInstalledModelsTitle": "Installed models",
+  "sherpaInstallingModel": "Installing model",
+  "sherpaLanguageCantonese": "Cantonese",
+  "sherpaModelCatalogTitle": "Model catalog",
+  "sherpaModelConfigurationError": "Model downloaded, but its configuration could not be saved.",
+  "sherpaModelError": "Model operation failed. Try again.",
+  "sherpaModelFamily": "Model family",
+  "sherpaModelInstalled": "Downloaded",
+  "sherpaModelNotInstalled": "Download a model on this device",
+  "sherpaModelSizeGB": "{size} GB · Multilingual",
+  "@sherpaModelSizeGB": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaModelSizeMB": "{size} MB · Multilingual",
+  "@sherpaModelSizeMB": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaProviderDescription": "Transcribe on this device without a server. Download a model, then select it in your inference profile.",
   "sidebarActiveSectionTitle": "Activity",
   "sidebarActivityCollapseTooltip": "Collapse activity",
   "sidebarActivityExpandTooltip": "Expand activity",
@@ -7167,6 +8062,9 @@
   "speechModalSelectLanguage": "Select Language",
   "speechModalTitle": "Speech Recognition",
   "speechNoAudioRecorded": "No audio was recorded. Try again.",
+  "speechSettingsAutoPrepareChatAudio": "Prepare chat audio automatically",
+  "speechSettingsChatAudioDescription": "Prepare new chat replies on this device so playback starts sooner. Audio plays only when you tap play.",
+  "speechSettingsChatAudioLabel": "Chat audio",
   "speechSettingsModelDescription": "On-device speech model",
   "speechSettingsModelDownloadsOnce": "Downloads once",
   "speechSettingsModelLabel": "Model",
@@ -7490,6 +8388,57 @@
       }
     }
   },
+  "systemHealthAnalyzedWindow": "Analyzed {start} → {end}",
+  "@systemHealthAnalyzedWindow": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "systemHealthChooseModelTitle": "Choose model",
+  "systemHealthCopiedToast": "Report copied. Known personal-data patterns were redacted.",
+  "systemHealthCopyButton": "Copy report",
+  "systemHealthCustomFromLabel": "From",
+  "systemHealthCustomToLabel": "To",
+  "systemHealthDescription": "Scans the log files on this device for errors, warnings and slow queries, redacts known personal-data patterns, and writes a short report you can paste into a coding assistant.",
+  "systemHealthDomainsDescription": "The domains switched on here are the ones analyzed, the same setting that decides what gets logged. Slow queries are included when slow-query logging is on.",
+  "systemHealthDomainsTitle": "Log domains",
+  "systemHealthFailedTitle": "Analysis failed",
+  "systemHealthGeneratedAt": "Generated {time}",
+  "@systemHealthGeneratedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "systemHealthHideDigest": "Hide digest",
+  "systemHealthModelDescription": "Writes the findings from the redacted digest. Proposes the thinking model of your default profile.",
+  "systemHealthModelNone": "Digest only, no model",
+  "systemHealthModelNoneDescription": "Set a default inference profile or add an agentic text model to get findings.",
+  "systemHealthModelTitle": "Model",
+  "systemHealthPresetCustom": "Custom",
+  "systemHealthPresetLast14Days": "14 days",
+  "systemHealthPresetLast24Hours": "24 h",
+  "systemHealthPresetLast7Days": "7 days",
+  "systemHealthPreviousReportsDescription": "Every report is kept on this device. Tap one to show it again.",
+  "systemHealthPreviousReportsTitle": "Previous reports",
+  "systemHealthRangeTitle": "Time range",
+  "systemHealthReportTitle": "Report",
+  "systemHealthRunButton": "Run analysis",
+  "systemHealthSavedTo": "Saved to {path}",
+  "@systemHealthSavedTo": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "systemHealthShowDigest": "Show digest",
   "taskActionBarAudioRecordingActive": "Audio recording in progress",
   "taskActionBarMoreActions": "More actions",
   "taskActionBarOpenRunningTimer": "Open running timer",

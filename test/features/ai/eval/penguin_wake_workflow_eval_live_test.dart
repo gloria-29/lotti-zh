@@ -30,6 +30,7 @@ import 'package:mocktail/mocktail.dart';
 
 import '../../../helpers/fallbacks.dart';
 import '../../../mocks/mocks.dart';
+import '../../ai_consumption/test_utils.dart';
 import 'support/penguin_wake_scenarios.dart';
 import 'support/penguin_wake_world_seed.dart';
 import 'support/task_agent_workflow_eval_harness.dart';
@@ -85,9 +86,11 @@ void main() {
       final container = ProviderContainer();
       addTearDown(container.dispose);
 
+      final attribution = AiInteractionCaptureTestBench.create();
       final harness = await TaskAgentWorkflowEvalHarness.start(
         container: container,
         scenario: scenario.id,
+        additionalGetItSetup: attribution.register,
       );
       addTearDown(harness.dispose);
 
@@ -305,6 +308,16 @@ void main() {
         changeSetRunKeys: changeSetRunKeys,
         calledTools: calledTools,
         reportText: reportText,
+        consumptionEvents: [
+          for (final event in attribution.recordedInteractions)
+            {
+              'providerModelId': event.providerModelId,
+              'credits': event.credits,
+              'costCreditsDecimal': event.costCreditsDecimal,
+              'inputTokens': event.inputTokens,
+              'outputTokens': event.outputTokens,
+            },
+        ],
       );
       final where = 'See $artifact.';
 
@@ -622,8 +635,14 @@ Future<String> _writeArtifact({
   required List<String> changeSetRunKeys,
   required List<String> calledTools,
   required String reportText,
+  required List<Map<String, Object?>> consumptionEvents,
 }) async {
-  final directory = Directory('eval_artifacts');
+  // A gym worker owns a unique directory outside the checkout. Preserve the
+  // standalone runner's default when no explicit artifact path was supplied.
+  final outputPath = Platform.environment['PENGUIN_WAKE_EVAL_OUTPUT'];
+  final directory = outputPath == null
+      ? Directory('eval_artifacts')
+      : File(outputPath).parent;
   if (!directory.existsSync()) {
     directory.createSync(recursive: true);
   }
@@ -638,7 +657,7 @@ Future<String> _writeArtifact({
       ? ''
       : '_${label.replaceAll(RegExp('[^a-zA-Z0-9._-]'), '_')}';
   final file = File(
-    '${directory.path}/${safeScenario}_$safeModel$safeLabel.json',
+    outputPath ?? '${directory.path}/${safeScenario}_$safeModel$safeLabel.json',
   );
   await file.writeAsString(
     const JsonEncoder.withIndent('  ').convert({
@@ -657,6 +676,7 @@ Future<String> _writeArtifact({
       'changeSetRunKeys': changeSetRunKeys,
       'calledTools': calledTools,
       'reportText': reportText,
+      'consumptionEvents': consumptionEvents,
     }),
   );
   return file.path;

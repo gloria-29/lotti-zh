@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:lotti/features/ai/util/forced_tool_choice.dart';
 import 'package:openai_dart/openai_dart.dart';
 
 /// Name of the tool a summary skill must call to publish its result.
@@ -118,15 +119,12 @@ const ChatCompletionTool entrySummaryTool = ChatCompletionTool(
 
 /// Pins the model to [entrySummaryTool] so the summary cannot come back as
 /// prose the caller would have to parse.
-const ChatCompletionToolChoiceOption entrySummaryToolChoice =
-    ChatCompletionToolChoiceOption.tool(
-      ChatCompletionNamedToolChoice(
-        type: ChatCompletionNamedToolChoiceType.function,
-        function: ChatCompletionFunctionCallOption(
-          name: entrySummaryToolName,
-        ),
-      ),
-    );
+///
+/// Null for the models that answer a pinned choice with prose anyway — see
+/// [forcedToolChoiceFor]. For those the single-tool list is what steers, and
+/// pinning would lose the call entirely rather than guarantee it.
+ChatCompletionToolChoiceOption? entrySummaryToolChoiceFor(String modelId) =>
+    forcedToolChoiceFor(modelId: modelId, toolName: entrySummaryToolName);
 
 /// Decodes and validates the [entrySummaryToolName] call out of [toolCalls].
 ///
@@ -140,6 +138,39 @@ const ChatCompletionToolChoiceOption entrySummaryToolChoice =
 /// rejected — some providers echo a duplicate final call, and a usable first
 /// result should not be thrown away over it.
 EntrySummary parseEntrySummaryToolCall(
+  List<ChatCompletionMessageToolCall> toolCalls,
+) {
+  final args = _decodeEntrySummaryToolCall(toolCalls);
+
+  final oneLiner = _requireSummaryField(args, EntrySummaryToolArgs.oneLiner);
+  if (oneLiner.length > entrySummaryOneLinerMaxChars) {
+    throw EntrySummaryToolException(
+      '"${EntrySummaryToolArgs.oneLiner}" is ${oneLiner.length} chars, '
+      'over the $entrySummaryOneLinerMaxChars limit',
+    );
+  }
+
+  return EntrySummary(
+    oneLiner: oneLiner,
+    tldr: _requireSummaryField(args, EntrySummaryToolArgs.tldr),
+    summary: _requireSummaryField(args, EntrySummaryToolArgs.summary),
+  );
+}
+
+/// Recovers the full analysis when an image response's shorter tiers are invalid.
+///
+/// Only the first matching tool call is considered, just as for the strict
+/// parser. Its arguments must be valid JSON and its summary a non-empty string.
+/// Missing or invalid shorter tiers are ignored; audio summaries continue to
+/// use [parseEntrySummaryToolCall] to require all three tiers.
+String parseEntrySummaryToolBody(
+  List<ChatCompletionMessageToolCall> toolCalls,
+) => _requireSummaryField(
+  _decodeEntrySummaryToolCall(toolCalls),
+  EntrySummaryToolArgs.summary,
+);
+
+Map<String, dynamic> _decodeEntrySummaryToolCall(
   List<ChatCompletionMessageToolCall> toolCalls,
 ) {
   final call = toolCalls
@@ -165,33 +196,19 @@ EntrySummary parseEntrySummaryToolCall(
   if (decoded is! Map<String, dynamic>) {
     throw const EntrySummaryToolException('arguments are not a JSON object');
   }
-  final args = decoded;
+  return decoded;
+}
 
-  String requireField(String key) {
-    final value = args[key];
-    if (value is! String) {
-      throw EntrySummaryToolException(
-        value == null ? 'missing "$key"' : '"$key" is not a string',
-      );
-    }
-    final trimmed = value.trim();
-    if (trimmed.isEmpty) {
-      throw EntrySummaryToolException('"$key" is empty');
-    }
-    return trimmed;
-  }
-
-  final oneLiner = requireField(EntrySummaryToolArgs.oneLiner);
-  if (oneLiner.length > entrySummaryOneLinerMaxChars) {
+String _requireSummaryField(Map<String, dynamic> args, String key) {
+  final value = args[key];
+  if (value is! String) {
     throw EntrySummaryToolException(
-      '"${EntrySummaryToolArgs.oneLiner}" is ${oneLiner.length} chars, '
-      'over the $entrySummaryOneLinerMaxChars limit',
+      value == null ? 'missing "$key"' : '"$key" is not a string',
     );
   }
-
-  return EntrySummary(
-    oneLiner: oneLiner,
-    tldr: requireField(EntrySummaryToolArgs.tldr),
-    summary: requireField(EntrySummaryToolArgs.summary),
-  );
+  final trimmed = value.trim();
+  if (trimmed.isEmpty) {
+    throw EntrySummaryToolException('"$key" is empty');
+  }
+  return trimmed;
 }

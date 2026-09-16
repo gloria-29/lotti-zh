@@ -23,15 +23,25 @@ class DesignSystemSpinner extends StatefulWidget {
   const DesignSystemSpinner({
     this.style = DesignSystemSpinnerStyle.track,
     this.size = 48,
-    this.strokeWidth = 8,
+    this.strokeWidth,
     this.semanticsLabel,
     super.key,
   });
 
   final DesignSystemSpinnerStyle style;
   final double size;
-  final double strokeWidth;
+
+  /// The ring's stroke. Null keys it on [size]: the emphasis border width
+  /// for a glyph-sized spinner, the wide default for the standalone one —
+  /// so call sites never reach for a spacing step as a stroke.
+  final double? strokeWidth;
   final String? semanticsLabel;
+
+  static const double _standaloneStroke = 8;
+
+  double get effectiveStrokeWidth =>
+      strokeWidth ??
+      (size <= IconSizes.s ? BorderWidths.emphasis : _standaloneStroke);
 
   @override
   State<DesignSystemSpinner> createState() => _DesignSystemSpinnerState();
@@ -47,7 +57,19 @@ class _DesignSystemSpinnerState extends State<DesignSystemSpinner>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
-    )..repeat();
+    );
+  }
+
+  // Reduced motion is a system setting, read from the tree: a spinner that
+  // keeps turning under it is a spinner the setting was asked to stop.
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _controller.stop();
+    } else if (!_controller.isAnimating) {
+      _controller.repeat();
+    }
   }
 
   @override
@@ -73,7 +95,7 @@ class _DesignSystemSpinnerState extends State<DesignSystemSpinner>
               painter: _SpinnerPainter(
                 color: color,
                 style: widget.style,
-                strokeWidth: widget.strokeWidth,
+                strokeWidth: widget.effectiveStrokeWidth,
                 rotationValue: _controller.value,
               ),
             );
@@ -176,7 +198,19 @@ class _DesignSystemSkeletonState extends State<DesignSystemSkeleton>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
-    )..repeat();
+    );
+  }
+
+  // Reduced motion is a system setting, read from the tree: a spinner that
+  // keeps turning under it is a spinner the setting was asked to stop.
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _controller.stop();
+    } else if (!_controller.isAnimating) {
+      _controller.repeat();
+    }
   }
 
   @override

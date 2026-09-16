@@ -47,12 +47,31 @@ class TldrHeader extends StatelessWidget {
     required this.agentName,
     this.onAgentTap,
     this.title,
+    this.subtitle,
     this.trailing,
+    this.icon,
+    this.plain = false,
     super.key,
   });
 
   final String? agentName;
   final VoidCallback? onAgentTap;
+
+  /// A neutral badge tile — surface fill, hairline border, medium-emphasis
+  /// glyph — for a card that is not an AI surface yet, so it does not wear
+  /// the accent it disclaims.
+  final bool plain;
+
+  /// A widget on the second line instead of the [agentName] caption — the
+  /// relationship briefing's status line, which carries a glyph and a
+  /// semantic colour the plain caption cannot. When set, [agentName] is
+  /// neither shown nor announced: the subtitle is its own semantics node,
+  /// and a name folded into the header's label would be read twice.
+  final Widget? subtitle;
+
+  /// The badge glyph; the sparkle by default. A card that is not an AI
+  /// surface — the unenrolled person's plain card — passes its own.
+  final IconData? icon;
 
   /// The card's own name, when it is not the task/goal agent's
   /// `aiCardTitle`. The relationship briefing is the same panel wearing a
@@ -72,7 +91,8 @@ class TldrHeader extends StatelessWidget {
     final messages = context.messages;
     final cardTitle = title ?? messages.aiCardTitle;
     final displayName = agentName?.trim();
-    final hasName = displayName != null && displayName.isNotEmpty;
+    final hasName =
+        subtitle == null && displayName != null && displayName.isNotEmpty;
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -91,10 +111,15 @@ class TldrHeader extends StatelessWidget {
             Expanded(
               child: Align(
                 alignment: AlignmentDirectional.centerStart,
+                // One node for the badge + title (their visible text may be
+                // tiered or truncated), with the subtitle left to speak for
+                // itself: it is the card's status line, and its live region
+                // must survive here or the running → current change is
+                // never announced.
                 child: Semantics(
                   button: onAgentTap != null,
                   label: hasName ? '$cardTitle. $displayName' : cardTitle,
-                  excludeSemantics: true,
+                  explicitChildNodes: true,
                   // No hover fill: a rectangle washing over the badge + title
                   // block made the card's identity read as a phantom button.
                   // Hover/focus/press answers on the block's own ink — the
@@ -115,18 +140,28 @@ class TldrHeader extends StatelessWidget {
                             height: tokens.spacing.step8,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
-                              color: ai.accentSoft,
+                              color: plain
+                                  ? tokens.colors.background.level03
+                                  : ai.accentSoft,
                               borderRadius: BorderRadius.circular(
                                 tokens.radii.m,
                               ),
                               border: Border.all(
-                                color: highlighted ? ai.accent : ai.border,
+                                color: plain
+                                    ? tokens.colors.decorative.level01
+                                    : highlighted
+                                    ? ai.accent
+                                    : ai.border,
                               ),
                             ),
-                            child: Icon(
-                              LottiIcons.aiSpark,
-                              size: tokens.spacing.step6,
-                              color: ai.accent,
+                            child: ExcludeSemantics(
+                              child: Icon(
+                                icon ?? LottiIcons.aiSpark,
+                                size: IconSizes.l,
+                                color: plain
+                                    ? tokens.colors.text.mediumEmphasis
+                                    : ai.accent,
+                              ),
                             ),
                           ),
                           SizedBox(width: tokens.spacing.step3),
@@ -139,30 +174,36 @@ class TldrHeader extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                _HeaderTitle(
-                                  text: cardTitle,
-                                  style: tokens
-                                      .typography
-                                      .styles
-                                      .subtitle
-                                      .subtitle1
-                                      .copyWith(color: ai.titleText),
-                                ),
-                                if (hasName)
-                                  Text(
-                                    displayName,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
+                                ExcludeSemantics(
+                                  child: _HeaderTitle(
+                                    text: cardTitle,
                                     style: tokens
                                         .typography
                                         .styles
-                                        .others
-                                        .caption
-                                        .copyWith(
-                                          color: highlighted
-                                              ? ai.bodyText
-                                              : ai.metaText,
-                                        ),
+                                        .subtitle
+                                        .subtitle1
+                                        .copyWith(color: ai.titleText),
+                                  ),
+                                ),
+                                if (subtitle case final subtitle?)
+                                  subtitle
+                                else if (hasName)
+                                  ExcludeSemantics(
+                                    child: Text(
+                                      displayName,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: tokens
+                                          .typography
+                                          .styles
+                                          .others
+                                          .caption
+                                          .copyWith(
+                                            color: highlighted
+                                                ? ai.bodyText
+                                                : ai.metaText,
+                                          ),
+                                    ),
                                   ),
                               ],
                             ),
@@ -197,7 +238,7 @@ class TldrHeader extends StatelessWidget {
 /// The card's own name — two lines where they help, one where they would not.
 ///
 /// German compounds this title into a single unbreakable token
-/// ("KI-Zusammenfassung"), and at 320 logical px with 1.3x text scale that
+/// ("KI-Zusammenfassung"), and on a narrow phone at a large text scale that
 /// token is wider than the line the header can give it. Flutter's line breaker
 /// then falls back to breaking *inside* the word — "KI-Zusammenf / assung" —
 /// which reads as a typo rather than as shortening, because nothing marks it
@@ -258,6 +299,8 @@ class TldrBody extends StatelessWidget {
     required this.onToggle,
     required this.disclosureKey,
     this.onOpenInternals,
+    this.bodyStyle,
+    this.trailing,
     super.key,
   });
 
@@ -266,6 +309,17 @@ class TldrBody extends StatelessWidget {
   final String? additionalReport;
   final VoidCallback onToggle;
   final VoidCallback? onOpenInternals;
+
+  /// The prose tier, when a host's other faces set it: the relationship
+  /// card reads at bodyMedium on every face, so its briefing must too.
+  /// Null keeps the compact summary size the task and goal cards use.
+  final TextStyle? bodyStyle;
+
+  /// An action at the trailing end of the disclosure row — the task card's
+  /// *Chat* — so it shares the line with *Read more* instead of costing a
+  /// row of its own. The row renders for it even when there is nothing
+  /// further to read.
+  final Widget? trailing;
 
   /// Key on the Read more / Show less control. Required rather than
   /// defaulted: a default would hand a fourth surface the task card's key
@@ -293,9 +347,10 @@ class TldrBody extends StatelessWidget {
     final messages = context.messages;
     // Match entry-editor prose and compact card summaries; the header and
     // card treatment provide the hierarchy without enlarging report text.
-    final bodyStyle = tokens.typography.styles.body.bodySmall.copyWith(
-      color: ai.bodyText,
-    );
+    final bodyStyle =
+        (this.bodyStyle ?? tokens.typography.styles.body.bodySmall).copyWith(
+          color: ai.bodyText,
+        );
     final hasMore = additionalReport?.trim().isNotEmpty ?? false;
     final hasDisclosure = hasMore || expanded;
 
@@ -322,33 +377,46 @@ class TldrBody extends StatelessWidget {
         // carries ~12 px of optical padding on each side, so an explicit gap
         // stacked a second one on top and left a dead band under the prose.
         // The target instead reaches up into the last line's descender area.
-        if (hasDisclosure)
-          Wrap(
-            spacing: tokens.spacing.step4,
-            runSpacing: tokens.spacing.step2,
+        if (hasDisclosure || trailing != null)
+          Row(
             children: [
-              if (hasMore)
-                _QuietDisclosureLink(
-                  key: disclosureKey,
-                  label: expanded
-                      ? messages.aiCardShowLess
-                      : messages.aiCardReadMore,
-                  icon: expanded ? LottiIcons.collapse : LottiIcons.expand,
-                  expanded: expanded,
-                  onPressed: onToggle,
+              Expanded(
+                child: Wrap(
+                  spacing: tokens.spacing.step4,
+                  runSpacing: tokens.spacing.step2,
+                  children: [
+                    if (hasMore)
+                      _QuietDisclosureLink(
+                        key: disclosureKey,
+                        label: expanded
+                            ? messages.aiCardShowLess
+                            : messages.aiCardReadMore,
+                        icon: expanded
+                            ? LottiIcons.collapse
+                            : LottiIcons.expand,
+                        expanded: expanded,
+                        onPressed: onToggle,
+                      ),
+                    if (expanded && onOpenInternals != null)
+                      _QuietDisclosureLink(
+                        label: messages.aiCardOpenAgentInternals,
+                        icon: LottiIcons.tune,
+                        onPressed: onOpenInternals!,
+                      ),
+                  ],
                 ),
-              if (expanded && onOpenInternals != null)
-                _QuietDisclosureLink(
-                  label: messages.aiCardOpenAgentInternals,
-                  icon: LottiIcons.tune,
-                  onPressed: onOpenInternals!,
-                ),
+              ),
+              if (trailing case final trailing?) ...[
+                SizedBox(width: tokens.spacing.step4),
+                trailing,
+              ],
             ],
           ),
         // Without a disclosure row there is no tap target to supply the
         // trailing optical gap, so the body pays for it itself. The card gives
         // this block no bottom padding of its own.
-        if (!hasDisclosure) SizedBox(height: tokens.spacing.step3),
+        if (!hasDisclosure && trailing == null)
+          SizedBox(height: tokens.spacing.step3),
       ],
     );
   }
@@ -387,16 +455,24 @@ class _QuietDisclosureLink extends StatelessWidget {
           builder: (context, highlighted) {
             final ink = highlighted ? ai.bodyText : ai.metaText;
             return ConstrainedBox(
-              constraints: BoxConstraints(minHeight: tokens.spacing.step8),
+              constraints: const BoxConstraints(
+                minHeight: TapTargets.minimum,
+              ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(icon, size: tokens.spacing.step5, color: ink),
+                  Icon(icon, size: IconSizes.s, color: ink),
                   SizedBox(width: tokens.spacing.step2),
-                  Text(
-                    label,
-                    style: tokens.typography.styles.others.caption.copyWith(
-                      color: ink,
+                  // Flexible: beside the trailing action on a 320 px card, a
+                  // long translation ("Deschideți componentele interne ale
+                  // agentului") wraps inside its tap target instead of
+                  // overflowing the row.
+                  Flexible(
+                    child: Text(
+                      label,
+                      style: tokens.typography.styles.others.caption.copyWith(
+                        color: ink,
+                      ),
                     ),
                   ),
                 ],

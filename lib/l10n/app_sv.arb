@@ -438,6 +438,7 @@
   },
   "agentSummaryAddItem": "Lägg till: ”{title}”",
   "agentSummaryArchiveItem": "Arkivera: ”{title}”",
+  "agentSummaryAssignLabel": "Tilldela etikett: ”{label}”",
   "agentSummaryCheckItem": "Markera: ”{title}”",
   "agentSummaryCreateFollowUp": "Skapa uppföljningsuppgift: ”{title}”",
   "agentSummaryCreateFollowUpRelated": "Skapa uppföljningsuppgift: ”{title}” — {relation}",
@@ -703,8 +704,6 @@
   "aiCardReadMore": "Läs mer",
   "aiCardShowLess": "Visa mindre",
   "aiCardTitle": "AI-sammanfattning",
-  "aiChatAssistantResponding": "Assistenten svarar",
-  "aiChatMessageCopied": "Kopierat till skrivplatta",
   "aiConfigFailedToLoadModelsGeneric": "Misslyckades med att ladda modellerna. Försök igen, tack.",
   "aiConfigNoModelsAvailable": "Inga AI-modeller är konfigurerade än. Vänligen lägg till en i inställningarna.",
   "aiConfigNoSuitableModelsAvailable": "Inga modeller uppfyller kraven för denna prompt. Vänligen konfigurera modeller som stödjer de nödvändiga funktionerna.",
@@ -904,44 +903,6 @@
   "aiInferenceErrorUnknownTitle": "Fel",
   "aiInternalsTitle": "Agentens inre delar",
   "aiModelCardDeleteTooltip": "Radera modell",
-  "aiModelDownloadCloseButton": "Stäng",
-  "aiModelDownloadDialogDescription": "Lotti laddar ner {modelName} till MLX Audio-cachen och använder den för lokal talbearbetning.",
-  "@aiModelDownloadDialogDescription": {
-    "placeholders": {
-      "modelName": {
-        "type": "String"
-      }
-    }
-  },
-  "aiModelDownloadDialogTitle": "Installera {modelName}",
-  "@aiModelDownloadDialogTitle": {
-    "placeholders": {
-      "modelName": {
-        "type": "String"
-      }
-    }
-  },
-  "aiModelDownloadInstallTooltip": "Installationsmodell",
-  "aiModelDownloadOpenProgressTooltip": "Visa nedladdningsframsteg",
-  "aiModelDownloadStatusChecking": "Kontrollerar modellstatus",
-  "aiModelDownloadStatusDownloading": "Nedladdning av {percent}%",
-  "@aiModelDownloadStatusDownloading": {
-    "placeholders": {
-      "percent": {
-        "type": "int"
-      }
-    }
-  },
-  "aiModelDownloadStatusDownloadingIndeterminate": "Nedladdning",
-  "aiModelDownloadStatusFailed": "Nedladdning misslyckades",
-  "aiModelDownloadStatusInstalled": "Installerat",
-  "aiModelDownloadStatusNotInstalled": "Ej installerad",
-  "aiModelDownloadStatusUnsupported": "Apple Silicon krävs",
-  "aiModelInstallChoiceCancelButton": "Avbryt",
-  "aiModelInstallChoiceDescription": "Välj först den lokala tal-till-text-modellen att ladda ner. Du kan installera de andra senare från modelllistan.",
-  "aiModelInstallChoiceInstallButton": "Installationsmodell",
-  "aiModelInstallChoiceRecommended": "Rekommenderas",
-  "aiModelInstallChoiceTitle": "Välj MLX Audio-modellen",
   "aiModelPickerByProviderLabel": "Välj en leverantör",
   "aiModelPickerCurrentDefaultLabel": "Nuvarande betalningsinställelse",
   "aiModelPickerProviderModelCount": "{count, plural, =1{1 modell} other{{count} modeller}}",
@@ -1124,22 +1085,20 @@
   "aiProviderDetailRemoveDescription": "Tar bort leverantören och alla modeller som är beroende av den. Detta kan inte göras ogjort.",
   "aiProviderDetailRemoveTitle": "Ta bort denna leverantör",
   "aiProviderDetailValueUnset": "Inte inställt",
-  "aiProviderEmbeddedRuntimeHint": "Körs inbäddad i Apple-appens process. Ingen lokal server eller bas-URL krävs.",
   "aiProviderGeminiName": "Googla Gemini",
   "aiProviderGenericOpenAiName": "OpenAI-kompatibel",
   "aiProviderMeliousName": "Melious.ai",
   "aiProviderMistralName": "Mistral",
-  "aiProviderMlxAudioName": "MLX Audio (lokal)",
   "aiProviderNebiusAiStudioName": "Nebius AI Studio",
   "aiProviderOllamaName": "Ollama",
   "aiProviderOmlxName": "oMLX (lokal)",
   "aiProviderOpenAiName": "OpenAI",
   "aiProviderOpenRouterName": "OpenRouter",
+  "aiProviderSherpaName": "sherpa-onnx (på enheten)",
   "aiProviderTaglineAlibaba": "Qwen-modeller · Multimodal · Lång kontext",
   "aiProviderTaglineAnthropic": "Familjen Claude · Lång kontext",
   "aiProviderTaglineGemini": "Multimodal · Ljudtranskription",
   "aiProviderTaglineMelious": "EU-värd · Dynamisk katalog · Eco-ruttning",
-  "aiProviderTaglineMlxAudio": "Inbäddad · Apple Silicon · Lokalt ljud",
   "aiProviderTaglineOllama": "Körs lokalt · inga molnsamtal",
   "aiProviderTaglineOmlx": "Lokal MLX-inferens · OpenAI-kompatibel",
   "aiProviderTaglineOpenAi": "GPT-familjen · Vision + resonemang",
@@ -1168,6 +1127,7 @@
   "aiSettingsCounterModels": "Modeller",
   "aiSettingsCounterProfiles": "Profiler",
   "aiSettingsCounterProviders": "Leverantörer",
+  "aiSettingsDefaultProfileDescription": "Reservprofil för agenter utan en konfigurerad modell på den här enheten.",
   "aiSettingsEmptyDescription": "Lägg till en för att låsa upp transkription, bildigenkänning, bildgenerering och semantisk sökning.",
   "aiSettingsEmptyTitle": "Inga leverantörer än",
   "aiSettingsFilterByCapabilityTooltip": "Filtrera efter {capability}-funktion",
@@ -1193,6 +1153,7 @@
   "aiSettingsModalityAudio": "Ljud",
   "aiSettingsModalityText": "Text",
   "aiSettingsModalityVision": "Vision",
+  "aiSettingsNoDefaultProfile": "Ingen standardprofil",
   "aiSettingsNoModelsConfigured": "Inga AI-modeller konfigurerade",
   "aiSettingsNoProvidersConfigured": "Inga AI-leverantörer konfigurerade",
   "aiSettingsPageLead": "Konfigurera AI-leverantörer, modellerna Lotti kan kalla och inferensprofilerna som avgör vilken modell som hanterar vilken uppgift.",
@@ -1393,6 +1354,10 @@
   "audioRecordingResume": "Återuppta",
   "audioRecordings": "Ljudinspelningar",
   "audioRecordingStop": "Stoppa",
+  "avatarCropHint": "Dra för att flytta · nyp för att zooma",
+  "avatarCropPreviewLabel": "Så här ser det ut i listan",
+  "avatarCropTitle": "Välj ansiktet",
+  "avatarCropUse": "Använd foto",
   "backfillAdvancedRecoveryActions": "{count, plural, =1{1 åtgärd} other{{count} handlingar}}",
   "@backfillAdvancedRecoveryActions": {
     "placeholders": {
@@ -1566,49 +1531,162 @@
   "chatInputStopRealtime": "Stoppa livetranskriptionen",
   "chatInputStopTranscribe": "Stoppa och transkribera",
   "chatInputTranscriptionFailed": "Inspelningen gjordes, men transkriberingen misslyckades. Försök igen.",
+  "checkInAddMoreButton": "Lägg till mer",
+  "checkInAudioSaved": "{length} ljud sparat",
+  "checkInAudioSavedAsYouGo": "Ljudet sparas på den här enheten medan du spelar in",
+  "checkInAudioSavedRoute": "{length} ljud sparat · {route}",
   "checkInAvoidLabel": "Bäst att undvika",
-  "checkInDateLabel": "När?",
-  "checkInDeleteConfirmMessage": "Ta bort den här avstämningen? Det går inte att ångra.",
-  "checkInDone": "Klart",
-  "@checkInDone": {
-    "description": "Relationships redesign label."
+  "checkInComposerSubtitle": "med {name} · senast {day}",
+  "checkInComposerSubtitleNoContact": "med {name} · ingen avstämning än",
+  "checkInComposerWithName": "med {name}",
+  "@checkInComposerWithName": {
+    "description": "The composer header's status line when only the person fits: the name is never shed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
+  "checkInContextSummary": "{type} · {time} · {duration}",
+  "checkInDeleteConfirmMessage": "Ta bort den här avstämningen? Det går inte att ångra.",
+  "checkInDictateButton": "Diktera",
+  "checkInDiscardDraftAudioKeptMessage": "Släng den här avstämningen? Inspelningen finns kvar i journalen.",
+  "@checkInDiscardDraftAudioKeptMessage": {
+    "description": "The discard confirmation while a saved recording exists: the check-in goes, the audio stays in the journal."
+  },
+  "checkInDiscardDraftMessage": "Släng den här avstämningen? Inget har sparats.",
+  "checkInDiscardDraftRecordingMessage": "Släng den här avstämningen och inspelningen? Inspelningen tas bort.",
+  "checkInDiscardRecording": "Släng",
+  "checkInDiscardRecordingBody": "Ljudet raderas. Din avstämning förblir öppen.",
+  "@checkInDiscardRecordingBody": {
+    "description": "Body of the confirmation before discarding a check-in recording: the audio is deleted, the composer stays open."
+  },
+  "checkInDismissButton": "Stäng",
+  "checkInDurationChip": "Längd",
+  "checkInDurationChipSemantics": "Längd: {duration}. Ändra",
+  "checkInDurationQuickPickHint": "Tryck på en längd för att spara den, eller snurra på hjulet.",
+  "checkInDurationSemanticsLabel": "Sätt längden till {label}",
   "checkInEditTitle": "Redigera avstämning",
   "checkInErrorCreateFailed": "Avstämningen kunde inte sparas. Försök igen.",
   "checkInErrorDeleteFailed": "Avstämningen kunde inte tas bort. Försök igen.",
-  "checkInHowDidItFeel": "Hur kändes det?",
-  "@checkInHowDidItFeel": {
-    "description": "Relationships redesign label."
-  },
-  "checkInHowDidYouConnect": "Hur hade ni kontakt?",
-  "@checkInHowDidYouConnect": {
-    "description": "Relationships redesign label."
-  },
   "checkInInteractionCall": "Samtal",
   "checkInInteractionInPerson": "Personligen",
   "checkInInteractionLabel": "Hur pratade ni?",
   "checkInInteractionMessage": "Meddelande",
   "checkInInteractionOther": "Annat",
   "checkInInteractionVideoCall": "Videosamtal",
-  "checkInNarrativeLabel": "Vad pratade ni om?",
+  "checkInMicrophoneDeniedBody": "Slå på den för Lotti i systeminställningarna och tryck sedan på Diktera. Inget spelades in.",
+  "checkInMicrophoneDeniedCalloutTitle": "Tillåt mikrofonåtkomst",
+  "@checkInMicrophoneDeniedCalloutTitle": {
+    "description": "The refused-microphone card's title: the next step, since the header status already says the microphone is unavailable."
+  },
+  "checkInMoreCaptionFeeling": "Känsla",
+  "@checkInMoreCaptionFeeling": {
+    "description": "Folded More row caption segment while no feeling is chosen."
+  },
+  "checkInMoreCaptionNextTime": "nästa gång",
+  "@checkInMoreCaptionNextTime": {
+    "description": "Folded More row caption segment while nothing is noted for next time."
+  },
+  "checkInMoreCaptionNextTimeSet": "nästa gång noterat",
+  "@checkInMoreCaptionNextTimeSet": {
+    "description": "Folded More row caption segment once something is noted for next time."
+  },
+  "checkInMoreCaptionTopics": "ämnen",
+  "@checkInMoreCaptionTopics": {
+    "description": "Folded More row caption segment while no topics are entered."
+  },
+  "checkInMoreCaptionTopicsCount": "{count, plural, =1{1 ämne} other{{count} ämnen}}",
+  "@checkInMoreCaptionTopicsCount": {
+    "description": "Folded More row caption segment: how many topics are entered.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkInMoreSection": "Mer",
+  "checkInNarrativeHint": "Vad pratade ni om? En rad räcker.",
+  "checkInNoDuration": "Ingen längd",
+  "checkInOpenSettingsButton": "Öppna inställningar",
+  "checkInOrTypeHint": "Eller skriv här…",
   "checkInPayAttentionLabel": "Nästa gång: var uppmärksam på",
-  "checkInPreparedOverline": "✦ LOTTI · FÖRBEREDD I MORSE",
+  "checkInPreparingLabel": "Förbereder ljud…",
+  "checkInRecorderBusyBody": "Stoppa den först från inspelningsindikatorn och försök igen. Inget nytt spelades in.",
+  "checkInRecorderBusyTitle": "En inspelning pågår redan",
+  "checkInRecordingFailedBody": "Mikrofonen kunde inte startas. Försök igen eller skriv avstämningen. Inget spelades in.",
+  "checkInRecordingFailedTitle": "Inspelningen startade inte",
+  "checkInRecordingHint": "Prata som vanligt. Orden dyker upp här när du stoppar.",
+  "checkInRecordingNotSavedBody": "Inspelningen kunde inte sparas. Försök igen eller skriv avstämningen.",
+  "checkInRecordingNotSavedTitle": "Inspelningen kunde inte sparas",
+  "checkInReRecordButton": "Spela in igen",
+  "checkInReRecordReplaceMessage": "Ersätta dina redigerade ord med en ny inspelning?",
+  "@checkInReRecordReplaceMessage": {
+    "description": "Confirmation before Re-record when the transcript has been edited since it landed."
+  },
+  "checkInSaveBlockedEmpty": "Lägg till några ord för att spara",
+  "checkInSaveBlockedRecording": "Stoppa inspelningen för att spara",
+  "checkInSaveBlockedRetry": "Skriv eller försök igen för att spara",
+  "checkInSaveBlockedTranscribing": "Väntar på transkriptionen",
+  "checkInSaveButton": "Spara avstämning",
+  "checkInSaveShortButton": "Spara",
+  "checkInSaveShortcutHint": "{shortcut} för att spara",
   "checkInSentimentDelightful": "Underbart",
   "checkInSentimentDifficult": "Svårt",
   "checkInSentimentGood": "Bra",
   "checkInSentimentLabel": "Hur kändes det?",
   "checkInSentimentNeutral": "Neutralt",
+  "checkInSentimentOptional": "Valfritt. Fylls aldrig i av agenten.",
   "checkInSentimentStrained": "Ansträngt",
+  "checkInSourceCall": "Från samtalet du ringde från den här sidan. Allt går att ändra.",
+  "checkInSourceMessage": "Från meddelandet du skickade från den här sidan. Allt går att ändra.",
   "checkInSpeakButton": "Tala in avstämning",
+  "checkInSpokenMinutes": "{count, plural, =1{1 minut} other{{count} minuter}}",
+  "@checkInSpokenMinutes": {
+    "description": "Minutes of a recording length, read by assistive technology.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkInSpokenSeconds": "{count, plural, =1{1 sekund} other{{count} sekunder}}",
+  "@checkInSpokenSeconds": {
+    "description": "Seconds of a recording length, read by assistive technology.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkInStartedLabel": "Startade",
+  "checkInStatusMicrophoneDenied": "Mikrofonen är inte tillgänglig",
+  "checkInStatusPaused": "Pausad",
+  "checkInStatusRecorderBusy": "Inspelaren är upptagen",
+  "checkInStatusRecording": "Spelar in",
+  "checkInStatusRecordingFailed": "Inspelningen startade inte",
+  "checkInStatusRecordingNotSaved": "Inspelningen sparades inte",
+  "checkInStatusTranscriptionUnavailable": "Ingen transkriptionsmodell",
+  "checkInStatusTranscriptMissing": "Ingen transkription mottagen",
+  "checkInTimeChipSemantics": "Start: {time}. Ändra",
   "checkInTopicsHint": "Kommaseparerade, t.ex. jobb, resor",
   "checkInTopicsLabel": "Ämnen",
-  "checkInTranscribingLabel": "Transkriberar…",
-  "checkInTranscriptFailed": "Ingen transkription kom tillbaka. Du kan skriva den själv.",
-  "checkInTranscriptUnavailable": "Transkription är inte uppsatt för den här personen. Lägg till en ljudmodell och slå på automatisk inferens för deras kategori, eller skriv avstämningen.",
-  "checkInWriteInstead": "Skriv istället",
-  "@checkInWriteInstead": {
-    "description": "Relationships redesign label."
+  "checkInTranscribingEta": "oftast under en minut",
+  "@checkInTranscribingEta": {
+    "description": "The last, first-shed tier of the transcribing caption: a time expectation for the wait."
   },
+  "checkInTranscribingLabel": "Transkriberar…",
+  "checkInTranscriptAdded": "Transkription tillagd",
+  "checkInTranscriptionUnavailableTitle": "Ingen transkriptionsmodell inställd",
+  "checkInTranscriptMissingBody": "Din inspelning på {length} finns kvar i journalen, även om du slänger den här avstämningen. Försök igen om en stund.",
+  "checkInTranscriptMissingCalloutTitle": "Försök igen, eller skriv",
+  "@checkInTranscriptMissingCalloutTitle": {
+    "description": "The transcript-not-received card's title: the next step, since the header status already names the state."
+  },
+  "checkInTranscriptUnavailable": "Välj en standardprofil för inferens med en transkriptionsmodell i AI-inställningarna, eller skriv din kontaktanteckning.",
+  "checkInTypeChipSemantics": "Typ: {type}. Ändra",
+  "checkInTypeInstead": "Skriv istället",
+  "checkInWordCount": "{count, plural, =1{1 ord} other{{count} ord}}",
   "checklistAddItem": "Lägg till ett nytt föremål",
   "checklistAiConfidenceLabel": "Självförtroende: {level}",
   "@checklistAiConfidenceLabel": {
@@ -1672,7 +1750,7 @@
   "configFlagEnableAiStreaming": "Aktivera AI-strömning för uppgiftsåtgärder",
   "configFlagEnableAiStreamingDescription": "Strömma AI-svar för uppgiftsrelaterade åtgärder. Stäng av för att buffra svar och håll gränssnittet smidigare.",
   "configFlagEnableAiSummaryTts": "AI-sammanfattningsuppspelning",
-  "configFlagEnableAiSummaryTtsDescription": "Visa den lokala text-till-tal-knappen på sammanfattningar av uppgift-AI. Kräver en installerad MLX Audio TTS-modell.",
+  "configFlagEnableAiSummaryTtsDescription": "Visa den lokala text-till-tal-knappen på sammanfattningar av uppgift-AI. Kräver en installerad Supertonic TTS-modell.",
   "configFlagEnableDailyOs": "Aktivera DailyOS",
   "configFlagEnableDailyOsDescription": "Visa DailyOS i huvudnavigeringen.",
   "configFlagEnableDashboardsPage": "Aktivera dashboards-sidan",
@@ -1692,6 +1770,8 @@
   "configFlagEnableNotificationsDescription": "Få notiser om påminnelser, uppdateringar och viktiga evenemang.",
   "configFlagEnableProjects": "Möjliggöra projekt",
   "configFlagEnableProjectsDescription": "Visa projektledningsfunktioner för att organisera uppgifter i projekt.",
+  "configFlagEnableQueryChat": "Experimentell uppgiftschatt",
+  "configFlagEnableQueryChatDescription": "Visar chattar för uppgifter, projekt och kategorier. Avstängd som standard.",
   "configFlagEnableRelationships": "Aktivera sidan Personer",
   "configFlagEnableRelationshipsDescription": "Visa fliken Personer för att vårda dina personliga relationer.",
   "configFlagEnableSessionRatings": "Aktivera sessionsbetyg",
@@ -2739,6 +2819,7 @@
   "designSystemTextareaWithCounterLabel": "Med räknare",
   "designSystemTextareaWithErrorLabel": "Med fel",
   "designSystemTextareaWithHelperLabel": "Med hjälptext",
+  "designSystemTieredTextTitle": "Nivåtext i tre bredder",
   "designSystemTimePickerFormatsTitle": "Tidsformat",
   "designSystemTimePickerTwelveHourLabel": "12-timmars",
   "designSystemTimePickerTwentyFourHourLabel": "24-timmars",
@@ -3390,6 +3471,8 @@
   "imageViewerPreviousTooltip": "Föregående bild",
   "inactiveLabel": "Inaktiv",
   "inactiveSwitchDescription": "Kan väljas för nya poster när du är på",
+  "inferenceProfileChat": "Chattmodell",
+  "inferenceProfileChatUsesThinking": "Använder resonemangsmodellen om inget väljs",
   "inferenceProfileChooseModelTitle": "Välj en modell",
   "inferenceProfileChooseTitle": "Välj en inferensprofil",
   "inferenceProfileCreateTitle": "Skapa profil",
@@ -4062,21 +4145,13 @@
   "multiSelectNoItemsFound": "Inga föremål hittades",
   "navSidebarManualBrowserHint": "Öppnas i din webbläsare",
   "navSidebarManualLabel": "Manuell",
-  "navTabMoreSemanticsLabel": "{count, plural, =1{Mer, 1 ytterligare destination} other{Mer, {count} ytterligare destinationer}}",
-  "@navTabMoreSemanticsLabel": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "navTabTitleCalendar": "DailyOS",
   "navTabTitleEvents": "Evenemang",
   "navTabTitleGoals": "Mål",
   "navTabTitleHabits": "Habiter",
   "navTabTitleInsights": "Insikter",
   "navTabTitleJournal": "Loggbok",
-  "navTabTitleMore": "Mer",
+  "navTabTitleNavigate": "Navigera",
   "navTabTitlePeople": "Personer",
   "navTabTitleProjects": "Projekt",
   "navTabTitleSettings": "Inställningar",
@@ -4348,6 +4423,47 @@
   "panasScaleModerately": "Måttligt",
   "panasScaleQuiteABit": "Ganska mycket",
   "panasScaleVerySlightlyOrNotAtAll": "Mycket lite grann eller inte alls",
+  "plazaBlockedReason": "blockerad — behöver ett beslut",
+  "plazaCategoryEmpty": "Den här kategorin har inga synliga projekt.",
+  "plazaClosedForNight": "STÄNGT FÖR NATTEN",
+  "plazaCloseHint": "Esc för att stänga",
+  "plazaControls": "WASD gå · håll Shift: 8× hastighet · dra för att se dig omkring · Tab nästa fyr · H hem · M översikt · / sök · T verktygsfält · Esc stäng · ⌘[ tillbaka",
+  "plazaCornerAfter": "Sväng efter {week}",
+  "plazaDebug": "Felsökning",
+  "plazaDecisionStrip": "BEHÖVER ETT BESLUT",
+  "plazaDoneCount": "{done} av {total} klara",
+  "plazaDueOn": "förfaller {date}",
+  "plazaDueSoonReason": "förfaller {date} — slutför den",
+  "plazaEmpty": "Lägg till en uppgift för att börja bygga projektets torg.",
+  "plazaEnterProject": "Gå in i projektet",
+  "plazaExploreCategory": "Utforska kategori",
+  "plazaExploreProject": "Utforska projekt",
+  "plazaFlyThere": "Flyg dit ›",
+  "plazaInProgressCount": "Pågår: {count}",
+  "plazaLinks": "länkar {count}",
+  "plazaMeerkats": "Surikater",
+  "plazaMorningWalk": "Morgonpromenad",
+  "plazaNeedsAttention": "Behöver uppmärksamhet: {count}",
+  "plazaOpeningSoon": "ÖPPNAR SNART",
+  "plazaOpenLate": "ÖPPET SENT",
+  "plazaOverdueSince": "försenad sedan {date} — slutför eller flytta",
+  "plazaOverview": "Överblick",
+  "plazaPaused": "Pausad",
+  "plazaProjectOverdue": "Försenade uppgifter: {count}",
+  "plazaSearchHint": "Sök uppgifter, Enter för att flyga",
+  "plazaShowPenguins": "Pingviner",
+  "plazaSkyDay": "Dag",
+  "plazaSkyNight": "Natt",
+  "plazaStaleReason": "ingen aktivitet på {days} dagar — ta upp den igen",
+  "plazaStats": "{tasks} uppgifter · {weeks} veckor · {attention} kräver uppmärksamhet",
+  "plazaTaskCount": "Uppgifter: {count}",
+  "plazaTitle": "Torg",
+  "plazaToggleToolbar": "Visa / dölj verktygsfältet",
+  "plazaToLet": "UTHYRES",
+  "plazaTourControls": "Mellanslag: paus · rör dig för att avsluta",
+  "plazaUnavailable": "Den här enheten kan inte visa 3D-världen.",
+  "plazaWeek": "V{week} · {date}",
+  "plazaWeekShort": "V{week}",
   "privateLabel": "Privat",
   "privateSwitchDescription": "Endast synligt när privata bidrag visas",
   "projectActionAddTask": "Lägg till uppgift",
@@ -4679,6 +4795,129 @@
   "provisionedSyncSummaryHomeserver": "Synkroniseringsserver",
   "provisionedSyncSummaryUser": "Synkkonto",
   "provisionedSyncTitle": "Enheter",
+  "queryActionsAccept": "Godkänn",
+  "queryActionsDismiss": "Avfärda",
+  "queryActionsIncomplete": "Vissa ändringar kunde inte tillämpas. Redan tillämpade ändringar upprepas inte när du försöker igen.",
+  "queryActionsReview": "Föreslagna ändringar",
+  "queryActionsTarget": "För: {target}",
+  "queryAllSources": "Alla",
+  "queryArchiveChat": "Arkivera chatt",
+  "queryArchiveConfirmation": "Chatten har arkiverats. Slutsatserna är fortfarande tillgängliga.",
+  "queryArchivedChats": "Arkiverade chattar",
+  "queryArchivedReadOnly": "Den här chatten är arkiverad. Återställ den för att fortsätta samtalet.",
+  "queryAsk": "Fråga",
+  "queryAskCategory": "Fråga om den här kategorin",
+  "queryAskProject": "Fråga om det här projektet",
+  "queryAskTask": "Fråga om den här uppgiften",
+  "queryAudioFailed": "Ljudet kunde inte förberedas eller spelas upp. Försök igen.",
+  "queryAudioListen": "Lyssna · {start}–{end}",
+  "queryAudioMissingFile": "Inspelningen är ännu inte tillgänglig på den här enheten.",
+  "queryAudioNoMatch": "Citatet kunde inte entydigt kopplas till inspelningen. Du kan fortfarande öppna hela posten.",
+  "queryAudioOpenRecording": "Öppna inspelning",
+  "queryAudioPlaying": "Spelar {start}–{end}",
+  "queryAudioPrepare": "Förbered ljudutdrag",
+  "queryAudioPreparing": "Förbereder ljud…",
+  "queryAudioReadAloud": "Läs upp svaret",
+  "queryAudioReading": "Läser upp svaret",
+  "queryAudioRetry": "Försök med ljud igen",
+  "queryAudioSetupDetails": "Inställningsdetaljer",
+  "queryAudioSetupRequired": "Ljudutdrag kräver en kompatibel transkriptionsmodell.",
+  "queryAudioStale": "Inspelningen har ändrats. Förbered tidsstämplarna igen.",
+  "queryAudioStop": "Stoppa ljudet",
+  "queryAudioTimingUnavailable": "Välj Melious Whisper eller en Mistral Voxtral-transkriptionsmodell som stöds i agentens inferensprofil för att förbereda ljudklipp. Leverantörens URL måste använda HTTPS.",
+  "queryAudioTooLarge": "Du kan förbereda tidsstämplar för inspelningar på upp till 25 MB. Välj en mindre inspelning.",
+  "queryAudioUploadNotice": "När tidsstämplar förbereds skickas inspelningen till transkriberingsleverantören som är inställd för den här agenten.",
+  "queryCategoryAgent": "Kategoriagent",
+  "queryChat": "Chatta",
+  "queryChats": "Chattar",
+  "queryChecked": "Kontrollerade källor: {count}",
+  "queryCloseChat": "Stäng chatt",
+  "queryCollapseChat": "Fäll ihop chatt",
+  "queryCopied": "Kopierat",
+  "queryCopyQuote": "Kopiera citat",
+  "queryCoverage": "Vad genomsöktes?",
+  "queryCoverageCategory": "Den här kategorin",
+  "queryCoverageExcluded": "Andra kategorier genomsöktes inte.",
+  "queryCoverageUnreadable": "Ingen sökbar text när detta svar skrevs. Öppna inspelningen för att granska den.",
+  "queryCoverageWider": "Andra poster i den här kategorin",
+  "queryDeleteChat": "Ta bort chatt",
+  "queryDeleteExplanation": "Ta bort den här konversationen? Välj vad som händer med dess delade slutsatser. Källinläggen påverkas inte.",
+  "queryDeleteForget": "Radera och glöm slutsatser",
+  "queryDeleteKeep": "Radera och behåll slutsatser",
+  "queryDictated": "Du kan redigera transkriptionen innan du skickar din fråga. Ljudet kan redan ha skickats till din transkriberingsleverantör.",
+  "queryDraftProvisional": "Utkast · ännu inte verifierat",
+  "queryDraftRetracted": "Svarsutkastet kunde inte verifieras. Försök igen.",
+  "queryEarlierTextOmitted": "[Tidigare text visas inte]",
+  "queryEmptyBody": "Fråga om beslut och tidigare arbete. Svaren skiljer sammanfattningar från exakta textavsnitt.",
+  "queryExactStoredText": "Exakt sparad text",
+  "queryExactText": "Visa exakt text",
+  "queryExampleDecision": "Vad kom vi överens om?",
+  "queryExampleMeeting": "På vilket möte diskuterade vi det här?",
+  "queryExampleSuggestion": "Var det ett beslut eller ett förslag?",
+  "queryExpandChat": "Expandera chatt",
+  "queryExpanding": "Kontrollerar andra poster i den här kategorin…",
+  "queryFailed": "Sökningen kunde inte slutföras. Försök igen.",
+  "queryForgetConclusions": "Glöm slutsatser",
+  "queryHideExactText": "Dölj exakt text",
+  "queryHideSurrounding": "Dölj omgivande text",
+  "queryHomeOnly": "Endast ursprungsområdet",
+  "queryHomeScope": "Ursprungsområde",
+  "queryIncomplete": "Sökningen är ofullständig. Avsaknad av belägg betyder inte att diskussionen aldrig ägde rum.",
+  "queryIncompleteShort": "Vissa källor kunde inte kontrolleras.",
+  "queryInferenceUnavailable": "Ingen användbar AI-konfiguration. Konfigurera agentens modell eller kategorins standardprofil och försök igen.",
+  "queryKeepConclusions": "Behåll slutsatser",
+  "queryLaterTextOmitted": "[Senare text visas inte]",
+  "queryMachineTranscript": "Maskintranskription: exakt sparad ordalydelse, inte kontrollerad mot ljudet.",
+  "queryMemoryCount": "Tillgängliga slutsatser från tidigare chattar: {count}",
+  "queryMissingTranscripts": "{count, plural, one{1 inspelning saknade sökbar text när detta svar skrevs.} other{{count} inspelningar saknade sökbar text när detta svar skrevs.}}",
+  "queryNewChat": "Ny chatt",
+  "queryNoAgent": "Det här området behöver sin vanliga agent. Gå tillbaka till detaljerna för att tilldela den.",
+  "queryNotes": "Anteckningar",
+  "queryOpenCurrentEntry": "Öppna aktuell post",
+  "queryOpenEntry": "Öppna inlägg",
+  "queryOriginalsHome": "Granskar bara den här uppgiften och dess direkt länkade poster.",
+  "queryOtherProject": "Utanför ursprungsområdet",
+  "queryPreparingAnswer": "Förbereder ett svar…",
+  "queryReachCategory": "Söker i detta område och i {category}.",
+  "queryReachCategoryOnly": "Söker inom {category}.",
+  "queryReachHome": "Söker bara i detta område och dess länkade poster.",
+  "queryReachUncategorized": "Söker endast i den här uppgiften och dess direkt länkade inlägg utan kategori.",
+  "queryRecall": "Det här svaret använde sparade slutsatser.",
+  "queryRecordings": "Inspelningar",
+  "queryRecordingTranscript": "Inspelningens transkription",
+  "queryRenameChat": "Byt namn på chatten",
+  "queryRestoreChat": "Återställ chatt",
+  "querySavedConclusion": "Slutsats sparad {date}",
+  "querySavedQuote": "Det här sparade citatet återger källan när svaret skrevs.",
+  "querySavedVersion": "Sparad version: {version}",
+  "@querySavedVersion": {
+    "description": "Identifies the historical text version by edit date or short content fingerprint.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "querySavedVersionUnavailable": "Versionsdatum saknas",
+  "querySearching": "Granskar tillgänglig information…",
+  "querySearchScope": "Sökområde och filter",
+  "querySourceAction": "{action}: {source}",
+  "querySourceChanged": "Källan har ändrats",
+  "querySourceDeleted": "Källan borttagen",
+  "querySourceMoved": "Källan flyttad till en annan kategori",
+  "querySummaryBased": "Baserat på sammanfattningar",
+  "querySummaryCoverage": "Det här svaret använder sammanfattningar av uppgifter eller projekt. De ursprungliga posterna granskades inte.",
+  "querySummaryCurrent": "Öppna en uppgift eller ett projekt för att läsa den aktuella sammanfattningen. Den kan ha ändrats sedan det här svaret.",
+  "querySummaryIncomplete": "Viss information saknas i de tillgängliga sammanfattningarna.",
+  "querySummaryOwners": "Om det här svaret",
+  "querySurroundingLimit": "Det här är det sparade utdraget, som kanske inte innehåller hela diskussionen.",
+  "querySurroundingText": "Visa omgivande text",
+  "queryTranscribing": "Transkriberar din inspelning. Ljudet kan redan finnas hos din leverantör.",
+  "queryUnavailable": "Det här området är inte längre tillgängligt med dina nuvarande synlighetsinställningar.",
+  "queryUnread": "Nytt svar",
+  "queryWelcomeCategory": "Fråga {agentName} om den här kategorin",
+  "queryWelcomeProject": "Fråga {agentName} om det här projektet",
+  "queryWelcomeTask": "Fråga {agentName} om den här uppgiften",
   "queueCatchUpNowButton": "Ta igen nu",
   "queueCatchUpNowDone": "Uppskjutning – kön är utmattande.",
   "queueCatchUpNowError": "Att komma ikapp misslyckades: {reason}",
@@ -4788,23 +5027,41 @@
   "relationshipActionFailed": "Inget på den här enheten kan öppna det",
   "relationshipActionMessage": "Meddelande",
   "relationshipAddChannelButton": "Lägg till kontaktuppgift",
-  "relationshipAsk": "Fråga",
-  "@relationshipAsk": {
-    "description": "Relationships redesign label."
+  "relationshipAddChannelFromContacts": "eller från kontakter",
+  "relationshipAgentAsOfBand": "{band} · uppdaterad {age}",
+  "relationshipAgentBriefNow": "Briefa nu",
+  "relationshipAgentCall": "Ring {name}",
+  "relationshipAgentFailedBody": "Leverantören svarade med ett fel innan briefingen skrevs. Dina avstämningar är oförändrade.",
+  "relationshipAgentFailedNoModel": "Ingen modell är inställd för briefingar. Välj en under AI-inställningar › Agenter. Detaljer finns under fliken Aktivitet.",
+  "relationshipAgentFailedPlain": "Senaste körningen misslyckades",
+  "relationshipAgentLastRunFailed": "Senaste körningen misslyckades · {time}",
+  "relationshipAgentMarkImportant": "Markera som viktig",
+  "relationshipAgentNoAgent": "Ingen agent för den här personen",
+  "relationshipAgentNoBriefingBody": "{count, plural, =0{Ingen briefing än. „Briefa nu“ skriver en så fort du loggat en avstämning; den ser aldrig telefonnummer eller e-post.} =1{Ingen briefing än. „Briefa nu“ skriver en utifrån din avstämning; den ser aldrig telefonnummer eller e-post.} other{Ingen briefing än. „Briefa nu“ skriver en utifrån dina {count} avstämningar; den ser aldrig telefonnummer eller e-post.}}",
+  "relationshipAgentNotEnrolledBody": "Markera {name} som viktig för att få en chatt, påminnelser när det gått ett tag och en briefing.",
+  "relationshipAgentOnlyYourStartsUseAi": "Bara det du själv startar använder AI",
+  "relationshipAgentOutOfDateNewCheckIn": "Inaktuell · ny avstämning {day}",
+  "relationshipAgentOutOfDateNewCheckInShort": "Inaktuell · ny avstämning",
+  "@relationshipAgentOutOfDateNewCheckInShort": {
+    "description": "The out-of-date status line's middle tier when the day does not fit beside the age pill."
   },
+  "relationshipAgentPausedBody": "Briefingar pausas så länge personen är vilande eller arkiverad.",
+  "relationshipAgentProposedCount": "{count, plural, =1{1 förslag} other{{count} förslag}}",
+  "relationshipAgentReadingBody": "{count, plural, =0{Förbereder briefingen. Tar oftast under en minut.} =1{Läser 1 avstämning. Tar oftast under en minut.} other{Läser {count} avstämningar. Tar oftast under en minut.}}",
+  "relationshipAgentSeeActivity": "Visa aktivitet",
+  "relationshipAgentSources": "Källor: {count, plural, =1{1 avstämning} other{{count} avstämningar}} · kontaktkanaler skickas aldrig",
+  "relationshipAgentTryAgain": "Försök igen",
+  "relationshipAgentWatching": "Agenten håller koll",
+  "relationshipAgentWatchingNextLook": "Agenten håller koll · nästa titt {day}",
+  "relationshipAgentWriting": "Skriver briefingen…",
   "relationshipBannerSemanticLabel": "Relationsbanner för {personName}",
+  "relationshipBriefingAge": "{days, plural, =1{1 dag gammal} other{{days} dagar gammal}}",
   "relationshipBriefingDisclosureBody": "Briefingen körs på {provider}. Anteckningar om personen skickas dit för bearbetning.",
   "relationshipBriefingDisclosureConfirm": "Fortsätt",
   "relationshipBriefingDisclosureTitle": "Skicka till {provider}?",
-  "relationshipBriefingEmpty": "Ingen briefing än — Uppdatera mig tar fram en från dina avstämningar.",
   "relationshipBriefingRequested": "Briefing begärd — den visas här strax.",
   "relationshipBriefingRequestFailed": "Det gick inte att begära briefingen.",
   "relationshipBriefingTitle": "Briefing",
-  "relationshipBriefMeAgain": "Briefa igen",
-  "@relationshipBriefMeAgain": {
-    "description": "Relationships redesign label."
-  },
-  "relationshipBriefMeButton": "Uppdatera mig",
   "relationshipCadenceEveryNDays": "{days, plural, =1{Varje dag} other{Var {days}:e dag}}",
   "relationshipCadenceFortnightly": "Varannan vecka",
   "relationshipCadenceLabel": "Kontaktrytm",
@@ -4818,18 +5075,13 @@
   "@relationshipCadenceOnTrack": {
     "description": "Relationships redesign label."
   },
+  "relationshipCadencePromptLabel": "Påminn mig var",
   "relationshipCadenceQuarterly": "Varje kvartal",
   "relationshipCadenceWeekly": "Varje vecka",
+  "relationshipChatAgentSubtitle": "Känner dina avstämningar, inte kontaktvägarna",
+  "relationshipChatAgentTitle": "{name} · briefingagent",
   "relationshipChatTooltip": "Chatta om den här personen",
   "relationshipChatUnavailable": "Ingen agent än — markera personen som viktig först.",
-  "relationshipCheckedInLabel": "Avstämning {date}",
-  "@relationshipCheckedInLabel": {
-    "placeholders": {
-      "date": {
-        "type": "String"
-      }
-    }
-  },
   "relationshipCheckInReminderBody": "Ett bra tillfälle att höra av dig.",
   "relationshipCheckInReminderTitle": "Hör av dig till {name}?",
   "@relationshipCheckInReminderTitle": {
@@ -4840,14 +5092,6 @@
     }
   },
   "relationshipCheckInsLabel": "Avstämningar",
-  "relationshipCheckInTitle": "Avstämning · {name}",
-  "@relationshipCheckInTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "relationshipContactCardAction": "Kontaktkort",
   "@relationshipContactCardAction": {
     "description": "Relationships redesign label."
@@ -4858,6 +5102,14 @@
   "relationshipContactMissing": "Den kontakten finns inte på den här enheten",
   "relationshipContactNoChanges": "Inget nytt att kopiera",
   "relationshipCreateTitle": "Lägg till person",
+  "relationshipDaysOver": "{count, plural, =1{försenad med 1 dag} other{försenad med {count} dagar}}",
+  "@relationshipDaysOver": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "relationshipDeleteConfirmMessage": "Alla avstämningar tas också bort. Det går inte att ångra.",
   "relationshipDeleteConfirmTitle": "Ta bort {name}?",
   "relationshipDueDay": "Senast {day}",
@@ -4868,11 +5120,54 @@
       }
     }
   },
+  "relationshipDueSince": "Försenad sedan {day} · {count, plural, =1{1 dag försenad} other{{count} dagar försenad}}",
+  "@relationshipDueSince": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipDueToday": "Dags i dag",
+  "relationshipDurationHours": "{hours} h",
+  "@relationshipDurationHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipDurationHoursMinutes": "{hours} h {minutes}",
+  "@relationshipDurationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipDurationMinutes": "{count} min",
+  "@relationshipDurationMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "relationshipEditTitle": "Redigera person",
   "relationshipErrorCreateFailed": "Personen kunde inte sparas. Försök igen.",
   "relationshipErrorDeleteFailed": "Personen kunde inte tas bort. Försök igen.",
   "relationshipErrorLinkTaskFailed": "Uppgiften kunde inte länkas. Försök igen.",
   "relationshipErrorUpdateFailed": "Ändringarna kunde inte sparas. Försök igen.",
+  "relationshipFormImportantBody": "Slår på en briefing, påminnelser och en chatt. Anteckningar från avstämningar går till agenten, men kontaktvägar skickas aldrig dit.",
+  "relationshipFormImportantBodyNamed": "Slår på en briefing, påminnelser och en chatt för {name}. Anteckningar från avstämningar går till agenten, men kontaktvägar skickas aldrig dit.",
+  "relationshipFormReachTitle": "Så når du dem",
+  "relationshipFormWhoTitle": "Vem",
   "relationshipHealthNeedsAttention": "Behöver uppmärksamhet",
   "relationshipHealthSteady": "Stabil",
   "relationshipHealthStrained": "Ansträngd",
@@ -4885,11 +5180,13 @@
   "relationshipImportEmpty": "Inga kontakter på den här enheten",
   "relationshipImportFailed": "Kunde inte lägga till någon",
   "relationshipImportGrantButton": "Tillåt åtkomst",
+  "relationshipImportImportantBody": "Briefingar, påminnelser och en chatt. Utan det händer inget av sig självt.",
   "relationshipImportNoMatches": "Inga kontakter matchar din sökning",
   "relationshipImportOpenSettings": "Öppna inställningar",
   "relationshipImportPermissionBody": "Lotti läser dina kontakter bara medan den här väljaren är öppen och kopierar bara de personer du väljer.",
   "relationshipImportRetry": "Försök igen",
   "relationshipImportReviewButton": "{count, plural, =1{Granska 1} other{Granska {count}}}",
+  "relationshipImportReviewSubtitle": "{count, plural, =1{1 person vald · kontaktuppgifterna stannar på den här enheten} other{{count} personer valda · kontaktuppgifterna stannar på den här enheten}}",
   "relationshipImportReviewTitle": "Innan du lägger till dem",
   "relationshipImportSearchHint": "Sök kontakter",
   "relationshipImportSettingsBody": "Åtkomst till kontakter är avstängd. Slå på den i systeminställningarna för att importera personer.",
@@ -4899,79 +5196,175 @@
   "@relationshipJustAdded": {
     "description": "Relationships redesign label."
   },
-  "relationshipLastCheckInLabel": "Senaste avstämning {date}",
-  "relationshipLinkContact": "Länka kontakt",
-  "relationshipLinkedTasksLabel": "Uppgifter",
-  "relationshipLinkTaskButton": "Länka uppgift",
-  "relationshipLogCheckIn": "Logga avstämning",
-  "relationshipLottisRead": "Lottis bedömning",
-  "@relationshipLottisRead": {
-    "description": "Relationships redesign label."
-  },
-  "relationshipLottisReadAsOf": "kl. {time}",
-  "@relationshipLottisReadAsOf": {
+  "relationshipLastSpoke": "pratade senast {time}",
+  "@relationshipLastSpoke": {
     "placeholders": {
       "time": {
         "type": "String"
       }
     }
   },
+  "relationshipLinkContact": "Länka kontakt",
+  "relationshipLinkedTasksLabel": "Uppgifter",
+  "relationshipLinkTaskButton": "Länka uppgift",
+  "relationshipLogCheckIn": "Logga avstämning",
+  "relationshipMoreActions": "Fler åtgärder",
   "relationshipNameLabel": "Namn",
   "relationshipNameRequired": "Namn krävs",
-  "relationshipNextByDay": "nästa senast {day}",
-  "@relationshipNextByDay": {
+  "relationshipNextDueOn": "Nästa gång {day}",
+  "@relationshipNextDueOn": {
     "placeholders": {
       "day": {
         "type": "String"
       }
     }
   },
+  "relationshipNextTimeTitle": "Nästa gång",
   "relationshipNicknameLabel": "Smeknamn",
   "relationshipNoCheckIns": "Inga avstämningar än — logga en efter ert nästa samtal.",
   "relationshipNoLinkedTasks": "Inga uppgifter länkade än.",
+  "relationshipNotEnrolled": "Följs inte",
   "relationshipNotFound": "Den här personen följs inte längre.",
-  "relationshipNudgesOn": "påminnelser på",
-  "@relationshipNudgesOn": {
-    "description": "Relationships redesign label."
-  },
-  "relationshipPostCallBody": "Du hörde precis av dig. Vill du logga en avstämning medan det är färskt?",
-  "relationshipPostCallConfirm": "Logga avstämning",
-  "relationshipPostCallDismiss": "Inte nu",
-  "relationshipPostCallTitle": "Hur gick det med {name}?",
-  "@relationshipPostCallTitle": {
+  "relationshipOnTrackCadence": "I fas · {cadence}",
+  "@relationshipOnTrackCadence": {
     "placeholders": {
-      "name": {
-        "type": "String",
-        "example": "Anna"
+      "cadence": {
+        "type": "String"
       }
     }
   },
-  "relationshipQuietForDays": "Ingen kontakt {count, plural, =1{på 1 dag} other{på {count} dagar}}",
-  "@relationshipQuietForDays": {
+  "relationshipPayAttentionTo": "Var uppmärksam på",
+  "relationshipPhotoAddBanner": "Lägg till banner",
+  "relationshipPhotoAdjustCrop": "Justera beskärning",
+  "relationshipPhotoBanner": "Banner",
+  "relationshipPhotoCardTitle": "Foto",
+  "relationshipPhotoChange": "Byt",
+  "relationshipPhotoChoose": "Välj från biblioteket",
+  "relationshipPhotoDragToReposition": "Dra för att flytta",
+  "relationshipPhotoFace": "Ansikte",
+  "relationshipPhotoPrivacy": "Bara på dina enheter · agenten ser det aldrig",
+  "relationshipPhotoRemove": "Ta bort foto",
+  "relationshipPhotoRemoveAction": "Ta bort",
+  "relationshipPhotoSaveFailed": "Det gick inte att spara fotot",
+  "relationshipPhotoSheetTitle": "Foto på {name}",
+  "relationshipPostCallConfirm": "Logga avstämning",
+  "relationshipPostCallDismiss": "Inte nu",
+  "relationshipPostCallMeta": "började kl. {time} · {minutes, plural, =0{under en minut} =1{cirka 1 min} other{cirka {minutes} min}}",
+  "@relationshipPostCallMeta": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipPostCallOfferCall": "Du ringde {name} för {minutes, plural, =0{mindre än en minut} =1{1 minut} other{{minutes} minuter}} sedan — anteckna medan det är färskt?",
+  "@relationshipPostCallOfferCall": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipPostCallOfferMessage": "Du skrev till {name} för {minutes, plural, =0{mindre än en minut} =1{1 minut} other{{minutes} minuter}} sedan — anteckna medan det är färskt?",
+  "@relationshipPostCallOfferMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipProposalAdded": "Tillagd → {title}",
+  "relationshipProposalEvidence": "Från avstämningen den {date}",
+  "relationshipProposalUndoFailed": "Kunde inte ångra. Uppgiften kan ha ändrats.",
+  "relationshipReachPrivacy": "Stannar på den här enheten · delas aldrig med AI:n",
+  "relationshipReachTitle": "Kontakt",
+  "relationshipRelinkContact": "Länka en annan kontakt",
+  "relationshipsEmptyState": "Lägg till människorna du vill hålla kontakten med.",
+  "relationshipsGroupDue": "Dags",
+  "relationshipsPageTitle": "Personer",
+  "relationshipsSelectPersonHint": "Välj en person för att se deras sida.",
+  "relationshipsSummaryDueNow": "Dags nu",
+  "relationshipsSummaryEnrolled": "{count, plural, =1{/ 1 följd} other{/ {count} följda}}",
+  "@relationshipsSummaryEnrolled": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "relationshipRelinkContact": "Länka en annan kontakt",
-  "relationshipSeeAllCheckIns": "Se alla avstämningar",
-  "@relationshipSeeAllCheckIns": {
-    "description": "Relationships redesign label."
+  "relationshipsSummaryNextDue": "Nästa: {name} · {day}",
+  "@relationshipsSummaryNextDue": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
   },
-  "relationshipsEmptyState": "Lägg till människorna du vill hålla kontakten med.",
-  "relationshipsPageTitle": "Personer",
+  "relationshipsSummaryNoneDue": "Ingen väntar",
+  "relationshipsSummaryNotEnrolled": "{count, plural, =1{1 person följs inte} other{{count} personer följs inte}}",
+  "@relationshipsSummaryNotEnrolled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "relationshipStatusActive": "Aktiv",
   "relationshipStatusArchived": "Arkiverad",
   "relationshipStatusDormant": "Vilande",
   "relationshipStatusFieldLabel": "Status",
-  "relationshipStayingInTouch": "Hålla kontakten",
-  "@relationshipStayingInTouch": {
-    "description": "Relationships redesign label."
+  "relationshipStatusLineAdded": "Nyss tillagd · {cadence}",
+  "@relationshipStatusLineAdded": {
+    "placeholders": {
+      "cadence": {
+        "type": "String"
+      }
+    }
   },
-  "relationshipStayInTouch": "Håll kontakten",
-  "@relationshipStayInTouch": {
-    "description": "Relationships redesign label."
+  "relationshipStatusLineAddedFirstDue": "Nyss tillagd · {cadence} · första gången senast {day}",
+  "@relationshipStatusLineAddedFirstDue": {
+    "placeholders": {
+      "cadence": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipStatusLineContacted": "{type} · {time} · {cadence}",
+  "@relationshipStatusLineContacted": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "cadence": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipTasksLinkedCount": "{count, plural, =1{1 kopplad} other{{count} kopplade}}",
+  "@relationshipTasksLinkedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "relationshipTimestampToday": "Idag",
   "relationshipTimestampYesterday": "Igår",
@@ -5458,7 +5851,6 @@
   "settingsSyncConflictsSubtitle": "Lös synkkonflikter",
   "settingsSyncNodeProfileCapabilitiesEmpty": "Ingen upptäckt — automatisk utlösning av synkroniserad ljudinferens riktar inte in sig på denna enhet.",
   "settingsSyncNodeProfileCapabilitiesLabel": "Upptäckta AI-förmågor",
-  "settingsSyncNodeProfileCapabilityMlxAudio": "MLX Audio (lokal)",
   "settingsSyncNodeProfileCapabilityOllamaLlm": "Ollama LLM",
   "settingsSyncNodeProfileCapabilityOmlxLlm": "oMLX LLM",
   "settingsSyncNodeProfileCapabilityVoxtral": "Voxtral (lokal)",
@@ -5473,6 +5865,8 @@
   "settingsSyncOutboxTitle": "Sync Outbox",
   "settingsSyncStatsSubtitle": "Inspektera synkpipeline-metrik",
   "settingsSyncSubtitle": "Konfigurera synk och visa statistik",
+  "settingsSystemHealthSubtitle": "Analysera de senaste loggarna och kopiera en delbar rapport",
+  "settingsSystemHealthTitle": "Systemstatus",
   "settingsThemingAutomatic": "Automatisk",
   "settingsThemingDark": "Mörkt utseende",
   "settingsThemingLight": "Ljust utseende",
@@ -5485,6 +5879,51 @@
   "settingsV2UnimplementedTitle": "Panelen har ännu inte implementerats",
   "settingsWhatsNewSubtitle": "Se de senaste uppdateringarna och funktionerna",
   "settingsWhatsNewTitle": "Vad är nytt",
+  "sherpaAllFamilies": "Alla familjer",
+  "sherpaCatalogMatches": "{count} av {total} modeller",
+  "sherpaDeleteModel": "Ta bort {model} från den här enheten",
+  "@sherpaDeleteModel": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaDownloadAction": "Ladda ner",
+  "sherpaDownloadModel": "Ladda ner {model}",
+  "@sherpaDownloadModel": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaInstalledModelsTitle": "Installerade modeller",
+  "sherpaInstallingModel": "Installerar modell",
+  "sherpaLanguageCantonese": "Kantonesiska",
+  "sherpaModelCatalogTitle": "Modellkatalog",
+  "sherpaModelConfigurationError": "Modellen har laddats ner, men dess konfiguration kunde inte sparas.",
+  "sherpaModelError": "Modellåtgärden misslyckades. Försök igen.",
+  "sherpaModelFamily": "Modellfamilj",
+  "sherpaModelInstalled": "Nedladdad",
+  "sherpaModelNotInstalled": "Ladda ner en modell på den här enheten",
+  "sherpaModelSizeGB": "{size} GB · Flerspråkig",
+  "@sherpaModelSizeGB": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaModelSizeMB": "{size} MB · Flerspråkig",
+  "@sherpaModelSizeMB": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaProviderDescription": "Transkribera på den här enheten utan server. Ladda ner en modell och välj den sedan i din inferensprofil.",
   "sidebarActiveSectionTitle": "Verksamhet",
   "sidebarActivityCollapseTooltip": "Kollapsaktivitet",
   "sidebarActivityExpandTooltip": "Utöka verksamheten",
@@ -5526,6 +5965,9 @@
   "speechDictionaryWarning": "Stora ordböcker ({count}-termer) kan öka API-kostnaderna",
   "speechModalSelectLanguage": "Välj språk",
   "speechModalTitle": "Taligenkänning",
+  "speechSettingsAutoPrepareChatAudio": "Förbered chattljud automatiskt",
+  "speechSettingsChatAudioDescription": "Förbered nya chattsvar på den här enheten så att uppspelningen börjar snabbare. Ljudet spelas bara upp när du trycker på spela upp.",
+  "speechSettingsChatAudioLabel": "Chattljud",
   "speechSettingsModelDescription": "Talmodell på enheten",
   "speechSettingsModelDownloadsOnce": "Nedladdningar en gång",
   "speechSettingsModelLabel": "Modell",
@@ -5800,6 +6242,33 @@
   "syncWizardStepConnect": "Anslut",
   "syncWizardStepGetCode": "Hämta kod",
   "syncWizardStepStatus": "Steg {step} av 3: {label}",
+  "systemHealthAnalyzedWindow": "Analyserat {start} → {end}",
+  "systemHealthChooseModelTitle": "Välj modell",
+  "systemHealthCopiedToast": "Rapporten är kopierad. Kända mönster av personuppgifter har maskerats.",
+  "systemHealthCopyButton": "Kopiera rapport",
+  "systemHealthCustomFromLabel": "Från",
+  "systemHealthCustomToLabel": "Till",
+  "systemHealthDescription": "Söker igenom loggfilerna på den här enheten efter fel, varningar och långsamma frågor, maskerar kända mönster av personuppgifter och skriver en kort rapport som du kan klistra in i en kodassistent.",
+  "systemHealthDomainsDescription": "De domäner som är påslagna här analyseras – samma inställning som avgör vad som loggas. Långsamma frågor tas med när loggning av dem är på.",
+  "systemHealthDomainsTitle": "Loggdomäner",
+  "systemHealthFailedTitle": "Analysen misslyckades",
+  "systemHealthGeneratedAt": "Skapad {time}",
+  "systemHealthHideDigest": "Dölj sammanfattning",
+  "systemHealthModelDescription": "Skriver slutsatserna utifrån den anonymiserade sammanfattningen. Föreslår tankemodellen i din standardprofil.",
+  "systemHealthModelNone": "Bara sammanfattning, ingen modell",
+  "systemHealthModelNoneDescription": "Ange en standardprofil för inferens eller lägg till en agentisk textmodell för att få slutsatser.",
+  "systemHealthModelTitle": "Modell",
+  "systemHealthPresetCustom": "Anpassat",
+  "systemHealthPresetLast14Days": "14 dagar",
+  "systemHealthPresetLast24Hours": "24 h",
+  "systemHealthPresetLast7Days": "7 dagar",
+  "systemHealthPreviousReportsDescription": "Varje rapport sparas på den här enheten. Tryck på en för att visa den igen.",
+  "systemHealthPreviousReportsTitle": "Tidigare rapporter",
+  "systemHealthRangeTitle": "Tidsintervall",
+  "systemHealthReportTitle": "Rapport",
+  "systemHealthRunButton": "Kör analys",
+  "systemHealthSavedTo": "Sparad i {path}",
+  "systemHealthShowDigest": "Visa sammanfattning",
   "taskActionBarAudioRecordingActive": "Ljudinspelning pågår",
   "taskActionBarMoreActions": "Fler åtgärder",
   "taskActionBarOpenRunningTimer": "Öppen löptimer",

@@ -1,12 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lotti/classes/journal_entities.dart';
 import 'package:lotti/classes/relationship_data.dart';
+import 'package:lotti/features/design_system/components/chips/ds_pill.dart';
 import 'package:lotti/features/design_system/theme/design_tokens.dart';
 import 'package:lotti/features/relationships/model/imported_contact.dart';
 import 'package:lotti/features/relationships/repository/relationship_repository.dart';
 import 'package:lotti/features/relationships/service/contacts_service.dart';
 import 'package:lotti/features/relationships/state/contact_import_controller.dart';
 import 'package:lotti/features/relationships/ui/pages/contact_import_page.dart';
+import 'package:lotti/features/relationships/ui/shared/persona_avatar.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -65,6 +67,7 @@ void main() {
         data: any(named: 'data'),
         entryText: any(named: 'entryText'),
         categoryId: any(named: 'categoryId'),
+        id: any(named: 'id'),
       ),
     ).thenAnswer(
       (_) async => RelationshipEntry(
@@ -257,23 +260,100 @@ void main() {
       await tester.pumpAndSettle();
     }
 
+    testWidgets(
+      'colours the review avatar by the id the person is created under, so '
+      'nobody changes colour the moment they are imported',
+      (tester) async {
+        await advanceToReview(tester);
+
+        final avatar = tester.widget<PersonaAvatar>(find.byType(PersonaAvatar));
+        expect(
+          avatar.id,
+          isNot('a'),
+          reason:
+              'the OS contact id is not the person id — hashing it for the '
+              'accent is what made everyone change colour on import',
+        );
+
+        await tester.tap(find.text('Add 1 person'));
+        await tester.pumpAndSettle();
+
+        final createdUnder = verify(
+          () => repository.createRelationship(
+            data: any(named: 'data'),
+            entryText: any(named: 'entryText'),
+            categoryId: any(named: 'categoryId'),
+            id: captureAny(named: 'id'),
+          ),
+        ).captured.single;
+        expect(createdUnder, avatar.id);
+      },
+    );
+
     testWidgets('asks who to nurture before creating anyone', (tester) async {
       await advanceToReview(tester);
 
       expect(find.text('Before you add them'), findsOneWidget);
-      expect(find.byType(SwitchListTile), findsOneWidget);
+      expect(find.byType(Switch), findsOneWidget);
+      // The subtitle says how many people this decision is about, and where
+      // their numbers stay.
+      expect(
+        find.text('1 person selected · contact details stay on this device'),
+        findsOneWidget,
+      );
+      // The switch explains itself without claiming that leaving it off
+      // keeps the person away from AI entirely.
+      expect(
+        find.text(
+          'Briefings, nudges and a chat. Without it, nothing runs on its own.',
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('each importance switch names the person it decides about, '
+        'so several in a list are told apart', (tester) async {
+      service.contacts = [
+        contact('c1', 'Ivo Brine'),
+        contact('c2', 'Tula Krillwright'),
+      ];
+      await pump(tester);
+      await tester.tap(find.text('Ivo Brine'));
+      await tester.tap(find.text('Tula Krillwright'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Review 2'));
+      await tester.pumpAndSettle();
+
+      final switchFinder = find.byType(Switch);
+      expect(
+        tester.getSemantics(switchFinder.first).label,
+        contains('Ivo Brine'),
+      );
+      expect(
+        tester.getSemantics(switchFinder.last).label,
+        contains('Tula Krillwright'),
+      );
+
+      // The label toggles the switch it belongs to, not its neighbour.
+      await tester.tap(find.text('Important').first);
+      await tester.pumpAndSettle();
+      final switches = tester.widgetList<Switch>(find.byType(Switch)).toList();
+      expect(switches.first.value, isTrue);
+      expect(switches.last.value, isFalse);
     });
 
     testWidgets('hides the cadence until a person is marked important — a '
         'cadence on an unimportant person is never evaluated', (tester) async {
       await advanceToReview(tester);
 
-      expect(find.byType(ChoiceChip), findsNothing);
+      expect(find.text('Nudge me every'), findsNothing);
+      expect(find.byType(DsPill), findsNothing);
 
-      await tester.tap(find.byType(SwitchListTile));
+      await tester.tap(find.byType(Switch));
       await tester.pumpAndSettle();
 
-      expect(find.byType(ChoiceChip), findsWidgets);
+      expect(find.text('Nudge me every'), findsOneWidget);
+      expect(find.byType(DsPill), findsWidgets);
     });
 
     testWidgets('going back keeps the selection', (tester) async {
@@ -300,6 +380,7 @@ void main() {
           data: any(named: 'data'),
           entryText: any(named: 'entryText'),
           categoryId: any(named: 'categoryId'),
+          id: any(named: 'id'),
         ),
       ).called(1);
     });
@@ -365,6 +446,7 @@ void main() {
           data: any(named: 'data'),
           entryText: any(named: 'entryText'),
           categoryId: any(named: 'categoryId'),
+          id: any(named: 'id'),
         ),
       ).thenAnswer((_) async => null);
 
@@ -407,9 +489,9 @@ void main() {
     ) async {
       await advanceToReview(tester);
 
-      await tester.tap(find.byType(SwitchListTile));
+      await tester.tap(find.byType(Switch));
       await tester.pumpAndSettle();
-      await tester.tap(find.widgetWithText(ChoiceChip, 'Every two weeks'));
+      await tester.tap(find.widgetWithText(DsPill, 'Every two weeks'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Add 1 person'));
       await tester.pumpAndSettle();
@@ -420,6 +502,7 @@ void main() {
                   data: captureAny(named: 'data'),
                   entryText: any(named: 'entryText'),
                   categoryId: any(named: 'categoryId'),
+                  id: any(named: 'id'),
                 ),
               ).captured.single
               as RelationshipData;
@@ -432,7 +515,7 @@ void main() {
     ) async {
       await advanceToReview(tester);
 
-      await tester.tap(find.byType(SwitchListTile));
+      await tester.tap(find.byType(Switch));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Add 1 person'));
       await tester.pumpAndSettle();
@@ -443,6 +526,7 @@ void main() {
                   data: captureAny(named: 'data'),
                   entryText: any(named: 'entryText'),
                   categoryId: any(named: 'categoryId'),
+                  id: any(named: 'id'),
                 ),
               ).captured.single
               as RelationshipData;

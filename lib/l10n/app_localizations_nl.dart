@@ -885,6 +885,11 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String agentSummaryAssignLabel(String label) {
+    return 'Label toewijzen: ‘$label’';
+  }
+
+  @override
   String agentSummaryCheckItem(Object title) {
     return 'Afvinken: \"$title\"';
   }
@@ -1488,12 +1493,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get aiCardTitle => 'Samenvatting van de AI';
 
   @override
-  String get aiChatAssistantResponding => 'De assistent antwoordt';
-
-  @override
-  String get aiChatMessageCopied => 'Gekopieerd naar het klembord';
-
-  @override
   String get aiConfigFailedToLoadModelsGeneric =>
       'Laden van modellen is mislukt. Probeer het opnieuw.';
 
@@ -1817,64 +1816,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get aiModelCardDeleteTooltip => 'Model verwijderen';
 
   @override
-  String get aiModelDownloadCloseButton => 'Sluiten';
-
-  @override
-  String aiModelDownloadDialogDescription(String modelName) {
-    return 'Lotti zal downloaden $modelName in de MLX Audio cache en gebruik het voor lokale spraakverwerking.';
-  }
-
-  @override
-  String aiModelDownloadDialogTitle(String modelName) {
-    return 'Installeren $modelName';
-  }
-
-  @override
-  String get aiModelDownloadInstallTooltip => 'Model installeren';
-
-  @override
-  String get aiModelDownloadOpenProgressTooltip => 'Downloadvoortgang tonen';
-
-  @override
-  String get aiModelDownloadStatusChecking => 'Modelstatus controleren';
-
-  @override
-  String aiModelDownloadStatusDownloading(int percent) {
-    return 'Downloaden $percent%';
-  }
-
-  @override
-  String get aiModelDownloadStatusDownloadingIndeterminate => 'Downloaden';
-
-  @override
-  String get aiModelDownloadStatusFailed => 'Downloaden is mislukt';
-
-  @override
-  String get aiModelDownloadStatusInstalled => 'Geïnstalleerd';
-
-  @override
-  String get aiModelDownloadStatusNotInstalled => 'Niet geïnstalleerd';
-
-  @override
-  String get aiModelDownloadStatusUnsupported => 'Apple Silicium vereist';
-
-  @override
-  String get aiModelInstallChoiceCancelButton => 'Annuleren';
-
-  @override
-  String get aiModelInstallChoiceDescription =>
-      'Kies het lokale spraak-tekstmodel om eerst te downloaden. U kunt de anderen later installeren uit de lijst met modellen.';
-
-  @override
-  String get aiModelInstallChoiceInstallButton => 'Model installeren';
-
-  @override
-  String get aiModelInstallChoiceRecommended => 'Aanbevolen';
-
-  @override
-  String get aiModelInstallChoiceTitle => 'Kies MLX Audio model';
-
-  @override
   String get aiModelPickerByProviderLabel => 'Kies een provider';
 
   @override
@@ -2176,10 +2117,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get aiProviderDetailValueUnset => 'Niet ingesteld';
 
   @override
-  String get aiProviderEmbeddedRuntimeHint =>
-      'Runs ingebed in het Apple-appproces. Er is geen lokale server of basis-URL vereist.';
-
-  @override
   String get aiProviderGeminiName => 'Google Gemini';
 
   @override
@@ -2190,9 +2127,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get aiProviderMistralName => 'Mistral';
-
-  @override
-  String get aiProviderMlxAudioName => 'MLX-audio (lokaal)';
 
   @override
   String get aiProviderNebiusAiStudioName => 'Nebius AI Studio';
@@ -2210,6 +2144,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get aiProviderOpenRouterName => 'OpenRouter';
 
   @override
+  String get aiProviderSherpaName => 'sherpa-onnx (op dit apparaat)';
+
+  @override
   String get aiProviderTaglineAlibaba =>
       'Qwen modellen · multimodaal · lange context';
 
@@ -2222,10 +2159,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get aiProviderTaglineMelious =>
       'EU-gehoste · dynamische catalogus · eco routing';
-
-  @override
-  String get aiProviderTaglineMlxAudio =>
-      'Ingebed · Apple Silicon · lokale audio';
 
   @override
   String get aiProviderTaglineOllama => 'Lokaal draait · geen cloudgesprekken';
@@ -2318,6 +2251,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get aiSettingsCounterProviders => 'Aanbieders';
 
   @override
+  String get aiSettingsDefaultProfileDescription =>
+      'Terugvalprofiel voor agents zonder ingesteld model op dit apparaat.';
+
+  @override
   String get aiSettingsEmptyDescription =>
       'Voeg er een toe om transcriptie, beeldherkenning, beeldgeneratie en semantische zoekopdrachten te ontgrendelen.';
 
@@ -2356,6 +2293,9 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get aiSettingsModalityVision => 'Gezicht';
+
+  @override
+  String get aiSettingsNoDefaultProfile => 'Geen standaardprofiel';
 
   @override
   String get aiSettingsNoModelsConfigured => 'Geen AI-modellen geconfigureerd';
@@ -2688,6 +2628,18 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get audioRecordingStop => 'Stoppen';
+
+  @override
+  String get avatarCropHint => 'Sleep om te verplaatsen · knijp om te zoomen';
+
+  @override
+  String get avatarCropPreviewLabel => 'Zo ziet het eruit in de lijst';
+
+  @override
+  String get avatarCropTitle => 'Kies het gezicht';
+
+  @override
+  String get avatarCropUse => 'Foto gebruiken';
 
   @override
   String backfillAdvancedRecoveryActions(int count) {
@@ -3124,17 +3076,90 @@ class AppLocalizationsNl extends AppLocalizations {
       'De opname is gelukt, maar het transcriberen is mislukt. Probeer het opnieuw.';
 
   @override
+  String get checkInAddMoreButton => 'Meer toevoegen';
+
+  @override
+  String checkInAudioSaved(String length) {
+    return '$length audio opgeslagen';
+  }
+
+  @override
+  String get checkInAudioSavedAsYouGo =>
+      'Audio wordt tijdens de opname op dit apparaat opgeslagen';
+
+  @override
+  String checkInAudioSavedRoute(String length, String route) {
+    return '$length audio opgeslagen · $route';
+  }
+
+  @override
   String get checkInAvoidLabel => 'Beter vermijden';
 
   @override
-  String get checkInDateLabel => 'Wanneer?';
+  String checkInComposerSubtitle(String name, String day) {
+    return 'met $name · laatst gesproken $day';
+  }
+
+  @override
+  String checkInComposerSubtitleNoContact(String name) {
+    return 'met $name · nog geen check-in';
+  }
+
+  @override
+  String checkInComposerWithName(String name) {
+    return 'met $name';
+  }
+
+  @override
+  String checkInContextSummary(String type, String time, String duration) {
+    return '$type · $time · $duration';
+  }
 
   @override
   String get checkInDeleteConfirmMessage =>
       'Deze check-in verwijderen? Dit kan niet ongedaan worden gemaakt.';
 
   @override
-  String get checkInDone => 'Klaar';
+  String get checkInDictateButton => 'Dicteren';
+
+  @override
+  String get checkInDiscardDraftAudioKeptMessage =>
+      'Deze check-in weggooien? De opname blijft in het journaal.';
+
+  @override
+  String get checkInDiscardDraftMessage =>
+      'Deze check-in weggooien? Er is niets opgeslagen.';
+
+  @override
+  String get checkInDiscardDraftRecordingMessage =>
+      'Deze check-in en de opname weggooien? De opname wordt verwijderd.';
+
+  @override
+  String get checkInDiscardRecording => 'Weggooien';
+
+  @override
+  String get checkInDiscardRecordingBody =>
+      'De audio wordt verwijderd. Je check-in blijft open.';
+
+  @override
+  String get checkInDismissButton => 'Sluiten';
+
+  @override
+  String get checkInDurationChip => 'Duur';
+
+  @override
+  String checkInDurationChipSemantics(String duration) {
+    return 'Duur: $duration. Wijzigen';
+  }
+
+  @override
+  String get checkInDurationQuickPickHint =>
+      'Tik op een duur om die te bewaren, of draai aan het wiel.';
+
+  @override
+  String checkInDurationSemanticsLabel(String label) {
+    return 'Duur instellen op $label';
+  }
 
   @override
   String get checkInEditTitle => 'Check-in bewerken';
@@ -3146,12 +3171,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get checkInErrorDeleteFailed =>
       'Kon de check-in niet verwijderen. Probeer het opnieuw.';
-
-  @override
-  String get checkInHowDidItFeel => 'Hoe voelde het?';
-
-  @override
-  String get checkInHowDidYouConnect => 'Hoe was het contact?';
 
   @override
   String get checkInInteractionCall => 'Telefoontje';
@@ -3172,13 +3191,113 @@ class AppLocalizationsNl extends AppLocalizations {
   String get checkInInteractionVideoCall => 'Videogesprek';
 
   @override
-  String get checkInNarrativeLabel => 'Waar hebben jullie het over gehad?';
+  String get checkInMicrophoneDeniedBody =>
+      'Zet het aan voor Lotti in de systeeminstellingen en tik dan op Dicteren. Er is niets opgenomen.';
+
+  @override
+  String get checkInMicrophoneDeniedCalloutTitle => 'Sta microfoontoegang toe';
+
+  @override
+  String get checkInMoreCaptionFeeling => 'Gevoel';
+
+  @override
+  String get checkInMoreCaptionNextTime => 'volgende keer';
+
+  @override
+  String get checkInMoreCaptionNextTimeSet => 'volgende keer genoteerd';
+
+  @override
+  String get checkInMoreCaptionTopics => 'onderwerpen';
+
+  @override
+  String checkInMoreCaptionTopicsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count onderwerpen',
+      one: '1 onderwerp',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get checkInMoreSection => 'Meer';
+
+  @override
+  String get checkInNarrativeHint =>
+      'Waar hebben jullie het over gehad? Eén regel is genoeg.';
+
+  @override
+  String get checkInNoDuration => 'Geen duur';
+
+  @override
+  String get checkInOpenSettingsButton => 'Instellingen openen';
+
+  @override
+  String get checkInOrTypeHint => 'Of typ het hier…';
 
   @override
   String get checkInPayAttentionLabel => 'Let de volgende keer op';
 
   @override
-  String get checkInPreparedOverline => '✦ LOTTI · VANOCHTEND VOORBEREID';
+  String get checkInPreparingLabel => 'Audio voorbereiden…';
+
+  @override
+  String get checkInRecorderBusyBody =>
+      'Stop die eerst via de opname-indicator en probeer het opnieuw. Er is niets nieuws opgenomen.';
+
+  @override
+  String get checkInRecorderBusyTitle => 'Er loopt al een opname';
+
+  @override
+  String get checkInRecordingFailedBody =>
+      'De microfoon kon niet worden gestart. Probeer het opnieuw of typ de check-in. Er is niets opgenomen.';
+
+  @override
+  String get checkInRecordingFailedTitle => 'Opname niet gestart';
+
+  @override
+  String get checkInRecordingHint =>
+      'Praat gewoon. De woorden verschijnen hier zodra je stopt.';
+
+  @override
+  String get checkInRecordingNotSavedBody =>
+      'De opname kon niet worden opgeslagen. Probeer het opnieuw of typ de check-in.';
+
+  @override
+  String get checkInRecordingNotSavedTitle =>
+      'Opname kon niet worden opgeslagen';
+
+  @override
+  String get checkInReRecordButton => 'Opnieuw opnemen';
+
+  @override
+  String get checkInReRecordReplaceMessage =>
+      'Je bewerkte woorden vervangen door een nieuwe opname?';
+
+  @override
+  String get checkInSaveBlockedEmpty =>
+      'Voeg een paar woorden toe om op te slaan';
+
+  @override
+  String get checkInSaveBlockedRecording => 'Stop de opname om op te slaan';
+
+  @override
+  String get checkInSaveBlockedRetry => 'Typ of probeer opnieuw om op te slaan';
+
+  @override
+  String get checkInSaveBlockedTranscribing => 'Wachten op het transcript';
+
+  @override
+  String get checkInSaveButton => 'Check-in opslaan';
+
+  @override
+  String get checkInSaveShortButton => 'Opslaan';
+
+  @override
+  String checkInSaveShortcutHint(String shortcut) {
+    return '$shortcut om op te slaan';
+  }
 
   @override
   String get checkInSentimentDelightful => 'Heerlijk';
@@ -3196,10 +3315,76 @@ class AppLocalizationsNl extends AppLocalizations {
   String get checkInSentimentNeutral => 'Neutraal';
 
   @override
+  String get checkInSentimentOptional =>
+      'Optioneel. Wordt nooit door de agent ingevuld.';
+
+  @override
   String get checkInSentimentStrained => 'Gespannen';
 
   @override
+  String get checkInSourceCall =>
+      'Van het gesprek dat je vanaf deze pagina begon. Alles is aan te passen.';
+
+  @override
+  String get checkInSourceMessage =>
+      'Van het bericht dat je vanaf deze pagina stuurde. Alles is aan te passen.';
+
+  @override
   String get checkInSpeakButton => 'Check-in inspreken';
+
+  @override
+  String checkInSpokenMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count minuten',
+      one: '1 minuut',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String checkInSpokenSeconds(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count seconden',
+      one: '1 seconde',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get checkInStartedLabel => 'Begonnen';
+
+  @override
+  String get checkInStatusMicrophoneDenied => 'Microfoon niet beschikbaar';
+
+  @override
+  String get checkInStatusPaused => 'Gepauzeerd';
+
+  @override
+  String get checkInStatusRecorderBusy => 'Recorder bezet';
+
+  @override
+  String get checkInStatusRecording => 'Opname loopt';
+
+  @override
+  String get checkInStatusRecordingFailed => 'Opname niet gestart';
+
+  @override
+  String get checkInStatusRecordingNotSaved => 'Opname niet opgeslagen';
+
+  @override
+  String get checkInStatusTranscriptionUnavailable => 'Geen transcriptiemodel';
+
+  @override
+  String get checkInStatusTranscriptMissing => 'Geen transcript ontvangen';
+
+  @override
+  String checkInTimeChipSemantics(String time) {
+    return 'Begin: $time. Wijzigen';
+  }
 
   @override
   String get checkInTopicsHint => 'Kommagescheiden, bijv. werk, reizen';
@@ -3208,18 +3393,49 @@ class AppLocalizationsNl extends AppLocalizations {
   String get checkInTopicsLabel => 'Onderwerpen';
 
   @override
+  String get checkInTranscribingEta => 'meestal binnen een minuut';
+
+  @override
   String get checkInTranscribingLabel => 'Bezig met transcriberen…';
 
   @override
-  String get checkInTranscriptFailed =>
-      'Er kwam geen transcriptie terug. Je kunt het zelf typen.';
+  String get checkInTranscriptAdded => 'Transcript toegevoegd';
+
+  @override
+  String get checkInTranscriptionUnavailableTitle =>
+      'Geen transcriptiemodel ingesteld';
+
+  @override
+  String checkInTranscriptMissingBody(String length) {
+    return 'Je opname van $length blijft in het journaal bewaard, ook als je deze check-in weggooit. Probeer het zo nog eens.';
+  }
+
+  @override
+  String get checkInTranscriptMissingCalloutTitle =>
+      'Probeer opnieuw, of typ het';
 
   @override
   String get checkInTranscriptUnavailable =>
-      'Transcriptie is niet ingesteld voor deze persoon. Voeg een audiomodel toe en zet automatische inferentie aan voor hun categorie, of typ de check-in.';
+      'Kies in de AI-instellingen een standaard inferentieprofiel met een transcriptiemodel, of schrijf je contactmoment op.';
 
   @override
-  String get checkInWriteInstead => 'Liever schrijven';
+  String checkInTypeChipSemantics(String type) {
+    return 'Soort: $type. Wijzigen';
+  }
+
+  @override
+  String get checkInTypeInstead => 'Liever typen';
+
+  @override
+  String checkInWordCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count woorden',
+      one: '1 woord',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get checklistAddItem => 'Een nieuw item toevoegen';
@@ -3366,7 +3582,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get configFlagEnableAiSummaryTtsDescription =>
-      'Toon de lokale tekst-naar-spraak-knop op taak AI samenvattingen. Vereist een geïnstalleerd MLX Audio TTS model.';
+      'Toon de lokale tekst-naar-spraak-knop op taak AI samenvattingen. Vereist een geïnstalleerd Supertonic TTS model.';
 
   @override
   String get configFlagEnableDailyOs => 'DailyOS inschakelen';
@@ -3434,6 +3650,13 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get configFlagEnableProjectsDescription =>
       'Functies voor projectbeheer tonen voor het organiseren van taken in projecten.';
+
+  @override
+  String get configFlagEnableQueryChat => 'Experimentele taakchat';
+
+  @override
+  String get configFlagEnableQueryChatDescription =>
+      'Toont chats voor taken, projecten en categorieën. Standaard uitgeschakeld.';
 
   @override
   String get configFlagEnableRelationships => 'Mensen-pagina inschakelen';
@@ -5835,6 +6058,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get designSystemTextareaWithHelperLabel => 'Met hulptekst';
 
   @override
+  String get designSystemTieredTextTitle => 'Getrapte tekst in drie breedtes';
+
+  @override
   String get designSystemTimePickerFormatsTitle => 'Tijdsformaten';
 
   @override
@@ -7758,6 +7984,13 @@ class AppLocalizationsNl extends AppLocalizations {
       'Kan worden gekozen voor nieuwe items wanneer op';
 
   @override
+  String get inferenceProfileChat => 'Chatmodel';
+
+  @override
+  String get inferenceProfileChatUsesThinking =>
+      'Gebruikt het denkmodel als er niets is ingesteld';
+
+  @override
   String get inferenceProfileChooseModelTitle => 'Kies een model';
 
   @override
@@ -9482,17 +9715,6 @@ class AppLocalizationsNl extends AppLocalizations {
   String get navSidebarManualLabel => 'Handmatig';
 
   @override
-  String navTabMoreSemanticsLabel(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'Meer. $count aanvullende bestemmingen',
-      one: 'Meer, 1 extra bestemming',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get navTabTitleCalendar => 'DailyOS';
 
   @override
@@ -9511,7 +9733,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get navTabTitleJournal => 'Logboek';
 
   @override
-  String get navTabTitleMore => 'Meer';
+  String get navTabTitleNavigate => 'Navigeren';
 
   @override
   String get navTabTitlePeople => 'Mensen';
@@ -10136,6 +10358,161 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get panasScaleVerySlightlyOrNotAtAll => 'Zeer licht of helemaal niet';
+
+  @override
+  String get plazaBlockedReason => 'geblokkeerd — een beslissing is nodig';
+
+  @override
+  String get plazaCategoryEmpty =>
+      'Deze categorie heeft geen zichtbare projecten.';
+
+  @override
+  String get plazaClosedForNight => 'GESLOTEN VOOR DE NACHT';
+
+  @override
+  String get plazaCloseHint => 'Esc om te sluiten';
+
+  @override
+  String get plazaControls =>
+      'WASD lopen · houd Shift ingedrukt: 8× snelheid · sleep om rond te kijken · Tab volgend baken · H start · M overzicht · / zoeken · T werkbalk · Esc sluiten · ⌘[ terug';
+
+  @override
+  String plazaCornerAfter(String week) {
+    return 'Bocht na $week';
+  }
+
+  @override
+  String get plazaDebug => 'Debuggen';
+
+  @override
+  String get plazaDecisionStrip => 'BESLISSING NODIG';
+
+  @override
+  String plazaDoneCount(int done, int total) {
+    return '$done van $total afgerond';
+  }
+
+  @override
+  String plazaDueOn(String date) {
+    return 'deadline $date';
+  }
+
+  @override
+  String plazaDueSoonReason(String date) {
+    return 'deadline $date — rond het af';
+  }
+
+  @override
+  String get plazaEmpty =>
+      'Voeg een taak toe om het plein van dit project op te bouwen.';
+
+  @override
+  String get plazaEnterProject => 'Project betreden';
+
+  @override
+  String get plazaExploreCategory => 'Categorie verkennen';
+
+  @override
+  String get plazaExploreProject => 'Project verkennen';
+
+  @override
+  String get plazaFlyThere => 'Vlieg erheen ›';
+
+  @override
+  String plazaInProgressCount(int count) {
+    return 'Bezig: $count';
+  }
+
+  @override
+  String plazaLinks(int count) {
+    return 'koppelingen $count';
+  }
+
+  @override
+  String get plazaMeerkats => 'Stokstaartjes';
+
+  @override
+  String get plazaMorningWalk => 'Ochtendwandeling';
+
+  @override
+  String plazaNeedsAttention(int count) {
+    return 'Aandacht nodig: $count';
+  }
+
+  @override
+  String get plazaOpeningSoon => 'BINNENKORT OPEN';
+
+  @override
+  String get plazaOpenLate => 'LAAT OPEN';
+
+  @override
+  String plazaOverdueSince(String date) {
+    return 'te laat sinds $date — rond af of verplaats';
+  }
+
+  @override
+  String get plazaOverview => 'Overzicht';
+
+  @override
+  String get plazaPaused => 'Gepauzeerd';
+
+  @override
+  String plazaProjectOverdue(int count) {
+    return 'Achterstallige taken: $count';
+  }
+
+  @override
+  String get plazaSearchHint => 'Zoek taken, Enter om erheen te vliegen';
+
+  @override
+  String get plazaShowPenguins => 'Pinguïns';
+
+  @override
+  String get plazaSkyDay => 'Dag';
+
+  @override
+  String get plazaSkyNight => 'Nacht';
+
+  @override
+  String plazaStaleReason(int days) {
+    return 'al $days dagen stil — pak het weer op';
+  }
+
+  @override
+  String plazaStats(int tasks, int weeks, int attention) {
+    return '$tasks taken · $weeks weken · $attention vragen aandacht';
+  }
+
+  @override
+  String plazaTaskCount(int count) {
+    return 'Taken: $count';
+  }
+
+  @override
+  String get plazaTitle => 'Plein';
+
+  @override
+  String get plazaToggleToolbar => 'Werkbalk tonen / verbergen';
+
+  @override
+  String get plazaToLet => 'TE HUUR';
+
+  @override
+  String get plazaTourControls => 'Spatie: pauze · beweeg om te stoppen';
+
+  @override
+  String get plazaUnavailable =>
+      'Dit apparaat kan de 3D-wereld niet weergeven.';
+
+  @override
+  String plazaWeek(int week, String date) {
+    return 'W$week · $date';
+  }
+
+  @override
+  String plazaWeekShort(int week) {
+    return 'W$week';
+  }
 
   @override
   String get privateLabel => 'Privé';
@@ -10782,6 +11159,420 @@ class AppLocalizationsNl extends AppLocalizations {
   String get provisionedSyncTitle => 'Apparaten';
 
   @override
+  String get queryActionsAccept => 'Accepteren';
+
+  @override
+  String get queryActionsDismiss => 'Afwijzen';
+
+  @override
+  String get queryActionsIncomplete =>
+      'Sommige wijzigingen konden niet worden toegepast. Reeds toegepaste wijzigingen worden niet herhaald wanneer je het opnieuw probeert.';
+
+  @override
+  String get queryActionsReview => 'Voorgestelde wijzigingen';
+
+  @override
+  String queryActionsTarget(String target) {
+    return 'Voor: $target';
+  }
+
+  @override
+  String get queryAllSources => 'Alles';
+
+  @override
+  String get queryArchiveChat => 'Chat archiveren';
+
+  @override
+  String get queryArchiveConfirmation =>
+      'Chat gearchiveerd. De conclusies blijven beschikbaar.';
+
+  @override
+  String get queryArchivedChats => 'Gearchiveerde chats';
+
+  @override
+  String get queryArchivedReadOnly =>
+      'Deze chat is gearchiveerd. Herstel deze om het gesprek voort te zetten.';
+
+  @override
+  String get queryAsk => 'Vragen';
+
+  @override
+  String get queryAskCategory => 'Vraag over deze categorie';
+
+  @override
+  String get queryAskProject => 'Vraag over dit project';
+
+  @override
+  String get queryAskTask => 'Vraag over deze taak';
+
+  @override
+  String get queryAudioFailed =>
+      'De audio kon niet worden voorbereid of afgespeeld. Probeer het opnieuw.';
+
+  @override
+  String queryAudioListen(String start, String end) {
+    return 'Luisteren · $start–$end';
+  }
+
+  @override
+  String get queryAudioMissingFile =>
+      'De opname is nog niet beschikbaar op dit apparaat.';
+
+  @override
+  String get queryAudioNoMatch =>
+      'Dit citaat kon niet eenduidig aan de opname worden gekoppeld. Je kunt nog steeds het volledige item openen.';
+
+  @override
+  String get queryAudioOpenRecording => 'Opname openen';
+
+  @override
+  String queryAudioPlaying(String start, String end) {
+    return 'Speelt $start–$end af';
+  }
+
+  @override
+  String get queryAudioPrepare => 'Audiofragment voorbereiden';
+
+  @override
+  String get queryAudioPreparing => 'Audio voorbereiden…';
+
+  @override
+  String get queryAudioReadAloud => 'Antwoord voorlezen';
+
+  @override
+  String get queryAudioReading => 'Antwoord wordt voorgelezen';
+
+  @override
+  String get queryAudioRetry => 'Audio opnieuw proberen';
+
+  @override
+  String get queryAudioSetupDetails => 'Instellingsdetails';
+
+  @override
+  String get queryAudioSetupRequired =>
+      'Audiofragmenten vereisen een compatibel transcriptiemodel.';
+
+  @override
+  String get queryAudioStale =>
+      'De opname is gewijzigd. Bereid de tijdstempels opnieuw voor.';
+
+  @override
+  String get queryAudioStop => 'Audio stoppen';
+
+  @override
+  String get queryAudioTimingUnavailable =>
+      'Selecteer Melious Whisper of een ondersteund Mistral Voxtral-transcriptiemodel in het inferentieprofiel van deze agent om audiofragmenten voor te bereiden. De URL van de provider moet HTTPS gebruiken.';
+
+  @override
+  String get queryAudioTooLarge =>
+      'Je kunt tijdstempels voorbereiden voor opnamen tot 25 MB. Kies een kleinere opname.';
+
+  @override
+  String get queryAudioUploadNotice =>
+      'Bij het voorbereiden van tijdstempels wordt deze opname naar de transcriptieprovider gestuurd die voor deze agent is ingesteld.';
+
+  @override
+  String get queryCategoryAgent => 'Categorie-agent';
+
+  @override
+  String get queryChat => 'Chat';
+
+  @override
+  String get queryChats => 'Chats';
+
+  @override
+  String queryChecked(int count) {
+    return 'Gecontroleerde bronnen: $count';
+  }
+
+  @override
+  String get queryCloseChat => 'Chat sluiten';
+
+  @override
+  String get queryCollapseChat => 'Chat inklappen';
+
+  @override
+  String get queryCopied => 'Gekopieerd';
+
+  @override
+  String get queryCopyQuote => 'Citaat kopiëren';
+
+  @override
+  String get queryCoverage => 'Wat is doorzocht?';
+
+  @override
+  String get queryCoverageCategory => 'Deze categorie';
+
+  @override
+  String get queryCoverageExcluded => 'Andere categorieën zijn niet doorzocht.';
+
+  @override
+  String get queryCoverageUnreadable =>
+      'Geen doorzoekbare tekst toen dit antwoord werd geschreven. Open de opname om deze te bekijken.';
+
+  @override
+  String get queryCoverageWider => 'Andere items in deze categorie';
+
+  @override
+  String get queryDeleteChat => 'Chat verwijderen';
+
+  @override
+  String get queryDeleteExplanation =>
+      'Deze conversatie verwijderen? Kies wat er met de gedeelde conclusies gebeurt. Bronitems blijven intact.';
+
+  @override
+  String get queryDeleteForget => 'Verwijderen en conclusies vergeten';
+
+  @override
+  String get queryDeleteKeep => 'Verwijderen en conclusies bewaren';
+
+  @override
+  String get queryDictated =>
+      'Je kunt de transcriptie bewerken voordat je je vraag verstuurt. De audio kan al naar je transcriptieaanbieder zijn verstuurd.';
+
+  @override
+  String get queryDraftProvisional => 'Concept · nog niet geverifieerd';
+
+  @override
+  String get queryDraftRetracted =>
+      'Het conceptantwoord kon niet worden geverifieerd. Probeer het opnieuw.';
+
+  @override
+  String get queryEarlierTextOmitted => '[Eerdere tekst niet getoond]';
+
+  @override
+  String get queryEmptyBody =>
+      'Vraag naar beslissingen en eerder werk. Antwoorden maken onderscheid tussen samenvattingen en exacte passages.';
+
+  @override
+  String get queryExactStoredText => 'Exact opgeslagen tekst';
+
+  @override
+  String get queryExactText => 'Exacte tekst tonen';
+
+  @override
+  String get queryExampleDecision => 'Wat hebben we afgesproken?';
+
+  @override
+  String get queryExampleMeeting =>
+      'In welke vergadering hebben we dit besproken?';
+
+  @override
+  String get queryExampleSuggestion => 'Was dat een besluit of een voorstel?';
+
+  @override
+  String get queryExpandChat => 'Chat uitklappen';
+
+  @override
+  String get queryExpanding => 'Andere items in deze categorie controleren…';
+
+  @override
+  String get queryFailed =>
+      'De zoekopdracht kon niet worden voltooid. Probeer opnieuw.';
+
+  @override
+  String get queryForgetConclusions => 'Conclusies vergeten';
+
+  @override
+  String get queryHideExactText => 'Exacte tekst verbergen';
+
+  @override
+  String get queryHideSurrounding => 'Omringende tekst verbergen';
+
+  @override
+  String get queryHomeOnly => 'Alleen eigen bereik';
+
+  @override
+  String get queryHomeScope => 'Eigen bereik';
+
+  @override
+  String get queryIncomplete =>
+      'De zoekdekking is onvolledig. Ontbrekend bewijs betekent niet dat het gesprek nooit heeft plaatsgevonden.';
+
+  @override
+  String get queryIncompleteShort =>
+      'Sommige bronnen konden niet worden gecontroleerd.';
+
+  @override
+  String get queryInferenceUnavailable =>
+      'Geen bruikbare AI-configuratie. Stel het model van de agent of het standaardprofiel van de categorie in en probeer opnieuw.';
+
+  @override
+  String get queryKeepConclusions => 'Conclusies bewaren';
+
+  @override
+  String get queryLaterTextOmitted => '[Latere tekst niet getoond]';
+
+  @override
+  String get queryMachineTranscript =>
+      'Automatische transcriptie: exacte opgeslagen tekst, niet gecontroleerd aan de hand van de audio.';
+
+  @override
+  String queryMemoryCount(int count) {
+    return 'Beschikbare conclusies uit eerdere chats: $count';
+  }
+
+  @override
+  String queryMissingTranscripts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count opnamen hadden geen doorzoekbare tekst toen dit antwoord werd geschreven.',
+      one:
+          '1 opname had geen doorzoekbare tekst toen dit antwoord werd geschreven.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get queryNewChat => 'Nieuwe chat';
+
+  @override
+  String get queryNoAgent =>
+      'Dit bereik heeft zijn gebruikelijke agent nodig. Ga terug naar de details om die toe te wijzen.';
+
+  @override
+  String get queryNotes => 'Notities';
+
+  @override
+  String get queryOpenCurrentEntry => 'Huidig item openen';
+
+  @override
+  String get queryOpenEntry => 'Item openen';
+
+  @override
+  String get queryOriginalsHome =>
+      'Raadpleegt alleen deze taak en de direct gekoppelde items.';
+
+  @override
+  String get queryOtherProject => 'Buiten het eigen bereik';
+
+  @override
+  String get queryPreparingAnswer => 'Antwoord voorbereiden…';
+
+  @override
+  String queryReachCategory(String category) {
+    return 'Zoekt binnen dit bereik en in $category.';
+  }
+
+  @override
+  String queryReachCategoryOnly(String category) {
+    return 'Zoekt binnen $category.';
+  }
+
+  @override
+  String get queryReachHome =>
+      'Zoekt alleen binnen dit bereik en de gekoppelde items.';
+
+  @override
+  String get queryReachUncategorized =>
+      'Zoekt alleen in deze taak en de rechtstreeks gekoppelde items zonder categorie.';
+
+  @override
+  String get queryRecall => 'Dit antwoord gebruikte opgeslagen conclusies.';
+
+  @override
+  String get queryRecordings => 'Opnamen';
+
+  @override
+  String get queryRecordingTranscript => 'Transcript van de opname';
+
+  @override
+  String get queryRenameChat => 'Chat hernoemen';
+
+  @override
+  String get queryRestoreChat => 'Chat herstellen';
+
+  @override
+  String querySavedConclusion(String date) {
+    return 'Conclusie opgeslagen op $date';
+  }
+
+  @override
+  String get querySavedQuote =>
+      'Dit opgeslagen citaat geeft de bron weer op het moment van het antwoord.';
+
+  @override
+  String querySavedVersion(String version) {
+    return 'Opgeslagen versie: $version';
+  }
+
+  @override
+  String get querySavedVersionUnavailable => 'Versiedatum niet beschikbaar';
+
+  @override
+  String get querySearching => 'Beschikbare informatie raadplegen…';
+
+  @override
+  String get querySearchScope => 'Zoekbereik en filters';
+
+  @override
+  String querySourceAction(String action, String source) {
+    return '$action: $source';
+  }
+
+  @override
+  String get querySourceChanged => 'Bron is gewijzigd';
+
+  @override
+  String get querySourceDeleted => 'Bron verwijderd';
+
+  @override
+  String get querySourceMoved => 'Bron verplaatst naar een andere categorie';
+
+  @override
+  String get querySummaryBased => 'Gebaseerd op samenvattingen';
+
+  @override
+  String get querySummaryCoverage =>
+      'Dit antwoord gebruikt taak- of projectsamenvattingen. De oorspronkelijke items zijn niet geraadpleegd.';
+
+  @override
+  String get querySummaryCurrent =>
+      'Open een taak of project om de huidige samenvatting te bekijken. Die kan sinds dit antwoord zijn gewijzigd.';
+
+  @override
+  String get querySummaryIncomplete =>
+      'Er ontbreekt informatie in de beschikbare samenvattingen.';
+
+  @override
+  String get querySummaryOwners => 'Over dit antwoord';
+
+  @override
+  String get querySurroundingLimit =>
+      'Dit is het opgeslagen fragment, dat mogelijk niet het hele gesprek bevat.';
+
+  @override
+  String get querySurroundingText => 'Omringende tekst tonen';
+
+  @override
+  String get queryTranscribing =>
+      'Je opname wordt uitgeschreven. Je aanbieder heeft de audio mogelijk al ontvangen.';
+
+  @override
+  String get queryUnavailable =>
+      'Dit bereik is niet meer beschikbaar met je huidige zichtbaarheidsinstellingen.';
+
+  @override
+  String get queryUnread => 'Nieuw antwoord';
+
+  @override
+  String queryWelcomeCategory(String agentName) {
+    return 'Vraag $agentName naar deze categorie';
+  }
+
+  @override
+  String queryWelcomeProject(String agentName) {
+    return 'Vraag $agentName naar dit project';
+  }
+
+  @override
+  String queryWelcomeTask(String agentName) {
+    return 'Vraag $agentName naar deze taak';
+  }
+
+  @override
   String get queueCatchUpNowButton => 'Inhalen nu';
 
   @override
@@ -10956,11 +11747,145 @@ class AppLocalizationsNl extends AppLocalizations {
   String get relationshipAddChannelButton => 'Contactgegeven toevoegen';
 
   @override
-  String get relationshipAsk => 'Vraag';
+  String get relationshipAddChannelFromContacts => 'of uit contacten';
+
+  @override
+  String relationshipAgentAsOfBand(String age, String band) {
+    return '$band · bijgewerkt $age';
+  }
+
+  @override
+  String get relationshipAgentBriefNow => 'Nu briefen';
+
+  @override
+  String relationshipAgentCall(String name) {
+    return '$name bellen';
+  }
+
+  @override
+  String get relationshipAgentFailedBody =>
+      'De provider gaf een fout voordat de briefing geschreven was. Je check-ins zijn ongewijzigd.';
+
+  @override
+  String get relationshipAgentFailedNoModel =>
+      'Er is geen model ingesteld voor briefings. Kies er een onder AI-instellingen › Agents. Details staan op het tabblad Activiteit.';
+
+  @override
+  String get relationshipAgentFailedPlain => 'Laatste run mislukt';
+
+  @override
+  String relationshipAgentLastRunFailed(String time) {
+    return 'Laatste run mislukt · $time';
+  }
+
+  @override
+  String get relationshipAgentMarkImportant => 'Als belangrijk markeren';
+
+  @override
+  String get relationshipAgentNoAgent => 'Geen agent voor deze persoon';
+
+  @override
+  String relationshipAgentNoBriefingBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Nog geen briefing. „Nu briefen“ schrijft er een op basis van je $count check-ins; het ziet nooit het telefoonnummer of het e-mailadres.',
+      one:
+          'Nog geen briefing. „Nu briefen“ schrijft er een op basis van je check-in; het ziet nooit het telefoonnummer of het e-mailadres.',
+      zero:
+          'Nog geen briefing. „Nu briefen“ schrijft er een zodra je een check-in hebt gelogd; het ziet nooit het telefoonnummer of het e-mailadres.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String relationshipAgentNotEnrolledBody(String name) {
+    return 'Markeer $name als belangrijk voor een chat, een seintje als het even geleden is, en een briefing.';
+  }
+
+  @override
+  String get relationshipAgentOnlyYourStartsUseAi =>
+      'Alleen wat je zelf start gebruikt AI';
+
+  @override
+  String relationshipAgentOutOfDateNewCheckIn(String day) {
+    return 'Verouderd · nieuwe check-in $day';
+  }
+
+  @override
+  String get relationshipAgentOutOfDateNewCheckInShort =>
+      'Verouderd · nieuwe check-in';
+
+  @override
+  String get relationshipAgentPausedBody =>
+      'Briefings pauzeren zolang deze persoon slapend of gearchiveerd is.';
+
+  @override
+  String relationshipAgentProposedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count voorstellen',
+      one: '1 voorstel',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String relationshipAgentReadingBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Leest $count check-ins. Meestal binnen een minuut.',
+      one: 'Leest 1 check-in. Meestal binnen een minuut.',
+      zero: 'Bereidt de briefing voor. Meestal binnen een minuut.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get relationshipAgentSeeActivity => 'Activiteit bekijken';
+
+  @override
+  String relationshipAgentSources(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count check-ins',
+      one: '1 check-in',
+    );
+    return 'Bronnen: $_temp0 · contactkanalen worden nooit verstuurd';
+  }
+
+  @override
+  String get relationshipAgentTryAgain => 'Opnieuw proberen';
+
+  @override
+  String get relationshipAgentWatching => 'Agent houdt het in de gaten';
+
+  @override
+  String relationshipAgentWatchingNextLook(String day) {
+    return 'Agent houdt het in de gaten · volgende blik $day';
+  }
+
+  @override
+  String get relationshipAgentWriting => 'Briefing wordt geschreven…';
 
   @override
   String relationshipBannerSemanticLabel(String personName) {
     return 'Relatiebanner voor $personName';
+  }
+
+  @override
+  String relationshipBriefingAge(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days dagen oud',
+      one: '1 dag oud',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -10977,10 +11902,6 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String get relationshipBriefingEmpty =>
-      'Nog geen briefing — Praat me bij maakt er een van je check-ins.';
-
-  @override
   String get relationshipBriefingRequested =>
       'Briefing aangevraagd — verschijnt hier zo.';
 
@@ -10990,12 +11911,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get relationshipBriefingTitle => 'Briefing';
-
-  @override
-  String get relationshipBriefMeAgain => 'Opnieuw vatten';
-
-  @override
-  String get relationshipBriefMeButton => 'Praat me bij';
 
   @override
   String relationshipCadenceEveryNDays(int days) {
@@ -11028,10 +11943,22 @@ class AppLocalizationsNl extends AppLocalizations {
   String get relationshipCadenceOnTrack => 'op schema';
 
   @override
+  String get relationshipCadencePromptLabel => 'Herinner me elke';
+
+  @override
   String get relationshipCadenceQuarterly => 'Elk kwartaal';
 
   @override
   String get relationshipCadenceWeekly => 'Wekelijks';
+
+  @override
+  String get relationshipChatAgentSubtitle =>
+      'Kent je check-ins, niet de contactgegevens';
+
+  @override
+  String relationshipChatAgentTitle(String name) {
+    return '$name · briefingagent';
+  }
 
   @override
   String get relationshipChatTooltip => 'Chat over deze persoon';
@@ -11039,11 +11966,6 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get relationshipChatUnavailable =>
       'Nog geen agent — markeer deze persoon eerst als belangrijk.';
-
-  @override
-  String relationshipCheckedInLabel(String date) {
-    return 'Check-in $date';
-  }
 
   @override
   String get relationshipCheckInReminderBody =>
@@ -11056,11 +11978,6 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get relationshipCheckInsLabel => 'Check-ins';
-
-  @override
-  String relationshipCheckInTitle(String name) {
-    return 'Check-in · $name';
-  }
 
   @override
   String get relationshipContactCardAction => 'Contactkaart';
@@ -11086,6 +12003,17 @@ class AppLocalizationsNl extends AppLocalizations {
   String get relationshipCreateTitle => 'Persoon toevoegen';
 
   @override
+  String relationshipDaysOver(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dagen te laat',
+      one: '1 dag te laat',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get relationshipDeleteConfirmMessage =>
       'Ook alle check-ins worden verwijderd. Dit kan niet ongedaan worden gemaakt.';
 
@@ -11097,6 +12025,35 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String relationshipDueDay(String day) {
     return 'Voor $day';
+  }
+
+  @override
+  String relationshipDueSince(String day, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dagen te laat',
+      one: '1 dag te laat',
+    );
+    return 'Te laat sinds $day · $_temp0';
+  }
+
+  @override
+  String get relationshipDueToday => 'Vandaag aan de beurt';
+
+  @override
+  String relationshipDurationHours(int hours) {
+    return '$hours u';
+  }
+
+  @override
+  String relationshipDurationHoursMinutes(int hours, String minutes) {
+    return '$hours u $minutes';
+  }
+
+  @override
+  String relationshipDurationMinutes(int count) {
+    return '$count min';
   }
 
   @override
@@ -11117,6 +12074,21 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get relationshipErrorUpdateFailed =>
       'Kon de wijzigingen niet opslaan. Probeer het opnieuw.';
+
+  @override
+  String get relationshipFormImportantBody =>
+      'Zet een briefing, seintjes en een chat aan. Notities van check-ins gaan naar de agent, contactgegevens nooit.';
+
+  @override
+  String relationshipFormImportantBodyNamed(String name) {
+    return 'Zet een briefing, seintjes en een chat aan voor $name. Notities van check-ins gaan naar de agent, contactgegevens nooit.';
+  }
+
+  @override
+  String get relationshipFormReachTitle => 'Hoe je ze bereikt';
+
+  @override
+  String get relationshipFormWhoTitle => 'Wie';
 
   @override
   String get relationshipHealthNeedsAttention => 'Vraagt aandacht';
@@ -11172,6 +12144,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get relationshipImportGrantButton => 'Toegang toestaan';
 
   @override
+  String get relationshipImportImportantBody =>
+      'Briefings, seintjes en een chat. Zonder dit loopt er niets vanzelf.';
+
+  @override
   String get relationshipImportNoMatches =>
       'Geen contacten komen overeen met je zoekopdracht';
 
@@ -11197,6 +12173,18 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
+  String relationshipImportReviewSubtitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count personen geselecteerd · contactgegevens blijven op dit apparaat',
+      one: '1 persoon geselecteerd · contactgegevens blijven op dit apparaat',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get relationshipImportReviewTitle => 'Voordat je ze toevoegt';
 
   @override
@@ -11217,8 +12205,8 @@ class AppLocalizationsNl extends AppLocalizations {
   String get relationshipJustAdded => 'Net toegevoegd';
 
   @override
-  String relationshipLastCheckInLabel(String date) {
-    return 'Laatste check-in $date';
+  String relationshipLastSpoke(String time) {
+    return 'laatst gesproken $time';
   }
 
   @override
@@ -11234,12 +12222,7 @@ class AppLocalizationsNl extends AppLocalizations {
   String get relationshipLogCheckIn => 'Check-in vastleggen';
 
   @override
-  String get relationshipLottisRead => 'Lotti\'s inschatting';
-
-  @override
-  String relationshipLottisReadAsOf(String time) {
-    return 'van $time';
-  }
+  String get relationshipMoreActions => 'Meer acties';
 
   @override
   String get relationshipNameLabel => 'Naam';
@@ -11248,9 +12231,12 @@ class AppLocalizationsNl extends AppLocalizations {
   String get relationshipNameRequired => 'Een naam is verplicht';
 
   @override
-  String relationshipNextByDay(String day) {
-    return 'volgende voor $day';
+  String relationshipNextDueOn(String day) {
+    return 'Volgende keer $day';
   }
+
+  @override
+  String get relationshipNextTimeTitle => 'Volgende keer';
 
   @override
   String get relationshipNicknameLabel => 'Bijnaam';
@@ -11263,15 +12249,61 @@ class AppLocalizationsNl extends AppLocalizations {
   String get relationshipNoLinkedTasks => 'Nog geen gekoppelde taken.';
 
   @override
+  String get relationshipNotEnrolled => 'Niet gevolgd';
+
+  @override
   String get relationshipNotFound =>
       'Deze persoon staat niet meer in je lijst.';
 
   @override
-  String get relationshipNudgesOn => 'herinneringen aan';
+  String relationshipOnTrackCadence(String cadence) {
+    return 'Op schema · $cadence';
+  }
 
   @override
-  String get relationshipPostCallBody =>
-      'Je hebt net contact gehad. Wil je een check-in vastleggen nu het nog vers is?';
+  String get relationshipPayAttentionTo => 'Let op';
+
+  @override
+  String get relationshipPhotoAddBanner => 'Banner toevoegen';
+
+  @override
+  String get relationshipPhotoAdjustCrop => 'Uitsnede aanpassen';
+
+  @override
+  String get relationshipPhotoBanner => 'Banner';
+
+  @override
+  String get relationshipPhotoCardTitle => 'Foto';
+
+  @override
+  String get relationshipPhotoChange => 'Wijzigen';
+
+  @override
+  String get relationshipPhotoChoose => 'Kiezen uit bibliotheek';
+
+  @override
+  String get relationshipPhotoDragToReposition => 'Sleep om te verplaatsen';
+
+  @override
+  String get relationshipPhotoFace => 'Gezicht';
+
+  @override
+  String get relationshipPhotoPrivacy =>
+      'Alleen op je apparaten · de agent ziet hem nooit';
+
+  @override
+  String get relationshipPhotoRemove => 'Foto verwijderen';
+
+  @override
+  String get relationshipPhotoRemoveAction => 'Verwijderen';
+
+  @override
+  String get relationshipPhotoSaveFailed => 'Kon de foto niet opslaan';
+
+  @override
+  String relationshipPhotoSheetTitle(String name) {
+    return 'Foto van $name';
+  }
 
   @override
   String get relationshipPostCallConfirm => 'Check-in vastleggen';
@@ -11280,33 +12312,105 @@ class AppLocalizationsNl extends AppLocalizations {
   String get relationshipPostCallDismiss => 'Niet nu';
 
   @override
-  String relationshipPostCallTitle(String name) {
-    return 'Hoe ging het met $name?';
+  String relationshipPostCallMeta(String time, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'ongeveer $minutes min',
+      one: 'ongeveer 1 min',
+      zero: 'minder dan een minuut',
+    );
+    return 'begonnen om $time · $_temp0';
   }
 
   @override
-  String relationshipQuietForDays(int count) {
+  String relationshipPostCallOfferCall(String name, int minutes) {
     String _temp0 = intl.Intl.pluralLogic(
-      count,
+      minutes,
       locale: localeName,
-      other: '$count dagen',
-      one: '1 dag',
+      other: '$minutes minuten',
+      one: '1 minuut',
+      zero: 'minder dan een minuut',
     );
-    return '$_temp0 geen contact';
+    return 'Je hebt $name $_temp0 geleden gebeld — nu vastleggen zolang het vers is?';
   }
+
+  @override
+  String relationshipPostCallOfferMessage(String name, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minuten',
+      one: '1 minuut',
+      zero: 'minder dan een minuut',
+    );
+    return 'Je hebt $name $_temp0 geleden geschreven — nu vastleggen zolang het vers is?';
+  }
+
+  @override
+  String relationshipProposalAdded(String title) {
+    return 'Toegevoegd → $title';
+  }
+
+  @override
+  String relationshipProposalEvidence(String date) {
+    return 'Uit de check-in van $date';
+  }
+
+  @override
+  String get relationshipProposalUndoFailed =>
+      'Ongedaan maken is mislukt. De taak is mogelijk gewijzigd.';
+
+  @override
+  String get relationshipReachPrivacy =>
+      'Blijft op dit apparaat · nooit gedeeld met de AI';
+
+  @override
+  String get relationshipReachTitle => 'Contact';
 
   @override
   String get relationshipRelinkContact => 'Ander contact koppelen';
-
-  @override
-  String get relationshipSeeAllCheckIns => 'Alle check-ins bekijken';
 
   @override
   String get relationshipsEmptyState =>
       'Voeg de mensen toe met wie je dichtbij wilt blijven.';
 
   @override
+  String get relationshipsGroupDue => 'Aan de beurt';
+
+  @override
   String get relationshipsPageTitle => 'Mensen';
+
+  @override
+  String get relationshipsSelectPersonHint =>
+      'Kies iemand om de pagina te zien.';
+
+  @override
+  String get relationshipsSummaryDueNow => 'Nu aan de beurt';
+
+  @override
+  String relationshipsSummaryEnrolled(int count) {
+    return '/ $count gevolgd';
+  }
+
+  @override
+  String relationshipsSummaryNextDue(String name, String day) {
+    return 'Volgende: $name · $day';
+  }
+
+  @override
+  String get relationshipsSummaryNoneDue => 'Niemand aan de beurt';
+
+  @override
+  String relationshipsSummaryNotEnrolled(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count personen niet gevolgd',
+      one: '1 persoon niet gevolgd',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get relationshipStatusActive => 'Actief';
@@ -11321,10 +12425,34 @@ class AppLocalizationsNl extends AppLocalizations {
   String get relationshipStatusFieldLabel => 'Status';
 
   @override
-  String get relationshipStayingInTouch => 'Contact houden';
+  String relationshipStatusLineAdded(String cadence) {
+    return 'Net toegevoegd · $cadence';
+  }
 
   @override
-  String get relationshipStayInTouch => 'Contact houden';
+  String relationshipStatusLineAddedFirstDue(String cadence, String day) {
+    return 'Net toegevoegd · $cadence · eerste keer voor $day';
+  }
+
+  @override
+  String relationshipStatusLineContacted(
+    String type,
+    String time,
+    String cadence,
+  ) {
+    return '$type · $time · $cadence';
+  }
+
+  @override
+  String relationshipTasksLinkedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count gekoppeld',
+      one: '1 gekoppeld',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get relationshipTimestampToday => 'Vandaag';
@@ -12598,9 +13726,6 @@ class AppLocalizationsNl extends AppLocalizations {
       'Gedetecteerde AI-mogelijkheden';
 
   @override
-  String get settingsSyncNodeProfileCapabilityMlxAudio => 'MLX-audio (lokaal)';
-
-  @override
   String get settingsSyncNodeProfileCapabilityOllamaLlm => 'Ollama LLM';
 
   @override
@@ -12649,6 +13774,13 @@ class AppLocalizationsNl extends AppLocalizations {
       'Synchronisatie- en weergavestatistieken instellen';
 
   @override
+  String get settingsSystemHealthSubtitle =>
+      'Recente logs analyseren en een deelbaar rapport kopiëren';
+
+  @override
+  String get settingsSystemHealthTitle => 'Systeemstatus';
+
+  @override
   String get settingsThemingAutomatic => 'Automatisch';
 
   @override
@@ -12686,6 +13818,69 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get settingsWhatsNewTitle => 'Wat is er nieuw?';
+
+  @override
+  String get sherpaAllFamilies => 'Alle families';
+
+  @override
+  String sherpaCatalogMatches(int count, int total) {
+    return '$count van $total modellen';
+  }
+
+  @override
+  String sherpaDeleteModel(String model) {
+    return '$model van dit apparaat verwijderen';
+  }
+
+  @override
+  String get sherpaDownloadAction => 'Downloaden';
+
+  @override
+  String sherpaDownloadModel(String model) {
+    return '$model downloaden';
+  }
+
+  @override
+  String get sherpaInstalledModelsTitle => 'Geïnstalleerde modellen';
+
+  @override
+  String get sherpaInstallingModel => 'Model installeren';
+
+  @override
+  String get sherpaLanguageCantonese => 'Kantonees';
+
+  @override
+  String get sherpaModelCatalogTitle => 'Modelcatalogus';
+
+  @override
+  String get sherpaModelConfigurationError =>
+      'Het model is gedownload, maar de configuratie kon niet worden opgeslagen.';
+
+  @override
+  String get sherpaModelError => 'Modelbewerking mislukt. Probeer het opnieuw.';
+
+  @override
+  String get sherpaModelFamily => 'Modelfamilie';
+
+  @override
+  String get sherpaModelInstalled => 'Gedownload';
+
+  @override
+  String get sherpaModelNotInstalled => 'Download een model op dit apparaat';
+
+  @override
+  String sherpaModelSizeGB(String size) {
+    return '$size GB · Meertalig';
+  }
+
+  @override
+  String sherpaModelSizeMB(String size) {
+    return '$size MB · Meertalig';
+  }
+
+  @override
+  String get sherpaProviderDescription =>
+      'Transcribeer op dit apparaat zonder server. Download een model en selecteer het vervolgens in je inferentieprofiel.';
 
   @override
   String get sidebarActiveSectionTitle => 'Activiteit';
@@ -12790,6 +13985,17 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get speechNoAudioRecorded => 'No audio was recorded. Try again.';
+
+  @override
+  String get speechSettingsAutoPrepareChatAudio =>
+      'Chataudio automatisch voorbereiden';
+
+  @override
+  String get speechSettingsChatAudioDescription =>
+      'Bereid nieuwe chatantwoorden op dit apparaat voor, zodat het afspelen sneller begint. Audio speelt pas af als je op afspelen tikt.';
+
+  @override
+  String get speechSettingsChatAudioLabel => 'Chataudio';
 
   @override
   String get speechSettingsModelDescription => 'Speechmodel voor het apparaat';
@@ -13493,6 +14699,99 @@ class AppLocalizationsNl extends AppLocalizations {
   String syncWizardStepStatus(int step, String label) {
     return 'Stap $step van 3: $label';
   }
+
+  @override
+  String systemHealthAnalyzedWindow(String start, String end) {
+    return 'Geanalyseerd $start → $end';
+  }
+
+  @override
+  String get systemHealthChooseModelTitle => 'Model kiezen';
+
+  @override
+  String get systemHealthCopiedToast =>
+      'Rapport gekopieerd. Bekende patronen van persoonlijke gegevens zijn weggelaten.';
+
+  @override
+  String get systemHealthCopyButton => 'Rapport kopiëren';
+
+  @override
+  String get systemHealthCustomFromLabel => 'Van';
+
+  @override
+  String get systemHealthCustomToLabel => 'Tot';
+
+  @override
+  String get systemHealthDescription =>
+      'Doorzoekt de logbestanden op dit apparaat op fouten, waarschuwingen en trage query\'s, laat bekende patronen van persoonlijke gegevens weg en schrijft een kort rapport dat je in een codeerassistent kunt plakken.';
+
+  @override
+  String get systemHealthDomainsDescription =>
+      'De domeinen die hier aanstaan worden geanalyseerd, dezelfde instelling die bepaalt wat er wordt gelogd. Trage query\'s worden meegenomen als het loggen daarvan aanstaat.';
+
+  @override
+  String get systemHealthDomainsTitle => 'Logdomeinen';
+
+  @override
+  String get systemHealthFailedTitle => 'Analyse mislukt';
+
+  @override
+  String systemHealthGeneratedAt(String time) {
+    return 'Gemaakt $time';
+  }
+
+  @override
+  String get systemHealthHideDigest => 'Samenvatting verbergen';
+
+  @override
+  String get systemHealthModelDescription =>
+      'Schrijft de bevindingen op basis van de geanonimiseerde samenvatting. Stelt het denkmodel van je standaardprofiel voor.';
+
+  @override
+  String get systemHealthModelNone => 'Alleen samenvatting, geen model';
+
+  @override
+  String get systemHealthModelNoneDescription =>
+      'Stel een standaard inferentieprofiel in of voeg een agentisch tekstmodel toe om bevindingen te krijgen.';
+
+  @override
+  String get systemHealthModelTitle => 'Model';
+
+  @override
+  String get systemHealthPresetCustom => 'Aangepast';
+
+  @override
+  String get systemHealthPresetLast14Days => '14 dagen';
+
+  @override
+  String get systemHealthPresetLast24Hours => '24 u';
+
+  @override
+  String get systemHealthPresetLast7Days => '7 dagen';
+
+  @override
+  String get systemHealthPreviousReportsDescription =>
+      'Elk rapport blijft op dit apparaat bewaard. Tik op een rapport om het opnieuw te tonen.';
+
+  @override
+  String get systemHealthPreviousReportsTitle => 'Eerdere rapporten';
+
+  @override
+  String get systemHealthRangeTitle => 'Periode';
+
+  @override
+  String get systemHealthReportTitle => 'Rapport';
+
+  @override
+  String get systemHealthRunButton => 'Analyse starten';
+
+  @override
+  String systemHealthSavedTo(String path) {
+    return 'Opgeslagen in $path';
+  }
+
+  @override
+  String get systemHealthShowDigest => 'Samenvatting tonen';
 
   @override
   String get taskActionBarAudioRecordingActive => 'Audio-opname in uitvoering';

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lotti/features/agents/model/agent_config.dart';
@@ -11,13 +13,18 @@ import 'package:lotti/features/ai/model/resolved_profile.dart';
 import 'package:lotti/features/ai/repository/ai_config_repository.dart';
 import 'package:lotti/features/ai/state/profile_automation_providers.dart';
 import 'package:lotti/features/ai/util/known_models.dart';
+import 'package:lotti/features/relationships/state/relationship_agent_providers.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../../mocks/mocks.dart';
+import '../../../widget_test_utils.dart';
 import '../test_data/entity_factories.dart';
 import '../test_data/template_factories.dart';
+import '../test_utils.dart' show testInferenceProfile;
 
 void main() {
+  setUp(setUpTestGetIt);
+  tearDown(tearDownTestGetIt);
   AiConfigModel model({
     bool tools = true,
     List<Modality> input = const [Modality.text],
@@ -112,20 +119,29 @@ void main() {
         createdAt: DateTime(2024),
         inferenceProviderType: InferenceProviderType.gemini,
       );
+      final models = StreamController<List<AiConfig>>.broadcast();
+      addTearDown(models.close);
       when(
-        () => repository.getConfigsByType(AiConfigType.inferenceProfile),
-      ).thenAnswer((_) async => const []);
+        () => repository.watchConfigsByType(AiConfigType.inferenceProfile),
+      ).thenAnswer((_) => Stream.value(const []));
       when(
-        () => repository.getConfigsByType(AiConfigType.model),
-      ).thenAnswer((_) async => [capable, incapable]);
+        () => repository.watchConfigsByType(AiConfigType.model),
+      ).thenAnswer((_) => models.stream);
       when(
-        () => repository.getConfigsByType(AiConfigType.inferenceProvider),
-      ).thenAnswer((_) async => [google]);
+        () => repository.watchConfigsByType(AiConfigType.inferenceProvider),
+      ).thenAnswer((_) => Stream.value([google]));
       final container = ProviderContainer(
         overrides: [aiConfigRepositoryProvider.overrideWithValue(repository)],
       );
       addTearDown(container.dispose);
+      // Hold the catalog alive so stream emissions keep recomputing it.
+      final subscription = container.listen(
+        taskAgentSetupOptionsProvider,
+        (_, _) {},
+      );
+      addTearDown(subscription.close);
 
+      models.add([capable, incapable]);
       final options = await container.read(
         taskAgentSetupOptionsProvider.future,
       );
@@ -137,14 +153,46 @@ void main() {
       final cached = await container.read(taskAgentSetupOptionsProvider.future);
       expect(cached, same(options));
       verify(
-        () => repository.getConfigsByType(AiConfigType.inferenceProfile),
+        () => repository.watchConfigsByType(AiConfigType.model),
       ).called(1);
-      verify(
-        () => repository.getConfigsByType(AiConfigType.model),
-      ).called(1);
-      verify(
-        () => repository.getConfigsByType(AiConfigType.inferenceProvider),
-      ).called(1);
+
+      // A model added later reaches the catalog without a restart.
+      final added = capable.copyWith(id: 'model-later');
+      models.add([capable, incapable, added]);
+      await Future<void>.delayed(Duration.zero);
+      final refreshed = await container.read(
+        taskAgentSetupOptionsProvider.future,
+      );
+      expect(refreshed.models, [capable, added]);
+      // The previous snapshot stays available while the refresh runs.
+      expect(
+        container.read(taskAgentSetupOptionsProvider).value?.models,
+        [capable, added],
+      );
+    },
+  );
+
+  test(
+    'relationship setup delegates without requiring a task template',
+    () async {
+      final identity = makeTestIdentity(kind: AgentKinds.relationshipAgent);
+      const expected = ResolvedAgentSetup(
+        status: AgentSetupResolutionStatus.disabled,
+      );
+      final container = ProviderContainer(
+        overrides: [
+          agentIdentityProvider.overrideWith((ref, id) async => identity),
+          relationshipAgentResolvedSetupProvider.overrideWith(
+            (ref, id) async => expected,
+          ),
+          templateForAgentProvider.overrideWith((ref, id) async => null),
+        ],
+      );
+      addTearDown(container.dispose);
+      expect(
+        await container.read(taskAgentResolvedSetupProvider('agent').future),
+        same(expected),
+      );
     },
   );
 
@@ -169,9 +217,11 @@ void main() {
         templateForAgentProvider.overrideWith((ref, id) async => template),
         activeTemplateVersionProvider.overrideWith((ref, id) async => version),
         profileResolverProvider.overrideWithValue(resolver),
+        aiConfigRepositoryProvider.overrideWithValue(MockAiConfigRepository()),
       ],
     );
     addTearDown(container.dispose);
+    container.listen(taskAgentResolvedSetupProvider('agent'), (_, _) {});
 
     expect(
       await container.read(taskAgentResolvedSetupProvider('agent').future),
@@ -198,7 +248,7 @@ void main() {
         ),
       ),
     );
-    final resolver = MockProfileResolver();
+    final repository = MockAiConfigRepository();
     final resolved = ResolvedProfile(
       thinkingModelId: 'wire-model',
       thinkingProvider: AiConfigInferenceProvider(
@@ -211,27 +261,37 @@ void main() {
       ),
       thinkingModel: model(),
     );
+    when(() => repository.getConfigById('goal-profile')).thenAnswer(
+      (_) async => testInferenceProfile(
+        id: 'goal-profile',
+        thinkingModelId: 'wire-model',
+      ),
+    );
     when(
-      () => resolver.resolveByProfileId('goal-profile'),
-    ).thenAnswer((_) async => resolved);
+      () => repository.getConfigsByType(AiConfigType.model),
+    ).thenAnswer((_) async => [model()]);
+    when(
+      () => repository.getConfigById('provider'),
+    ).thenAnswer((_) async => resolved.thinkingProvider);
     final container = ProviderContainer(
       overrides: [
         agentIdentityProvider.overrideWith((ref, id) async => identity),
         templateForAgentProvider.overrideWith((ref, id) async => null),
-        profileResolverProvider.overrideWithValue(resolver),
+        aiConfigRepositoryProvider.overrideWithValue(repository),
       ],
     );
     addTearDown(container.dispose);
+    container.listen(goalAgentResolvedSetupProvider('agent'), (_, _) {});
 
     final setup = await container.read(
       goalAgentResolvedSetupProvider('agent').future,
     );
 
     expect(setup?.status, AgentSetupResolutionStatus.resolved);
-    expect(setup?.profile, resolved);
+    expect(setup?.profile?.thinkingModelId, resolved.thinkingModelId);
     expect(setup?.source, AgentSetupResolutionSource.baseProfile);
     expect(setup?.setupOrigin, AgentInferenceSetupOrigin.user);
-    verify(() => resolver.resolveByProfileId('goal-profile')).called(1);
+    verify(() => repository.getConfigById('goal-profile')).called(1);
   });
 
   test(
@@ -241,7 +301,7 @@ void main() {
         kind: AgentKinds.goalAgent,
         config: const AgentConfig(profileId: 'goal-profile'),
       );
-      final resolver = MockProfileResolver();
+      final repository = MockAiConfigRepository();
       final resolved = ResolvedProfile(
         thinkingModelId: 'wire-model',
         thinkingProvider: AiConfigInferenceProvider(
@@ -254,23 +314,33 @@ void main() {
         ),
         thinkingModel: model(),
       );
+      when(() => repository.getConfigById('goal-profile')).thenAnswer(
+        (_) async => testInferenceProfile(
+          id: 'goal-profile',
+          thinkingModelId: 'wire-model',
+        ),
+      );
       when(
-        () => resolver.resolveByProfileId('goal-profile'),
-      ).thenAnswer((_) async => resolved);
+        () => repository.getConfigsByType(AiConfigType.model),
+      ).thenAnswer((_) async => [model()]);
+      when(
+        () => repository.getConfigById('provider'),
+      ).thenAnswer((_) async => resolved.thinkingProvider);
       final container = ProviderContainer(
         overrides: [
           agentIdentityProvider.overrideWith((ref, id) async => identity),
-          profileResolverProvider.overrideWithValue(resolver),
+          aiConfigRepositoryProvider.overrideWithValue(repository),
         ],
       );
       addTearDown(container.dispose);
+      container.listen(goalAgentResolvedSetupProvider('agent'), (_, _) {});
 
       final setup = await container.read(
         goalAgentResolvedSetupProvider('agent').future,
       );
 
       expect(setup?.status, AgentSetupResolutionStatus.resolved);
-      expect(setup?.profile, resolved);
+      expect(setup?.profile?.thinkingModelId, resolved.thinkingModelId);
       expect(setup?.source, AgentSetupResolutionSource.legacyAgentProfile);
       expect(setup?.setupOrigin, isNull);
     },
@@ -306,11 +376,15 @@ void main() {
         ],
       );
       addTearDown(builtInContainer.dispose);
+      builtInContainer.listen(
+        goalAgentResolvedSetupProvider('agent'),
+        (_, _) {},
+      );
       final builtIn = await builtInContainer.read(
         goalAgentResolvedSetupProvider('agent').future,
       );
       expect(builtIn?.status, AgentSetupResolutionStatus.resolved);
-      expect(builtIn?.source, AgentSetupResolutionSource.directModel);
+      expect(builtIn?.source, AgentSetupResolutionSource.legacyModel);
       expect(builtIn?.profile?.thinkingModelId, meliousGlm52ModelId);
       expect(builtIn?.profile?.thinkingProvider, provider);
       expect(builtIn?.profile?.thinkingModel, builtInModel);
@@ -328,6 +402,10 @@ void main() {
         ],
       );
       addTearDown(unavailableContainer.dispose);
+      unavailableContainer.listen(
+        goalAgentResolvedSetupProvider('agent'),
+        (_, _) {},
+      );
       expect(
         (await unavailableContainer.read(
           goalAgentResolvedSetupProvider('agent').future,
@@ -335,9 +413,11 @@ void main() {
         AgentSetupResolutionStatus.broken,
       );
 
-      final resolver = MockProfileResolver();
       when(
-        () => resolver.resolveByProfileId('missing-profile'),
+        () => repository.getConfigById('missing-profile'),
+      ).thenAnswer((_) async => null);
+      when(
+        () => unavailableRepository.getConfigById('missing-profile'),
       ).thenAnswer((_) async => null);
       final fallbackContainer = ProviderContainer(
         overrides: [
@@ -347,16 +427,19 @@ void main() {
               config: const AgentConfig(profileId: 'missing-profile'),
             ),
           ),
-          profileResolverProvider.overrideWithValue(resolver),
           aiConfigRepositoryProvider.overrideWithValue(repository),
         ],
       );
       addTearDown(fallbackContainer.dispose);
+      fallbackContainer.listen(
+        goalAgentResolvedSetupProvider('agent'),
+        (_, _) {},
+      );
       final fallback = await fallbackContainer.read(
         goalAgentResolvedSetupProvider('agent').future,
       );
       expect(fallback?.status, AgentSetupResolutionStatus.resolved);
-      expect(fallback?.source, AgentSetupResolutionSource.directModel);
+      expect(fallback?.source, AgentSetupResolutionSource.legacyModel);
       expect(fallback?.profile?.thinkingModelId, meliousGlm52ModelId);
 
       final brokenProfileContainer = ProviderContainer(
@@ -367,11 +450,14 @@ void main() {
               config: const AgentConfig(profileId: 'missing-profile'),
             ),
           ),
-          profileResolverProvider.overrideWithValue(resolver),
           aiConfigRepositoryProvider.overrideWithValue(unavailableRepository),
         ],
       );
       addTearDown(brokenProfileContainer.dispose);
+      brokenProfileContainer.listen(
+        goalAgentResolvedSetupProvider('agent'),
+        (_, _) {},
+      );
       expect(
         (await brokenProfileContainer.read(
           goalAgentResolvedSetupProvider('agent').future,

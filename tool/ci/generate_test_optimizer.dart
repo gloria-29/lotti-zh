@@ -8,8 +8,16 @@ import 'package:path/path.dart' as path;
 const _outputRelativePath = 'test/.test_optimizer.dart';
 const testTargetsRelativePath = 'test/.test_targets.json';
 
-/// Generates the stable optimized test entrypoint used by sharded CI.
-Future<File> generateTestOptimizer({required String packageRoot}) async {
+/// Generates a stable bundle containing only the selected shard’s test files.
+Future<File> generateTestOptimizer({
+  required String packageRoot,
+  Set<String> excludedSuiteTags = const {},
+  int totalShards = 1,
+  int shardIndex = 0,
+}) async {
+  if (totalShards < 1 || shardIndex < 0 || shardIndex >= totalShards) {
+    throw ArgumentError('Invalid shard $shardIndex of $totalShards');
+  }
   final testDirectory = Directory(path.join(packageRoot, 'test'));
   if (!testDirectory.existsSync()) {
     throw FileSystemException(
@@ -20,19 +28,27 @@ Future<File> generateTestOptimizer({required String packageRoot}) async {
 
   final testPaths = <String>[];
   final standalonePaths = <String>[];
+  final sizes = <String, int>{};
   for (final entity in testDirectory.listSync(recursive: true)) {
     if (entity is! File || !entity.path.endsWith('_test.dart')) continue;
     final contents = await entity.readAsString();
     // Library metadata belongs to a suite, not the imported main() function.
     // Keep annotated suites intact so the test runner interprets their tags,
     // timeouts, platform selectors, skips and retries without losing context.
-    final unit = parseString(content: contents).unit;
-    if (unit.directives.whereType<LibraryDirective>().any(
-      (directive) => directive.metadata.isNotEmpty,
+    final libraries = parseString(
+      content: contents,
+    ).unit.directives.whereType<LibraryDirective>();
+    if (libraries.any(
+      (directive) => _isExcluded(directive, excludedSuiteTags),
     )) {
-      standalonePaths.add(
-        path.relative(entity.path, from: packageRoot).replaceAll(r'\', '/'),
-      );
+      continue;
+    }
+    final relative = path
+        .relative(entity.path, from: packageRoot)
+        .replaceAll(r'\', '/');
+    sizes[relative] = contents.length;
+    if (libraries.any((directive) => directive.metadata.isNotEmpty)) {
+      standalonePaths.add(relative);
       continue;
     }
     testPaths.add(
@@ -41,6 +57,25 @@ Future<File> generateTestOptimizer({required String packageRoot}) async {
           .replaceAll(r'\', '/'),
     );
   }
+  // Greedily balance source size before compilation. Path tie-breaks keep the
+  // assignment reproducible without a timing artifact or machine-local state.
+  final candidates = sizes.keys.toList()
+    ..sort((a, b) {
+      final bySize = sizes[b]!.compareTo(sizes[a]!);
+      return bySize == 0 ? a.compareTo(b) : bySize;
+    });
+  final loads = List<int>.filled(totalShards, 0);
+  final selected = <String>{};
+  for (final candidate in candidates) {
+    var shard = 0;
+    for (var index = 1; index < totalShards; index++) {
+      if (loads[index] < loads[shard]) shard = index;
+    }
+    loads[shard] += sizes[candidate]!;
+    if (shard == shardIndex) selected.add(candidate);
+  }
+  testPaths.removeWhere((file) => !selected.contains('test/$file'));
+  standalonePaths.removeWhere((file) => !selected.contains(file));
   testPaths.sort();
   standalonePaths.sort();
 
@@ -50,6 +85,27 @@ Future<File> generateTestOptimizer({required String packageRoot}) async {
     jsonEncode([_outputRelativePath, ...standalonePaths]),
   );
   return output;
+}
+
+// Only inherited literal tags can prove that every test is excluded. Unknown
+// constants and per-test tags stay with Flutter's own discovery/filtering.
+bool _isExcluded(LibraryDirective library, Set<String> excludedTags) {
+  for (final annotation in library.metadata) {
+    if (annotation.name.name.split('.').last != 'Tags') continue;
+    final arguments = annotation.arguments?.arguments;
+    if (arguments == null || arguments.length != 1) continue;
+    final elements = switch (arguments.single) {
+      ListLiteral(:final elements) => elements,
+      SetOrMapLiteral(:final elements) => elements,
+      _ => const <CollectionElement>[],
+    };
+    if (elements.whereType<StringLiteral>().any(
+      (tag) => excludedTags.contains(tag.stringValue),
+    )) {
+      return true;
+    }
+  }
+  return false;
 }
 
 String _renderBundle(List<String> testPaths) {

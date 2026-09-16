@@ -23,7 +23,7 @@ void main() {
           types.take(AiPickProviderModal.defaultTiles.length),
           AiPickProviderModal.defaultTiles.map((t) => t.providerType),
         );
-        // Remaining four are the advanced types appended alphabetically.
+        // Remaining advanced types are the advanced types appended alphabetically.
         expect(types.skip(AiPickProviderModal.defaultTiles.length).toList(), [
           InferenceProviderType.genericOpenAi,
           InferenceProviderType.nebiusAiStudio,
@@ -165,7 +165,12 @@ void main() {
           // advanced tile is selectable end-to-end, not just rendered.
           await tester.tap(find.text(messages.aiProviderGenericOpenAiName));
           await tester.pump();
-          await tester.tap(find.text(messages.aiPickProviderContinueButton));
+          final continueButton = find.text(
+            messages.aiPickProviderContinueButton,
+          );
+          await tester.ensureVisible(continueButton);
+          await tester.pump();
+          await tester.tap(continueButton);
           await tester.pump();
           await tester.pump(const Duration(milliseconds: 300));
 
@@ -243,7 +248,12 @@ void main() {
           await tester.pump();
           await tester.pump(const Duration(milliseconds: 300));
           final messages = hL10n(tester);
-          await tester.tap(find.text(messages.aiPickProviderContinueButton));
+          final continueButton = find.text(
+            messages.aiPickProviderContinueButton,
+          );
+          await tester.ensureVisible(continueButton);
+          await tester.pump();
+          await tester.tap(continueButton);
           await tester.pump();
           await tester.pump(const Duration(milliseconds: 300));
 

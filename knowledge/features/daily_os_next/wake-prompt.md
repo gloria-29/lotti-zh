@@ -15,7 +15,7 @@ sources:
   - id: inference-boundaries
     resource: ../../../lib/features/daily_os_next/agents/workflow/day_agent_workflow_models.dart
     title: Per-mode inference deadlines and output ceilings
-    last_modified: 2026-07-29
+    last_modified: 2026-09-12
   - id: sections
     resource: ../../../lib/features/daily_os_next/agents/prompt/day_agent_prompt_sections.dart
     title: Prompt section tags
@@ -79,13 +79,24 @@ Every provider turn also receives a mode-specific output ceiling:
 | Capture parse | 4,096 |
 | Day draft | 8,192 |
 | Refine | 4,096 |
-| Coordinator digest | 4,096 |
+| Coordinator digest | 16,384 |
 | Other day-agent wake | 4,096 |
 
 The draft ceiling is larger because its terminal tool serializes the complete
-block list. The others produce smaller artifacts. These are injected through
+block list. Digests receive extra headroom after repeated truncation at the
+previous ceiling. The others produce smaller artifacts. These are injected through
 `DayAgentOutputTokenBudgetPolicy`, then clamped around the resolved provider
-repository, so a caller may request less but cannot bypass the Daily OS maximum.
+repository. A lower `AiConfigModel.maxCompletionTokens` on the selected thinking
+model further reduces the ceiling; callers can request less but cannot bypass
+either maximum.
+
+When reported effective completion usage exceeds 4,096 tokens, the wrapper logs
+one `outputBudget` entry in `agentWorkflow` per provider turn. It records the
+wake kind, peak completion and reasoning counts, effective total, threshold, and
+applied ceiling, without response content. Gemini reasoning is added to its
+completion count; OpenAI-compatible totals already include it. Duplicate usage
+chunks are not summed, and a later stream failure still logs any reported peak.
+The usual domain logging flag controls these diagnostic entries.
 
 A response ending with `finish_reason: length` is truncated. Providers that omit
 that reason are treated the same when reported completion usage reaches the
@@ -251,6 +262,24 @@ mutable register, upserted in place within its window and preserving `createdAt`
 It is windowed to the **wall clock**: today or yesterday only, independent of the
 wake workspace. This is the sole, ADR-governed exception to the workspace-day tool
 guard, dispatched before the blanket dayId rejection.
+
+## The workspace-day guard, and the blank id
+
+A day-scoped call naming a day other than the wake's workspace is rejected
+(ADR 0022 Decision 4): under one planner the model must never mutate another
+day. A call naming **no** day is not rejected — for the plan tools it is
+normalized to the wake's own `dayId` before dispatch.
+
+The two rules are the same rule. If the only day a named call may carry is this
+wake's, an unnamed one can mean nothing else; failing it instead cost whole
+drafted plans, because `draft_day_plan` is terminal and the writer's
+`dayId must not be empty` arrives after the model has already done the work.
+Measured on `glm-5.3-flash`, a blank `dayId` was the single commonest rejection
+in a day-planning run.
+
+The fill is scoped to the plan tools, which are the ones that take a `dayId`.
+Capture, knowledge and week-context schemas declare `additionalProperties: false`
+and no `dayId`, so adding the field there would make their calls invalid.
 
 Text is whitespace-normalized and capped at 500 characters at the write path.
 Concurrent versions resolve **earliest-createdAt wins** — the most

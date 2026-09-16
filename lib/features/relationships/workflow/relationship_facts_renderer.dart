@@ -1,8 +1,13 @@
+import 'dart:convert';
+
+import 'package:lotti/classes/check_in_data.dart';
 import 'package:lotti/classes/journal_entities.dart';
 import 'package:lotti/classes/nudge_models.dart';
 import 'package:lotti/classes/relationship_trigger_tokens.dart';
 import 'package:lotti/classes/task.dart';
 import 'package:lotti/features/agents/model/agent_domain_entity.dart';
+import 'package:lotti/features/agents/model/proposal_ledger.dart';
+import 'package:lotti/features/relationships/model/relationship_health_metrics.dart';
 import 'package:lotti/features/relationships/runtime/relationship_agent_phase_a.dart';
 
 /// How many recent check-ins feed the FACTS block (ADR 0040 Decision 4:
@@ -11,6 +16,57 @@ const relationshipCheckInLookback = 10;
 
 /// Longest check-in narrative excerpt the FACTS block carries per entry.
 const relationshipNarrativeExcerptChars = 400;
+
+/// The health bands one wake may publish, and the newest user-set sentiment
+/// they derive from.
+typedef RelationshipHealthBandConstraint = ({
+  CheckInSentiment sentiment,
+  Set<RelationshipHealthBand> bands,
+});
+
+/// Returns the health bands allowed by the user's own sentiment ratings in
+/// the bounded check-in window, or null when the user supplied no sentiment.
+///
+/// The newest rating sets the bound, so positive narrative never improves a
+/// negative rating. A positive newest rating still permits `needsAttention`
+/// when [cadenceStatus] is due or an older rating in the window was strained
+/// or difficult: neither a lapse nor a hard stretch is erased by one good
+/// conversation.
+RelationshipHealthBandConstraint? relationshipHealthBandConstraint({
+  required List<CheckInEntry> checkIns,
+  required RelationshipCadenceStatus cadenceStatus,
+}) {
+  final sentiments = relationshipCheckInWindow(checkIns)
+      .map((checkIn) => checkIn.data.sentiment)
+      .whereType<CheckInSentiment>()
+      .toList();
+  if (sentiments.isEmpty) return null;
+  final newest = sentiments.first;
+  final hardStretch = sentiments
+      .skip(1)
+      .any(
+        (sentiment) =>
+            sentiment == CheckInSentiment.strained ||
+            sentiment == CheckInSentiment.difficult,
+      );
+  final bands = switch (newest) {
+    CheckInSentiment.delightful || CheckInSentiment.good => {
+      RelationshipHealthBand.thriving,
+      RelationshipHealthBand.steady,
+      if (cadenceStatus == RelationshipCadenceStatus.due || hardStretch)
+        RelationshipHealthBand.needsAttention,
+    },
+    CheckInSentiment.neutral => const {
+      RelationshipHealthBand.steady,
+      RelationshipHealthBand.needsAttention,
+    },
+    CheckInSentiment.strained || CheckInSentiment.difficult => const {
+      RelationshipHealthBand.needsAttention,
+      RelationshipHealthBand.strained,
+    },
+  };
+  return (sentiment: newest, bands: bands);
+}
 
 /// Renders the deterministic FACTS block of a relationship-agent Phase B
 /// wake (the goal facts-renderer shape).
@@ -42,6 +98,7 @@ class RelationshipFactsRenderer {
     required List<RelationshipNudgeEntity> nudges,
     required DateTime now,
     RelationshipCadenceStatus? preTransitionStatus,
+    ProposalLedger proposals = const ProposalLedger.empty(),
   }) {
     final data = relationship.data;
     final buffer = StringBuffer()
@@ -81,18 +138,37 @@ class RelationshipFactsRenderer {
         );
     }
 
-    final recent = [...checkIns]
-      ..sort((a, b) => b.meta.dateFrom.compareTo(a.meta.dateFrom));
-    final window = recent.take(relationshipCheckInLookback).toList();
+    final window = relationshipCheckInWindow(checkIns);
+    final constraint = relationshipHealthBandConstraint(
+      checkIns: window,
+      cadenceStatus: derivation.status,
+    );
     buffer.writeln(
       'CHECK-INS (newest first, ${window.length} of ${checkIns.length}):',
     );
+    if (constraint != null) {
+      buffer
+        ..writeln(
+          'HEALTH BAND CONSTRAINT '
+          '(newest user-set sentiment=${constraint.sentiment.name}):',
+        )
+        ..writeln(
+          '- allowed health verdicts: '
+          '${RelationshipHealthBand.values.where(constraint.bands.contains).map(_healthBandLabel).join(', ')}',
+        )
+        ..writeln('- narrative cannot improve this constraint')
+        ..writeln(
+          '- use the matching exact enum only in healthBand; never copy it '
+          'into prose or replies',
+        );
+    }
     if (window.isEmpty) {
       buffer.writeln('- none recorded');
     }
     for (final checkIn in window) {
       final d = checkIn.data;
       final parts = <String>[
+        'checkInId=${checkIn.id}',
         _day(checkIn.meta.dateFrom),
         d.interactionType.name,
         if (d.sentiment != null) 'sentiment(user-set)=${d.sentiment!.name}',
@@ -167,6 +243,15 @@ class RelationshipFactsRenderer {
       );
     }
 
+    buffer.writeln('PROPOSALS (do not repeat, including paraphrases):');
+    for (final entry in [...proposals.open, ...proposals.resolved]) {
+      buffer.writeln(
+        '- ${entry.status.name} | ${entry.toolName} | '
+        '${jsonEncode(entry.args)} | ${entry.humanSummary}',
+      );
+    }
+    if (proposals.isEmpty) buffer.writeln('- none');
+
     return buffer.toString().trimRight();
   }
 
@@ -196,6 +281,11 @@ class RelationshipFactsRenderer {
     rejected: (_) => 'rejected',
   );
 
+  String _healthBandLabel(RelationshipHealthBand band) => switch (band) {
+    RelationshipHealthBand.needsAttention => 'needs attention',
+    _ => band.name,
+  };
+
   String _day(DateTime value) {
     final local = value.toLocal();
     final month = local.month.toString().padLeft(2, '0');
@@ -218,4 +308,11 @@ class RelationshipFactsRenderer {
     if (collapsed.length <= relationshipNarrativeExcerptChars) return collapsed;
     return '${collapsed.substring(0, relationshipNarrativeExcerptChars)}…';
   }
+}
+
+/// The exact evidence window shared by prompt rendering and tool validation.
+List<CheckInEntry> relationshipCheckInWindow(List<CheckInEntry> checkIns) {
+  final sorted = [...checkIns]
+    ..sort((a, b) => b.meta.dateFrom.compareTo(a.meta.dateFrom));
+  return sorted.take(relationshipCheckInLookback).toList();
 }

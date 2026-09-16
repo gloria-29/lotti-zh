@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:lotti/features/ai/constants/provider_config.dart';
 import 'package:lotti/features/ai/model/ai_config.dart';
+import 'package:lotti/features/ai/speech/sherpa_model_repository.dart';
 import 'package:lotti/features/sync/model/sync_node_profile.dart';
 import 'package:meta/meta.dart';
 
@@ -87,10 +88,6 @@ Future<bool> probeHttpReachability({
 /// Default probe: reports the host platform and detects the local
 /// inference capabilities this app actually integrates with:
 ///
-/// - **`mlxAudio`** — claimed on macOS only. The MLX channel
-///   (`lib/features/ai/util/mlx_audio_channel.dart`) is macOS-only; on any
-///   other platform the runtime cannot run MLX models, so advertising the
-///   capability would mis-route pin choices in the UI.
 /// - **`ollamaLlm`** — claimed when a short HTTP probe to
 ///   `127.0.0.1:11434/api/version` succeeds. Uses a tight 300ms timeout so
 ///   startup never stalls; a missed Ollama server is recoverable — the next
@@ -106,6 +103,7 @@ Future<bool> probeHttpReachability({
 SyncNodeCapabilityProbe makeDefaultSyncNodeCapabilityProbe({
   OllamaReachabilityProbe ollamaProbe = _defaultOllamaProbe,
   OmlxReachabilityProbe omlxProbe = _defaultOmlxProbe,
+  Future<bool> Function()? sherpaProbe,
 }) {
   return ({
     required String hostId,
@@ -114,7 +112,7 @@ SyncNodeCapabilityProbe makeDefaultSyncNodeCapabilityProbe({
     String? appVersion,
   }) async {
     final capabilities = <NodeCapability>[
-      if (Platform.isMacOS) NodeCapability.mlxAudio,
+      if (await sherpaProbe?.call() ?? false) NodeCapability.sherpa,
       if (await omlxProbe(timeout: const Duration(milliseconds: 300)))
         NodeCapability.omlxLlm,
       if (await ollamaProbe(timeout: const Duration(milliseconds: 300)))
@@ -142,7 +140,9 @@ Future<SyncNodeProfile> defaultSyncNodeCapabilityProbe({
   String? displayName,
   String? appVersion,
 }) {
-  return makeDefaultSyncNodeCapabilityProbe()(
+  return makeDefaultSyncNodeCapabilityProbe(
+    sherpaProbe: probeSherpaAvailability,
+  )(
     hostId: hostId,
     now: now,
     displayName: displayName,
@@ -154,4 +154,23 @@ String _defaultDisplayName() {
   final host = Platform.localHostname;
   if (host.isNotEmpty) return host;
   return 'Lotti on ${Platform.operatingSystem}';
+}
+
+/// Advertising requires at least one verified model on this device. A synced
+/// provider configuration alone must not create an apparently ready ASR node.
+@visibleForTesting
+Future<bool> probeSherpaAvailability({
+  SherpaModelRepository Function() createRepository = SherpaModelRepository.new,
+}) async {
+  final repository = createRepository();
+  try {
+    for (final model in repository.models) {
+      if (await repository.isAvailable(model.id)) return true;
+    }
+    return false;
+  } catch (_) {
+    return false;
+  } finally {
+    repository.close();
+  }
 }

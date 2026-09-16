@@ -15,7 +15,6 @@ import 'package:lotti/features/agents/model/agent_domain_entity.dart';
 import 'package:lotti/features/agents/model/agent_enums.dart';
 import 'package:lotti/features/agents/sync/agent_sync_service.dart';
 import 'package:lotti/features/agents/util/agent_error_logging.dart';
-import 'package:lotti/features/agents/util/inference_provider_resolver.dart';
 import 'package:lotti/features/agents/util/text_utils.dart';
 import 'package:lotti/features/agents/workflow/agent_system_prompt.dart';
 import 'package:lotti/features/agents/workflow/carrierless_attribution.dart';
@@ -27,6 +26,7 @@ import 'package:lotti/features/ai/model/inference_usage.dart';
 import 'package:lotti/features/ai/repository/ai_config_repository.dart';
 import 'package:lotti/features/ai/repository/cloud_inference_repository.dart';
 import 'package:lotti/features/ai/repository/cloud_inference_wrapper.dart';
+import 'package:lotti/features/ai/util/forced_tool_choice.dart';
 import 'package:lotti/features/ai/util/known_models.dart';
 import 'package:lotti/features/ai/util/profile_resolver.dart';
 import 'package:lotti/features/ai_consumption/model/ai_attribution.dart';
@@ -298,7 +298,9 @@ class GoalAgentWorkflow with AgentErrorLogging {
     if (version is! GoalSpecVersionEntity) {
       return WakeResult(
         success: false,
-        error: 'goal spec head ${head.versionId} points at nothing',
+        error:
+            'goal spec head ${DomainLogger.sanitizeId(head.versionId)} '
+            'points at nothing',
       );
     }
 
@@ -657,8 +659,7 @@ class GoalAgentWorkflow with AgentErrorLogging {
                     'after editing a habit day. Call update_goal_report now '
                     'with the status and current evidence from the FACTS '
                     'block.'
-              : 'The track status changed this wake. Call update_goal_report '
-                    'now with the status from the FACTS block.',
+              : goalStatusTransitionReportInstruction,
         );
         if (retryUsage != null) {
           usage = usage == null ? retryUsage : usage.merge(retryUsage);
@@ -866,7 +867,7 @@ class GoalAgentWorkflow with AgentErrorLogging {
           now,
         );
       }
-      return WakeResult(success: false, error: error.toString());
+      return WakeResult.failed(kind: 'Goal Phase B', error: error);
     }
   }
 
@@ -1026,13 +1027,9 @@ class GoalAgentWorkflow with AgentErrorLogging {
               tool,
         ],
         toolChoice: userRequestedAd
-            ? const ChatCompletionToolChoiceOption.tool(
-                ChatCompletionNamedToolChoice(
-                  type: ChatCompletionNamedToolChoiceType.function,
-                  function: ChatCompletionFunctionCallOption(
-                    name: GoalAgentToolNames.createGoalAd,
-                  ),
-                ),
+            ? forcedToolChoiceFor(
+                modelId: resolved.modelId,
+                toolName: GoalAgentToolNames.createGoalAd,
               )
             : null,
         temperature: 0,
@@ -1107,9 +1104,7 @@ class GoalAgentWorkflow with AgentErrorLogging {
       periodKey != null &&
       periodKey.compareTo(const GoalWindow.day().periodKey(now)) < 0;
 
-  /// glm-5.2 on Melious is the validated default (the model the eval
-  /// matrix proved the contract against); an AI profile on the agent's
-  /// config overrides it.
+  /// Uses the shared standalone setup/profile/default resolution chain.
   Future<
     ({
       String modelId,
@@ -1118,29 +1113,19 @@ class GoalAgentWorkflow with AgentErrorLogging {
     })?
   >
   _resolveModel(AgentIdentityEntity agentIdentity) async {
-    final profileId = agentIdentity.config.profileId;
-    if (profileId != null) {
-      final profile = await ProfileResolver(
-        aiConfigRepository: _aiConfigRepository,
-      ).resolveByProfileId(profileId);
-      if (profile != null) {
-        return (
-          modelId: profile.thinkingModelId,
-          provider: profile.thinkingProvider,
-          geminiThinkingMode: profile.thinkingModel?.geminiThinkingMode,
+    final details =
+        await ProfileResolver(
+          aiConfigRepository: _aiConfigRepository,
+        ).resolveStandalone(
+          agentConfig: agentIdentity.config,
+          legacyModelId: meliousGlm52ModelId,
         );
-      }
-    }
-    final direct = await resolveInferenceProviderWithModel(
-      modelId: meliousGlm52ModelId,
-      aiConfigRepository: _aiConfigRepository,
-      logTag: 'GoalAgentWorkflow',
-    );
-    if (direct == null) return null;
+    final profile = details.profile;
+    if (profile == null) return null;
     return (
-      modelId: direct.model.providerModelId,
-      provider: direct.provider,
-      geminiThinkingMode: direct.model.geminiThinkingMode,
+      modelId: profile.thinkingModelId,
+      provider: profile.thinkingProvider,
+      geminiThinkingMode: profile.thinkingModel?.geminiThinkingMode,
     );
   }
 
@@ -1417,13 +1402,9 @@ class GoalAgentWorkflow with AgentErrorLogging {
           for (final tool in tools)
             if (tool.function.name == GoalAgentToolNames.updateGoalReport) tool,
         ],
-        toolChoice: const ChatCompletionToolChoiceOption.tool(
-          ChatCompletionNamedToolChoice(
-            type: ChatCompletionNamedToolChoiceType.function,
-            function: ChatCompletionFunctionCallOption(
-              name: GoalAgentToolNames.updateGoalReport,
-            ),
-          ),
+        toolChoice: forcedToolChoiceFor(
+          modelId: resolved.modelId,
+          toolName: GoalAgentToolNames.updateGoalReport,
         ),
         temperature: 0,
         strategy: strategy,

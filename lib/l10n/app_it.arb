@@ -438,6 +438,7 @@
   },
   "agentSummaryAddItem": "Aggiungi: \"{title}\"",
   "agentSummaryArchiveItem": "Archivia: \"{title}\"",
+  "agentSummaryAssignLabel": "Assegna etichetta: «{label}»",
   "agentSummaryCheckItem": "Segna: \"{title}\"",
   "agentSummaryCreateFollowUp": "Crea attività di follow-up: \"{title}\"",
   "agentSummaryCreateFollowUpRelated": "Crea attività di follow-up: \"{title}\" — {relation}",
@@ -703,8 +704,6 @@
   "aiCardReadMore": "Leggi tutto",
   "aiCardShowLess": "Mostra di meno",
   "aiCardTitle": "Riepilogo dell'AI",
-  "aiChatAssistantResponding": "L’assistente sta rispondendo",
-  "aiChatMessageCopied": "Copiato negli appunti",
   "aiConfigFailedToLoadModelsGeneric": "Non caricare modelli. Si prega di riprovare.",
   "aiConfigNoModelsAvailable": "Non sono ancora configurati modelli AI. Si prega di aggiungere uno nelle impostazioni.",
   "aiConfigNoSuitableModelsAvailable": "Nessun modello soddisfa i requisiti per questo prompt. Si prega di configurare i modelli che supportano le funzionalità richieste.",
@@ -904,44 +903,6 @@
   "aiInferenceErrorUnknownTitle": "Errore",
   "aiInternalsTitle": "Agenti interni",
   "aiModelCardDeleteTooltip": "Cancella modello",
-  "aiModelDownloadCloseButton": "Chiudere",
-  "aiModelDownloadDialogDescription": "Lotti scaricherà {modelName} nella cache MLX Audio e la userà per l'elaborazione del discorso locale.",
-  "@aiModelDownloadDialogDescription": {
-    "placeholders": {
-      "modelName": {
-        "type": "String"
-      }
-    }
-  },
-  "aiModelDownloadDialogTitle": "Installare {modelName}",
-  "@aiModelDownloadDialogTitle": {
-    "placeholders": {
-      "modelName": {
-        "type": "String"
-      }
-    }
-  },
-  "aiModelDownloadInstallTooltip": "Modello di installazione",
-  "aiModelDownloadOpenProgressTooltip": "Mostra i progressi del download",
-  "aiModelDownloadStatusChecking": "Controllare lo stato del modello",
-  "aiModelDownloadStatusDownloading": "Scarica {percent}%",
-  "@aiModelDownloadStatusDownloading": {
-    "placeholders": {
-      "percent": {
-        "type": "int"
-      }
-    }
-  },
-  "aiModelDownloadStatusDownloadingIndeterminate": "Download in corso",
-  "aiModelDownloadStatusFailed": "Download non riuscito",
-  "aiModelDownloadStatusInstalled": "Installato",
-  "aiModelDownloadStatusNotInstalled": "Non installato",
-  "aiModelDownloadStatusUnsupported": "Apple Silicon richiesto",
-  "aiModelInstallChoiceCancelButton": "Annullamento",
-  "aiModelInstallChoiceDescription": "Scegli il modello vocale-to-text locale per scaricare prima. Puoi installare gli altri più tardi dalla lista dei modelli.",
-  "aiModelInstallChoiceInstallButton": "Modello di installazione",
-  "aiModelInstallChoiceRecommended": "Consigliato",
-  "aiModelInstallChoiceTitle": "Scegli il modello MLX Audio",
   "aiModelPickerByProviderLabel": "Scegli un fornitore",
   "aiModelPickerCurrentDefaultLabel": "Corrente di default",
   "aiModelPickerProviderModelCount": "{count, plural, =1{1 modello} other{{count} modelli}}",
@@ -1124,22 +1085,20 @@
   "aiProviderDetailRemoveDescription": "Elimina il fornitore e ogni modello che dipende da esso. Questo non può essere annullato.",
   "aiProviderDetailRemoveTitle": "Rimuovi questo fornitore",
   "aiProviderDetailValueUnset": "Non impostato",
-  "aiProviderEmbeddedRuntimeHint": "Esegue incorporato nel processo dell'app Apple. Non è richiesto alcun server locale o URL di base.",
   "aiProviderGeminiName": "Google Gemini",
   "aiProviderGenericOpenAiName": "Compatibile con OpenAI",
   "aiProviderMeliousName": "Melious.ai",
   "aiProviderMistralName": "Mistral",
-  "aiProviderMlxAudioName": "MLX Audio (locale)",
   "aiProviderNebiusAiStudioName": "Nebius AI Studio",
   "aiProviderOllamaName": "Ollama",
   "aiProviderOmlxName": "oMLX (locale)",
   "aiProviderOpenAiName": "OpenAI",
   "aiProviderOpenRouterName": "OpenRouter",
+  "aiProviderSherpaName": "sherpa-onnx (sul dispositivo)",
   "aiProviderTaglineAlibaba": "Modelli Qwen · multimodale · contesto lungo",
   "aiProviderTaglineAnthropic": "Claude famiglia · contesto lungo",
   "aiProviderTaglineGemini": "Multimodal · trascrizione audio",
   "aiProviderTaglineMelious": "EU-hosted · catalogo dinamico · eco routing",
-  "aiProviderTaglineMlxAudio": "Embedded · Apple Silicon · audio locale",
   "aiProviderTaglineOllama": "Corre localmente · nessuna chiamata cloud",
   "aiProviderTaglineOmlx": "Inferenza locale MLX · compatibile con OpenAI",
   "aiProviderTaglineOpenAi": "Famiglia GPT · visione + ragionamento",
@@ -1168,6 +1127,7 @@
   "aiSettingsCounterModels": "Modelli",
   "aiSettingsCounterProfiles": "Profili",
   "aiSettingsCounterProviders": "Fornitori",
+  "aiSettingsDefaultProfileDescription": "Profilo di riserva per gli agenti senza un modello configurato su questo dispositivo.",
   "aiSettingsEmptyDescription": "Aggiungere uno per sbloccare la trascrizione, il riconoscimento delle immagini, la generazione di immagini e la ricerca semantica.",
   "aiSettingsEmptyTitle": "Nessun provider ancora",
   "aiSettingsFilterByCapabilityTooltip": "Filtra per capacità {capability}",
@@ -1193,6 +1153,7 @@
   "aiSettingsModalityAudio": "Audio audio",
   "aiSettingsModalityText": "Testo",
   "aiSettingsModalityVision": "Visione",
+  "aiSettingsNoDefaultProfile": "Nessun profilo predefinito",
   "aiSettingsNoModelsConfigured": "Nessun modello AI configurato",
   "aiSettingsNoProvidersConfigured": "Nessun provider AI configurato",
   "aiSettingsPageLead": "Configurare i provider AI, i modelli Lotti possono chiamare, e i profili di inferenza che decidono quale modello gestisce quale compito.",
@@ -1393,6 +1354,10 @@
   "audioRecordingResume": "Riprendi",
   "audioRecordings": "Registrazioni audio",
   "audioRecordingStop": "Arresta",
+  "avatarCropHint": "Trascina per spostare · pizzica per zoomare",
+  "avatarCropPreviewLabel": "Come apparirà nell'elenco",
+  "avatarCropTitle": "Scegli il volto",
+  "avatarCropUse": "Usa la foto",
   "backfillAdvancedRecoveryActions": "{count, plural, =1{1 azione} other{{count} azioni}}",
   "@backfillAdvancedRecoveryActions": {
     "placeholders": {
@@ -1566,49 +1531,162 @@
   "chatInputStopRealtime": "Stop trascrizione live",
   "chatInputStopTranscribe": "Fermati e trascrivi",
   "chatInputTranscriptionFailed": "La registrazione è stata acquisita, ma la trascrizione non è riuscita. Riprova.",
+  "checkInAddMoreButton": "Aggiungi altro",
+  "checkInAudioSaved": "{length} di audio salvato",
+  "checkInAudioSavedAsYouGo": "L’audio viene salvato su questo dispositivo man mano",
+  "checkInAudioSavedRoute": "{length} di audio salvato · {route}",
   "checkInAvoidLabel": "Meglio evitare",
-  "checkInDateLabel": "Quando?",
-  "checkInDeleteConfirmMessage": "Eliminare questo contatto? L'azione non si può annullare.",
-  "checkInDone": "Fatto",
-  "@checkInDone": {
-    "description": "Relationships redesign label."
+  "checkInComposerSubtitle": "con {name} · ultimo contatto {day}",
+  "checkInComposerSubtitleNoContact": "con {name} · ancora nessun check-in",
+  "checkInComposerWithName": "con {name}",
+  "@checkInComposerWithName": {
+    "description": "The composer header's status line when only the person fits: the name is never shed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
+  "checkInContextSummary": "{type} · {time} · {duration}",
+  "checkInDeleteConfirmMessage": "Eliminare questo contatto? L'azione non si può annullare.",
+  "checkInDictateButton": "Detta",
+  "checkInDiscardDraftAudioKeptMessage": "Scartare questo check-in? La registrazione resta nel diario.",
+  "@checkInDiscardDraftAudioKeptMessage": {
+    "description": "The discard confirmation while a saved recording exists: the check-in goes, the audio stays in the journal."
+  },
+  "checkInDiscardDraftMessage": "Scartare questo check-in? Non è stato salvato nulla.",
+  "checkInDiscardDraftRecordingMessage": "Scartare questo check-in e la registrazione? La registrazione verrà eliminata.",
+  "checkInDiscardRecording": "Scarta",
+  "checkInDiscardRecordingBody": "L’audio viene eliminato. Il tuo check-in resta aperto.",
+  "@checkInDiscardRecordingBody": {
+    "description": "Body of the confirmation before discarding a check-in recording: the audio is deleted, the composer stays open."
+  },
+  "checkInDismissButton": "Chiudi",
+  "checkInDurationChip": "Durata",
+  "checkInDurationChipSemantics": "Durata: {duration}. Cambia",
+  "checkInDurationQuickPickHint": "Tocca una durata per salvarla, oppure gira la rotella.",
+  "checkInDurationSemanticsLabel": "Imposta la durata su {label}",
   "checkInEditTitle": "Modifica contatto",
   "checkInErrorCreateFailed": "Impossibile salvare il contatto. Riprova.",
   "checkInErrorDeleteFailed": "Impossibile eliminare il contatto. Riprova.",
-  "checkInHowDidItFeel": "Com’è andata?",
-  "@checkInHowDidItFeel": {
-    "description": "Relationships redesign label."
-  },
-  "checkInHowDidYouConnect": "Come vi siete sentiti?",
-  "@checkInHowDidYouConnect": {
-    "description": "Relationships redesign label."
-  },
   "checkInInteractionCall": "Chiamata",
   "checkInInteractionInPerson": "Di persona",
   "checkInInteractionLabel": "Come avete parlato?",
   "checkInInteractionMessage": "Messaggio",
   "checkInInteractionOther": "Altro",
   "checkInInteractionVideoCall": "Videochiamata",
-  "checkInNarrativeLabel": "Di cosa avete parlato?",
+  "checkInMicrophoneDeniedBody": "Attivalo per Lotti nelle impostazioni di sistema, poi tocca Detta. Non è stato registrato nulla.",
+  "checkInMicrophoneDeniedCalloutTitle": "Consenti l’accesso al microfono",
+  "@checkInMicrophoneDeniedCalloutTitle": {
+    "description": "The refused-microphone card's title: the next step, since the header status already says the microphone is unavailable."
+  },
+  "checkInMoreCaptionFeeling": "Sensazione",
+  "@checkInMoreCaptionFeeling": {
+    "description": "Folded More row caption segment while no feeling is chosen."
+  },
+  "checkInMoreCaptionNextTime": "la prossima volta",
+  "@checkInMoreCaptionNextTime": {
+    "description": "Folded More row caption segment while nothing is noted for next time."
+  },
+  "checkInMoreCaptionNextTimeSet": "prossima volta annotata",
+  "@checkInMoreCaptionNextTimeSet": {
+    "description": "Folded More row caption segment once something is noted for next time."
+  },
+  "checkInMoreCaptionTopics": "argomenti",
+  "@checkInMoreCaptionTopics": {
+    "description": "Folded More row caption segment while no topics are entered."
+  },
+  "checkInMoreCaptionTopicsCount": "{count, plural, =1{1 argomento} other{{count} argomenti}}",
+  "@checkInMoreCaptionTopicsCount": {
+    "description": "Folded More row caption segment: how many topics are entered.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkInMoreSection": "Altro",
+  "checkInNarrativeHint": "Di cosa avete parlato? Basta una riga.",
+  "checkInNoDuration": "Nessuna durata",
+  "checkInOpenSettingsButton": "Apri impostazioni",
+  "checkInOrTypeHint": "Oppure scrivilo qui…",
   "checkInPayAttentionLabel": "La prossima volta fai attenzione a",
-  "checkInPreparedOverline": "✦ LOTTI · PREPARATO STAMATTINA",
+  "checkInPreparingLabel": "Preparazione dell’audio…",
+  "checkInRecorderBusyBody": "Fermala prima dall’indicatore di registrazione, poi riprova. Non è stato registrato nulla di nuovo.",
+  "checkInRecorderBusyTitle": "C’è già una registrazione in corso",
+  "checkInRecordingFailedBody": "Impossibile avviare il microfono. Riprova o scrivi il check-in. Non è stato registrato nulla.",
+  "checkInRecordingFailedTitle": "Registrazione non avviata",
+  "checkInRecordingHint": "Parla normalmente. Le parole compariranno qui quando ti fermi.",
+  "checkInRecordingNotSavedBody": "La registrazione non è stata salvata. Riprova o scrivi il check-in.",
+  "checkInRecordingNotSavedTitle": "Impossibile salvare la registrazione",
+  "checkInReRecordButton": "Registra di nuovo",
+  "checkInReRecordReplaceMessage": "Sostituire le parole modificate con una nuova registrazione?",
+  "@checkInReRecordReplaceMessage": {
+    "description": "Confirmation before Re-record when the transcript has been edited since it landed."
+  },
+  "checkInSaveBlockedEmpty": "Aggiungi qualche parola per salvare",
+  "checkInSaveBlockedRecording": "Ferma la registrazione per salvare",
+  "checkInSaveBlockedRetry": "Scrivi o riprova per salvare",
+  "checkInSaveBlockedTranscribing": "In attesa della trascrizione",
+  "checkInSaveButton": "Salva il check-in",
+  "checkInSaveShortButton": "Salva",
+  "checkInSaveShortcutHint": "{shortcut} per salvare",
   "checkInSentimentDelightful": "Splendido",
   "checkInSentimentDifficult": "Difficile",
   "checkInSentimentGood": "Bene",
   "checkInSentimentLabel": "Com'è andata?",
   "checkInSentimentNeutral": "Neutro",
+  "checkInSentimentOptional": "Facoltativo. L’agente non lo compila mai.",
   "checkInSentimentStrained": "Teso",
+  "checkInSourceCall": "Dalla chiamata che hai fatto da questa pagina. Tutto è modificabile.",
+  "checkInSourceMessage": "Dal messaggio che hai inviato da questa pagina. Tutto è modificabile.",
   "checkInSpeakButton": "Detta il contatto",
+  "checkInSpokenMinutes": "{count, plural, =1{1 minuto} other{{count} minuti}}",
+  "@checkInSpokenMinutes": {
+    "description": "Minutes of a recording length, read by assistive technology.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkInSpokenSeconds": "{count, plural, =1{1 secondo} other{{count} secondi}}",
+  "@checkInSpokenSeconds": {
+    "description": "Seconds of a recording length, read by assistive technology.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkInStartedLabel": "Inizio",
+  "checkInStatusMicrophoneDenied": "Microfono non disponibile",
+  "checkInStatusPaused": "In pausa",
+  "checkInStatusRecorderBusy": "Registratore occupato",
+  "checkInStatusRecording": "Registrazione in corso",
+  "checkInStatusRecordingFailed": "Registrazione non avviata",
+  "checkInStatusRecordingNotSaved": "Registrazione non salvata",
+  "checkInStatusTranscriptionUnavailable": "Nessun modello di trascrizione",
+  "checkInStatusTranscriptMissing": "Trascrizione non ricevuta",
+  "checkInTimeChipSemantics": "Inizio: {time}. Cambia",
   "checkInTopicsHint": "Separati da virgole, ad es. lavoro, viaggi",
   "checkInTopicsLabel": "Argomenti",
-  "checkInTranscribingLabel": "Trascrizione in corso…",
-  "checkInTranscriptFailed": "Non è arrivata nessuna trascrizione. Puoi scriverlo tu.",
-  "checkInTranscriptUnavailable": "La trascrizione non è configurata per questa persona. Aggiungi un modello audio e attiva l'inferenza automatica per la sua categoria, oppure scrivi il contatto.",
-  "checkInWriteInstead": "Scrivi invece",
-  "@checkInWriteInstead": {
-    "description": "Relationships redesign label."
+  "checkInTranscribingEta": "di solito meno di un minuto",
+  "@checkInTranscribingEta": {
+    "description": "The last, first-shed tier of the transcribing caption: a time expectation for the wait."
   },
+  "checkInTranscribingLabel": "Trascrizione in corso…",
+  "checkInTranscriptAdded": "Trascrizione aggiunta",
+  "checkInTranscriptionUnavailableTitle": "Nessun modello di trascrizione configurato",
+  "checkInTranscriptMissingBody": "La tua registrazione di {length} resta salvata nel diario, anche se scarti questo check-in. Riprova tra un momento.",
+  "checkInTranscriptMissingCalloutTitle": "Riprova, o scrivilo",
+  "@checkInTranscriptMissingCalloutTitle": {
+    "description": "The transcript-not-received card's title: the next step, since the header status already names the state."
+  },
+  "checkInTranscriptUnavailable": "Scegli un profilo di inferenza predefinito con un modello di trascrizione nelle impostazioni IA, oppure scrivi il tuo check-in.",
+  "checkInTypeChipSemantics": "Tipo: {type}. Cambia",
+  "checkInTypeInstead": "Scrivi invece",
+  "checkInWordCount": "{count, plural, =1{1 parola} other{{count} parole}}",
   "checklistAddItem": "Aggiungi un nuovo articolo",
   "checklistAiConfidenceLabel": "Confidenza: {level}",
   "@checklistAiConfidenceLabel": {
@@ -1672,7 +1750,7 @@
   "configFlagEnableAiStreaming": "Attiva lo streaming AI per le azioni di attività",
   "configFlagEnableAiStreamingDescription": "Risposte dell'intelligenza artificiale per le azioni correlate al compito. Spegnere le risposte del buffer e mantenere l'interfaccia utente più fluida.",
   "configFlagEnableAiSummaryTts": "Riproduzione di sintesi AI",
-  "configFlagEnableAiSummaryTtsDescription": "Mostra il pulsante di testo-to-speech locale sui riassunti dell'intelligenza artificiale del compito. Richiede un modello MLX Audio TTS installato.",
+  "configFlagEnableAiSummaryTtsDescription": "Mostra il pulsante di testo-to-speech locale sui riassunti dell'intelligenza artificiale del compito. Richiede un modello Supertonic TTS installato.",
   "configFlagEnableDailyOs": "Abilita DailyOS",
   "configFlagEnableDailyOsDescription": "Mostra DailyOS nella navigazione principale.",
   "configFlagEnableDashboardsPage": "Attivare la pagina Dashboards",
@@ -1692,6 +1770,8 @@
   "configFlagEnableNotificationsDescription": "Ricevi notifiche per promemoria, aggiornamenti e eventi importanti.",
   "configFlagEnableProjects": "Attivare i progetti",
   "configFlagEnableProjectsDescription": "Mostra le caratteristiche di gestione del progetto per l'organizzazione dei compiti in progetti.",
+  "configFlagEnableQueryChat": "Chat attività sperimentale",
+  "configFlagEnableQueryChatDescription": "Mostra le chat per attività, progetti e categorie. Disattivata per impostazione predefinita.",
   "configFlagEnableRelationships": "Attiva la pagina Persone",
   "configFlagEnableRelationshipsDescription": "Mostra la scheda Persone per coltivare le tue relazioni personali.",
   "configFlagEnableSessionRatings": "Attiva le valutazioni delle sessioni",
@@ -2739,6 +2819,7 @@
   "designSystemTextareaWithCounterLabel": "Con contatore",
   "designSystemTextareaWithErrorLabel": "Con l'errore",
   "designSystemTextareaWithHelperLabel": "Con testo helper",
+  "designSystemTieredTextTitle": "Testo a livelli in tre larghezze",
   "designSystemTimePickerFormatsTitle": "Formati del tempo",
   "designSystemTimePickerTwelveHourLabel": "12 ore",
   "designSystemTimePickerTwentyFourHourLabel": "24 ore su 24",
@@ -3390,6 +3471,8 @@
   "imageViewerPreviousTooltip": "Immagine precedente",
   "inactiveLabel": "Inattivo",
   "inactiveSwitchDescription": "Può essere scelto per le nuove voci quando in su",
+  "inferenceProfileChat": "Modello di chat",
+  "inferenceProfileChatUsesThinking": "Se non impostato, usa il modello di pensiero",
   "inferenceProfileChooseModelTitle": "Scegli un modello",
   "inferenceProfileChooseTitle": "Scegli un profilo di inferenza",
   "inferenceProfileCreateTitle": "Crea il profilo",
@@ -4062,21 +4145,13 @@
   "multiSelectNoItemsFound": "Nessun articolo trovato",
   "navSidebarManualBrowserHint": "Si apre nel tuo browser",
   "navSidebarManualLabel": "Manuale",
-  "navTabMoreSemanticsLabel": "{count, plural, =1{Altro, 1 destinazione aggiuntiva} other{Altro, {count} destinazioni aggiuntive}}",
-  "@navTabMoreSemanticsLabel": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "navTabTitleCalendar": "Quotidiano",
   "navTabTitleEvents": "Eventi",
   "navTabTitleGoals": "Obiettivi",
   "navTabTitleHabits": "Abitazioni",
   "navTabTitleInsights": "Analisi",
   "navTabTitleJournal": "Regime di registro",
-  "navTabTitleMore": "Altro",
+  "navTabTitleNavigate": "Naviga",
   "navTabTitlePeople": "Persone",
   "navTabTitleProjects": "Progetti",
   "navTabTitleSettings": "Impostazioni",
@@ -4348,6 +4423,47 @@
   "panasScaleModerately": "Moderatamente",
   "panasScaleQuiteABit": "Un po' troppo.",
   "panasScaleVerySlightlyOrNotAtAll": "Molto leggermente o non affatto",
+  "plazaBlockedReason": "bloccata — serve una decisione",
+  "plazaCategoryEmpty": "Questa categoria non ha progetti visibili.",
+  "plazaClosedForNight": "CHIUSO PER LA NOTTE",
+  "plazaCloseHint": "Esc per chiudere",
+  "plazaControls": "WASD cammina · tieni premuto Shift: velocità ×8 · trascina per guardare · Tab prossimo segnale · H inizio · M panoramica · / cerca · T barra strumenti · Esc chiude · ⌘[ indietro",
+  "plazaCornerAfter": "Svolta dopo {week}",
+  "plazaDebug": "Debug",
+  "plazaDecisionStrip": "SERVE UNA DECISIONE",
+  "plazaDoneCount": "{done} di {total} completate",
+  "plazaDueOn": "scadenza {date}",
+  "plazaDueSoonReason": "scadenza {date} — completala",
+  "plazaEmpty": "Aggiungi un’attività per iniziare a costruire la piazza di questo progetto.",
+  "plazaEnterProject": "Entra nel progetto",
+  "plazaExploreCategory": "Esplora categoria",
+  "plazaExploreProject": "Esplora progetto",
+  "plazaFlyThere": "Vola lì ›",
+  "plazaInProgressCount": "In corso: {count}",
+  "plazaLinks": "collegamenti {count}",
+  "plazaMeerkats": "Suricati",
+  "plazaMorningWalk": "Passeggiata mattutina",
+  "plazaNeedsAttention": "Richiedono attenzione: {count}",
+  "plazaOpeningSoon": "PROSSIMA APERTURA",
+  "plazaOpenLate": "APERTO FINO A TARDI",
+  "plazaOverdueSince": "scaduta dal {date} — completala o rimandala",
+  "plazaOverview": "Panoramica",
+  "plazaPaused": "In pausa",
+  "plazaProjectOverdue": "Attività scadute: {count}",
+  "plazaSearchHint": "Cerca attività, Invio per volare",
+  "plazaShowPenguins": "Pinguini",
+  "plazaSkyDay": "Giorno",
+  "plazaSkyNight": "Notte",
+  "plazaStaleReason": "ferma da {days} giorni — riprendila",
+  "plazaStats": "{tasks} attività · {weeks} settimane · {attention} richiedono attenzione",
+  "plazaTaskCount": "Attività: {count}",
+  "plazaTitle": "Piazza",
+  "plazaToggleToolbar": "Mostra / nascondi la barra degli strumenti",
+  "plazaToLet": "AFFITTASI",
+  "plazaTourControls": "Spazio: pausa · muoviti per uscire",
+  "plazaUnavailable": "Questo dispositivo non può mostrare il mondo 3D.",
+  "plazaWeek": "S{week} · {date}",
+  "plazaWeekShort": "S{week}",
   "privateLabel": "Privato",
   "privateSwitchDescription": "Solo visibile quando vengono mostrate le voci private",
   "projectActionAddTask": "Aggiungi attività",
@@ -4679,6 +4795,129 @@
   "provisionedSyncSummaryHomeserver": "Server di sincronizzazione",
   "provisionedSyncSummaryUser": "Account di sincronizzazione",
   "provisionedSyncTitle": "Dispositivi",
+  "queryActionsAccept": "Accetta",
+  "queryActionsDismiss": "Ignora",
+  "queryActionsIncomplete": "Non è stato possibile applicare alcune modifiche. Le modifiche già applicate non verranno ripetute quando riprovi.",
+  "queryActionsReview": "Modifiche proposte",
+  "queryActionsTarget": "Per: {target}",
+  "queryAllSources": "Tutti",
+  "queryArchiveChat": "Archivia chat",
+  "queryArchiveConfirmation": "Chat archiviata. Le sue conclusioni restano disponibili.",
+  "queryArchivedChats": "Chat archiviate",
+  "queryArchivedReadOnly": "Questa chat è archiviata. Ripristinala per continuare la conversazione.",
+  "queryAsk": "Chiedi",
+  "queryAskCategory": "Chiedi di questa categoria",
+  "queryAskProject": "Chiedi di questo progetto",
+  "queryAskTask": "Chiedi di questa attività",
+  "queryAudioFailed": "Impossibile preparare o riprodurre l’audio. Riprova.",
+  "queryAudioListen": "Ascolta · {start}–{end}",
+  "queryAudioMissingFile": "La registrazione non è ancora disponibile su questo dispositivo.",
+  "queryAudioNoMatch": "Non è stato possibile associare questa citazione in modo univoco alla registrazione. Puoi comunque aprire la voce completa.",
+  "queryAudioOpenRecording": "Apri registrazione",
+  "queryAudioPlaying": "Riproduzione {start}–{end}",
+  "queryAudioPrepare": "Prepara estratto audio",
+  "queryAudioPreparing": "Preparazione dell’audio…",
+  "queryAudioReadAloud": "Leggi la risposta ad alta voce",
+  "queryAudioReading": "Lettura della risposta ad alta voce",
+  "queryAudioRetry": "Riprova audio",
+  "queryAudioSetupDetails": "Dettagli di configurazione",
+  "queryAudioSetupRequired": "Gli estratti audio richiedono un modello di trascrizione compatibile.",
+  "queryAudioStale": "La registrazione è cambiata. Prepara di nuovo i riferimenti temporali.",
+  "queryAudioStop": "Ferma audio",
+  "queryAudioTimingUnavailable": "Per preparare gli estratti, seleziona Melious Whisper o un modello di trascrizione Mistral Voxtral supportato nel profilo di inferenza di questo agente. L’URL del fornitore deve usare HTTPS.",
+  "queryAudioTooLarge": "Puoi preparare i timestamp per registrazioni fino a 25 MB. Scegli una registrazione più piccola.",
+  "queryAudioUploadNotice": "La preparazione dei riferimenti temporali invia questa registrazione al fornitore di trascrizione configurato per questo agente.",
+  "queryCategoryAgent": "Agente di categoria",
+  "queryChat": "Chat",
+  "queryChats": "Chat",
+  "queryChecked": "Fonti verificate: {count}",
+  "queryCloseChat": "Chiudi chat",
+  "queryCollapseChat": "Riduci chat",
+  "queryCopied": "Copiato",
+  "queryCopyQuote": "Copia citazione",
+  "queryCoverage": "Cosa è stato cercato",
+  "queryCoverageCategory": "Questa categoria",
+  "queryCoverageExcluded": "Le altre categorie non sono state cercate.",
+  "queryCoverageUnreadable": "Nessun testo ricercabile al momento di questa risposta. Apri la registrazione per consultarla.",
+  "queryCoverageWider": "Altre voci di questa categoria",
+  "queryDeleteChat": "Elimina chat",
+  "queryDeleteExplanation": "Eliminare questa conversazione? Scegli cosa succede alle conclusioni condivise. Le voci di origine rimangono intatte.",
+  "queryDeleteForget": "Elimina e dimentica le conclusioni",
+  "queryDeleteKeep": "Elimina e conserva le conclusioni",
+  "queryDictated": "Puoi modificare la trascrizione prima di inviare la domanda. L’audio potrebbe essere già stato inviato al tuo servizio di trascrizione.",
+  "queryDraftProvisional": "Bozza · non ancora verificata",
+  "queryDraftRetracted": "Non è stato possibile verificare la bozza della risposta. Riprova.",
+  "queryEarlierTextOmitted": "[Testo precedente non mostrato]",
+  "queryEmptyBody": "Chiedi informazioni sulle decisioni e sul lavoro passato. Le risposte distinguono i riepiloghi dai passaggi esatti.",
+  "queryExactStoredText": "Testo esatto salvato",
+  "queryExactText": "Mostra testo esatto",
+  "queryExampleDecision": "Cosa abbiamo concordato?",
+  "queryExampleMeeting": "In quale riunione ne abbiamo discusso?",
+  "queryExampleSuggestion": "Era una decisione o un suggerimento?",
+  "queryExpandChat": "Espandi chat",
+  "queryExpanding": "Verifica di altre voci in questa categoria…",
+  "queryFailed": "La ricerca non è terminata. Riprova.",
+  "queryForgetConclusions": "Dimentica le conclusioni",
+  "queryHideExactText": "Nascondi testo esatto",
+  "queryHideSurrounding": "Nascondi contesto",
+  "queryHomeOnly": "Solo ambito iniziale",
+  "queryHomeScope": "Ambito iniziale",
+  "queryIncomplete": "La ricerca è incompleta. L’assenza di prove non significa che la discussione non sia mai avvenuta.",
+  "queryIncompleteShort": "Non è stato possibile verificare alcune fonti.",
+  "queryInferenceUnavailable": "Nessuna configurazione IA utilizzabile. Configura il modello dell’agente o il profilo predefinito della categoria, poi riprova.",
+  "queryKeepConclusions": "Conserva le conclusioni",
+  "queryLaterTextOmitted": "[Testo successivo non mostrato]",
+  "queryMachineTranscript": "Trascrizione automatica: testo salvato esatto, non verificato con l’audio.",
+  "queryMemoryCount": "Conclusioni disponibili da chat precedenti: {count}",
+  "queryMissingTranscripts": "{count, plural, one{1 registrazione non aveva testo ricercabile al momento di questa risposta.} other{{count} registrazioni non avevano testo ricercabile al momento di questa risposta.}}",
+  "queryNewChat": "Nuova chat",
+  "queryNoAgent": "Questo ambito richiede il suo agente abituale. Torna ai dettagli per assegnarlo.",
+  "queryNotes": "Note",
+  "queryOpenCurrentEntry": "Apri la voce attuale",
+  "queryOpenEntry": "Apri voce",
+  "queryOriginalsHome": "Consulta solo questa attività e le voci collegate direttamente.",
+  "queryOtherProject": "Oltre l’ambito iniziale",
+  "queryPreparingAnswer": "Preparazione della risposta…",
+  "queryReachCategory": "La ricerca include questo ambito e {category}.",
+  "queryReachCategoryOnly": "Cerca in {category}.",
+  "queryReachHome": "La ricerca include solo questo ambito e le voci collegate.",
+  "queryReachUncategorized": "Cerca solo in questa attività e nelle sue voci senza categoria collegate direttamente.",
+  "queryRecall": "Questa risposta ha utilizzato conclusioni salvate.",
+  "queryRecordings": "Registrazioni",
+  "queryRecordingTranscript": "Trascrizione della registrazione",
+  "queryRenameChat": "Rinomina chat",
+  "queryRestoreChat": "Ripristina chat",
+  "querySavedConclusion": "Conclusione salvata il {date}",
+  "querySavedQuote": "Questa citazione salvata riflette la fonte al momento della risposta.",
+  "querySavedVersion": "Versione salvata: {version}",
+  "@querySavedVersion": {
+    "description": "Identifies the historical text version by edit date or short content fingerprint.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "querySavedVersionUnavailable": "Data della versione non disponibile",
+  "querySearching": "Consultazione delle informazioni disponibili…",
+  "querySearchScope": "Ambito di ricerca e filtri",
+  "querySourceAction": "{action}: {source}",
+  "querySourceChanged": "La fonte è cambiata",
+  "querySourceDeleted": "Fonte eliminata",
+  "querySourceMoved": "Fonte spostata in un’altra categoria",
+  "querySummaryBased": "Basata sui riepiloghi",
+  "querySummaryCoverage": "Questa risposta usa riepiloghi di attività o progetti. Le voci originali non sono state consultate.",
+  "querySummaryCurrent": "Apri un’attività o un progetto per consultarne il riepilogo attuale. Potrebbe essere cambiato dopo questa risposta.",
+  "querySummaryIncomplete": "Alcune informazioni mancano nei riepiloghi disponibili.",
+  "querySummaryOwners": "Informazioni su questa risposta",
+  "querySurroundingLimit": "Questo è l’estratto salvato, che potrebbe non includere l’intera discussione.",
+  "querySurroundingText": "Mostra contesto",
+  "queryTranscribing": "Trascrizione della tua registrazione. Il tuo fornitore potrebbe già avere l’audio.",
+  "queryUnavailable": "Questo ambito non è più disponibile con le tue impostazioni di visibilità attuali.",
+  "queryUnread": "Nuova risposta",
+  "queryWelcomeCategory": "Chiedi a {agentName} di questa categoria",
+  "queryWelcomeProject": "Chiedi a {agentName} di questo progetto",
+  "queryWelcomeTask": "Chiedi a {agentName} di questa attività",
   "queueCatchUpNowButton": "Prenditi ora",
   "queueCatchUpNowDone": "Prendere a calci — la coda sta drenando.",
   "queueCatchUpNowError": "Il catch-up non è riuscito: {reason}",
@@ -4788,23 +5027,41 @@
   "relationshipActionFailed": "Niente su questo dispositivo può aprirlo",
   "relationshipActionMessage": "Messaggio",
   "relationshipAddChannelButton": "Aggiungi recapito",
-  "relationshipAsk": "Chiedi",
-  "@relationshipAsk": {
-    "description": "Relationships redesign label."
+  "relationshipAddChannelFromContacts": "o dai contatti",
+  "relationshipAgentAsOfBand": "{band} · aggiornato {age}",
+  "relationshipAgentBriefNow": "Crea il briefing ora",
+  "relationshipAgentCall": "Chiama {name}",
+  "relationshipAgentFailedBody": "Il provider ha restituito un errore prima che il briefing fosse scritto. I tuoi check-in sono invariati.",
+  "relationshipAgentFailedNoModel": "Nessun modello è configurato per i briefing. Scegline uno in Impostazioni IA › Agenti. I dettagli sono nella scheda Attività.",
+  "relationshipAgentFailedPlain": "Ultima esecuzione fallita",
+  "relationshipAgentLastRunFailed": "Ultima esecuzione fallita · {time}",
+  "relationshipAgentMarkImportant": "Segna come importante",
+  "relationshipAgentNoAgent": "Nessun agente per questa persona",
+  "relationshipAgentNoBriefingBody": "{count, plural, =0{Nessun briefing ancora. „Crea il briefing ora“ ne scrive uno appena registri un check-in; non vede mai numero di telefono né e-mail.} =1{Nessun briefing ancora. „Crea il briefing ora“ ne scrive uno dal tuo check-in; non vede mai numero di telefono né e-mail.} other{Nessun briefing ancora. „Crea il briefing ora“ ne scrive uno dai tuoi {count} check-in; non vede mai numero di telefono né e-mail.}}",
+  "relationshipAgentNotEnrolledBody": "Segna {name} come importante per avere una chat, promemoria quando è passato un po' di tempo e un briefing.",
+  "relationshipAgentOnlyYourStartsUseAi": "Solo ciò che avvii tu usa l’IA",
+  "relationshipAgentOutOfDateNewCheckIn": "Non aggiornato · nuovo check-in {day}",
+  "relationshipAgentOutOfDateNewCheckInShort": "Non aggiornato · nuovo check-in",
+  "@relationshipAgentOutOfDateNewCheckInShort": {
+    "description": "The out-of-date status line's middle tier when the day does not fit beside the age pill."
   },
+  "relationshipAgentPausedBody": "I briefing sono in pausa finché questa persona è inattiva o archiviata.",
+  "relationshipAgentProposedCount": "{count, plural, =1{1 proposta} other{{count} proposte}}",
+  "relationshipAgentReadingBody": "{count, plural, =0{Preparazione del briefing. Di solito meno di un minuto.} =1{Lettura di 1 check-in. Di solito meno di un minuto.} other{Lettura di {count} check-in. Di solito meno di un minuto.}}",
+  "relationshipAgentSeeActivity": "Vedi attività",
+  "relationshipAgentSources": "Fonti: {count, plural, =1{1 check-in} other{{count} check-in}} · i recapiti non vengono mai inviati",
+  "relationshipAgentTryAgain": "Riprova",
+  "relationshipAgentWatching": "Monitoraggio attivo",
+  "relationshipAgentWatchingNextLook": "Monitoraggio attivo · prossimo controllo {day}",
+  "relationshipAgentWriting": "Scrittura del briefing…",
   "relationshipBannerSemanticLabel": "Banner della relazione con {personName}",
+  "relationshipBriefingAge": "{days, plural, =1{1 giorno} other{{days} giorni}}",
   "relationshipBriefingDisclosureBody": "Il briefing viene generato su {provider}. Le note su questa persona verranno inviate lì per l’elaborazione.",
   "relationshipBriefingDisclosureConfirm": "Continua",
   "relationshipBriefingDisclosureTitle": "Inviare a {provider}?",
-  "relationshipBriefingEmpty": "Nessun briefing ancora: Aggiornami ne prepara uno dai tuoi check-in.",
   "relationshipBriefingRequested": "Briefing richiesto: apparirà qui a breve.",
   "relationshipBriefingRequestFailed": "Impossibile richiedere il briefing.",
   "relationshipBriefingTitle": "Briefing",
-  "relationshipBriefMeAgain": "Aggiornami di nuovo",
-  "@relationshipBriefMeAgain": {
-    "description": "Relationships redesign label."
-  },
-  "relationshipBriefMeButton": "Aggiornami",
   "relationshipCadenceEveryNDays": "{days, plural, =1{Ogni giorno} other{Ogni {days} giorni}}",
   "relationshipCadenceFortnightly": "Ogni due settimane",
   "relationshipCadenceLabel": "Ritmo dei contatti",
@@ -4818,18 +5075,13 @@
   "@relationshipCadenceOnTrack": {
     "description": "Relationships redesign label."
   },
+  "relationshipCadencePromptLabel": "Ricordamelo ogni",
   "relationshipCadenceQuarterly": "Ogni trimestre",
   "relationshipCadenceWeekly": "Ogni settimana",
+  "relationshipChatAgentSubtitle": "Conosce i tuoi contatti, non i recapiti",
+  "relationshipChatAgentTitle": "{name} · agente di briefing",
   "relationshipChatTooltip": "Chatta su questa persona",
   "relationshipChatUnavailable": "Nessun agente ancora: prima segna questa persona come importante.",
-  "relationshipCheckedInLabel": "Contatto {date}",
-  "@relationshipCheckedInLabel": {
-    "placeholders": {
-      "date": {
-        "type": "String"
-      }
-    }
-  },
   "relationshipCheckInReminderBody": "Un buon momento per farsi sentire.",
   "relationshipCheckInReminderTitle": "Ti fai sentire con {name}?",
   "@relationshipCheckInReminderTitle": {
@@ -4840,14 +5092,6 @@
     }
   },
   "relationshipCheckInsLabel": "Contatti registrati",
-  "relationshipCheckInTitle": "Contatto · {name}",
-  "@relationshipCheckInTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "relationshipContactCardAction": "Scheda contatto",
   "@relationshipContactCardAction": {
     "description": "Relationships redesign label."
@@ -4858,6 +5102,14 @@
   "relationshipContactMissing": "Quel contatto non è su questo dispositivo",
   "relationshipContactNoChanges": "Niente di nuovo da copiare",
   "relationshipCreateTitle": "Aggiungi persona",
+  "relationshipDaysOver": "{count, plural, =1{1 giorno di ritardo} other{{count} giorni di ritardo}}",
+  "@relationshipDaysOver": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "relationshipDeleteConfirmMessage": "Verranno eliminati anche tutti i contatti registrati. L'azione non si può annullare.",
   "relationshipDeleteConfirmTitle": "Eliminare {name}?",
   "relationshipDueDay": "Entro {day}",
@@ -4868,11 +5120,54 @@
       }
     }
   },
+  "relationshipDueSince": "In ritardo da {day} · {count, plural, =1{1 giorno di ritardo} other{{count} giorni di ritardo}}",
+  "@relationshipDueSince": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipDueToday": "In scadenza oggi",
+  "relationshipDurationHours": "{hours} h",
+  "@relationshipDurationHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipDurationHoursMinutes": "{hours} h {minutes}",
+  "@relationshipDurationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipDurationMinutes": "{count} min",
+  "@relationshipDurationMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "relationshipEditTitle": "Modifica persona",
   "relationshipErrorCreateFailed": "Impossibile salvare la persona. Riprova.",
   "relationshipErrorDeleteFailed": "Impossibile eliminare la persona. Riprova.",
   "relationshipErrorLinkTaskFailed": "Impossibile collegare l'attività. Riprova.",
   "relationshipErrorUpdateFailed": "Impossibile salvare le modifiche. Riprova.",
+  "relationshipFormImportantBody": "Attiva un briefing, promemoria e una chat. Le note su questa persona vanno all'agente; i recapiti mai.",
+  "relationshipFormImportantBodyNamed": "Attiva un briefing, promemoria e una chat per {name}. Le note su questa persona vanno all'agente; i recapiti mai.",
+  "relationshipFormReachTitle": "Come raggiungerli",
+  "relationshipFormWhoTitle": "Chi",
   "relationshipHealthNeedsAttention": "Serve attenzione",
   "relationshipHealthSteady": "Stabile",
   "relationshipHealthStrained": "Tesa",
@@ -4885,11 +5180,13 @@
   "relationshipImportEmpty": "Nessun contatto su questo dispositivo",
   "relationshipImportFailed": "Non è stato possibile aggiungere nessuno",
   "relationshipImportGrantButton": "Consenti accesso",
+  "relationshipImportImportantBody": "Briefing, promemoria e una chat. Senza, non parte nulla da solo.",
   "relationshipImportNoMatches": "Nessun contatto corrisponde alla tua ricerca",
   "relationshipImportOpenSettings": "Apri impostazioni",
   "relationshipImportPermissionBody": "Lotti legge i tuoi contatti solo mentre questo selettore è aperto e copia solo le persone che scegli.",
   "relationshipImportRetry": "Riprova",
   "relationshipImportReviewButton": "{count, plural, =1{Controlla 1} other{Controlla {count}}}",
+  "relationshipImportReviewSubtitle": "{count, plural, =1{1 persona selezionata · i recapiti restano su questo dispositivo} other{{count} persone selezionate · i recapiti restano su questo dispositivo}}",
   "relationshipImportReviewTitle": "Prima di aggiungerle",
   "relationshipImportSearchHint": "Cerca contatti",
   "relationshipImportSettingsBody": "L’accesso ai contatti è disattivato. Attivalo nelle impostazioni di sistema per importare persone.",
@@ -4899,79 +5196,175 @@
   "@relationshipJustAdded": {
     "description": "Relationships redesign label."
   },
-  "relationshipLastCheckInLabel": "Ultimo contatto {date}",
-  "relationshipLinkContact": "Collega contatto",
-  "relationshipLinkedTasksLabel": "Attività",
-  "relationshipLinkTaskButton": "Collega attività",
-  "relationshipLogCheckIn": "Registra un contatto",
-  "relationshipLottisRead": "Lotti dice",
-  "@relationshipLottisRead": {
-    "description": "Relationships redesign label."
-  },
-  "relationshipLottisReadAsOf": "alle {time}",
-  "@relationshipLottisReadAsOf": {
+  "relationshipLastSpoke": "ultimo contatto {time}",
+  "@relationshipLastSpoke": {
     "placeholders": {
       "time": {
         "type": "String"
       }
     }
   },
+  "relationshipLinkContact": "Collega contatto",
+  "relationshipLinkedTasksLabel": "Attività",
+  "relationshipLinkTaskButton": "Collega attività",
+  "relationshipLogCheckIn": "Registra un contatto",
+  "relationshipMoreActions": "Altre azioni",
   "relationshipNameLabel": "Nome",
   "relationshipNameRequired": "Il nome è obbligatorio",
-  "relationshipNextByDay": "prossimo entro {day}",
-  "@relationshipNextByDay": {
+  "relationshipNextDueOn": "Prossima scadenza {day}",
+  "@relationshipNextDueOn": {
     "placeholders": {
       "day": {
         "type": "String"
       }
     }
   },
+  "relationshipNextTimeTitle": "La prossima volta",
   "relationshipNicknameLabel": "Soprannome",
   "relationshipNoCheckIns": "Nessun contatto registrato — aggiungine uno dopo la prossima conversazione.",
   "relationshipNoLinkedTasks": "Nessuna attività collegata.",
+  "relationshipNotEnrolled": "Non seguita",
   "relationshipNotFound": "Questa persona non è più nella tua lista.",
-  "relationshipNudgesOn": "promemoria attivi",
-  "@relationshipNudgesOn": {
-    "description": "Relationships redesign label."
-  },
-  "relationshipPostCallBody": "Hai appena scritto o chiamato. Vuoi annotare un check-in finché è fresco?",
-  "relationshipPostCallConfirm": "Annota check-in",
-  "relationshipPostCallDismiss": "Non ora",
-  "relationshipPostCallTitle": "Com’è andata con {name}?",
-  "@relationshipPostCallTitle": {
+  "relationshipOnTrackCadence": "In linea · {cadence}",
+  "@relationshipOnTrackCadence": {
     "placeholders": {
-      "name": {
-        "type": "String",
-        "example": "Anna"
+      "cadence": {
+        "type": "String"
       }
     }
   },
-  "relationshipQuietForDays": "Nessun contatto {count, plural, =1{da 1 giorno} other{da {count} giorni}}",
-  "@relationshipQuietForDays": {
+  "relationshipPayAttentionTo": "Fai attenzione a",
+  "relationshipPhotoAddBanner": "Aggiungi banner",
+  "relationshipPhotoAdjustCrop": "Regola il ritaglio",
+  "relationshipPhotoBanner": "Banner",
+  "relationshipPhotoCardTitle": "Foto",
+  "relationshipPhotoChange": "Cambia",
+  "relationshipPhotoChoose": "Scegli dalla libreria",
+  "relationshipPhotoDragToReposition": "Trascina per riposizionare",
+  "relationshipPhotoFace": "Volto",
+  "relationshipPhotoPrivacy": "Solo sui tuoi dispositivi · l'agente non la vede mai",
+  "relationshipPhotoRemove": "Rimuovi la foto",
+  "relationshipPhotoRemoveAction": "Rimuovi",
+  "relationshipPhotoSaveFailed": "Impossibile salvare la foto",
+  "relationshipPhotoSheetTitle": "Foto di {name}",
+  "relationshipPostCallConfirm": "Annota check-in",
+  "relationshipPostCallDismiss": "Non ora",
+  "relationshipPostCallMeta": "Inizio: {time} · {minutes, plural, =0{meno di un minuto} =1{circa 1 min} other{circa {minutes} min}}",
+  "@relationshipPostCallMeta": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipPostCallOfferCall": "Hai chiamato {name} {minutes, plural, =0{meno di un minuto} =1{1 minuto} other{{minutes} minuti}} fa — lo annotiamo finché è fresco?",
+  "@relationshipPostCallOfferCall": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipPostCallOfferMessage": "Hai scritto a {name} {minutes, plural, =0{meno di un minuto} =1{1 minuto} other{{minutes} minuti}} fa — lo annotiamo finché è fresco?",
+  "@relationshipPostCallOfferMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipProposalAdded": "Aggiunta → {title}",
+  "relationshipProposalEvidence": "Dal contatto del {date}",
+  "relationshipProposalUndoFailed": "Impossibile annullare. L’attività potrebbe essere stata modificata.",
+  "relationshipReachPrivacy": "Resta su questo dispositivo · mai condiviso con l'IA",
+  "relationshipReachTitle": "Contatti",
+  "relationshipRelinkContact": "Collega un altro contatto",
+  "relationshipsEmptyState": "Aggiungi le persone a cui vuoi restare vicino.",
+  "relationshipsGroupDue": "In scadenza",
+  "relationshipsPageTitle": "Persone",
+  "relationshipsSelectPersonHint": "Scegli una persona per vedere la sua pagina.",
+  "relationshipsSummaryDueNow": "Da sentire ora",
+  "relationshipsSummaryEnrolled": "{count, plural, =1{/ 1 seguita} other{/ {count} seguite}}",
+  "@relationshipsSummaryEnrolled": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "relationshipRelinkContact": "Collega un altro contatto",
-  "relationshipSeeAllCheckIns": "Vedi tutti i contatti",
-  "@relationshipSeeAllCheckIns": {
-    "description": "Relationships redesign label."
+  "relationshipsSummaryNextDue": "Prossima scadenza: {name} · {day}",
+  "@relationshipsSummaryNextDue": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
   },
-  "relationshipsEmptyState": "Aggiungi le persone a cui vuoi restare vicino.",
-  "relationshipsPageTitle": "Persone",
+  "relationshipsSummaryNoneDue": "Nessuno in scadenza",
+  "relationshipsSummaryNotEnrolled": "{count, plural, =1{1 persona non seguita} other{{count} persone non seguite}}",
+  "@relationshipsSummaryNotEnrolled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "relationshipStatusActive": "Attiva",
   "relationshipStatusArchived": "Archiviata",
   "relationshipStatusDormant": "In pausa",
   "relationshipStatusFieldLabel": "Stato",
-  "relationshipStayingInTouch": "Restare in contatto",
-  "@relationshipStayingInTouch": {
-    "description": "Relationships redesign label."
+  "relationshipStatusLineAdded": "Appena aggiunto · {cadence}",
+  "@relationshipStatusLineAdded": {
+    "placeholders": {
+      "cadence": {
+        "type": "String"
+      }
+    }
   },
-  "relationshipStayInTouch": "Restare in contatto",
-  "@relationshipStayInTouch": {
-    "description": "Relationships redesign label."
+  "relationshipStatusLineAddedFirstDue": "Appena aggiunto · {cadence} · prima scadenza {day}",
+  "@relationshipStatusLineAddedFirstDue": {
+    "placeholders": {
+      "cadence": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipStatusLineContacted": "{type} · {time} · {cadence}",
+  "@relationshipStatusLineContacted": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "cadence": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipTasksLinkedCount": "{count, plural, =1{1 collegata} other{{count} collegate}}",
+  "@relationshipTasksLinkedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "relationshipTimestampToday": "Oggi",
   "relationshipTimestampYesterday": "Ieri",
@@ -5458,7 +5851,6 @@
   "settingsSyncConflictsSubtitle": "Risolvi i conflitti di sincronizzazione",
   "settingsSyncNodeProfileCapabilitiesEmpty": "Nessuno rilevato — auto-trigger dell'inferenza audio sincronizzata non si rivolgerà a questo dispositivo.",
   "settingsSyncNodeProfileCapabilitiesLabel": "Capacità AI rilevate",
-  "settingsSyncNodeProfileCapabilityMlxAudio": "MLX Audio (locale)",
   "settingsSyncNodeProfileCapabilityOllamaLlm": "Ollama LLM",
   "settingsSyncNodeProfileCapabilityOmlxLlm": "oMLX LLM",
   "settingsSyncNodeProfileCapabilityVoxtral": "Voxtral (locale)",
@@ -5473,6 +5865,8 @@
   "settingsSyncOutboxTitle": "Posta in uscita",
   "settingsSyncStatsSubtitle": "Ispezione delle metriche di sincronizzazione",
   "settingsSyncSubtitle": "Configurare le statistiche di sincronizzazione e visualizzazione",
+  "settingsSystemHealthSubtitle": "Analizza i log recenti e copia un report condivisibile",
+  "settingsSystemHealthTitle": "Stato del sistema",
   "settingsThemingAutomatic": "Automatico",
   "settingsThemingDark": "Aspetto scuro",
   "settingsThemingLight": "Aspetto chiaro",
@@ -5485,6 +5879,51 @@
   "settingsV2UnimplementedTitle": "Pannello non ancora implementato",
   "settingsWhatsNewSubtitle": "Visualizza gli ultimi aggiornamenti e le funzionalità",
   "settingsWhatsNewTitle": "Che cosa è nuovo",
+  "sherpaAllFamilies": "Tutte le famiglie",
+  "sherpaCatalogMatches": "{count} di {total} modelli",
+  "sherpaDeleteModel": "Rimuovi {model} da questo dispositivo",
+  "@sherpaDeleteModel": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaDownloadAction": "Scarica",
+  "sherpaDownloadModel": "Scarica {model}",
+  "@sherpaDownloadModel": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaInstalledModelsTitle": "Modelli installati",
+  "sherpaInstallingModel": "Installazione del modello",
+  "sherpaLanguageCantonese": "Cantonese",
+  "sherpaModelCatalogTitle": "Catalogo dei modelli",
+  "sherpaModelConfigurationError": "Il modello è stato scaricato, ma non è stato possibile salvare la sua configurazione.",
+  "sherpaModelError": "Operazione sul modello non riuscita. Riprova.",
+  "sherpaModelFamily": "Famiglia di modelli",
+  "sherpaModelInstalled": "Scaricato",
+  "sherpaModelNotInstalled": "Scarica un modello su questo dispositivo",
+  "sherpaModelSizeGB": "{size} GB · Multilingue",
+  "@sherpaModelSizeGB": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaModelSizeMB": "{size} MB · Multilingue",
+  "@sherpaModelSizeMB": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaProviderDescription": "Trascrivi su questo dispositivo senza un server. Scarica un modello, poi selezionalo nel tuo profilo di inferenza.",
   "sidebarActiveSectionTitle": "Attività",
   "sidebarActivityCollapseTooltip": "L'attività di colata",
   "sidebarActivityExpandTooltip": "Attività all'estero",
@@ -5526,6 +5965,9 @@
   "speechDictionaryWarning": "Grande dizionario ( termini {count}) può aumentare i costi API",
   "speechModalSelectLanguage": "Seleziona la lingua",
   "speechModalTitle": "Riconoscimento vocale",
+  "speechSettingsAutoPrepareChatAudio": "Prepara automaticamente l’audio della chat",
+  "speechSettingsChatAudioDescription": "Prepara le nuove risposte della chat su questo dispositivo per avviare prima la riproduzione. L’audio parte solo quando tocchi riproduci.",
+  "speechSettingsChatAudioLabel": "Audio della chat",
   "speechSettingsModelDescription": "Modello vocale on-device",
   "speechSettingsModelDownloadsOnce": "Downloads una volta",
   "speechSettingsModelLabel": "Modello",
@@ -5800,6 +6242,33 @@
   "syncWizardStepConnect": "Collega",
   "syncWizardStepGetCode": "Ottieni codice",
   "syncWizardStepStatus": "Passaggio {step} di 3: {label}",
+  "systemHealthAnalyzedWindow": "Analizzato {start} → {end}",
+  "systemHealthChooseModelTitle": "Scegli modello",
+  "systemHealthCopiedToast": "Report copiato. I dati personali riconosciuti sono stati oscurati.",
+  "systemHealthCopyButton": "Copia report",
+  "systemHealthCustomFromLabel": "Da",
+  "systemHealthCustomToLabel": "A",
+  "systemHealthDescription": "Esamina i file di log di questo dispositivo alla ricerca di errori, avvisi e query lente, oscura i pattern noti di dati personali e scrive un breve report che puoi incollare in un assistente di programmazione.",
+  "systemHealthDomainsDescription": "I domini attivati qui sono quelli analizzati, la stessa impostazione che decide cosa viene registrato. Le query lente sono incluse quando la loro registrazione è attiva.",
+  "systemHealthDomainsTitle": "Domini di log",
+  "systemHealthFailedTitle": "Analisi non riuscita",
+  "systemHealthGeneratedAt": "Generato {time}",
+  "systemHealthHideDigest": "Nascondi riepilogo",
+  "systemHealthModelDescription": "Scrive i risultati a partire dal riepilogo anonimizzato. Propone il modello di ragionamento del tuo profilo predefinito.",
+  "systemHealthModelNone": "Solo riepilogo, nessun modello",
+  "systemHealthModelNoneDescription": "Imposta un profilo di inferenza predefinito o aggiungi un modello di testo agentico per ottenere i risultati.",
+  "systemHealthModelTitle": "Modello",
+  "systemHealthPresetCustom": "Personalizzato",
+  "systemHealthPresetLast14Days": "14 giorni",
+  "systemHealthPresetLast24Hours": "24 h",
+  "systemHealthPresetLast7Days": "7 giorni",
+  "systemHealthPreviousReportsDescription": "Ogni report resta su questo dispositivo. Toccane uno per mostrarlo di nuovo.",
+  "systemHealthPreviousReportsTitle": "Report precedenti",
+  "systemHealthRangeTitle": "Periodo",
+  "systemHealthReportTitle": "Report",
+  "systemHealthRunButton": "Avvia analisi",
+  "systemHealthSavedTo": "Salvato in {path}",
+  "systemHealthShowDigest": "Mostra riepilogo",
   "taskActionBarAudioRecordingActive": "Registrazione audio in corso",
   "taskActionBarMoreActions": "Altre azioni",
   "taskActionBarOpenRunningTimer": "Apri il timer in esecuzione",

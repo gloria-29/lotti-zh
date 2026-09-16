@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:clock/clock.dart';
 import 'package:lotti/classes/day_agent_identity.dart';
@@ -27,6 +28,7 @@ import 'package:lotti/features/ai/repository/ai_config_repository.dart';
 import 'package:lotti/features/ai/repository/cloud_inference_repository.dart';
 import 'package:lotti/features/ai/repository/cloud_inference_wrapper.dart';
 import 'package:lotti/features/ai/repository/inference_repository_interface.dart';
+import 'package:lotti/features/ai/util/forced_tool_choice.dart';
 import 'package:lotti/features/ai/util/profile_resolver.dart';
 import 'package:lotti/features/ai_consumption/service/ai_interaction_capture.dart';
 import 'package:lotti/features/daily_os_next/agents/domain/daily_os_planner_wake_context.dart';
@@ -44,7 +46,8 @@ import 'package:lotti/features/daily_os_next/agents/service/day_agent_plan_parse
         advertisedPlanningStart,
         draftPlanningWindowClosed,
         remainingWorkingMinutes,
-        scheduledMinutesFor;
+        scheduledMinutesFor,
+        workingHourOn;
 import 'package:lotti/features/daily_os_next/agents/service/day_agent_plan_service.dart';
 import 'package:lotti/features/daily_os_next/agents/service/day_agent_week_context_service.dart';
 import 'package:lotti/features/daily_os_next/agents/service/day_audio_entry_context_service.dart';
@@ -557,7 +560,12 @@ class DayAgentWorkflow {
       final outputBudgetRepo = DayAgentOutputBudgetInferenceRepository(
         delegate: cloudInferenceRepo,
         wakeKind: wakeKind,
-        maxCompletionTokens: outputTokenBudgets.forKind(wakeKind),
+        maxCompletionTokens: math.min(
+          outputTokenBudgets.forKind(wakeKind),
+          resolvedProfile.thinkingModel?.maxCompletionTokens ??
+              outputTokenBudgets.forKind(wakeKind),
+        ),
+        domainLogger: domainLogger,
       );
       inferenceRepo = DayAgentTimeoutInferenceRepository(
         delegate: outputBudgetRepo,
@@ -828,7 +836,7 @@ class DayAgentWorkflow {
           stackTrace: stackTrace,
         );
       }
-      return WakeResult(success: false, error: e.toString());
+      return WakeResult.failed(kind: 'Day agent', error: e);
     } finally {
       await inferenceRepo?.dispose();
       conversationRepository.deleteConversation(conversationId);

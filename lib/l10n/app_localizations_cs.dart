@@ -885,6 +885,11 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
+  String agentSummaryAssignLabel(String label) {
+    return 'Přiřadit štítek: „$label“';
+  }
+
+  @override
   String agentSummaryCheckItem(Object title) {
     return 'Odškrtnout: „$title“';
   }
@@ -1491,12 +1496,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get aiCardTitle => 'Souhrn AI';
 
   @override
-  String get aiChatAssistantResponding => 'Asistent odpovídá';
-
-  @override
-  String get aiChatMessageCopied => 'Zkopírováno do schránky';
-
-  @override
   String get aiConfigFailedToLoadModelsGeneric =>
       'Nepodařilo se načíst modely. Prosím, zkuste to znovu.';
 
@@ -1820,64 +1819,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get aiModelCardDeleteTooltip => 'Smazat model';
 
   @override
-  String get aiModelDownloadCloseButton => 'Zavřít';
-
-  @override
-  String aiModelDownloadDialogDescription(String modelName) {
-    return 'Lotti stáhne $modelName do cache MLX Audio a použije ho pro lokální zpracování řeči.';
-  }
-
-  @override
-  String aiModelDownloadDialogTitle(String modelName) {
-    return 'Instalovat $modelName';
-  }
-
-  @override
-  String get aiModelDownloadInstallTooltip => 'Instalovat model';
-
-  @override
-  String get aiModelDownloadOpenProgressTooltip => 'Zobrazit průběh stahování';
-
-  @override
-  String get aiModelDownloadStatusChecking => 'Kontroluje se stav modelu';
-
-  @override
-  String aiModelDownloadStatusDownloading(int percent) {
-    return 'Stahování $percent %';
-  }
-
-  @override
-  String get aiModelDownloadStatusDownloadingIndeterminate => 'Stahování';
-
-  @override
-  String get aiModelDownloadStatusFailed => 'Stahování selhalo';
-
-  @override
-  String get aiModelDownloadStatusInstalled => 'Nainstalováno';
-
-  @override
-  String get aiModelDownloadStatusNotInstalled => 'Nenainstalováno';
-
-  @override
-  String get aiModelDownloadStatusUnsupported => 'Vyžaduje Apple Silicon';
-
-  @override
-  String get aiModelInstallChoiceCancelButton => 'Zrušit';
-
-  @override
-  String get aiModelInstallChoiceDescription =>
-      'Nejdřív vyber lokální model pro převod řeči na text, který se má stáhnout. Ostatní můžeš nainstalovat později ze seznamu modelů.';
-
-  @override
-  String get aiModelInstallChoiceInstallButton => 'Instalovat model';
-
-  @override
-  String get aiModelInstallChoiceRecommended => 'Doporučeno';
-
-  @override
-  String get aiModelInstallChoiceTitle => 'Vybrat model MLX Audio';
-
-  @override
   String get aiModelPickerByProviderLabel => 'Vyber poskytovatele';
 
   @override
@@ -2186,10 +2127,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get aiProviderDetailValueUnset => 'Nenastaveno';
 
   @override
-  String get aiProviderEmbeddedRuntimeHint =>
-      'Běží přímo v procesu aplikace Apple. Není potřeba lokální server ani základní URL.';
-
-  @override
   String get aiProviderGeminiName => 'Google Gemini';
 
   @override
@@ -2200,9 +2137,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get aiProviderMistralName => 'Mistral';
-
-  @override
-  String get aiProviderMlxAudioName => 'MLX Audio (lokálně)';
 
   @override
   String get aiProviderNebiusAiStudioName => 'Nebius AI Studio';
@@ -2220,6 +2154,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get aiProviderOpenRouterName => 'OpenRouter';
 
   @override
+  String get aiProviderSherpaName => 'sherpa-onnx (v zařízení)';
+
+  @override
   String get aiProviderTaglineAlibaba =>
       'Modely Qwen · multimodální · dlouhý kontext';
 
@@ -2232,10 +2169,6 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get aiProviderTaglineMelious =>
       'Hostováno v EU · dynamický katalog · eko směrování';
-
-  @override
-  String get aiProviderTaglineMlxAudio =>
-      'Vestavěné · Apple Silicon · lokální audio';
 
   @override
   String get aiProviderTaglineOllama => 'Běží lokálně · bez cloudových volání';
@@ -2328,6 +2261,10 @@ class AppLocalizationsCs extends AppLocalizations {
   String get aiSettingsCounterProviders => 'Poskytovatelé';
 
   @override
+  String get aiSettingsDefaultProfileDescription =>
+      'Záložní profil pro agenty bez nastaveného modelu na tomto zařízení.';
+
+  @override
   String get aiSettingsEmptyDescription =>
       'Přidej jednoho a odemkni přepis, rozpoznávání obrázků, generování obrázků a sémantické vyhledávání.';
 
@@ -2367,6 +2304,9 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get aiSettingsModalityVision => 'Obraz';
+
+  @override
+  String get aiSettingsNoDefaultProfile => 'Žádný výchozí profil';
 
   @override
   String get aiSettingsNoModelsConfigured =>
@@ -2703,6 +2643,18 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get audioRecordingStop => 'Stop';
+
+  @override
+  String get avatarCropHint => 'Tažením posuneš · stažením přiblížíš';
+
+  @override
+  String get avatarCropPreviewLabel => 'Takhle to bude vypadat v seznamu';
+
+  @override
+  String get avatarCropTitle => 'Vyber obličej';
+
+  @override
+  String get avatarCropUse => 'Použít fotku';
 
   @override
   String backfillAdvancedRecoveryActions(int count) {
@@ -3155,17 +3107,90 @@ class AppLocalizationsCs extends AppLocalizations {
       'Nahrávka se pořídila, ale přepis se nezdařil. Zkus to prosím znovu.';
 
   @override
+  String get checkInAddMoreButton => 'Přidat další';
+
+  @override
+  String checkInAudioSaved(String length) {
+    return '$length zvuku uloženo';
+  }
+
+  @override
+  String get checkInAudioSavedAsYouGo =>
+      'Zvuk se průběžně ukládá na toto zařízení';
+
+  @override
+  String checkInAudioSavedRoute(String length, String route) {
+    return '$length zvuku uloženo · $route';
+  }
+
+  @override
   String get checkInAvoidLabel => 'Raději se vyhnout';
 
   @override
-  String get checkInDateLabel => 'Kdy?';
+  String checkInComposerSubtitle(String name, String day) {
+    return 's $name · naposledy $day';
+  }
+
+  @override
+  String checkInComposerSubtitleNoContact(String name) {
+    return 's $name · zatím žádný check-in';
+  }
+
+  @override
+  String checkInComposerWithName(String name) {
+    return 's $name';
+  }
+
+  @override
+  String checkInContextSummary(String type, String time, String duration) {
+    return '$type · $time · $duration';
+  }
 
   @override
   String get checkInDeleteConfirmMessage =>
       'Smazat tento záznam? Tohle nelze vrátit zpět.';
 
   @override
-  String get checkInDone => 'Hotovo';
+  String get checkInDictateButton => 'Diktovat';
+
+  @override
+  String get checkInDiscardDraftAudioKeptMessage =>
+      'Zahodit tento check-in? Nahrávka zůstane v deníku.';
+
+  @override
+  String get checkInDiscardDraftMessage =>
+      'Zahodit tento check-in? Nic se neuložilo.';
+
+  @override
+  String get checkInDiscardDraftRecordingMessage =>
+      'Zahodit tento check-in i nahrávku? Nahrávka se smaže.';
+
+  @override
+  String get checkInDiscardRecording => 'Zahodit';
+
+  @override
+  String get checkInDiscardRecordingBody =>
+      'Zvuk se smaže. Tvůj check-in zůstane otevřený.';
+
+  @override
+  String get checkInDismissButton => 'Zavřít';
+
+  @override
+  String get checkInDurationChip => 'Délka';
+
+  @override
+  String checkInDurationChipSemantics(String duration) {
+    return 'Délka: $duration. Změnit';
+  }
+
+  @override
+  String get checkInDurationQuickPickHint =>
+      'Klepni na délku a uloží se, nebo otoč kolečkem.';
+
+  @override
+  String checkInDurationSemanticsLabel(String label) {
+    return 'Nastavit délku na $label';
+  }
 
   @override
   String get checkInEditTitle => 'Upravit záznam';
@@ -3177,12 +3202,6 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get checkInErrorDeleteFailed =>
       'Záznam se nepodařilo smazat. Zkus to prosím znovu.';
-
-  @override
-  String get checkInHowDidItFeel => 'Jaké to bylo?';
-
-  @override
-  String get checkInHowDidYouConnect => 'Jak proběhl kontakt?';
 
   @override
   String get checkInInteractionCall => 'Hovor';
@@ -3203,13 +3222,112 @@ class AppLocalizationsCs extends AppLocalizations {
   String get checkInInteractionVideoCall => 'Videohovor';
 
   @override
-  String get checkInNarrativeLabel => 'O čem jste mluvili?';
+  String get checkInMicrophoneDeniedBody =>
+      'Zapni ho pro Lotti v nastavení systému a pak klepni na Diktovat. Nic se nenahrálo.';
+
+  @override
+  String get checkInMicrophoneDeniedCalloutTitle => 'Povol přístup k mikrofonu';
+
+  @override
+  String get checkInMoreCaptionFeeling => 'Pocit';
+
+  @override
+  String get checkInMoreCaptionNextTime => 'příště';
+
+  @override
+  String get checkInMoreCaptionNextTimeSet => 'příště poznamenáno';
+
+  @override
+  String get checkInMoreCaptionTopics => 'témata';
+
+  @override
+  String checkInMoreCaptionTopicsCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count témat',
+      few: '$count témata',
+      one: '1 téma',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get checkInMoreSection => 'Více';
+
+  @override
+  String get checkInNarrativeHint => 'O čem jste mluvili? Stačí jeden řádek.';
+
+  @override
+  String get checkInNoDuration => 'Bez délky';
+
+  @override
+  String get checkInOpenSettingsButton => 'Otevřít nastavení';
+
+  @override
+  String get checkInOrTypeHint => 'Nebo to napiš sem…';
 
   @override
   String get checkInPayAttentionLabel => 'Příště se zaměřit na';
 
   @override
-  String get checkInPreparedOverline => '✦ LOTTI · PŘIPRAVENO DNES RÁNO';
+  String get checkInPreparingLabel => 'Příprava zvuku…';
+
+  @override
+  String get checkInRecorderBusyBody =>
+      'Nejdřív ji zastav v indikátoru nahrávání a pak to zkus znovu. Nic nového se nenahrálo.';
+
+  @override
+  String get checkInRecorderBusyTitle => 'Už běží jiná nahrávka';
+
+  @override
+  String get checkInRecordingFailedBody =>
+      'Mikrofon se nepodařilo spustit. Zkus to znovu, nebo check-in napiš. Nic se nenahrálo.';
+
+  @override
+  String get checkInRecordingFailedTitle => 'Nahrávání se nespustilo';
+
+  @override
+  String get checkInRecordingHint =>
+      'Mluv normálně. Slova se tu objeví, jakmile zastavíš.';
+
+  @override
+  String get checkInRecordingNotSavedBody =>
+      'Nahrávku se nepodařilo uložit. Zkus to znovu, nebo check-in napiš.';
+
+  @override
+  String get checkInRecordingNotSavedTitle => 'Nahrávku se nepodařilo uložit';
+
+  @override
+  String get checkInReRecordButton => 'Nahrát znovu';
+
+  @override
+  String get checkInReRecordReplaceMessage =>
+      'Nahradit upravená slova novou nahrávkou?';
+
+  @override
+  String get checkInSaveBlockedEmpty => 'Napiš pár slov, aby šlo uložit';
+
+  @override
+  String get checkInSaveBlockedRecording => 'Pro uložení zastav nahrávání';
+
+  @override
+  String get checkInSaveBlockedRetry =>
+      'Napiš to nebo to zkus znovu, pak můžeš uložit';
+
+  @override
+  String get checkInSaveBlockedTranscribing => 'Čeká se na přepis';
+
+  @override
+  String get checkInSaveButton => 'Uložit check-in';
+
+  @override
+  String get checkInSaveShortButton => 'Uložit';
+
+  @override
+  String checkInSaveShortcutHint(String shortcut) {
+    return '$shortcut pro uložení';
+  }
 
   @override
   String get checkInSentimentDelightful => 'Skvělé';
@@ -3227,10 +3345,78 @@ class AppLocalizationsCs extends AppLocalizations {
   String get checkInSentimentNeutral => 'Neutrální';
 
   @override
+  String get checkInSentimentOptional =>
+      'Volitelné. Agent to nikdy nevyplňuje.';
+
+  @override
   String get checkInSentimentStrained => 'Napjaté';
 
   @override
+  String get checkInSourceCall =>
+      'Z hovoru, který jsi zahájil/a z této stránky. Vše jde upravit.';
+
+  @override
+  String get checkInSourceMessage =>
+      'Ze zprávy, kterou jsi poslal/a z této stránky. Vše jde upravit.';
+
+  @override
   String get checkInSpeakButton => 'Namluvit kontakt';
+
+  @override
+  String checkInSpokenMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count minut',
+      few: '$count minuty',
+      one: '1 minuta',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String checkInSpokenSeconds(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sekund',
+      few: '$count sekundy',
+      one: '1 sekunda',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get checkInStartedLabel => 'Začátek';
+
+  @override
+  String get checkInStatusMicrophoneDenied => 'Mikrofon není k dispozici';
+
+  @override
+  String get checkInStatusPaused => 'Pozastaveno';
+
+  @override
+  String get checkInStatusRecorderBusy => 'Rekordér je obsazený';
+
+  @override
+  String get checkInStatusRecording => 'Nahrává se';
+
+  @override
+  String get checkInStatusRecordingFailed => 'Nahrávání se nespustilo';
+
+  @override
+  String get checkInStatusRecordingNotSaved => 'Nahrávka neuložena';
+
+  @override
+  String get checkInStatusTranscriptionUnavailable => 'Žádný model pro přepis';
+
+  @override
+  String get checkInStatusTranscriptMissing => 'Přepis nedorazil';
+
+  @override
+  String checkInTimeChipSemantics(String time) {
+    return 'Začátek: $time. Změnit';
+  }
 
   @override
   String get checkInTopicsHint => 'Oddělená čárkami, např. práce, cestování';
@@ -3239,18 +3425,50 @@ class AppLocalizationsCs extends AppLocalizations {
   String get checkInTopicsLabel => 'Témata';
 
   @override
+  String get checkInTranscribingEta => 'obvykle do minuty';
+
+  @override
   String get checkInTranscribingLabel => 'Přepisuje se…';
 
   @override
-  String get checkInTranscriptFailed =>
-      'Přepis nedorazil. Můžeš text napsat sám.';
+  String get checkInTranscriptAdded => 'Přepis přidán';
+
+  @override
+  String get checkInTranscriptionUnavailableTitle =>
+      'Není nastavený žádný model pro přepis';
+
+  @override
+  String checkInTranscriptMissingBody(String length) {
+    return 'Tvoje nahrávka ($length) zůstane uložená v deníku, i když tento check-in zahodíš. Zkus to za chvíli znovu.';
+  }
+
+  @override
+  String get checkInTranscriptMissingCalloutTitle =>
+      'Zkus to znovu, nebo to napiš';
 
   @override
   String get checkInTranscriptUnavailable =>
-      'Přepis pro tuto osobu není nastavený. Přidej zvukový model a zapni automatické odvozování pro její kategorii, nebo napiš záznam ručně.';
+      'V nastavení AI vyber výchozí inferenční profil s modelem pro přepis, nebo svůj kontakt zapiš.';
 
   @override
-  String get checkInWriteInstead => 'Spíše psát';
+  String checkInTypeChipSemantics(String type) {
+    return 'Typ: $type. Změnit';
+  }
+
+  @override
+  String get checkInTypeInstead => 'Raději napsat';
+
+  @override
+  String checkInWordCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count slov',
+      few: '$count slova',
+      one: '1 slovo',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get checklistAddItem => 'Přidat novou položku';
@@ -3397,7 +3615,7 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get configFlagEnableAiSummaryTtsDescription =>
-      'Zobrazí tlačítko místního převodu textu na řeč u AI souhrnů úkolů. Vyžaduje nainstalovaný model MLX Audio TTS.';
+      'Zobrazí tlačítko místního převodu textu na řeč u AI souhrnů úkolů. Vyžaduje nainstalovaný model Supertonic TTS.';
 
   @override
   String get configFlagEnableDailyOs => 'Povolit DailyOS';
@@ -3464,6 +3682,13 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get configFlagEnableProjectsDescription =>
       'Zobrazit funkce správy projektů pro organizaci úkolů do projektů.';
+
+  @override
+  String get configFlagEnableQueryChat => 'Experimentální chat k úkolům';
+
+  @override
+  String get configFlagEnableQueryChatDescription =>
+      'Zobrazí chaty pro úkoly, projekty a kategorie. Ve výchozím stavu je vypnutý.';
 
   @override
   String get configFlagEnableRelationships => 'Zapnout stránku Lidé';
@@ -5879,6 +6104,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get designSystemTextareaWithHelperLabel => 'S nápovědou';
 
   @override
+  String get designSystemTieredTextTitle => 'Stupňovitý text ve třech šířkách';
+
+  @override
   String get designSystemTimePickerFormatsTitle => 'Formáty času';
 
   @override
@@ -7825,6 +8053,13 @@ class AppLocalizationsCs extends AppLocalizations {
       'Lze vybrat pro nové záznamy, když je zapnuto';
 
   @override
+  String get inferenceProfileChat => 'Model pro chat';
+
+  @override
+  String get inferenceProfileChatUsesThinking =>
+      'Pokud není nastaven, použije se model pro uvažování';
+
+  @override
   String get inferenceProfileChooseModelTitle => 'Vyber model';
 
   @override
@@ -9579,18 +9814,6 @@ class AppLocalizationsCs extends AppLocalizations {
   String get navSidebarManualLabel => 'Příručka';
 
   @override
-  String navTabMoreSemanticsLabel(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'Více, $count dalších sekcí',
-      few: 'Více, $count další sekce',
-      one: 'Více, 1 další sekce',
-    );
-    return '$_temp0';
-  }
-
-  @override
   String get navTabTitleCalendar => 'DailyOS';
 
   @override
@@ -9609,7 +9832,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get navTabTitleJournal => 'Zápisník';
 
   @override
-  String get navTabTitleMore => 'Více';
+  String get navTabTitleNavigate => 'Navigovat';
 
   @override
   String get navTabTitlePeople => 'Lidé';
@@ -10241,6 +10464,160 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get panasScaleVerySlightlyOrNotAtAll => 'Vůbec nebo jen velmi málo';
+
+  @override
+  String get plazaBlockedReason => 'blokováno — čeká na rozhodnutí';
+
+  @override
+  String get plazaCategoryEmpty =>
+      'V této kategorii nejsou žádné viditelné projekty.';
+
+  @override
+  String get plazaClosedForNight => 'NA NOC ZAVŘENO';
+
+  @override
+  String get plazaCloseHint => 'Esc zavře';
+
+  @override
+  String get plazaControls =>
+      'WASD chůze · drž Shift: 8× rychlost · tažením se rozhlížej · Tab další maják · H domů · M přehled · / hledat · T panel nástrojů · Esc zavře · ⌘[ zpět';
+
+  @override
+  String plazaCornerAfter(String week) {
+    return 'Odbočka za $week';
+  }
+
+  @override
+  String get plazaDebug => 'Ladění';
+
+  @override
+  String get plazaDecisionStrip => 'ČEKÁ NA ROZHODNUTÍ';
+
+  @override
+  String plazaDoneCount(int done, int total) {
+    return 'Hotovo: $done z $total';
+  }
+
+  @override
+  String plazaDueOn(String date) {
+    return 'termín $date';
+  }
+
+  @override
+  String plazaDueSoonReason(String date) {
+    return 'termín $date — dokonči to';
+  }
+
+  @override
+  String get plazaEmpty =>
+      'Přidej úkol a začni budovat náměstí tohoto projektu.';
+
+  @override
+  String get plazaEnterProject => 'Vstoupit do projektu';
+
+  @override
+  String get plazaExploreCategory => 'Prozkoumat kategorii';
+
+  @override
+  String get plazaExploreProject => 'Prozkoumat projekt';
+
+  @override
+  String get plazaFlyThere => 'Přeletět sem ›';
+
+  @override
+  String plazaInProgressCount(int count) {
+    return 'Probíhá: $count';
+  }
+
+  @override
+  String plazaLinks(int count) {
+    return 'odkazy $count';
+  }
+
+  @override
+  String get plazaMeerkats => 'Surikaty';
+
+  @override
+  String get plazaMorningWalk => 'Ranní procházka';
+
+  @override
+  String plazaNeedsAttention(int count) {
+    return 'Vyžaduje pozornost: $count';
+  }
+
+  @override
+  String get plazaOpeningSoon => 'BRZY OTEVŘEME';
+
+  @override
+  String get plazaOpenLate => 'OTEVŘENO DO NOCI';
+
+  @override
+  String plazaOverdueSince(String date) {
+    return 'po termínu od $date — dokonči nebo přesuň';
+  }
+
+  @override
+  String get plazaOverview => 'Přehled';
+
+  @override
+  String get plazaPaused => 'Pozastaveno';
+
+  @override
+  String plazaProjectOverdue(int count) {
+    return 'Úkoly po termínu: $count';
+  }
+
+  @override
+  String get plazaSearchHint => 'Hledej úkoly, Enter pro přelet';
+
+  @override
+  String get plazaShowPenguins => 'Tučňáci';
+
+  @override
+  String get plazaSkyDay => 'Den';
+
+  @override
+  String get plazaSkyNight => 'Noc';
+
+  @override
+  String plazaStaleReason(int days) {
+    return 'bez aktivity $days dní — vrať se k tomu';
+  }
+
+  @override
+  String plazaStats(int tasks, int weeks, int attention) {
+    return '$tasks úkolů · $weeks týdnů · $attention vyžaduje pozornost';
+  }
+
+  @override
+  String plazaTaskCount(int count) {
+    return 'Úkoly: $count';
+  }
+
+  @override
+  String get plazaTitle => 'Náměstí';
+
+  @override
+  String get plazaToggleToolbar => 'Zobrazit / skrýt panel nástrojů';
+
+  @override
+  String get plazaToLet => 'K PRONÁJMU';
+
+  @override
+  String get plazaTourControls => 'Mezerník: pauza · pohybem ukončíš';
+
+  @override
+  String get plazaUnavailable => 'Toto zařízení nedokáže zobrazit 3D svět.';
+
+  @override
+  String plazaWeek(int week, String date) {
+    return 'T$week · $date';
+  }
+
+  @override
+  String plazaWeekShort(int week) {
+    return 'T$week';
+  }
 
   @override
   String get privateLabel => 'Soukromé';
@@ -10904,6 +11281,420 @@ class AppLocalizationsCs extends AppLocalizations {
   String get provisionedSyncTitle => 'Zařízení';
 
   @override
+  String get queryActionsAccept => 'Přijmout';
+
+  @override
+  String get queryActionsDismiss => 'Zamítnout';
+
+  @override
+  String get queryActionsIncomplete =>
+      'Některé změny se nepodařilo provést. Při dalším pokusu se již provedené změny nebudou opakovat.';
+
+  @override
+  String get queryActionsReview => 'Navržené změny';
+
+  @override
+  String queryActionsTarget(String target) {
+    return 'Pro: $target';
+  }
+
+  @override
+  String get queryAllSources => 'Vše';
+
+  @override
+  String get queryArchiveChat => 'Archivovat chat';
+
+  @override
+  String get queryArchiveConfirmation =>
+      'Chat archivován. Jeho závěry zůstávají dostupné.';
+
+  @override
+  String get queryArchivedChats => 'Archivované chaty';
+
+  @override
+  String get queryArchivedReadOnly =>
+      'Tento chat je archivovaný. Obnov ho, pokud chceš pokračovat.';
+
+  @override
+  String get queryAsk => 'Zeptat se';
+
+  @override
+  String get queryAskCategory => 'Zeptat se na tuto kategorii';
+
+  @override
+  String get queryAskProject => 'Zeptat se na tento projekt';
+
+  @override
+  String get queryAskTask => 'Zeptat se na tento úkol';
+
+  @override
+  String get queryAudioFailed =>
+      'Zvuk se nepodařilo připravit nebo přehrát. Zkus to znovu.';
+
+  @override
+  String queryAudioListen(String start, String end) {
+    return 'Poslechnout · $start–$end';
+  }
+
+  @override
+  String get queryAudioMissingFile =>
+      'Nahrávka na tomto zařízení zatím není dostupná.';
+
+  @override
+  String get queryAudioNoMatch =>
+      'Tento citát se nepodařilo jednoznačně přiřadit k nahrávce. Stále můžeš otevřít celý záznam.';
+
+  @override
+  String get queryAudioOpenRecording => 'Otevřít nahrávku';
+
+  @override
+  String queryAudioPlaying(String start, String end) {
+    return 'Přehrávání $start–$end';
+  }
+
+  @override
+  String get queryAudioPrepare => 'Připravit zvukový úryvek';
+
+  @override
+  String get queryAudioPreparing => 'Připravuji zvuk…';
+
+  @override
+  String get queryAudioReadAloud => 'Přečíst odpověď nahlas';
+
+  @override
+  String get queryAudioReading => 'Odpověď se čte nahlas';
+
+  @override
+  String get queryAudioRetry => 'Zkusit zvuk znovu';
+
+  @override
+  String get queryAudioSetupDetails => 'Podrobnosti nastavení';
+
+  @override
+  String get queryAudioSetupRequired =>
+      'Zvukové úryvky vyžadují kompatibilní model přepisu.';
+
+  @override
+  String get queryAudioStale =>
+      'Nahrávka se změnila. Připrav časové značky znovu.';
+
+  @override
+  String get queryAudioStop => 'Zastavit zvuk';
+
+  @override
+  String get queryAudioTimingUnavailable =>
+      'Pro přípravu úryvků vyber v inferenčním profilu tohoto agenta Melious Whisper nebo podporovaný přepisovací model Mistral Voxtral. URL poskytovatele musí používat HTTPS.';
+
+  @override
+  String get queryAudioTooLarge =>
+      'Časové značky lze připravit pro nahrávky do 25 MB. Vyber menší nahrávku.';
+
+  @override
+  String get queryAudioUploadNotice =>
+      'Při přípravě časových značek se tato nahrávka odešle poskytovateli přepisu nastavenému pro tohoto agenta.';
+
+  @override
+  String get queryCategoryAgent => 'Agent kategorie';
+
+  @override
+  String get queryChat => 'Chat';
+
+  @override
+  String get queryChats => 'Chaty';
+
+  @override
+  String queryChecked(int count) {
+    return 'Zkontrolované zdroje: $count';
+  }
+
+  @override
+  String get queryCloseChat => 'Zavřít chat';
+
+  @override
+  String get queryCollapseChat => 'Sbalit chat';
+
+  @override
+  String get queryCopied => 'Zkopírováno';
+
+  @override
+  String get queryCopyQuote => 'Kopírovat citaci';
+
+  @override
+  String get queryCoverage => 'Co bylo prohledáno';
+
+  @override
+  String get queryCoverageCategory => 'Tato kategorie';
+
+  @override
+  String get queryCoverageExcluded => 'Ostatní kategorie nebyly prohledány.';
+
+  @override
+  String get queryCoverageUnreadable =>
+      'Při vytvoření této odpovědi nebyl dostupný prohledávatelný text. Otevři nahrávku a prohlédni si ji.';
+
+  @override
+  String get queryCoverageWider => 'Další záznamy v této kategorii';
+
+  @override
+  String get queryDeleteChat => 'Smazat chat';
+
+  @override
+  String get queryDeleteExplanation =>
+      'Smazat tuto konverzaci? Vyber, co se stane se sdílenými závěry. Zdrojové záznamy zůstanou zachovány.';
+
+  @override
+  String get queryDeleteForget => 'Smazat a zapomenout závěry';
+
+  @override
+  String get queryDeleteKeep => 'Smazat a ponechat závěry';
+
+  @override
+  String get queryDictated =>
+      'Přepis můžeš upravit před odesláním otázky. Zvuk už mohl být odeslán tvému poskytovateli přepisu.';
+
+  @override
+  String get queryDraftProvisional => 'Návrh · zatím neověřený';
+
+  @override
+  String get queryDraftRetracted =>
+      'Návrh odpovědi se nepodařilo ověřit. Zkus to znovu.';
+
+  @override
+  String get queryEarlierTextOmitted => '[Dřívější text není zobrazen]';
+
+  @override
+  String get queryEmptyBody =>
+      'Ptej se na rozhodnutí a dřívější práci. Odpovědi rozlišují souhrny od přesných pasáží.';
+
+  @override
+  String get queryExactStoredText => 'Přesný uložený text';
+
+  @override
+  String get queryExactText => 'Zobrazit přesný text';
+
+  @override
+  String get queryExampleDecision => 'Na čem jsme se dohodli?';
+
+  @override
+  String get queryExampleMeeting => 'Na které schůzce jsme to probírali?';
+
+  @override
+  String get queryExampleSuggestion => 'Bylo to rozhodnutí, nebo návrh?';
+
+  @override
+  String get queryExpandChat => 'Rozbalit chat';
+
+  @override
+  String get queryExpanding => 'Kontrola dalších záznamů v této kategorii…';
+
+  @override
+  String get queryFailed => 'Hledání se nepodařilo dokončit. Zkus to znovu.';
+
+  @override
+  String get queryForgetConclusions => 'Zapomenout závěry';
+
+  @override
+  String get queryHideExactText => 'Skrýt přesný text';
+
+  @override
+  String get queryHideSurrounding => 'Skrýt okolní text';
+
+  @override
+  String get queryHomeOnly => 'Jen základní rozsah';
+
+  @override
+  String get queryHomeScope => 'Základní rozsah';
+
+  @override
+  String get queryIncomplete =>
+      'Hledání není úplné. Chybějící důkazy neznamenají, že diskuze nikdy neproběhla.';
+
+  @override
+  String get queryIncompleteShort =>
+      'Některé zdroje se nepodařilo zkontrolovat.';
+
+  @override
+  String get queryInferenceUnavailable =>
+      'Chybí použitelná konfigurace AI. Nastav model agenta nebo výchozí profil kategorie a zkus to znovu.';
+
+  @override
+  String get queryKeepConclusions => 'Ponechat závěry';
+
+  @override
+  String get queryLaterTextOmitted => '[Pozdější text není zobrazen]';
+
+  @override
+  String get queryMachineTranscript =>
+      'Strojový přepis: přesné uložené znění, neověřené podle zvuku.';
+
+  @override
+  String queryMemoryCount(int count) {
+    return 'Dostupné závěry z dřívějších chatů: $count';
+  }
+
+  @override
+  String queryMissingTranscripts(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count nahrávek při vytvoření této odpovědi nemělo prohledávatelný text.',
+      few:
+          '$count nahrávky při vytvoření této odpovědi neměly prohledávatelný text.',
+      one:
+          '1 nahrávka při vytvoření této odpovědi neměla prohledávatelný text.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get queryNewChat => 'Nový chat';
+
+  @override
+  String get queryNoAgent =>
+      'Tento rozsah potřebuje svého obvyklého agenta. Vrať se do detailů a přiřaď ho.';
+
+  @override
+  String get queryNotes => 'Poznámky';
+
+  @override
+  String get queryOpenCurrentEntry => 'Otevřít aktuální záznam';
+
+  @override
+  String get queryOpenEntry => 'Otevřít záznam';
+
+  @override
+  String get queryOriginalsHome =>
+      'Prohlíží pouze tento úkol a jeho přímo propojené záznamy.';
+
+  @override
+  String get queryOtherProject => 'Mimo základní rozsah';
+
+  @override
+  String get queryPreparingAnswer => 'Připravuji odpověď…';
+
+  @override
+  String queryReachCategory(String category) {
+    return 'Prohledává tuto oblast a kategorii $category.';
+  }
+
+  @override
+  String queryReachCategoryOnly(String category) {
+    return 'Hledá v kategorii $category.';
+  }
+
+  @override
+  String get queryReachHome =>
+      'Prohledává pouze tuto oblast a její propojené záznamy.';
+
+  @override
+  String get queryReachUncategorized =>
+      'Hledá pouze v tomto úkolu a přímo propojených záznamech bez kategorie.';
+
+  @override
+  String get queryRecall => 'Tato odpověď využila uložené závěry.';
+
+  @override
+  String get queryRecordings => 'Nahrávky';
+
+  @override
+  String get queryRecordingTranscript => 'Přepis nahrávky';
+
+  @override
+  String get queryRenameChat => 'Přejmenovat chat';
+
+  @override
+  String get queryRestoreChat => 'Obnovit chat';
+
+  @override
+  String querySavedConclusion(String date) {
+    return 'Závěr uložen $date';
+  }
+
+  @override
+  String get querySavedQuote =>
+      'Tato uložená citace odpovídá zdroji v době odpovědi.';
+
+  @override
+  String querySavedVersion(String version) {
+    return 'Uložená verze: $version';
+  }
+
+  @override
+  String get querySavedVersionUnavailable => 'Datum verze není k dispozici';
+
+  @override
+  String get querySearching => 'Prohlížení dostupných informací…';
+
+  @override
+  String get querySearchScope => 'Rozsah hledání a filtry';
+
+  @override
+  String querySourceAction(String action, String source) {
+    return '$action: $source';
+  }
+
+  @override
+  String get querySourceChanged => 'Zdroj byl změněn';
+
+  @override
+  String get querySourceDeleted => 'Zdroj smazán';
+
+  @override
+  String get querySourceMoved => 'Zdroj přesunut do jiné kategorie';
+
+  @override
+  String get querySummaryBased => 'Na základě souhrnů';
+
+  @override
+  String get querySummaryCoverage =>
+      'Tato odpověď využívá souhrny úkolů nebo projektů. Původní záznamy nebyly prohlédnuty.';
+
+  @override
+  String get querySummaryCurrent =>
+      'Otevři úkol nebo projekt a prohlédni si jeho aktuální souhrn. Od této odpovědi se mohl změnit.';
+
+  @override
+  String get querySummaryIncomplete =>
+      'V dostupných souhrnech chybí některé informace.';
+
+  @override
+  String get querySummaryOwners => 'O této odpovědi';
+
+  @override
+  String get querySurroundingLimit =>
+      'Toto je uložený úryvek, který nemusí obsahovat celou diskusi.';
+
+  @override
+  String get querySurroundingText => 'Zobrazit okolní text';
+
+  @override
+  String get queryTranscribing =>
+      'Přepisování tvé nahrávky. Poskytovatel už mohl zvuk obdržet.';
+
+  @override
+  String get queryUnavailable =>
+      'Tento rozsah už není s tvým nastavením viditelnosti dostupný.';
+
+  @override
+  String get queryUnread => 'Nová odpověď';
+
+  @override
+  String queryWelcomeCategory(String agentName) {
+    return 'Zeptej se agenta $agentName na tuto kategorii';
+  }
+
+  @override
+  String queryWelcomeProject(String agentName) {
+    return 'Zeptej se agenta $agentName na tento projekt';
+  }
+
+  @override
+  String queryWelcomeTask(String agentName) {
+    return 'Zeptej se agenta $agentName na tento úkol';
+  }
+
+  @override
   String get queueCatchUpNowButton => 'Dohnat nyní';
 
   @override
@@ -11095,11 +11886,151 @@ class AppLocalizationsCs extends AppLocalizations {
   String get relationshipAddChannelButton => 'Přidat kontakt';
 
   @override
-  String get relationshipAsk => 'Zeptat';
+  String get relationshipAddChannelFromContacts => 'nebo z kontaktů';
+
+  @override
+  String relationshipAgentAsOfBand(String age, String band) {
+    return '$band · aktualizováno $age';
+  }
+
+  @override
+  String get relationshipAgentBriefNow => 'Vytvořit briefing teď';
+
+  @override
+  String relationshipAgentCall(String name) {
+    return 'Zavolat $name';
+  }
+
+  @override
+  String get relationshipAgentFailedBody =>
+      'Poskytovatel vrátil chybu dřív, než se briefing napsal. Tvoje check-iny zůstaly beze změny.';
+
+  @override
+  String get relationshipAgentFailedNoModel =>
+      'Pro briefingy není nastaven žádný model. Vyber ho v Nastavení AI › Agenti. Podrobnosti najdeš na kartě Aktivita.';
+
+  @override
+  String get relationshipAgentFailedPlain => 'Poslední běh selhal';
+
+  @override
+  String relationshipAgentLastRunFailed(String time) {
+    return 'Poslední běh selhal · $time';
+  }
+
+  @override
+  String get relationshipAgentMarkImportant => 'Označit jako důležité';
+
+  @override
+  String get relationshipAgentNoAgent => 'Pro tuto osobu není žádný agent';
+
+  @override
+  String relationshipAgentNoBriefingBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Zatím žádný briefing. „Vytvořit briefing teď“ ho napíše z tvých $count check-inů; telefon ani e-mail nikdy nevidí.',
+      few:
+          'Zatím žádný briefing. „Vytvořit briefing teď“ ho napíše z tvých $count check-inů; telefon ani e-mail nikdy nevidí.',
+      one:
+          'Zatím žádný briefing. „Vytvořit briefing teď“ ho napíše z tvého check-inu; telefon ani e-mail nikdy nevidí.',
+      zero:
+          'Zatím žádný briefing. „Vytvořit briefing teď“ ho napíše, jakmile zaznamenáš check-in; telefon ani e-mail nikdy nevidí.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String relationshipAgentNotEnrolledBody(String name) {
+    return 'Označ $name jako důležitou osobu a získáš chat, připomínky po delší odmlce a briefing.';
+  }
+
+  @override
+  String get relationshipAgentOnlyYourStartsUseAi =>
+      'AI používá jen to, co spustíš sám';
+
+  @override
+  String relationshipAgentOutOfDateNewCheckIn(String day) {
+    return 'Zastaralé · nový check-in $day';
+  }
+
+  @override
+  String get relationshipAgentOutOfDateNewCheckInShort =>
+      'Zastaralé · nový check-in';
+
+  @override
+  String get relationshipAgentPausedBody =>
+      'Briefingy se pozastaví, dokud je tato osoba neaktivní nebo archivovaná.';
+
+  @override
+  String relationshipAgentProposedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count návrhů',
+      few: '$count návrhy',
+      one: '1 návrh',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String relationshipAgentReadingBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Čte $count check-inů. Obvykle do minuty.',
+      few: 'Čte $count check-iny. Obvykle do minuty.',
+      one: 'Čte 1 check-in. Obvykle do minuty.',
+      zero: 'Připravuje briefing. Obvykle do minuty.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get relationshipAgentSeeActivity => 'Zobrazit aktivitu';
+
+  @override
+  String relationshipAgentSources(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count check-inů',
+      few: '$count check-iny',
+      one: '1 check-in',
+    );
+    return 'Zdroje: $_temp0 · kontaktní kanály se nikdy neposílají';
+  }
+
+  @override
+  String get relationshipAgentTryAgain => 'Zkusit znovu';
+
+  @override
+  String get relationshipAgentWatching => 'Agent sleduje';
+
+  @override
+  String relationshipAgentWatchingNextLook(String day) {
+    return 'Agent sleduje · příště $day';
+  }
+
+  @override
+  String get relationshipAgentWriting => 'Píše se briefing…';
 
   @override
   String relationshipBannerSemanticLabel(String personName) {
     return 'Banner vztahu s $personName';
+  }
+
+  @override
+  String relationshipBriefingAge(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days dní starý',
+      few: '$days dny starý',
+      one: '1 den starý',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -11116,10 +12047,6 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
-  String get relationshipBriefingEmpty =>
-      'Zatím žádný briefing — Shrň mi to ho připraví z tvých check-inů.';
-
-  @override
   String get relationshipBriefingRequested =>
       'Briefing vyžádán — za chvíli se tu objeví.';
 
@@ -11129,12 +12056,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get relationshipBriefingTitle => 'Briefing';
-
-  @override
-  String get relationshipBriefMeAgain => 'Shrnout znovu';
-
-  @override
-  String get relationshipBriefMeButton => 'Shrň mi to';
 
   @override
   String relationshipCadenceEveryNDays(int days) {
@@ -11168,10 +12089,22 @@ class AppLocalizationsCs extends AppLocalizations {
   String get relationshipCadenceOnTrack => 'v rytmu';
 
   @override
+  String get relationshipCadencePromptLabel => 'Připomínej mi každý';
+
+  @override
   String get relationshipCadenceQuarterly => 'Každé čtvrtletí';
 
   @override
   String get relationshipCadenceWeekly => 'Každý týden';
+
+  @override
+  String get relationshipChatAgentSubtitle =>
+      'Zná tvé check-iny, ne kontaktní údaje';
+
+  @override
+  String relationshipChatAgentTitle(String name) {
+    return '$name · briefingový agent';
+  }
 
   @override
   String get relationshipChatTooltip => 'Chatovat o této osobě';
@@ -11179,11 +12112,6 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get relationshipChatUnavailable =>
       'Zatím žádný agent — nejprve označ tuto osobu jako důležitou.';
-
-  @override
-  String relationshipCheckedInLabel(String date) {
-    return 'Záznam $date';
-  }
 
   @override
   String get relationshipCheckInReminderBody => 'Dobrá chvíle se ozvat.';
@@ -11195,11 +12123,6 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get relationshipCheckInsLabel => 'Záznamy kontaktů';
-
-  @override
-  String relationshipCheckInTitle(String name) {
-    return 'Záznam · $name';
-  }
 
   @override
   String get relationshipContactCardAction => 'Vizitka';
@@ -11225,6 +12148,18 @@ class AppLocalizationsCs extends AppLocalizations {
   String get relationshipCreateTitle => 'Přidat osobu';
 
   @override
+  String relationshipDaysOver(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dní po termínu',
+      few: '$count dny po termínu',
+      one: '1 den po termínu',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get relationshipDeleteConfirmMessage =>
       'Smažou se i všechny záznamy kontaktů. Tohle nelze vrátit zpět.';
 
@@ -11236,6 +12171,36 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String relationshipDueDay(String day) {
     return 'Do $day';
+  }
+
+  @override
+  String relationshipDueSince(String day, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count dní po termínu',
+      few: '$count dny po termínu',
+      one: '1 den po termínu',
+    );
+    return 'Po termínu od $day · $_temp0';
+  }
+
+  @override
+  String get relationshipDueToday => 'Dnes na řadě';
+
+  @override
+  String relationshipDurationHours(int hours) {
+    return '$hours h';
+  }
+
+  @override
+  String relationshipDurationHoursMinutes(int hours, String minutes) {
+    return '$hours h $minutes';
+  }
+
+  @override
+  String relationshipDurationMinutes(int count) {
+    return '$count min';
   }
 
   @override
@@ -11256,6 +12221,21 @@ class AppLocalizationsCs extends AppLocalizations {
   @override
   String get relationshipErrorUpdateFailed =>
       'Změny se nepodařilo uložit. Zkus to prosím znovu.';
+
+  @override
+  String get relationshipFormImportantBody =>
+      'Zapne briefing, připomínky a chat. Poznámky z check-inů jdou agentovi, kontaktní údaje nikdy.';
+
+  @override
+  String relationshipFormImportantBodyNamed(String name) {
+    return 'Zapne briefing, připomínky a chat pro osobu $name. Poznámky z check-inů jdou agentovi, kontaktní údaje nikdy.';
+  }
+
+  @override
+  String get relationshipFormReachTitle => 'Jak je zastihnout';
+
+  @override
+  String get relationshipFormWhoTitle => 'Kdo';
 
   @override
   String get relationshipHealthNeedsAttention => 'Vyžaduje pozornost';
@@ -11313,6 +12293,10 @@ class AppLocalizationsCs extends AppLocalizations {
   String get relationshipImportGrantButton => 'Povolit přístup';
 
   @override
+  String get relationshipImportImportantBody =>
+      'Briefingy, připomínky a chat. Bez toho se nic nespustí samo.';
+
+  @override
   String get relationshipImportNoMatches =>
       'Tvému hledání neodpovídají žádné kontakty';
 
@@ -11339,6 +12323,19 @@ class AppLocalizationsCs extends AppLocalizations {
   }
 
   @override
+  String relationshipImportReviewSubtitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count vybraných osob · kontaktní údaje zůstanou v tomto zařízení',
+      few: '$count vybrané osoby · kontaktní údaje zůstanou v tomto zařízení',
+      one: '1 vybraná osoba · kontaktní údaje zůstanou v tomto zařízení',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get relationshipImportReviewTitle => 'Než je přidáš';
 
   @override
@@ -11359,8 +12356,8 @@ class AppLocalizationsCs extends AppLocalizations {
   String get relationshipJustAdded => 'Právě přidáno';
 
   @override
-  String relationshipLastCheckInLabel(String date) {
-    return 'Poslední záznam $date';
+  String relationshipLastSpoke(String time) {
+    return 'naposledy mluvili $time';
   }
 
   @override
@@ -11376,12 +12373,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get relationshipLogCheckIn => 'Zaznamenat kontakt';
 
   @override
-  String get relationshipLottisRead => 'Lottiho odhad';
-
-  @override
-  String relationshipLottisReadAsOf(String time) {
-    return 'k $time';
-  }
+  String get relationshipMoreActions => 'Další akce';
 
   @override
   String get relationshipNameLabel => 'Jméno';
@@ -11390,9 +12382,12 @@ class AppLocalizationsCs extends AppLocalizations {
   String get relationshipNameRequired => 'Jméno je povinné';
 
   @override
-  String relationshipNextByDay(String day) {
-    return 'příští do $day';
+  String relationshipNextDueOn(String day) {
+    return 'Příště $day';
   }
+
+  @override
+  String get relationshipNextTimeTitle => 'Příště';
 
   @override
   String get relationshipNicknameLabel => 'Přezdívka';
@@ -11405,14 +12400,60 @@ class AppLocalizationsCs extends AppLocalizations {
   String get relationshipNoLinkedTasks => 'Zatím žádné propojené úkoly.';
 
   @override
+  String get relationshipNotEnrolled => 'Nesledováno';
+
+  @override
   String get relationshipNotFound => 'Tahle osoba už není sledovaná.';
 
   @override
-  String get relationshipNudgesOn => 'připomínky zapnuty';
+  String relationshipOnTrackCadence(String cadence) {
+    return 'V rytmu · $cadence';
+  }
 
   @override
-  String get relationshipPostCallBody =>
-      'Právě jsi se ozval. Chceš si zapsat check-in, dokud je to čerstvé?';
+  String get relationshipPayAttentionTo => 'Dávej pozor na';
+
+  @override
+  String get relationshipPhotoAddBanner => 'Přidat banner';
+
+  @override
+  String get relationshipPhotoAdjustCrop => 'Upravit ořez';
+
+  @override
+  String get relationshipPhotoBanner => 'Banner';
+
+  @override
+  String get relationshipPhotoCardTitle => 'Fotka';
+
+  @override
+  String get relationshipPhotoChange => 'Změnit';
+
+  @override
+  String get relationshipPhotoChoose => 'Vybrat z knihovny';
+
+  @override
+  String get relationshipPhotoDragToReposition => 'Tažením posuneš';
+
+  @override
+  String get relationshipPhotoFace => 'Obličej';
+
+  @override
+  String get relationshipPhotoPrivacy =>
+      'Jen na tvých zařízeních · agent ji nikdy nevidí';
+
+  @override
+  String get relationshipPhotoRemove => 'Odebrat fotku';
+
+  @override
+  String get relationshipPhotoRemoveAction => 'Odebrat';
+
+  @override
+  String get relationshipPhotoSaveFailed => 'Fotku se nepodařilo uložit';
+
+  @override
+  String relationshipPhotoSheetTitle(String name) {
+    return 'Fotka – $name';
+  }
 
   @override
   String get relationshipPostCallConfirm => 'Zapsat check-in';
@@ -11421,34 +12462,113 @@ class AppLocalizationsCs extends AppLocalizations {
   String get relationshipPostCallDismiss => 'Teď ne';
 
   @override
-  String relationshipPostCallTitle(String name) {
-    return 'Jak to šlo s $name?';
+  String relationshipPostCallMeta(String time, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'asi $minutes min',
+      one: 'asi 1 min',
+      zero: 'necelá minuta',
+    );
+    return 'začátek v $time · $_temp0';
   }
 
   @override
-  String relationshipQuietForDays(int count) {
+  String relationshipPostCallOfferCall(String name, int minutes) {
     String _temp0 = intl.Intl.pluralLogic(
-      count,
+      minutes,
       locale: localeName,
-      other: '$count dní',
-      few: '$count dny',
-      one: '1 den',
+      other: '$minutes minutami',
+      one: '1 minutou',
+      zero: 'necelou minutou',
     );
-    return '$_temp0 bez kontaktu';
+    return 'Hovor s $name před $_temp0 — zapíšeme to, dokud je to čerstvé?';
   }
+
+  @override
+  String relationshipPostCallOfferMessage(String name, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minutami',
+      one: '1 minutou',
+      zero: 'necelou minutou',
+    );
+    return 'Zpráva pro $name před $_temp0 — zapíšeme to, dokud je to čerstvé?';
+  }
+
+  @override
+  String relationshipProposalAdded(String title) {
+    return 'Přidáno → $title';
+  }
+
+  @override
+  String relationshipProposalEvidence(String date) {
+    return 'Z kontaktu dne $date';
+  }
+
+  @override
+  String get relationshipProposalUndoFailed =>
+      'Akci se nepodařilo vrátit. Úkol se možná změnil.';
+
+  @override
+  String get relationshipReachPrivacy =>
+      'Zůstává v tomto zařízení · nikdy se nesdílí s AI';
+
+  @override
+  String get relationshipReachTitle => 'Kontakt';
 
   @override
   String get relationshipRelinkContact => 'Propojit jiný kontakt';
-
-  @override
-  String get relationshipSeeAllCheckIns => 'Zobrazit všechny záznamy';
 
   @override
   String get relationshipsEmptyState =>
       'Přidej lidi, se kterými chceš zůstat v kontaktu.';
 
   @override
+  String get relationshipsGroupDue => 'Na řadě';
+
+  @override
   String get relationshipsPageTitle => 'Lidé';
+
+  @override
+  String get relationshipsSelectPersonHint =>
+      'Vyber osobu a zobrazí se její stránka.';
+
+  @override
+  String get relationshipsSummaryDueNow => 'Teď na řadě';
+
+  @override
+  String relationshipsSummaryEnrolled(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '/ $count sledovaných',
+      few: '/ $count sledované',
+      one: '/ 1 sledovaná',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String relationshipsSummaryNextDue(String name, String day) {
+    return 'Další: $name · $day';
+  }
+
+  @override
+  String get relationshipsSummaryNoneDue => 'Nikdo není na řadě';
+
+  @override
+  String relationshipsSummaryNotEnrolled(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count nesledovaných osob',
+      few: '$count nesledované osoby',
+      one: '1 nesledovaná osoba',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get relationshipStatusActive => 'Aktivní';
@@ -11463,10 +12583,35 @@ class AppLocalizationsCs extends AppLocalizations {
   String get relationshipStatusFieldLabel => 'Stav';
 
   @override
-  String get relationshipStayingInTouch => 'Udržovat kontakt';
+  String relationshipStatusLineAdded(String cadence) {
+    return 'Právě přidáno · $cadence';
+  }
 
   @override
-  String get relationshipStayInTouch => 'Udržovat kontakt';
+  String relationshipStatusLineAddedFirstDue(String cadence, String day) {
+    return 'Právě přidáno · $cadence · poprvé do $day';
+  }
+
+  @override
+  String relationshipStatusLineContacted(
+    String type,
+    String time,
+    String cadence,
+  ) {
+    return '$type · $time · $cadence';
+  }
+
+  @override
+  String relationshipTasksLinkedCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count propojených',
+      few: '$count propojené',
+      one: '1 propojený',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get relationshipTimestampToday => 'Dnes';
@@ -12732,9 +13877,6 @@ class AppLocalizationsCs extends AppLocalizations {
       'Detekované AI schopnosti';
 
   @override
-  String get settingsSyncNodeProfileCapabilityMlxAudio => 'MLX Audio (lokální)';
-
-  @override
   String get settingsSyncNodeProfileCapabilityOllamaLlm => 'Ollama LLM';
 
   @override
@@ -12783,6 +13925,13 @@ class AppLocalizationsCs extends AppLocalizations {
       'Nastavte synchronizaci a zobrazte statistiky';
 
   @override
+  String get settingsSystemHealthSubtitle =>
+      'Analyzovat nedávné logy a zkopírovat sdílitelnou zprávu';
+
+  @override
+  String get settingsSystemHealthTitle => 'Stav systému';
+
+  @override
   String get settingsThemingAutomatic => 'Automaticky';
 
   @override
@@ -12818,6 +13967,70 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get settingsWhatsNewTitle => 'Co je nového';
+
+  @override
+  String get sherpaAllFamilies => 'Všechny rodiny';
+
+  @override
+  String sherpaCatalogMatches(int count, int total) {
+    return '$count z $total modelů';
+  }
+
+  @override
+  String sherpaDeleteModel(String model) {
+    return 'Odebrat $model z tohoto zařízení';
+  }
+
+  @override
+  String get sherpaDownloadAction => 'Stáhnout';
+
+  @override
+  String sherpaDownloadModel(String model) {
+    return 'Stáhnout $model';
+  }
+
+  @override
+  String get sherpaInstalledModelsTitle => 'Nainstalované modely';
+
+  @override
+  String get sherpaInstallingModel => 'Instalace modelu';
+
+  @override
+  String get sherpaLanguageCantonese => 'Kantonština';
+
+  @override
+  String get sherpaModelCatalogTitle => 'Katalog modelů';
+
+  @override
+  String get sherpaModelConfigurationError =>
+      'Model je stažený, ale jeho konfiguraci se nepodařilo uložit.';
+
+  @override
+  String get sherpaModelError =>
+      'Operace s modelem se nezdařila. Zkus to znovu.';
+
+  @override
+  String get sherpaModelFamily => 'Rodina modelů';
+
+  @override
+  String get sherpaModelInstalled => 'Staženo';
+
+  @override
+  String get sherpaModelNotInstalled => 'Stáhni si model do tohoto zařízení';
+
+  @override
+  String sherpaModelSizeGB(String size) {
+    return '$size GB · Vícejazyčný';
+  }
+
+  @override
+  String sherpaModelSizeMB(String size) {
+    return '$size MB · Vícejazyčný';
+  }
+
+  @override
+  String get sherpaProviderDescription =>
+      'Přepisuj na tomto zařízení bez serveru. Stáhni model a pak ho vyber ve svém inferenčním profilu.';
 
   @override
   String get sidebarActiveSectionTitle => 'Aktivita';
@@ -12924,6 +14137,17 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get speechNoAudioRecorded => 'Nebyl nahrán žádný zvuk. Zkus to znovu.';
+
+  @override
+  String get speechSettingsAutoPrepareChatAudio =>
+      'Automaticky připravovat zvuk chatu';
+
+  @override
+  String get speechSettingsChatAudioDescription =>
+      'Připrav nové odpovědi chatu v tomto zařízení, aby přehrávání začalo dříve. Zvuk se přehraje až po klepnutí na přehrát.';
+
+  @override
+  String get speechSettingsChatAudioLabel => 'Zvuk chatu';
 
   @override
   String get speechSettingsModelDescription => 'Hlasový model v zařízení';
@@ -13625,6 +14849,99 @@ class AppLocalizationsCs extends AppLocalizations {
   String syncWizardStepStatus(int step, String label) {
     return 'Krok $step ze 3: $label';
   }
+
+  @override
+  String systemHealthAnalyzedWindow(String start, String end) {
+    return 'Analyzováno $start → $end';
+  }
+
+  @override
+  String get systemHealthChooseModelTitle => 'Vybrat model';
+
+  @override
+  String get systemHealthCopiedToast =>
+      'Zpráva zkopírována. Známé vzory osobních údajů byly odstraněny.';
+
+  @override
+  String get systemHealthCopyButton => 'Kopírovat zprávu';
+
+  @override
+  String get systemHealthCustomFromLabel => 'Od';
+
+  @override
+  String get systemHealthCustomToLabel => 'Do';
+
+  @override
+  String get systemHealthDescription =>
+      'Prohledá soubory logů v tomto zařízení a najde chyby, varování a pomalé dotazy, odstraní známé vzory osobních údajů a napíše krátkou zprávu, kterou můžeš vložit do programovacího asistenta.';
+
+  @override
+  String get systemHealthDomainsDescription =>
+      'Analyzují se domény, které jsou zde zapnuté – stejné nastavení určuje, co se loguje. Pomalé dotazy jsou zahrnuty, když je zapnuté jejich logování.';
+
+  @override
+  String get systemHealthDomainsTitle => 'Domény logování';
+
+  @override
+  String get systemHealthFailedTitle => 'Analýza selhala';
+
+  @override
+  String systemHealthGeneratedAt(String time) {
+    return 'Vytvořeno $time';
+  }
+
+  @override
+  String get systemHealthHideDigest => 'Skrýt přehled';
+
+  @override
+  String get systemHealthModelDescription =>
+      'Napíše zjištění z anonymizovaného přehledu. Navrhuje myslicí model tvého výchozího profilu.';
+
+  @override
+  String get systemHealthModelNone => 'Jen přehled, bez modelu';
+
+  @override
+  String get systemHealthModelNoneDescription =>
+      'Nastav výchozí inferenční profil nebo přidej agentní textový model, abys získal zjištění.';
+
+  @override
+  String get systemHealthModelTitle => 'Model';
+
+  @override
+  String get systemHealthPresetCustom => 'Vlastní';
+
+  @override
+  String get systemHealthPresetLast14Days => '14 dní';
+
+  @override
+  String get systemHealthPresetLast24Hours => '24 h';
+
+  @override
+  String get systemHealthPresetLast7Days => '7 dní';
+
+  @override
+  String get systemHealthPreviousReportsDescription =>
+      'Každá zpráva zůstává v tomto zařízení. Klepni na některou a zobrazí se znovu.';
+
+  @override
+  String get systemHealthPreviousReportsTitle => 'Předchozí zprávy';
+
+  @override
+  String get systemHealthRangeTitle => 'Časové období';
+
+  @override
+  String get systemHealthReportTitle => 'Zpráva';
+
+  @override
+  String get systemHealthRunButton => 'Spustit analýzu';
+
+  @override
+  String systemHealthSavedTo(String path) {
+    return 'Uloženo do $path';
+  }
+
+  @override
+  String get systemHealthShowDigest => 'Zobrazit přehled';
 
   @override
   String get taskActionBarAudioRecordingActive => 'Probíhá nahrávání zvuku';

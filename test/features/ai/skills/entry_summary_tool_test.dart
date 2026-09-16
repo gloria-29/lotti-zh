@@ -228,6 +228,61 @@ void main() {
     });
   });
 
+  group('parseEntrySummaryToolBody', () {
+    test('recovers and trims the body without requiring shorter tiers', () {
+      expect(
+        parseEntrySummaryToolBody([
+          _call(_args(oneLiner: null, tldr: null, summary: '  ## Analysis\n')),
+        ]),
+        '## Analysis',
+      );
+    });
+
+    test('recovers the body rejected by strict one-liner validation', () {
+      final calls = [_call(_args(oneLiner: 'x' * 149))];
+      expect(
+        () => parseEntrySummaryToolCall(calls),
+        throwsA(isA<EntrySummaryToolException>()),
+      );
+      expect(
+        parseEntrySummaryToolBody(calls),
+        '## Decisions\n- Ship behind a flag',
+      );
+    });
+
+    test('selects the first matching call and ignores unrelated calls', () {
+      expect(
+        parseEntrySummaryToolBody([
+          _call(_args(summary: 'Unrelated'), name: 'other_tool'),
+          _call(_args(summary: 'First analysis')),
+          _call(_args(summary: 'Echoed analysis'), id: 'call-2'),
+        ]),
+        'First analysis',
+      );
+    });
+
+    for (final invalid in <String, List<ChatCompletionMessageToolCall>>{
+      'missing tool': [],
+      'wrong tool': [_call(_args(), name: 'other_tool')],
+      'malformed JSON': [_call('{')],
+      'non-object JSON': [_call('[]')],
+      'missing summary': [_call(_args(summary: null))],
+      'empty summary': [_call(_args(summary: '  \n '))],
+      'non-string summary': [_call('{"summary":42}')],
+      'invalid first matching call': [
+        _call('{}'),
+        _call(_args(), id: 'call-2'),
+      ],
+    }.entries) {
+      test('rejects ${invalid.key}', () {
+        expect(
+          () => parseEntrySummaryToolBody(invalid.value),
+          throwsA(isA<EntrySummaryToolException>()),
+        );
+      });
+    }
+  });
+
   group('entrySummaryTool schema', () {
     test('requires exactly the three tiers and forbids extra properties', () {
       final parameters = entrySummaryTool.function.parameters!;
@@ -261,9 +316,15 @@ void main() {
 
     test('pins tool choice to this tool by name', () {
       expect(
-        entrySummaryToolChoice.toString(),
+        entrySummaryToolChoiceFor('glm-5.3-flash').toString(),
         contains(entrySummaryToolName),
       );
+    });
+
+    test('pins nothing for a model that answers a pinned choice in prose', () {
+      // DeepSeek returns the call as text with an empty `tool_calls` when the
+      // choice is pinned, so the summary would be lost entirely.
+      expect(entrySummaryToolChoiceFor('deepseek-v4.1-flash:speed'), isNull);
     });
   });
 }

@@ -78,9 +78,12 @@ final dailyOsActualTimeBlocksProvider = FutureProvider.autoDispose
         rangeStart: dayStart,
         rangeEnd: dayEnd,
       );
-      final links = await db.basicLinksForEntryIds(
-        entries.map((entry) => entry.meta.id).toSet(),
-      );
+      final links = [
+        ...await db.basicLinksForEntryIds(
+          entries.map((entry) => entry.meta.id).toSet(),
+        ),
+        ...checkInOwnerLinks(entries),
+      ];
       return actualTimeBlocksForEntries(
         entries: entries,
         links: links,
@@ -214,6 +217,13 @@ String _actualBlockTitle({
   if (linkedFrom is Task) {
     final taskTitle = linkedFrom.data.title.trim();
     if (taskTitle.isNotEmpty) return taskTitle;
+  }
+
+  // A check-in is time spent with someone: the block names the person, not
+  // the first line of what was said.
+  if (entry is CheckInEntry && linkedFrom is RelationshipEntry) {
+    final name = linkedFrom.data.title.trim();
+    if (name.isNotEmpty) return name;
   }
 
   final entryText = entry.entryText?.plainText.trim();

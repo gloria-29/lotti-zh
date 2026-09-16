@@ -12,7 +12,7 @@ class PromptCapabilityFilter {
   /// Check if a prompt is available on the current platform
   ///
   /// Returns false for prompts using local-only models (Whisper, Ollama,
-  /// Voxtral, MLX Audio, oMLX) when running on mobile platforms.
+  /// Voxtral, oMLX) when running on mobile platforms.
   Future<bool> isPromptAvailableOnPlatform(AiConfigPrompt prompt) async {
     // Desktop supports all models
     if (isDesktop) {
@@ -38,7 +38,8 @@ class PromptCapabilityFilter {
     }
 
     // Check if this is a local-only provider type
-    return !_isLocalOnlyProvider(provider.inferenceProviderType);
+    return provider.inferenceProviderType == InferenceProviderType.sherpa ||
+        !_isLocalOnlyProvider(provider.inferenceProviderType);
   }
 
   /// Check if an inference provider type is local-only
@@ -57,11 +58,11 @@ class PromptCapabilityFilter {
   ///
   /// New local providers must be added here so both call sites stay in sync.
   static bool isLocalOnlyProviderType(InferenceProviderType providerType) {
-    return providerType == InferenceProviderType.whisper ||
+    return providerType == InferenceProviderType.sherpa ||
+        providerType == InferenceProviderType.whisper ||
         providerType == InferenceProviderType.ollama ||
         providerType == InferenceProviderType.omlx ||
-        providerType == InferenceProviderType.voxtral ||
-        providerType == InferenceProviderType.mlxAudio;
+        providerType == InferenceProviderType.voxtral;
   }
 
   /// Filter a list of prompts to only include those available on current platform

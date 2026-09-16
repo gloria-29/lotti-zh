@@ -3,10 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lotti/features/agents/state/agent_chat_projection.dart';
+import 'package:lotti/features/agents/ui/chat/chat_recorder_controller.dart';
+import 'package:lotti/features/agents/ui/chat/chat_recorder_error_message.dart';
+import 'package:lotti/features/agents/ui/chat/waveform_bars.dart';
 import 'package:lotti/features/agents/ui/widgets/agent_markdown_view.dart';
-import 'package:lotti/features/ai_chat/ui/controllers/chat_recorder_controller.dart';
-import 'package:lotti/features/ai_chat/ui/widgets/chat_recorder_error_message.dart';
-import 'package:lotti/features/ai_chat/ui/widgets/waveform_bars.dart';
 import 'package:lotti/features/design_system/components/buttons/design_system_button.dart';
 import 'package:lotti/features/design_system/components/inputs/design_system_text_input.dart';
 import 'package:lotti/features/design_system/components/toasts/design_system_toast.dart';
@@ -32,6 +32,22 @@ class AgentChatView extends ConsumerStatefulWidget {
     required this.onRetry,
     this.hasFailedTurn = false,
     this.attachmentBuilder,
+    this.history,
+    this.emptyState,
+    this.activity,
+    this.pinnedActivity,
+    this.sendingLabel,
+    this.footer,
+    this.composerEnabled = true,
+    this.allowDraftWhileSending = false,
+    this.showVoiceDetails = false,
+    this.scrollOnReplies = true,
+    this.conversationId,
+    this.groupAttachmentsWithReply = false,
+    this.composerShape = DesignSystemTextInputShape.rounded,
+    this.replyTextStyle,
+    this.onLinkTap,
+    this.resolveTranscriptionTarget,
     super.key,
   });
 
@@ -44,6 +60,46 @@ class AgentChatView extends ConsumerStatefulWidget {
   final VoidCallback onSend;
   final VoidCallback onRetry;
   final AgentChatMessageAttachmentBuilder? attachmentBuilder;
+
+  /// A scoped consumer can supply its own privacy-filtered chat projection.
+  /// When present the agent-wide message log is never subscribed to.
+  final AsyncValue<List<AgentChatMessage>>? history;
+  final Widget? emptyState;
+  final Widget? activity;
+
+  /// Optional persistent status above the composer for an active request.
+  final Widget? pinnedActivity;
+
+  /// Describes the consumer's current operation in the composer and the
+  /// default activity bubble's accessibility label.
+  final String? sendingLabel;
+  final Widget? footer;
+  final bool composerEnabled;
+
+  /// Allow preparation of the next draft while Send remains disabled.
+  final bool allowDraftWhileSending;
+
+  /// Show elapsed capture time and a cancellable transcription state.
+  final bool showVoiceDetails;
+  final bool scrollOnReplies;
+  final String? conversationId;
+
+  /// Keeps supporting evidence inside the reply's surface and reading width.
+  final bool groupAttachmentsWithReply;
+  final DesignSystemTextInputShape composerShape;
+
+  /// Consumer typography for assistant replies; other conversations use the
+  /// standard body style when omitted.
+  final TextStyle? replyTextStyle;
+
+  /// Lets a host resolve a reply link against the message that contains it.
+  /// Supplying this handler also exposes the rich reply and its links to
+  /// assistive technology instead of announcing a flattened message label.
+  final void Function(AgentChatMessage message, String url, String title)?
+  onLinkTap;
+
+  /// Resolves the host's explicit transcription setup before uploading audio.
+  final ChatTranscriptionTargetResolver? resolveTranscriptionTarget;
 
   @override
   ConsumerState<AgentChatView> createState() => _AgentChatViewState();
@@ -74,6 +130,9 @@ class _AgentChatViewState extends ConsumerState<AgentChatView> {
     super.initState();
     _controller = TextEditingController(text: widget.draft);
     _wasSending = widget.isSending;
+    if (widget.conversationId != null) {
+      _lastMessageId = widget.history?.value?.lastOrNull?.id;
+    }
     _recorderSubscription = ref.listenManual<ChatRecorderState>(
       chatRecorderControllerProvider,
       (previous, next) {
@@ -145,123 +204,173 @@ class _AgentChatViewState extends ConsumerState<AgentChatView> {
   @override
   Widget build(BuildContext context) {
     final tokens = context.designTokens;
-    final historyAsync = ref.watch(
-      agentChatProjectionProvider(widget.agentId),
-    );
+    final historyAsync =
+        widget.history ??
+        ref.watch<AsyncValue<List<AgentChatMessage>>>(
+          agentChatProjectionProvider(widget.agentId),
+        );
     final messages = historyAsync.value;
     final latestMessageId = messages?.lastOrNull?.id;
     final shouldScroll =
         messages != null &&
-        (_lastMessageId != latestMessageId ||
+        ((_lastMessageId != latestMessageId &&
+                (widget.scrollOnReplies ||
+                    messages.lastOrNull?.role == AgentChatRole.user)) ||
             (!_wasSending && widget.isSending));
     _lastMessageId = latestMessageId;
     _wasSending = widget.isSending;
     if (shouldScroll) _scrollToLatest();
 
-    return Column(
-      children: [
-        Expanded(
-          child: switch (messages) {
-            null when historyAsync.hasError => Center(
-              child: Padding(
-                padding: EdgeInsets.all(tokens.spacing.step5),
-                child: Text(
-                  context.messages.goalChatHistoryError,
-                  style: tokens.typography.styles.body.bodyMedium.copyWith(
-                    color: tokens.colors.alert.error.ink,
+    return LayoutBuilder(
+      builder: (context, constraints) => Column(
+        children: [
+          Expanded(
+            child: switch (messages) {
+              null when historyAsync.hasError => Center(
+                child: Padding(
+                  padding: EdgeInsets.all(tokens.spacing.step5),
+                  child: Text(
+                    context.messages.goalChatHistoryError,
+                    style: tokens.typography.styles.body.bodyMedium.copyWith(
+                      color: tokens.colors.alert.error.ink,
+                    ),
                   ),
                 ),
               ),
-            ),
-            null => const Center(child: CircularProgressIndicator()),
-            final history =>
-              history.isEmpty && !widget.isSending
-                  ? Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(tokens.spacing.step5),
-                        child: Text(
-                          context.messages.goalChatEmpty(widget.agentName),
-                          textAlign: TextAlign.center,
-                          style: tokens.typography.styles.body.bodyMedium
-                              .copyWith(
-                                color: tokens.colors.text.mediumEmphasis,
-                              ),
-                        ),
-                      ),
-                    )
-                  : ListView.builder(
-                      controller: _scrollController,
-                      padding: EdgeInsets.all(tokens.spacing.step5),
-                      itemCount: history.length + (widget.isSending ? 1 : 0),
-                      itemBuilder: (context, index) {
-                        if (index == history.length) {
-                          return _ThinkingBubble(agentName: widget.agentName);
-                        }
-                        final message = history[index];
-                        final attachment = widget.attachmentBuilder?.call(
-                          context,
-                          message,
-                        );
-                        return Padding(
-                          padding: EdgeInsets.only(
-                            bottom: tokens.spacing.cardItemSpacing,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              _MessageBubble(
-                                key: ValueKey(
-                                  'goal-chat-message-${message.id}',
+              null => const Center(child: CircularProgressIndicator()),
+              final history =>
+                history.isEmpty && !widget.isSending
+                    ? widget.emptyState ??
+                          Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(tokens.spacing.step5),
+                              child: Text(
+                                context.messages.goalChatEmpty(
+                                  widget.agentName,
                                 ),
-                                message: message,
-                                agentName: widget.agentName,
-                                measuredHeights: _measuredHeights,
+                                textAlign: TextAlign.center,
+                                style: tokens.typography.styles.body.bodyMedium
+                                    .copyWith(
+                                      color: tokens.colors.text.mediumEmphasis,
+                                    ),
                               ),
-                              if (attachment != null) ...[
-                                SizedBox(height: tokens.spacing.step2),
-                                attachment,
+                            ),
+                          )
+                    : ListView.builder(
+                        key: widget.conversationId == null
+                            ? null
+                            : PageStorageKey(widget.conversationId),
+                        controller: _scrollController,
+                        padding: EdgeInsets.all(tokens.spacing.step5),
+                        itemCount: history.length + (widget.isSending ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          if (index == history.length) {
+                            return widget.activity ??
+                                _ThinkingBubble(
+                                  label:
+                                      widget.sendingLabel ??
+                                      context.messages.goalChatResponding(
+                                        widget.agentName,
+                                      ),
+                                );
+                          }
+                          final message = history[index];
+                          final groupAttachment =
+                              widget.groupAttachmentsWithReply &&
+                              message.role == AgentChatRole.agent;
+                          final attachment = widget.attachmentBuilder?.call(
+                            context,
+                            message,
+                          );
+                          return Padding(
+                            padding: EdgeInsets.only(
+                              bottom: tokens.spacing.cardItemSpacing,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                _MessageBubble(
+                                  key: ValueKey(
+                                    'goal-chat-message-${message.id}',
+                                  ),
+                                  message: message,
+                                  agentName: widget.agentName,
+                                  measuredHeights: _measuredHeights,
+                                  replyTextStyle: widget.replyTextStyle,
+                                  onLinkTap: widget.onLinkTap == null
+                                      ? null
+                                      : (url, title) => widget.onLinkTap!(
+                                          message,
+                                          url,
+                                          title,
+                                        ),
+                                  attachment: groupAttachment
+                                      ? attachment
+                                      : null,
+                                ),
+                                if (attachment != null && !groupAttachment) ...[
+                                  SizedBox(height: tokens.spacing.step2),
+                                  KeyedSubtree(
+                                    key: ValueKey(
+                                      'goal-chat-attachment-${message.id}',
+                                    ),
+                                    child: attachment,
+                                  ),
+                                ],
                               ],
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-          },
-        ),
-        if (widget.hasFailedTurn)
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: tokens.spacing.step5,
-              vertical: tokens.spacing.step2,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  context.messages.goalChatFailed,
-                  style: tokens.typography.styles.others.caption.copyWith(
-                    color: tokens.colors.alert.error.ink,
-                  ),
-                ),
-                SizedBox(width: tokens.spacing.step2),
-                DesignSystemButton(
-                  label: context.messages.aiInferenceErrorRetryButton,
-                  onPressed: widget.onRetry,
-                  variant: DesignSystemButtonVariant.dangerTertiary,
-                  size: DesignSystemButtonSize.dense,
-                ),
-              ],
-            ),
+                            ),
+                          );
+                        },
+                      ),
+            },
           ),
-        _ChatComposer(
-          controller: _controller,
-          agentName: widget.agentName,
-          isSending: widget.isSending,
-          draft: widget.draft,
-          onDraftChanged: widget.onDraftChanged,
-          onSend: widget.onSend,
-        ),
-      ],
+          if (widget.isSending && widget.pinnedActivity != null)
+            widget.pinnedActivity!,
+          if (widget.hasFailedTurn)
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: tokens.spacing.step5,
+                vertical: tokens.spacing.step2,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    context.messages.goalChatFailed,
+                    style: tokens.typography.styles.others.caption.copyWith(
+                      color: tokens.colors.alert.error.ink,
+                    ),
+                  ),
+                  SizedBox(width: tokens.spacing.step2),
+                  DesignSystemButton(
+                    label: context.messages.aiInferenceErrorRetryButton,
+                    onPressed: widget.onRetry,
+                    variant: DesignSystemButtonVariant.dangerTertiary,
+                    size: DesignSystemButtonSize.dense,
+                  ),
+                ],
+              ),
+            ),
+          ?widget.footer,
+          if (widget.composerEnabled)
+            _ChatComposer(
+              availableHeight: constraints.maxHeight,
+              controller: _controller,
+              agentName: widget.agentName,
+              isSending: widget.isSending,
+              allowDraftWhileSending: widget.allowDraftWhileSending,
+              showVoiceDetails: widget.showVoiceDetails,
+              sendingLabel:
+                  widget.sendingLabel ??
+                  context.messages.goalChatResponding(widget.agentName),
+              draft: widget.draft,
+              onDraftChanged: widget.onDraftChanged,
+              onSend: widget.onSend,
+              shape: widget.composerShape,
+              resolveTranscriptionTarget: widget.resolveTranscriptionTarget,
+            ),
+        ],
+      ),
     );
   }
 }
@@ -277,20 +386,32 @@ class _AgentChatViewState extends ConsumerState<AgentChatView> {
 /// stream rebuilds only this subtree, not the full message list above.
 class _ChatComposer extends ConsumerWidget {
   const _ChatComposer({
+    required this.availableHeight,
     required this.controller,
     required this.agentName,
     required this.isSending,
+    required this.allowDraftWhileSending,
+    required this.showVoiceDetails,
+    required this.sendingLabel,
     required this.draft,
     required this.onDraftChanged,
     required this.onSend,
+    required this.shape,
+    this.resolveTranscriptionTarget,
   });
 
+  final double availableHeight;
   final TextEditingController controller;
   final String agentName;
   final bool isSending;
+  final bool allowDraftWhileSending;
+  final bool showVoiceDetails;
+  final String sendingLabel;
   final String draft;
   final ValueChanged<String> onDraftChanged;
   final VoidCallback onSend;
+  final DesignSystemTextInputShape shape;
+  final ChatTranscriptionTargetResolver? resolveTranscriptionTarget;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -309,6 +430,7 @@ class _ChatComposer extends ConsumerWidget {
         padding: EdgeInsets.all(tokens.spacing.step4),
         child: switch (status) {
           ChatRecorderStatus.recording => _RecordingControls(
+            elapsed: showVoiceDetails ? recorderState.elapsed : null,
             amplitudes: ref
                 .read(chatRecorderControllerProvider.notifier)
                 .getNormalizedAmplitudeHistory(),
@@ -319,17 +441,28 @@ class _ChatComposer extends ConsumerWidget {
                 .stopAndTranscribe(),
           ),
           ChatRecorderStatus.processing => _TranscriptionProgress(
+            availableHeight: availableHeight,
             partialTranscript: recorderState.partialTranscript ?? '',
+            onCancel: showVoiceDetails
+                ? () =>
+                      ref.read(chatRecorderControllerProvider.notifier).cancel()
+                : null,
           ),
           _ => _IdleComposer(
             controller: controller,
             agentName: agentName,
             isSending: isSending,
+            allowDraftWhileSending: allowDraftWhileSending,
+            sendingLabel: sendingLabel,
             draft: draft,
             onDraftChanged: onDraftChanged,
             onSend: onSend,
-            onStartRecording: () =>
-                ref.read(chatRecorderControllerProvider.notifier).start(),
+            shape: shape,
+            onStartRecording: () => ref
+                .read(chatRecorderControllerProvider.notifier)
+                .start(
+                  resolveTranscriptionTarget: resolveTranscriptionTarget,
+                ),
           ),
         },
       ),
@@ -342,19 +475,25 @@ class _IdleComposer extends StatelessWidget {
     required this.controller,
     required this.agentName,
     required this.isSending,
+    required this.allowDraftWhileSending,
+    required this.sendingLabel,
     required this.draft,
     required this.onDraftChanged,
     required this.onSend,
     required this.onStartRecording,
+    required this.shape,
   });
 
   final TextEditingController controller;
   final String agentName;
   final bool isSending;
+  final bool allowDraftWhileSending;
+  final String sendingLabel;
   final String draft;
   final ValueChanged<String> onDraftChanged;
   final VoidCallback onSend;
   final VoidCallback onStartRecording;
+  final DesignSystemTextInputShape shape;
 
   @override
   Widget build(BuildContext context) {
@@ -368,14 +507,19 @@ class _IdleComposer extends StatelessWidget {
         Expanded(
           child: DesignSystemTextInput(
             controller: controller,
+            shape: shape,
             hintText: context.messages.goalChatPlaceholder(agentName),
-            helperText: isSending
-                ? context.messages.goalChatResponding(agentName)
+            helperText: isSending && !allowDraftWhileSending
+                ? sendingLabel
                 : null,
-            enabled: !isSending,
+            enabled: !isSending || allowDraftWhileSending,
             textCapitalization: TextCapitalization.sentences,
+            emphasizeTrailingIcon:
+                hasText && shape == DesignSystemTextInputShape.pill,
             trailingIcon: hasText
-                ? LottiIcons.send
+                ? (shape == DesignSystemTextInputShape.pill
+                      ? LottiIcons.arrowUp
+                      : LottiIcons.send)
                 : (canRecord ? LottiIcons.mic : null),
             onTrailingIconTap: hasText
                 ? (canSend ? onSend : null)
@@ -385,7 +529,7 @@ class _IdleComposer extends StatelessWidget {
                 : (canRecord ? context.messages.chatInputRecordVoice : null),
             onChanged: onDraftChanged,
             onSubmitted: (_) {
-              if (draft.trim().isNotEmpty) onSend();
+              if (canSend) onSend();
             },
           ),
         ),
@@ -399,11 +543,13 @@ class _RecordingControls extends StatelessWidget {
     required this.amplitudes,
     required this.onCancel,
     required this.onStop,
+    this.elapsed,
   });
 
   final List<double> amplitudes;
   final VoidCallback onCancel;
   final VoidCallback onStop;
+  final Duration? elapsed;
 
   @override
   Widget build(BuildContext context) {
@@ -414,85 +560,240 @@ class _RecordingControls extends StatelessWidget {
       },
       child: Focus(
         autofocus: true,
-        child: Row(
-          children: [
-            Expanded(
-              child: WaveformBars(amplitudesNormalized: amplitudes),
-            ),
-            SizedBox(width: tokens.spacing.step3),
-            _CircleIconButton(
-              icon: LottiIcons.close,
-              onPressed: onCancel,
-              tooltip: context.messages.chatInputCancelRecording,
-            ),
-            SizedBox(width: tokens.spacing.step2),
-            _CircleIconButton(
-              icon: LottiIcons.stop,
-              onPressed: onStop,
-              tooltip: context.messages.chatInputStopTranscribe,
-            ),
-          ],
-        ),
+        child: elapsed != null
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: tokens.spacing.step9,
+                        child: Text(
+                          '${elapsed!.inMinutes.toString().padLeft(2, '0')}:${(elapsed!.inSeconds % 60).toString().padLeft(2, '0')}',
+                          style: tokens.typography.styles.others.caption
+                              .copyWith(
+                                fontFeatures: const [
+                                  FontFeature.tabularFigures(),
+                                ],
+                              ),
+                        ),
+                      ),
+                      SizedBox(width: tokens.spacing.step3),
+                      Expanded(
+                        child: WaveformBars(amplitudesNormalized: amplitudes),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: tokens.spacing.step2),
+                  Wrap(
+                    alignment: WrapAlignment.end,
+                    spacing: tokens.spacing.step3,
+                    runSpacing: tokens.spacing.step2,
+                    children: [
+                      DesignSystemButton(
+                        label: context.messages.cancelButton,
+                        onPressed: onCancel,
+                        variant: DesignSystemButtonVariant.outlined,
+                      ),
+                      DesignSystemButton(
+                        label: context.messages.audioRecordingStop,
+                        onPressed: onStop,
+                      ),
+                    ],
+                  ),
+                ],
+              )
+            : Row(
+                children: [
+                  Expanded(
+                    child: WaveformBars(amplitudesNormalized: amplitudes),
+                  ),
+                  SizedBox(width: tokens.spacing.step3),
+                  _CircleIconButton(
+                    icon: LottiIcons.close,
+                    onPressed: onCancel,
+                    tooltip: context.messages.chatInputCancelRecording,
+                  ),
+                  SizedBox(width: tokens.spacing.step2),
+                  _CircleIconButton(
+                    icon: LottiIcons.stop,
+                    onPressed: onStop,
+                    tooltip: context.messages.chatInputStopTranscribe,
+                  ),
+                ],
+              ),
       ),
     );
   }
 }
 
-class _TranscriptionProgress extends StatelessWidget {
-  const _TranscriptionProgress({required this.partialTranscript});
+/// Keeps streaming text inspectable without letting it push Cancel out of the
+/// composer. The host height already accounts for its header and keyboard.
+class _TranscriptionProgress extends StatefulWidget {
+  const _TranscriptionProgress({
+    required this.availableHeight,
+    required this.partialTranscript,
+    this.onCancel,
+  });
 
+  final double availableHeight;
   final String partialTranscript;
+  final VoidCallback? onCancel;
+
+  @override
+  State<_TranscriptionProgress> createState() => _TranscriptionProgressState();
+}
+
+class _TranscriptionProgressState extends State<_TranscriptionProgress> {
+  final _scrollController = ScrollController();
+  bool _expanded = false;
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.designTokens;
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: tokens.spacing.step4,
-              vertical: tokens.spacing.step3,
-            ),
-            decoration: BoxDecoration(
-              color: tokens.colors.background.level02,
-              borderRadius: BorderRadius.circular(tokens.radii.l),
-            ),
-            constraints: BoxConstraints(maxHeight: tokens.spacing.step9),
-            child: SingleChildScrollView(
-              reverse: true,
-              child: Text(
-                partialTranscript,
-                style: tokens.typography.styles.body.bodyMedium.copyWith(
-                  color: tokens.colors.text.mediumEmphasis,
+    final style = tokens.typography.styles.body.bodySmall.copyWith(
+      color: tokens.colors.text.mediumEmphasis,
+    );
+    final hasPartial = widget.partialTranscript.trim().isNotEmpty;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final textWidth = (constraints.maxWidth - tokens.spacing.step4 * 2)
+            .clamp(0.0, double.infinity);
+        final painter = TextPainter(
+          text: TextSpan(text: widget.partialTranscript, style: style),
+          textDirection: Directionality.of(context),
+          textScaler: MediaQuery.textScalerOf(context),
+          locale: Localizations.localeOf(context),
+        );
+        final lineHeight = painter.preferredLineHeight;
+        // Up to six lines, using at most a quarter of the actual chat height.
+        // On a short viewport expansion can keep the same height while making
+        // the full text scrollable, rather than squeezing out the controls.
+        final previewHeight = (widget.availableHeight / 4).clamp(
+          lineHeight,
+          lineHeight * 6,
+        );
+        final collapsedLines = (previewHeight / lineHeight).floor().clamp(1, 3);
+        painter
+          ..maxLines = collapsedLines
+          ..layout(maxWidth: textWidth);
+        final overflows = painter.didExceedMaxLines;
+        painter.dispose();
+
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (hasPartial) ...[
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: tokens.spacing.step4,
+                  vertical: tokens.spacing.step3,
                 ),
-              ),
-            ),
-          ),
-        ),
-        SizedBox(width: tokens.spacing.step3),
-        SizedBox.square(
-          dimension: tokens.spacing.step8,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              SizedBox(
-                width: tokens.spacing.step6,
-                height: tokens.spacing.step6,
-                child: CircularProgressIndicator(
-                  strokeWidth: BorderWidths.emphasis,
-                  color: tokens.colors.interactive.enabled,
+                decoration: BoxDecoration(
+                  color: tokens.colors.background.level02,
+                  borderRadius: BorderRadius.circular(tokens.radii.l),
                 ),
+                child: _expanded && overflows
+                    ? ConstrainedBox(
+                        constraints: BoxConstraints(maxHeight: previewHeight),
+                        child: Scrollbar(
+                          controller: _scrollController,
+                          child: SingleChildScrollView(
+                            key: const ValueKey('chat-transcription-preview'),
+                            controller: _scrollController,
+                            primary: false,
+                            child: Text(widget.partialTranscript, style: style),
+                          ),
+                        ),
+                      )
+                    : Text(
+                        widget.partialTranscript,
+                        style: style,
+                        maxLines: collapsedLines,
+                        overflow: TextOverflow.ellipsis,
+                      ),
               ),
-              Icon(
-                LottiIcons.mic,
-                size: IconSizes.s,
-                color: tokens.colors.interactive.enabled,
-              ),
+              SizedBox(height: tokens.spacing.step1),
             ],
-          ),
-        ),
-      ],
+            Row(
+              children: [
+                SizedBox.square(
+                  dimension: ControlSizes.iconChipCompact,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SizedBox.square(
+                        dimension: IconSizes.l,
+                        child: CircularProgressIndicator(
+                          strokeWidth: BorderWidths.emphasis,
+                          color: tokens.colors.interactive.enabled,
+                          semanticsLabel: hasPartial
+                              ? context.messages.timelineTranscribing
+                              : null,
+                        ),
+                      ),
+                      Icon(
+                        LottiIcons.mic,
+                        size: IconSizes.s,
+                        color: tokens.colors.interactive.enabled,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: tokens.spacing.step2),
+                if (!hasPartial)
+                  Expanded(
+                    child: Text(
+                      context.messages.timelineTranscribing,
+                      style: style,
+                    ),
+                  ),
+                if (hasPartial || widget.onCancel != null)
+                  Expanded(
+                    child: Wrap(
+                      alignment: WrapAlignment.end,
+                      spacing: tokens.spacing.step1,
+                      children: [
+                        if (hasPartial && overflows)
+                          MergeSemantics(
+                            child: Semantics(
+                              expanded: _expanded,
+                              child: DesignSystemButton(
+                                label: _expanded
+                                    ? context.messages.aiResponseShowLess
+                                    : context.messages.aiResponseShowMore,
+                                onPressed: () => setState(
+                                  () => _expanded = !_expanded,
+                                ),
+                                variant: DesignSystemButtonVariant.tertiary,
+                                size: DesignSystemButtonSize.dense,
+                                tapTargetSize: MaterialTapTargetSize.padded,
+                              ),
+                            ),
+                          ),
+                        if (widget.onCancel != null)
+                          DesignSystemButton(
+                            label: context.messages.cancelButton,
+                            onPressed: widget.onCancel,
+                            variant: DesignSystemButtonVariant.tertiary,
+                            size: DesignSystemButtonSize.dense,
+                            tapTargetSize: MaterialTapTargetSize.padded,
+                          ),
+                      ],
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -547,11 +848,17 @@ class _MessageBubble extends StatelessWidget {
     required this.message,
     required this.agentName,
     required this.measuredHeights,
+    this.attachment,
+    this.replyTextStyle,
+    this.onLinkTap,
     super.key,
   });
 
   final AgentChatMessage message;
   final String agentName;
+  final Widget? attachment;
+  final TextStyle? replyTextStyle;
+  final void Function(String url, String title)? onLinkTap;
 
   /// List-owned reply heights; see [_AgentChatViewState._measuredHeights].
   final Map<String, double> measuredHeights;
@@ -567,11 +874,13 @@ class _MessageBubble extends StatelessWidget {
     return Semantics(
       container: true,
       explicitChildNodes: !isUser,
-      label: context.messages.goalChatMessageSemantics(
-        author,
-        time,
-        message.text,
-      ),
+      label: !isUser && onLinkTap != null
+          ? context.messages.goalChatMessageFooter(author, time)
+          : context.messages.goalChatMessageSemantics(
+              author,
+              time,
+              message.text,
+            ),
       child: Align(
         alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
         child: ConstrainedBox(
@@ -605,17 +914,28 @@ class _MessageBubble extends StatelessWidget {
                     )
                   else
                     ExcludeSemantics(
+                      excluding: onLinkTap == null,
                       child: _CollapsibleAgentMarkdown(
+                        onLinkTap: onLinkTap,
                         cacheKey: message.id,
                         measuredHeights: measuredHeights,
                         text: message.text,
-                        style: tokens.typography.styles.body.bodyMedium
-                            .copyWith(
-                              color: tokens.colors.text.highEmphasis,
-                            ),
+                        style:
+                            (replyTextStyle ??
+                                    tokens.typography.styles.body.bodyMedium)
+                                .copyWith(
+                                  color: tokens.colors.text.highEmphasis,
+                                ),
                         fadeColor: tokens.colors.background.level02,
                       ),
                     ),
+                  if (attachment != null) ...[
+                    SizedBox(height: tokens.spacing.step3),
+                    Material(
+                      type: MaterialType.transparency,
+                      child: attachment,
+                    ),
+                  ],
                   SizedBox(height: tokens.spacing.step1),
                   ExcludeSemantics(
                     child: Text(
@@ -651,6 +971,7 @@ class _CollapsibleAgentMarkdown extends StatefulWidget {
     required this.text,
     required this.style,
     required this.fadeColor,
+    this.onLinkTap,
   });
 
   /// Identifies this reply in [measuredHeights] — the message id, stable
@@ -663,6 +984,7 @@ class _CollapsibleAgentMarkdown extends StatefulWidget {
 
   final String text;
   final TextStyle style;
+  final void Function(String url, String title)? onLinkTap;
 
   /// The bubble surface color the bottom fade dissolves into.
   final Color fadeColor;
@@ -714,7 +1036,11 @@ class _CollapsibleAgentMarkdownState extends State<_CollapsibleAgentMarkdown> {
     // collapsed, so the measurement keeps tracking content changes.
     final content = _MeasureHeight(
       onHeight: _handleHeight,
-      child: AgentMarkdownView(widget.text, style: widget.style),
+      child: AgentMarkdownView(
+        widget.text,
+        style: widget.style,
+        onLinkTap: widget.onLinkTap,
+      ),
     );
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -758,15 +1084,22 @@ class _CollapsibleAgentMarkdownState extends State<_CollapsibleAgentMarkdown> {
           ),
         if (overflows) ...[
           SizedBox(height: tokens.spacing.step1),
-          DesignSystemButton(
-            label: _expanded
-                ? context.messages.aiResponseShowLess
-                : context.messages.aiResponseShowMore,
-            onPressed: () => setState(() => _expanded = !_expanded),
-            variant: DesignSystemButtonVariant.tertiary,
-            size: DesignSystemButtonSize.dense,
-            trailingIcon: _expanded ? LottiIcons.collapse : LottiIcons.expand,
-            alignsLabelToLeadingEdge: true,
+          MergeSemantics(
+            child: Semantics(
+              expanded: _expanded,
+              child: DesignSystemButton(
+                label: _expanded
+                    ? context.messages.aiResponseShowLess
+                    : context.messages.aiResponseShowMore,
+                onPressed: () => setState(() => _expanded = !_expanded),
+                variant: DesignSystemButtonVariant.tertiary,
+                size: DesignSystemButtonSize.dense,
+                trailingIcon: _expanded
+                    ? LottiIcons.collapse
+                    : LottiIcons.expand,
+                alignsLabelToLeadingEdge: true,
+              ),
+            ),
           ),
         ],
       ],
@@ -809,15 +1142,15 @@ class _RenderMeasureHeight extends RenderProxyBox {
 }
 
 class _ThinkingBubble extends StatelessWidget {
-  const _ThinkingBubble({required this.agentName});
+  const _ThinkingBubble({required this.label});
 
-  final String agentName;
+  final String label;
 
   @override
   Widget build(BuildContext context) {
     final tokens = context.designTokens;
     return Semantics(
-      label: context.messages.goalChatResponding(agentName),
+      label: label,
       child: Align(
         alignment: Alignment.centerLeft,
         child: DecoratedBox(

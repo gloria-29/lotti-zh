@@ -143,9 +143,7 @@ extension _InferenceProviderEditPageForm on _InferenceProviderEditPageState {
               ),
             ] else ...[
               SizedBox(height: tokens.spacing.step6),
-              EmbeddedProviderHint(
-                providerType: formState.inferenceProviderType,
-              ),
+              Text(messages.sherpaProviderDescription),
             ],
           ],
         ),
@@ -188,11 +186,6 @@ extension _InferenceProviderEditPageForm on _InferenceProviderEditPageState {
                   validator: (_) => formState.baseUrl.error?.displayMessage,
                   keyboardType: TextInputType.url,
                   prefixIcon: LottiIcons.link,
-                ),
-              ] else ...[
-                SizedBox(height: tokens.spacing.step6),
-                EmbeddedProviderHint(
-                  providerType: formState.inferenceProviderType,
                 ),
               ],
             ],
@@ -289,28 +282,6 @@ extension _InferenceProviderEditPageForm on _InferenceProviderEditPageState {
 
     // Perform FTUE setup for supported provider types
     await _performFtueSetupForProvider(config: config);
-  }
-
-  Future<void> _offerMlxAudioInstall(AiConfigInferenceProvider config) async {
-    if (!mounted) return;
-
-    final repository = ref.read(aiConfigRepositoryProvider);
-    final allModels = await repository.getConfigsByType(AiConfigType.model);
-    final providerModels = allModels
-        .whereType<AiConfigModel>()
-        .where((m) => m.inferenceProviderId == config.id)
-        .where(isMlxAudioSpeechToTextModel)
-        .toList(growable: false);
-    if (providerModels.isEmpty || !mounted) return;
-
-    final model = await MlxAudioModelInstallChoiceDialog.show(
-      context: context,
-      models: providerModels,
-      recommendedModelId: mlxAudioRecommendedSttModelId,
-    );
-    if (model == null || !mounted) return;
-
-    await MlxAudioModelDownloadDialog.show(context: context, model: model);
   }
 
   /// Performs FTUE setup flow for a supported provider.

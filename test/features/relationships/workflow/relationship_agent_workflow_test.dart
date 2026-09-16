@@ -12,6 +12,9 @@ import 'package:lotti/features/agents/model/agent_constants.dart';
 import 'package:lotti/features/agents/model/agent_domain_entity.dart';
 import 'package:lotti/features/agents/model/agent_enums.dart';
 import 'package:lotti/features/agents/model/agent_link.dart';
+import 'package:lotti/features/agents/model/agent_report_provenance.dart';
+import 'package:lotti/features/agents/model/change_set.dart';
+import 'package:lotti/features/agents/model/proposal_ledger.dart';
 import 'package:lotti/features/agents/workflow/wake_result.dart';
 import 'package:lotti/features/ai/model/ai_config.dart';
 import 'package:lotti/features/ai/model/inference_usage.dart';
@@ -94,11 +97,16 @@ void main() {
     ),
   );
 
-  CheckInEntry checkIn(String id, DateTime at) => CheckInEntry(
+  CheckInEntry checkIn(
+    String id,
+    DateTime at, {
+    CheckInSentiment? sentiment,
+  }) => CheckInEntry(
     meta: meta(id, dateFrom: at),
-    data: const CheckInData(
+    data: CheckInData(
       relationshipId: relationshipId,
       interactionType: CheckInInteractionType.call,
+      sentiment: sentiment,
     ),
   );
 
@@ -173,6 +181,9 @@ void main() {
     conversationRepository = MockConversationRepository(conversationManager);
     when(() => conversationManager.messages).thenReturn(const []);
     upserts = [];
+    when(
+      () => repository.getProposalLedger(agentId, taskId: relationshipId),
+    ).thenAnswer((_) async => const ProposalLedger.empty());
     workflow = RelationshipAgentWorkflow(
       repository: repository,
       syncService: syncService,
@@ -209,6 +220,9 @@ void main() {
     when(() => syncService.upsertEntity(any())).thenAnswer((invocation) async {
       upserts.add(invocation.positionalArguments.first as AgentDomainEntity);
     });
+    // No state row unless a test seeds one: the outcome stamp then has
+    // nothing to write, which keeps every older test's upsert list intact.
+    when(() => repository.getAgentState(any())).thenAnswer((_) async => null);
     when(
       () =>
           relationshipRepository.getRelationshipByIdUnfiltered(relationshipId),
@@ -245,6 +259,116 @@ void main() {
       pendingUserMessage: pendingUserMessage,
     ),
   );
+
+  void stubTaskProposal() {
+    stubGlmResolution();
+    conversationRepository
+      ..maxDelegateCalls = 1
+      ..sendMessageDelegate =
+          ({
+            required conversationId,
+            required message,
+            required model,
+            required provider,
+            required inferenceRepo,
+            tools,
+            toolChoice,
+            temperature = 0,
+            strategy,
+          }) async {
+            expect(message, contains('checkInId=c-1'));
+            expect(message, contains('PROPOSALS'));
+            await strategy!.processToolCalls(
+              toolCalls: [
+                toolCall(RelationshipAgentToolNames.createAndLinkTask, {
+                  'title': 'Send Pip the checklist',
+                  'description': 'I promised to send the checklist.',
+                  'sourceCheckInId': 'c-1',
+                  'reason': 'An explicit commitment.',
+                }),
+                toolCall(
+                  RelationshipAgentToolNames.updateRelationshipReport,
+                  briefingArgs(),
+                  id: 'report',
+                ),
+                toolCall(
+                  RelationshipAgentToolNames.createRelationshipAd,
+                  adArgs(),
+                  id: 'ad',
+                ),
+              ],
+              manager: conversationManager,
+            );
+            return null;
+          };
+  }
+
+  test(
+    'defers the task in a relationship-scoped change set with evidence',
+    () async {
+      stubTaskProposal();
+      expect((await run()).success, isTrue);
+      final set = upserts.whereType<ChangeSetEntity>().single;
+      expect(set.taskId, relationshipId);
+      expect(set.agentId, agentId);
+      expect(set.status, ChangeSetStatus.pending);
+      expect(set.items.single.args['sourceCheckInId'], 'c-1');
+      expect(
+        set.items.single.humanSummary,
+        'Create task: Send Pip the checklist',
+      );
+    },
+  );
+
+  for (final status in [
+    ChangeItemStatus.pending,
+    ChangeItemStatus.confirmed,
+    ChangeItemStatus.rejected,
+  ]) {
+    test('does not repeat a $status task when its rationale changes', () async {
+      stubTaskProposal();
+      expect((await run()).success, isTrue);
+      final previous = upserts.whereType<ChangeSetEntity>().single;
+      final item = previous.items.single.copyWith(
+        args: {...previous.items.single.args, 'reason': 'Different rationale'},
+      );
+      final entry = LedgerEntry(
+        changeSetId: 'previous',
+        itemIndex: 0,
+        toolName: item.toolName,
+        args: item.args,
+        humanSummary: item.humanSummary,
+        fingerprint: ChangeItem.fingerprint(item),
+        status: status,
+        createdAt: now,
+      );
+      when(
+        () => repository.getProposalLedger(agentId, taskId: relationshipId),
+      ).thenAnswer(
+        (_) async => ProposalLedger(
+          open: status == ChangeItemStatus.pending ? [entry] : [],
+          resolved: status == ChangeItemStatus.pending ? [] : [entry],
+        ),
+      );
+      upserts.clear();
+      conversationRepository.maxDelegateCalls = 2;
+      expect((await run()).success, isTrue);
+      expect(upserts.whereType<ChangeSetEntity>(), isEmpty);
+    });
+  }
+
+  test('a retry never replaces an already persisted proposal set', () async {
+    stubTaskProposal();
+    expect((await run()).success, isTrue);
+    final previous = upserts.whereType<ChangeSetEntity>().single;
+    when(
+      () => repository.getEntity(previous.id),
+    ).thenAnswer((_) async => previous);
+    upserts.clear();
+    conversationRepository.maxDelegateCalls = 2;
+    expect((await run()).success, isTrue);
+    expect(upserts.whereType<ChangeSetEntity>(), isEmpty);
+  });
 
   group('the €0 gates — no inference without a live fact', () {
     test('an agent with no link is a benign no-op', () async {
@@ -318,6 +442,30 @@ void main() {
     });
   });
 
+  for (final failingRead in ['configuration', 'failure counter']) {
+    test(
+      '$failingRead read errors still preserve the escalation retry',
+      () async {
+        if (failingRead == 'configuration') {
+          when(
+            aiConfigRepository.getDefaultProfileId,
+          ).thenThrow(StateError('settings unavailable'));
+        } else {
+          when(
+            () => repository.getAgentState(agentId),
+          ).thenThrow(StateError('state unavailable'));
+        }
+        final tokens = {relationshipEscalationWorkspaceKey('2026-08-08')};
+        final result = await run(tokens: tokens);
+        expect(result.success, isFalse);
+        final retry = upserts.whereType<ScheduledWakeEntity>().single;
+        expect(retry.scheduledAt, now.toUtc().add(const Duration(hours: 1)));
+        expect(retry.triggerTokens.toSet(), tokens);
+        expect(conversationRepository.sendMessageDelegateCallCount, 0);
+      },
+    );
+  }
+
   test(
     'an unresolvable provider re-arms the consumed escalation — a '
     'temporarily unconfigured provider must not orphan the episode',
@@ -335,7 +483,7 @@ void main() {
       // resolver's reschedule-beats-consume path. A pending twin at the
       // consumed record's own instant would lose to consumption-is-terminal
       // on any peer echo, orphaning the retry fleet-wide.
-      expect(rearmed.scheduledAt, now.toUtc());
+      expect(rearmed.scheduledAt, now.toUtc().add(const Duration(hours: 1)));
       expect(rearmed.scheduledAt.isAfter(DateTime.utc(2026, 8, 8)), isTrue);
       // The ORIGINAL tokens ride along verbatim (the baseline token cannot
       // be regenerated after the register transitioned).
@@ -402,6 +550,13 @@ void main() {
       contains('difficult calls'),
     );
     expect(report.provenance['relationshipId'], relationshipId);
+    final inference = ReportInferenceProvenance.tryRead(report.provenance);
+    expect(inference, isNotNull);
+    expect(inference!.executor.providerModelId, glmModel.providerModelId);
+    expect(inference.executor.modelConfigId, glmModel.id);
+    expect(inference.executor.servingProviderName, meliousProvider.name);
+    expect(inference.finalContentAuthor, ReportContentAuthor.executor);
+
     expect(upserts.whereType<AgentReportHeadEntity>(), hasLength(1));
 
     final banner = upserts.whereType<RelationshipNudgeEntity>().single;
@@ -422,6 +577,147 @@ void main() {
       contains('test-conv-id'),
     );
   });
+
+  test(
+    'the workflow rejects a report above the newest user sentiment',
+    () async {
+      stubGlmResolution();
+      when(
+        () => relationshipRepository.getAllCheckInsForRelationship(
+          relationshipId,
+        ),
+      ).thenAnswer(
+        (_) async => [
+          checkIn(
+            'c-1',
+            DateTime(2026, 8, 1, 18),
+            sentiment: CheckInSentiment.difficult,
+          ),
+        ],
+      );
+      // Recorded, not asserted inside the delegate: the pinned retry swallows
+      // every error, so an `expect` there could fail without failing the test.
+      final messages = <String>[];
+      var processedCalls = 0;
+      conversationRepository
+        ..maxDelegateCalls = 2
+        ..sendMessageDelegate =
+            ({
+              required conversationId,
+              required message,
+              required model,
+              required provider,
+              required inferenceRepo,
+              tools,
+              toolChoice,
+              temperature = 0,
+              strategy,
+            }) async {
+              messages.add(message);
+              final calls = messages.length;
+              await strategy!.processToolCalls(
+                toolCalls: [
+                  toolCall(
+                    RelationshipAgentToolNames.updateRelationshipReport,
+                    {...briefingArgs(), 'healthBand': 'thriving'},
+                  ),
+                  if (calls == 1)
+                    toolCall(
+                      RelationshipAgentToolNames.createRelationshipAd,
+                      adArgs(),
+                      id: 'call-2',
+                    ),
+                ],
+                manager: conversationManager,
+              );
+              processedCalls++;
+              return null;
+            };
+
+      final result = await run(
+        tokens: {relationshipEscalationWorkspaceKey('2026-08-08')},
+      );
+
+      expect(result.success, isTrue);
+      expect(result.reportUpdated, isFalse);
+      expect(upserts.whereType<AgentReportEntity>(), isEmpty);
+      expect(messages, hasLength(2));
+      // The wake's FACTS carry the bound; the retry is the bare pinned
+      // briefing instruction, and its out-of-range report is rejected too.
+      expect(messages.first, contains('needs attention, strained'));
+      expect(messages.last, contains('Call update_relationship_report now'));
+      expect(messages.last, isNot(contains('HEALTH BAND CONSTRAINT')));
+      expect(processedCalls, 2);
+    },
+  );
+
+  test(
+    'a lapsed cadence keeps needs attention publishable after a good rating',
+    () async {
+      stubGlmResolution();
+      when(
+        () => relationshipRepository.getAllCheckInsForRelationship(
+          relationshipId,
+        ),
+      ).thenAnswer(
+        (_) async => [
+          checkIn(
+            'c-1',
+            DateTime(2026, 8, 1, 18),
+            sentiment: CheckInSentiment.good,
+          ),
+        ],
+      );
+      final messages = <String>[];
+      conversationRepository
+        ..maxDelegateCalls = 1
+        ..sendMessageDelegate =
+            ({
+              required conversationId,
+              required message,
+              required model,
+              required provider,
+              required inferenceRepo,
+              tools,
+              toolChoice,
+              temperature = 0,
+              strategy,
+            }) async {
+              messages.add(message);
+              await strategy!.processToolCalls(
+                toolCalls: [
+                  toolCall(
+                    RelationshipAgentToolNames.updateRelationshipReport,
+                    {...briefingArgs(), 'healthBand': 'needsAttention'},
+                  ),
+                  toolCall(
+                    RelationshipAgentToolNames.createRelationshipAd,
+                    adArgs(),
+                    id: 'call-2',
+                  ),
+                ],
+                manager: conversationManager,
+              );
+              return null;
+            };
+
+      final result = await run(
+        tokens: {relationshipEscalationWorkspaceKey('2026-08-08')},
+      );
+
+      expect(messages.single, contains('- status: due'));
+      expect(messages.single, contains('thriving, steady, needs attention'));
+      expect(result.success, isTrue);
+      expect(result.reportUpdated, isTrue);
+      expect(
+        upserts
+            .whereType<AgentReportEntity>()
+            .single
+            .provenance[RelationshipReportProvenanceKeys.healthBand],
+        'needsAttention',
+      );
+    },
+  );
 
   group('the standing report head', () {
     /// One wake that publishes a briefing for the 2026-08-08 due day.
@@ -619,7 +915,7 @@ void main() {
     );
 
     expect(result.success, isFalse);
-    expect(result.error, contains('outbox flush failed'));
+    expect(result.error, 'Relationship Phase B workflow failed (StateError)');
     expect(
       conversationRepository.deletedConversationIds,
       contains('test-conv-id'),
@@ -1235,7 +1531,7 @@ void main() {
 
     final result = await run(pendingUserMessage: 'How is Anna?');
     expect(result.success, isFalse);
-    expect(result.error, contains('no visible reply'));
+    expect(result.error, 'Relationship Phase B workflow failed (StateError)');
   });
 
   test('a deferred outbox-flush failure AFTER the interactive reply '
@@ -1518,6 +1814,397 @@ void main() {
     expect(upserts.whereType<AgentReportEntity>(), hasLength(1));
   });
 
+  group('resolveRelationshipAgentModel — the chain (ADR 0040 Decision 6)', () {
+    final anthropicProvider =
+        AiConfig.inferenceProvider(
+              id: 'anthropic-provider',
+              baseUrl: 'https://api.anthropic.com',
+              apiKey: 'key',
+              name: 'Anthropic',
+              createdAt: DateTime(2026),
+              inferenceProviderType: InferenceProviderType.anthropic,
+            )
+            as AiConfigInferenceProvider;
+    final claudeModel =
+        AiConfig.model(
+              id: 'model-claude',
+              name: 'Claude',
+              providerModelId: 'claude-x',
+              inferenceProviderId: 'anthropic-provider',
+              createdAt: DateTime(2026),
+              inputModalities: const [Modality.text],
+              outputModalities: const [Modality.text],
+              isReasoningModel: true,
+              supportsFunctionCalling: true,
+              description: 'claude',
+            )
+            as AiConfigModel;
+
+    RelationshipEntry personInCategory({String? profileId}) =>
+        relationship(profileId: profileId).copyWith(
+          meta: meta(relationshipId).copyWith(categoryId: 'cat-1'),
+        );
+
+    /// The catalogue holds ONLY the category profile's model, so a resolved
+    /// route proves the category step and nothing else.
+    void stubCategoryProfileOnClaude() {
+      when(() => aiConfigRepository.getConfigById('profile-cat')).thenAnswer(
+        (_) async => AiConfig.inferenceProfile(
+          id: 'profile-cat',
+          name: 'Family profile',
+          createdAt: DateTime(2026),
+          thinkingModelId: 'model-claude',
+        ),
+      );
+      when(
+        () => aiConfigRepository.getConfigsByType(AiConfigType.model),
+      ).thenAnswer((_) async => [claudeModel]);
+      when(
+        () => aiConfigRepository.getConfigById('anthropic-provider'),
+      ).thenAnswer((_) async => anthropicProvider);
+    }
+
+    Future<String?> categoryLookup(String categoryId) async =>
+        categoryId == 'cat-1' ? 'profile-cat' : null;
+
+    test(
+      'the Settings default supplies an otherwise unconfigured person',
+      () async {
+        stubCategoryProfileOnClaude();
+        when(
+          aiConfigRepository.getDefaultProfileId,
+        ).thenAnswer((_) async => 'profile-cat');
+        final resolved = await resolveRelationshipAgentModel(
+          relationship: relationship(),
+          agentIdentity: identity(),
+          aiConfigRepository: aiConfigRepository,
+        );
+        expect(resolved?.modelId, 'claude-x');
+        expect(resolved?.profileId, 'profile-cat');
+      },
+    );
+
+    test(
+      'briefing recovers after selecting a usable default and records its author',
+      () async {
+        var selectedId = 'missing-profile';
+        when(
+          aiConfigRepository.getDefaultProfileId,
+        ).thenAnswer((_) async => selectedId);
+        stubCategoryProfileOnClaude();
+        final failed = await run(
+          tokens: {relationshipReportRefreshTriggerToken},
+        );
+        expect(failed.success, isFalse);
+        expect(conversationRepository.sendMessageDelegateCallCount, 0);
+        expect(upserts.whereType<AgentReportEntity>(), isEmpty);
+        selectedId = 'profile-cat';
+        conversationRepository.sendMessageDelegate =
+            ({
+              required conversationId,
+              required message,
+              required model,
+              required provider,
+              required inferenceRepo,
+              tools,
+              toolChoice,
+              temperature = 0,
+              strategy,
+            }) async {
+              expect(model, claudeModel.providerModelId);
+              expect(provider.id, anthropicProvider.id);
+              await strategy!.processToolCalls(
+                toolCalls: [
+                  toolCall(
+                    RelationshipAgentToolNames.updateRelationshipReport,
+                    briefingArgs(),
+                  ),
+                ],
+                manager: conversationManager,
+              );
+              return null;
+            };
+        final recovered = await run(
+          tokens: {relationshipReportRefreshTriggerToken},
+        );
+        expect(recovered.success, isTrue);
+        expect(recovered.reportUpdated, isTrue);
+        final report = upserts.whereType<AgentReportEntity>().single;
+        expect(report.content, contains('Full briefing'));
+        final provenance = ReportInferenceProvenance.tryRead(report.provenance);
+        expect(provenance?.profileId, selectedId);
+        expect(
+          provenance?.executor.servingProviderConfigId,
+          anthropicProvider.id,
+        );
+        expect(provenance?.executor.modelConfigId, claudeModel.id);
+      },
+    );
+
+    test('a missing Settings default does not silently choose GLM', () async {
+      stubGlmResolution();
+      when(
+        aiConfigRepository.getDefaultProfileId,
+      ).thenAnswer((_) async => 'missing-profile');
+      final resolved = await resolveRelationshipAgentModel(
+        relationship: relationship(),
+        agentIdentity: identity(),
+        aiConfigRepository: aiConfigRepository,
+      );
+      expect(resolved, isNull);
+    });
+
+    test('the model chosen in agent setup overrides legacy routes', () async {
+      stubCategoryProfileOnClaude();
+      when(
+        () => aiConfigRepository.getConfigById(claudeModel.id),
+      ).thenAnswer((_) async => claudeModel);
+      final configured = identity().copyWith(
+        config: const AgentConfig(
+          inferenceSetup: AgentInferenceSetup(
+            mode: AgentInferenceSetupMode.configured,
+            origin: AgentInferenceSetupOrigin.user,
+            thinkingModelOverrideId: 'model-claude',
+          ),
+        ),
+      );
+
+      final resolved = await resolveRelationshipAgentModel(
+        relationship: relationship(),
+        agentIdentity: configured,
+        aiConfigRepository: aiConfigRepository,
+      );
+
+      expect(resolved?.modelId, 'claude-x');
+      expect(resolved?.provider, anthropicProvider);
+      expect(resolved?.profileId, isNull);
+    });
+
+    test(
+      'a typed base profile resolves without a legacy profile mirror',
+      () async {
+        stubCategoryProfileOnClaude();
+        final resolved = await resolveRelationshipAgentModel(
+          relationship: relationship(),
+          agentIdentity: identity().copyWith(
+            config: const AgentConfig(
+              inferenceSetup: AgentInferenceSetup(
+                mode: AgentInferenceSetupMode.configured,
+                origin: AgentInferenceSetupOrigin.user,
+                baseProfileId: 'profile-cat',
+              ),
+            ),
+          ),
+          aiConfigRepository: aiConfigRepository,
+        );
+
+        expect(resolved?.modelId, 'claude-x');
+        expect(resolved?.profileId, 'profile-cat');
+      },
+    );
+
+    for (final mode in AgentInferenceSetupMode.values) {
+      test(
+        'an unresolved typed $mode setup never falls through to GLM',
+        () async {
+          stubGlmResolution();
+          final resolved = await resolveRelationshipAgentModel(
+            relationship: relationship(),
+            agentIdentity: identity().copyWith(
+              config: AgentConfig(
+                inferenceSetup: AgentInferenceSetup(
+                  mode: mode,
+                  origin: AgentInferenceSetupOrigin.user,
+                  thinkingModelOverrideId: 'missing-model',
+                ),
+              ),
+            ),
+            aiConfigRepository: aiConfigRepository,
+          );
+
+          expect(resolved, isNull);
+          verifyNever(
+            () => aiConfigRepository.getConfigsByType(AiConfigType.model),
+          );
+        },
+      );
+    }
+
+    test("the category's default profile routes when neither the person nor "
+        'the agent pins one — the ordinary setup', () async {
+      stubCategoryProfileOnClaude();
+
+      final resolved = await resolveRelationshipAgentModel(
+        relationship: personInCategory(),
+        agentIdentity: identity(),
+        aiConfigRepository: aiConfigRepository,
+        categoryProfileLookup: categoryLookup,
+      );
+
+      expect(resolved?.profileId, 'profile-cat');
+      expect(resolved?.modelId, 'claude-x');
+      expect(resolved?.provider.id, 'anthropic-provider');
+    });
+
+    test('without a category lookup the same person has no route at all — '
+        'the chain "Brief me" used to hit', () async {
+      stubCategoryProfileOnClaude();
+
+      final resolved = await resolveRelationshipAgentModel(
+        relationship: personInCategory(),
+        agentIdentity: identity(),
+        aiConfigRepository: aiConfigRepository,
+      );
+
+      expect(resolved, isNull);
+    });
+
+    test(
+      "the person's own profile still wins over the category default",
+      () async {
+        stubCategoryProfileOnClaude();
+        // The person's profile routes through the melious default model.
+        when(() => aiConfigRepository.getConfigById('profile-1')).thenAnswer(
+          (_) async => AiConfig.inferenceProfile(
+            id: 'profile-1',
+            name: 'Mine',
+            createdAt: DateTime(2026),
+            thinkingModelId: 'model-glm',
+          ),
+        );
+        when(
+          () => aiConfigRepository.getConfigsByType(AiConfigType.model),
+        ).thenAnswer((_) async => [claudeModel, glmModel]);
+        when(
+          () => aiConfigRepository.getConfigById('melious-provider'),
+        ).thenAnswer((_) async => meliousProvider);
+
+        final resolved = await resolveRelationshipAgentModel(
+          relationship: personInCategory(profileId: 'profile-1'),
+          agentIdentity: identity(),
+          aiConfigRepository: aiConfigRepository,
+          categoryProfileLookup: categoryLookup,
+        );
+
+        expect(resolved?.profileId, 'profile-1');
+        expect(resolved?.provider.id, 'melious-provider');
+      },
+    );
+
+    test('a dangling category default falls through to the validated default '
+        'model', () async {
+      stubGlmResolution();
+
+      final resolved = await resolveRelationshipAgentModel(
+        relationship: personInCategory(),
+        agentIdentity: identity(),
+        aiConfigRepository: aiConfigRepository,
+        categoryProfileLookup: (_) async => 'gone',
+      );
+
+      expect(resolved?.profileId, isNull);
+      expect(resolved?.provider.id, 'melious-provider');
+    });
+
+    test('an explicit profile resolves before the category lookup runs — a '
+        'failing category read cannot take down a pinned route', () async {
+      stubGlmResolution();
+      when(() => aiConfigRepository.getConfigById('profile-1')).thenAnswer(
+        (_) async => AiConfig.inferenceProfile(
+          id: 'profile-1',
+          name: 'Mine',
+          createdAt: DateTime(2026),
+          thinkingModelId: 'model-glm',
+        ),
+      );
+
+      final resolved = await resolveRelationshipAgentModel(
+        relationship: personInCategory(profileId: 'profile-1'),
+        agentIdentity: identity(),
+        aiConfigRepository: aiConfigRepository,
+        categoryProfileLookup: (_) async =>
+            throw StateError('the category read failed'),
+      );
+
+      expect(resolved?.profileId, 'profile-1');
+    });
+
+    test('a person without a category never consults the lookup', () async {
+      stubGlmResolution();
+
+      final resolved = await resolveRelationshipAgentModel(
+        relationship: relationship(),
+        agentIdentity: identity(),
+        aiConfigRepository: aiConfigRepository,
+        categoryProfileLookup: (_) async =>
+            throw StateError('lookup must not run without a category'),
+      );
+
+      expect(resolved?.provider.id, 'melious-provider');
+    });
+
+    test('the workflow routes a run through its own category lookup — a '
+        'briefing lands for a category-routed person where the two-step '
+        'chain failed', () async {
+      stubCategoryProfileOnClaude();
+      when(
+        () => relationshipRepository.getRelationshipByIdUnfiltered(
+          relationshipId,
+        ),
+      ).thenAnswer((_) async => personInCategory());
+      conversationRepository.sendMessageDelegate =
+          ({
+            required conversationId,
+            required message,
+            required model,
+            required provider,
+            required inferenceRepo,
+            tools,
+            toolChoice,
+            temperature = 0,
+            strategy,
+          }) async {
+            expect(model, 'claude-x');
+            expect(provider.name, 'Anthropic');
+            await strategy!.processToolCalls(
+              toolCalls: [
+                toolCall(
+                  RelationshipAgentToolNames.updateRelationshipReport,
+                  briefingArgs(),
+                ),
+              ],
+              manager: conversationManager,
+            );
+            return null;
+          };
+      final tokens = {relationshipEscalationWorkspaceKey('2026-08-08')};
+
+      // The default construction (no lookup) is the regression: no route.
+      final unwired = await run(tokens: tokens);
+      expect(unwired.success, isFalse);
+      expect(unwired.error, contains('no inference provider'));
+
+      workflow = RelationshipAgentWorkflow(
+        repository: repository,
+        syncService: syncService,
+        phaseA: RelationshipAgentPhaseA(
+          repository: repository,
+          syncService: syncService,
+          relationshipRepository: relationshipRepository,
+        ),
+        relationshipRepository: relationshipRepository,
+        conversationRepository: conversationRepository,
+        cloudInferenceRepository: MockCloudInferenceRepository(),
+        aiConfigRepository: aiConfigRepository,
+        categoryProfileLookup: categoryLookup,
+      );
+      upserts.clear();
+      final wired = await run(tokens: tokens);
+      expect(wired.success, isTrue);
+      expect(upserts.whereType<AgentReportEntity>(), hasLength(1));
+    });
+  });
+
   group('with the consumption pair registered', () {
     late MockAiAttributionService attribution;
 
@@ -1711,6 +2398,181 @@ void main() {
         conversationRepository.deletedConversationIds,
         contains('test-conv-id'),
       );
+    });
+  });
+  group('the wake outcome on the state row', () {
+    AgentStateEntity stateRow({int failures = 0}) =>
+        AgentDomainEntity.agentState(
+              id: '$agentId:state',
+              agentId: agentId,
+              slots: const AgentSlots(),
+              updatedAt: testDate,
+              vectorClock: null,
+              consecutiveFailureCount: failures,
+            )
+            as AgentStateEntity;
+
+    test(
+      'missing configuration backs off exponentially with a one-day cap',
+      () async {
+        for (final (failures, hours) in [
+          (1, 2),
+          (3, 8),
+          (4, 16),
+          (5, 24),
+          (100, 24),
+        ]) {
+          upserts.clear();
+          when(
+            () => repository.getAgentState(agentId),
+          ).thenAnswer((_) async => stateRow(failures: failures));
+          final result = await run(
+            tokens: {relationshipEscalationWorkspaceKey('2026-08-08')},
+          );
+          expect(result.success, isFalse);
+          expect(
+            upserts.whereType<ScheduledWakeEntity>().single.scheduledAt,
+            now.toUtc().add(Duration(hours: hours)),
+          );
+          expect(
+            upserts
+                .whereType<AgentStateEntity>()
+                .single
+                .consecutiveFailureCount,
+            failures + 1,
+          );
+        }
+        expect(conversationRepository.sendMessageDelegateCallCount, 0);
+      },
+    );
+
+    void succeedingModel() {
+      stubGlmResolution();
+      conversationRepository.sendMessageDelegate =
+          ({
+            required conversationId,
+            required message,
+            required model,
+            required provider,
+            required inferenceRepo,
+            tools,
+            toolChoice,
+            temperature = 0,
+            strategy,
+          }) async {
+            await strategy!.processToolCalls(
+              toolCalls: [
+                toolCall(
+                  RelationshipAgentToolNames.updateRelationshipReport,
+                  briefingArgs(),
+                ),
+              ],
+              manager: conversationManager,
+            );
+            return const InferenceUsage(inputTokens: 100);
+          };
+    }
+
+    void explodingModel() {
+      stubGlmResolution();
+      conversationRepository.sendMessageDelegate =
+          ({
+            required conversationId,
+            required message,
+            required model,
+            required provider,
+            required inferenceRepo,
+            tools,
+            toolChoice,
+            temperature = 0,
+            strategy,
+          }) async => throw Exception('provider exploded');
+    }
+
+    AgentStateEntity stamped() => upserts.whereType<AgentStateEntity>().single;
+
+    test(
+      'a successful wake stamps lastWakeAt and clears the failure streak',
+      () async {
+        when(
+          () => repository.getAgentState(agentId),
+        ).thenAnswer((_) async => stateRow(failures: 2));
+        succeedingModel();
+
+        final result = await run(
+          tokens: {relationshipEscalationWorkspaceKey('2026-08-08')},
+        );
+
+        expect(result.success, isTrue);
+        expect(stamped().consecutiveFailureCount, 0);
+        expect(stamped().lastWakeAt, now);
+      },
+    );
+
+    test('a failed wake stamps lastWakeAt and bumps the failure streak — the '
+        "person page's card reads both to show failed", () async {
+      when(
+        () => repository.getAgentState(agentId),
+      ).thenAnswer((_) async => stateRow(failures: 2));
+      explodingModel();
+
+      final result = await run(
+        tokens: {relationshipEscalationWorkspaceKey('2026-08-08')},
+      );
+
+      expect(result.success, isFalse);
+      expect(stamped().consecutiveFailureCount, 3);
+      expect(stamped().lastWakeAt, now);
+    });
+
+    test('a wake that finds no model to run on is stamped as failed too — '
+        'the card must read Failed · Choose a model, not wait for a briefing '
+        'that cannot come', () async {
+      when(
+        () => repository.getAgentState(agentId),
+      ).thenAnswer((_) async => stateRow(failures: 2));
+      // No stubGlmResolution(): the default stubs resolve no profile and no
+      // model, so execution returns before the try block.
+
+      final result = await run(
+        tokens: {relationshipEscalationWorkspaceKey('2026-08-08')},
+      );
+
+      expect(result.success, isFalse);
+      expect(result.error, contains('no inference provider'));
+      expect(stamped().consecutiveFailureCount, 3);
+      expect(stamped().lastWakeAt, now);
+    });
+
+    test('no state row means nothing to stamp', () async {
+      explodingModel();
+
+      await run(tokens: {relationshipEscalationWorkspaceKey('2026-08-08')});
+
+      expect(upserts.whereType<AgentStateEntity>(), isEmpty);
+    });
+
+    test('a stamp that fails to write is contained — the wake keeps its own '
+        'verdict', () async {
+      when(
+        () => repository.getAgentState(agentId),
+      ).thenAnswer((_) async => stateRow());
+      when(() => syncService.upsertEntity(any())).thenAnswer((
+        invocation,
+      ) async {
+        final entity =
+            invocation.positionalArguments.first as AgentDomainEntity;
+        if (entity is AgentStateEntity) throw StateError('state locked');
+        upserts.add(entity);
+      });
+      succeedingModel();
+
+      final result = await run(
+        tokens: {relationshipEscalationWorkspaceKey('2026-08-08')},
+      );
+
+      expect(result.success, isTrue);
+      expect(upserts.whereType<AgentReportEntity>(), hasLength(1));
     });
   });
 }

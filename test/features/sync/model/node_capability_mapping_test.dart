@@ -17,8 +17,8 @@ void main() {
   group('nodeCapabilityFromProviderType', () {
     test('returns a capability for every local provider type', () {
       expect(
-        nodeCapabilityFromProviderType(InferenceProviderType.mlxAudio),
-        NodeCapability.mlxAudio,
+        nodeCapabilityFromProviderType(InferenceProviderType.sherpa),
+        NodeCapability.sherpa,
       );
       expect(
         nodeCapabilityFromProviderType(InferenceProviderType.omlx),
@@ -78,11 +78,11 @@ void main() {
         // values; this expectation verifies the intended capability result.
         final capability = nodeCapabilityFromProviderType(providerType);
         const expected = {
-          InferenceProviderType.mlxAudio: NodeCapability.mlxAudio,
           InferenceProviderType.omlx: NodeCapability.omlxLlm,
           InferenceProviderType.ollama: NodeCapability.ollamaLlm,
           InferenceProviderType.voxtral: NodeCapability.voxtral,
           InferenceProviderType.whisper: NodeCapability.whisper,
+          InferenceProviderType.sherpa: NodeCapability.sherpa,
         };
         expect(capability, expected[providerType]);
       },

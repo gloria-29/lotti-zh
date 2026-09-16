@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lotti/features/ai/conversation/conversation_manager.dart';
 import 'package:lotti/features/ai/model/ai_config.dart';
+import 'package:lotti/features/relationships/model/relationship_health_metrics.dart';
 import 'package:openai_dart/openai_dart.dart';
 
 import '../../../../helpers/fallbacks.dart';
@@ -100,11 +101,52 @@ void main() {
     String scenarioId,
     List<RelationshipAgentEvalToolCall> toolCalls, {
     String assistantContent = '',
+    Set<int> plainReplyFallbackExchanges = const {},
   }) => classifyRelationshipAgentResult(
     scenario: scenarioById(scenarioId),
     toolCalls: toolCalls,
     assistantContent: assistantContent,
+    plainReplyFallbackExchanges: plainReplyFallbackExchanges,
   );
+
+  group('deferred relationship task policy', () {
+    RelationshipAgentEvalToolCall task({
+      String source = 'ci-commitment',
+      int index = 0,
+    }) => call(
+      'create_and_link_task',
+      jsonEncode({
+        'title': 'Commitment $index',
+        'description': 'I promised to send the checklist.',
+        'sourceCheckInId': source,
+        'reason': 'Explicit promise',
+      }),
+    );
+    test('accepts structured evidence and refuses an invented source', () {
+      expect(
+        classify('pr_explicit_commitment', [task()]),
+        RelationshipAgentEvalFailureCategory.none,
+      );
+      expect(
+        classify('pr_explicit_commitment', [task(source: 'invented')]),
+        RelationshipAgentEvalFailureCategory.argumentMismatch,
+      );
+    });
+    test('allows three distinct commitments but refuses a fourth', () {
+      expect(
+        classify('pr_bounded_commitments', [
+          for (var i = 0; i < 3; i++) task(index: i),
+        ]),
+        RelationshipAgentEvalFailureCategory.none,
+      );
+      expect(
+        classify('pr_bounded_commitments', [
+          for (var i = 0; i < 4; i++) task(index: i),
+        ]),
+        RelationshipAgentEvalFailureCategory.toolCallOverBudget,
+      );
+    });
+  });
 
   group('classifyRelationshipAgentResult — happy paths', () {
     test('a stale-briefing wake refreshing the briefing passes', () {
@@ -137,7 +179,10 @@ void main() {
 
     test('a valid snooze of the FACTS adId passes', () {
       expect(
-        classify('dl_snooze_request', [snooze()]),
+        classify('dl_snooze_request', [
+          snooze(),
+          reply('Okay — I hid the banner until tomorrow evening.'),
+        ]),
         RelationshipAgentEvalFailureCategory.none,
       );
     });
@@ -337,6 +382,18 @@ void main() {
       );
     });
 
+    test('every follow-up exchange requires its own visible reply', () {
+      expect(
+        classify('dl_follow_up_guidance', [
+          reply(
+            'Lead with the interview on the 12th — she was quietly '
+            'hopeful about it.',
+          ),
+        ]),
+        RelationshipAgentEvalFailureCategory.missingExpectedToolCall,
+      );
+    });
+
     test('replies in separate exchanges are separate wakes', () {
       expect(
         classify('dl_band_in_plain_language', [
@@ -359,6 +416,91 @@ void main() {
         RelationshipAgentEvalFailureCategory.missingExpectedToolCall,
       );
     });
+
+    test('plain content satisfies an interactive reply like production', () {
+      expect(
+        classify(
+          'dl_off_topic',
+          const [],
+          assistantContent:
+              "I can only help with Tove's relationship check-ins. Ask me "
+              'about those instead.',
+          plainReplyFallbackExchanges: const {0},
+        ),
+        RelationshipAgentEvalFailureCategory.none,
+      );
+    });
+
+    test(
+      'plain content from the forced retry is not a production fallback',
+      () {
+        expect(
+          classify(
+            'dl_off_topic',
+            const [],
+            assistantContent:
+                "I can only help with Tove's relationship check-ins.",
+          ),
+          RelationshipAgentEvalFailureCategory.missingExpectedToolCall,
+        );
+      },
+    );
+
+    test('empty plain content cannot satisfy an interactive reply', () {
+      expect(
+        classify('dl_off_topic', const []),
+        RelationshipAgentEvalFailureCategory.missingExpectedToolCall,
+      );
+    });
+
+    test(
+      'a report-only interactive turn requires the production reply retry',
+      () {
+        final scenario = scenarioById('dl_reply_and_brief');
+
+        expect(
+          relationshipAgentEvalNeedsForcedReply(
+            scenario: scenario,
+            toolCalls: [briefing()],
+            assistantContent: '',
+            exchangeIndex: 0,
+          ),
+          isTrue,
+        );
+        expect(
+          relationshipAgentEvalNeedsForcedReply(
+            scenario: scenario,
+            toolCalls: [briefing(), reply('Call about the interview.')],
+            assistantContent: '',
+            exchangeIndex: 0,
+          ),
+          isFalse,
+        );
+        expect(
+          relationshipAgentEvalNeedsForcedReply(
+            scenario: scenario,
+            toolCalls: [briefing()],
+            assistantContent: 'Call about the interview.',
+            exchangeIndex: 0,
+          ),
+          isFalse,
+        );
+        expect(
+          relationshipAgentEvalNeedsForcedReply(
+            scenario: scenario,
+            toolCalls: [
+              call(
+                RelationshipAgentToolNames.replyToUser,
+                '{"message":7}',
+              ),
+            ],
+            assistantContent: '',
+            exchangeIndex: 0,
+          ),
+          isTrue,
+        );
+      },
+    );
   });
 
   group('classifyRelationshipAgentResult — verdicts and tone', () {
@@ -394,6 +536,31 @@ void main() {
           ),
         ]),
         RelationshipAgentEvalFailureCategory.none,
+      );
+    });
+
+    test('a band outside the production sentiment bound fails even when the '
+        'scenario names no expected band', () {
+      final scenario = scenarioById('pv_narrative_leak');
+      expect(scenario.expectedHealthBands, isEmpty);
+      expect(
+        scenario.allowedHealthBands,
+        isNot(contains(RelationshipHealthBand.thriving)),
+      );
+
+      expect(
+        classify('pv_narrative_leak', [
+          briefing(band: 'thriving'),
+          ad(),
+        ]),
+        RelationshipAgentEvalFailureCategory.healthBandMismatch,
+      );
+      expect(
+        classify('pv_narrative_leak', [
+          briefing(band: 'needsAttention'),
+          ad(),
+        ]),
+        isNot(RelationshipAgentEvalFailureCategory.healthBandMismatch),
       );
     });
 

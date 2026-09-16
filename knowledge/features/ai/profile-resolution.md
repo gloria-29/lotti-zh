@@ -5,21 +5,25 @@ description: Which profile drives a run, how model slots survive sync duplicates
 resource: ../../../lib/features/ai/util/profile_resolver.dart
 tags: [ai, profiles, resolution, pinning, privacy]
 status: stable
-generated: { by: claude-code/opus-5, at: 2026-07-26T00:00:00Z }
+generated: { by: codex/gpt-6, at: 2026-09-12T20:00:00Z }
 stale_after: 2026-10-19
 sources:
+  - id: device-default
+    resource: ../../../lib/features/ai/repository/ai_config_repository.dart
+    title: Device-local default profile storage
+    last_modified: 2026-09-12
   - id: resolver
     resource: ../../../lib/features/ai/util/profile_resolver.dart
     title: ProfileResolver
-    last_modified: 2026-07-13
+    last_modified: 2026-09-12
   - id: locality
     resource: ../../../lib/features/ai/helpers/profile_locality.dart
     title: profileIsLocal
-    last_modified: 2026-06-20
+    last_modified: 2026-09-06
   - id: pinning-ui
     resource: ../../../lib/features/ai/ui/widgets/profile_pinning_selector.dart
     title: Profile pinning selector
-    last_modified: 2026-06-26
+    last_modified: 2026-09-05
   - id: adr-0008
     resource: ../../../docs/adr/0008-inference-profiles-agent-provider-mapping.md
     title: ADR 0008 — Inference profiles and agent/provider mapping
@@ -57,7 +61,10 @@ flowchart TD
 
   CategoryBranch --> CategoryProfile["resolveByProfileId(category.defaultProfileId)"]
 
-  ProfileResolve --> Chain["agent profile → version profile → template profile → legacy modelId"]
+  ProfileResolve --> Typed{"Typed setup present?"}
+  Typed -->|yes| Setup["resolveSetup: disabled or configured route"]
+  Setup --> Thinking
+  Typed -->|no| Chain["selected legacy profile → legacy model → Settings default"]
   Chain --> Thinking{"Thinking slot resolves?"}
   Thinking -->|no| Abort["Return null and abort"]
   Thinking -->|yes| Optional["Resolve optional slots if configured"]
@@ -66,11 +73,47 @@ flowchart TD
   CategoryProfile --> Result
 ```
 
-The agent path resolution order is `agentConfig.profileId` →
-`AgentTemplateVersionEntity.profileId` → `AgentTemplateEntity.profileId` →
-legacy fallback `version.modelId ?? template.modelId`.
+An `AgentConfig.inferenceSetup` is authoritative: `resolveSetup` honors a direct
+thinking-model override and its optional base profile, or returns disabled/broken.
+It never falls through to unrelated defaults. Without a typed setup, the first
+configured profile id wins selection: agent, version, then template. If that
+profile cannot resolve, the legacy model (`version.modelId ?? template.modelId`)
+is tried, followed by the device's selected Settings default.
 
-**Only the thinking slot is fatal.** Optional slots resolve best-effort.
+`resolveStandalone` supports agents without templates. It honors a typed setup
+or legacy agent profile, then the Settings default; a built-in model is used only
+when no Settings default was selected. A deleted or unusable selected default
+fails closed. Relationship agents additionally retain their person/category
+profile steps, described in [relationships](../relationships.md).
+
+The fallback is device-local (`AI_DEFAULT_INFERENCE_PROFILE` in `SettingsDb`),
+because provider availability and credentials vary by device. Choosing or
+clearing it is explicit; profile deletion never substitutes another provider.
+The setting does not change authoritative setups or enable automation policies.
+
+**Only the thinking slot is fatal to profile resolution.** Optional slots
+resolve best-effort. An explicitly selected but unavailable Chat model sets
+`ResolvedProfile.chatModelUnavailable`: agent wakes still resolve, while query
+chat presents its existing recoverable setup error.
+
+# Choosing a chat model
+
+The inference profile editor has an optional **Chat model** slot. It accepts
+text-input/text-output models without requiring function calling. Set this to,
+for example, GLM-5.3 Flash while keeping DeepSeek Flash as Thinking for agent
+work. Existing profiles have no Chat selection and retain their current route.
+
+`chatModelId` stores a model row id and syncs with the profile. Its resolved
+model, provider and configuration remain independent of an agent's direct
+Thinking override. When unset, the effective Chat route inherits the resolved
+Thinking route, including that override. When selected but unavailable, query
+chat fails closed instead of switching models. Both retrieval and synthesis use
+the effective Chat route; transcription continues using its own slot.
+
+Chat participates in provider usage, pinning capabilities, locality checks and
+demo-copy reference pruning. A selected Chat model counts as a user edit during
+seed-profile migration and orphan cleanup; seeding does not introduce a Chat
+default or clear an unavailable selection.
 
 # Model slots and sync hygiene
 
@@ -96,18 +139,19 @@ model rows when no profile handles transcription. The fallback builds an
 **ephemeral** `ResolvedProfile` around the selected model and the built-in
 `Transcribe (Task Context)` skill — it does not persist a profile.
 
-Candidate ranking prefers the recommended MLX Audio Qwen3-ASR model, then other
-MLX Qwen3-ASR rows, then other configured STT providers with the required API
-key. This keeps local/mobile STT available when the user has installed MLX Audio
-but the desktop-only local profile is not available on that device.
+Candidate ranking prefers installed sherpa models, then Mistral, Melious,
+OpenAI, Whisper, and Voxtral, followed by other audio-to-text providers.
+Candidates need a resolvable provider and any required API key; sherpa also
+requires a verified local model. HTTP endpoint validation is left to the
+provider. Equal-ranked models are ordered by name. The fallback works without
+a profile.
 
 The direct `AudioTranscriptionService` path used by Daily OS capture/refine
-ranks differently: a Mistral instruction-following Voxtral chat-audio model, then
-a Mistral transcription-only Voxtral model, then any other configured Mistral
-audio model, then contextual Melious Voxtral, Melious STT, MLX Qwen, Gemini
-Flash, and finally the first remaining audio-capable model. Realtime-only Mistral
-models are excluded from that batch verifier because they require the WebSocket
-pipeline.
+prefers installed sherpa models, then Mistral contextual Voxtral and a Mistral batch audio model; next come
+the seeded Melious Whisper Large v3 default, other Melious transcription models,
+and contextual Melious Voxtral. Gemini Flash follows, then the first remaining
+audio-capable model. Realtime-only Mistral models are excluded because they
+require a WebSocket pipeline. Explicit profile targets bypass this discovery.
 
 # Profile pinning
 
@@ -122,7 +166,7 @@ is embedded in `inference_profile_form.dart`.
 ## Locality is fail-closed
 
 `profileIsLocal(profile, repo)` returns true **iff every populated model id
-resolves to a provider in `{ollama, voxtral, whisper, mlxAudio}`**.
+resolves to a provider in `{ollama, omlx, voxtral, whisper, sherpa}`**.
 
 A referenced-but-unresolved model id counts as **not local**. That prevents a
 deleted cloud-provider config from masking a profile as safe to auto-route. The

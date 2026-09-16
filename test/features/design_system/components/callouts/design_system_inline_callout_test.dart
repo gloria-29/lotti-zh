@@ -38,6 +38,60 @@ void main() {
       expect(find.byIcon(LottiIcons.pauseCircled), findsOneWidget);
     });
 
+    testWidgets('a title sits above the message and the actions end on the '
+        'trailing edge, quietest first', (tester) async {
+      await tester.pumpWidget(
+        makeTestableWidget(
+          DesignSystemInlineCallout(
+            icon: LottiIcons.pauseCircled,
+            title: 'Transcript not received',
+            text: 'Your recording is saved.',
+            actions: [
+              TextButton(
+                key: const ValueKey('quiet'),
+                onPressed: () {},
+                child: const Text('Type instead'),
+              ),
+              FilledButton(
+                key: const ValueKey('primary'),
+                onPressed: () {},
+                child: const Text('Try again'),
+              ),
+            ],
+          ),
+        ),
+      );
+      final title = tester.getRect(find.text('Transcript not received'));
+      final body = tester.getRect(find.text('Your recording is saved.'));
+      final quiet = tester.getRect(find.byKey(const ValueKey('quiet')));
+      final primary = tester.getRect(find.byKey(const ValueKey('primary')));
+      final callout = tester.getRect(find.byType(DesignSystemInlineCallout));
+      expect(title.bottom, lessThanOrEqualTo(body.top));
+      expect(quiet.top, greaterThanOrEqualTo(body.bottom));
+      expect(primary.left, greaterThan(quiet.right));
+      final inset = tokensOf(tester).spacing.step4;
+      expect(primary.right, closeTo(callout.right - inset, 1));
+    });
+
+    testWidgets('announce reads the title and message as one live node', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        makeTestableWidget(
+          const DesignSystemInlineCallout(
+            icon: LottiIcons.pauseCircled,
+            title: 'Transcript not received',
+            text: 'Your recording is saved.',
+            announce: true,
+          ),
+        ),
+      );
+      final node = tester.getSemantics(find.text('Transcript not received'));
+      expect(node.flagsCollection.isLiveRegion, isTrue);
+      expect(node.label, contains('Transcript not received'));
+      expect(node.label, contains('Your recording is saved.'));
+    });
+
     testWidgets('carries the warning tone by default', (tester) async {
       await tester.pumpWidget(
         makeTestableWidget(

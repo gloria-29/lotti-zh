@@ -6,9 +6,11 @@ import 'dart:ui' show Color;
 import 'package:flutter_scene/scene.dart';
 import 'package:lotti/features/plaza/domain/attention.dart';
 import 'package:lotti/features/plaza/domain/plaza_layout.dart';
+import 'package:lotti/features/plaza/domain/plaza_task.dart';
 import 'package:lotti/features/plaza/scene/plaza_primitives.dart';
 import 'package:lotti/features/plaza/scene/plaza_scene_records.dart';
 import 'package:lotti/features/plaza/scene/plaza_world.dart';
+import 'package:lotti/features/plaza/ui/plaza_palette.dart';
 import 'package:lotti/features/plaza/ui/plaza_style.dart';
 import 'package:vector_math/vector_math.dart' hide Colors;
 
@@ -26,15 +28,20 @@ class PlazaSprites {
     required this.scene,
     required this.world,
     required PlazaSceneBindings bindings,
+    this.palette = PlazaPalette.night,
   }) {
-    for (final anchor in bindings.lampAnchors) {
+    // Street lamps stand in both hours; only at night do they burn. A
+    // daylight lamp keeps its post and loses its bulb and halo, so nothing
+    // hangs a glowing dot over sunlit paving.
+    for (final anchor
+        in palette.lights.lampsLit ? bindings.lampAnchors : const <Node>[]) {
       final bulb = Sprite(
-        color: linearColor(PlazaStyle.lamp),
+        color: linearColor(palette.lights.lamp),
         width: lampBulbSize,
         height: lampBulbSize,
       );
       final halo = Sprite(
-        color: linearColor(PlazaStyle.lamp, alpha: 0.35),
+        color: linearColor(palette.lights.lamp, alpha: 0.35),
         width: lampHaloSize,
         height: lampHaloSize,
       );
@@ -53,7 +60,7 @@ class PlazaSprites {
     }
     for (final anchor in bindings.spireAnchors) {
       final sprite = Sprite(
-        color: linearColor(PlazaStyle.warning),
+        color: linearColor(palette.lights.warning),
         width: spireLightSize,
         height: spireLightSize,
       );
@@ -84,7 +91,7 @@ class PlazaSprites {
       );
     }
     for (final building in bindings.buildings) {
-      final color = PlazaStyle.lantern(building.attention.lantern);
+      final color = palette.taskColor(building.attention);
       final sprite = Sprite(color: linearColor(color));
       final node = Node(mesh: sprite.mesh)..raycastable = false;
       building.lanternAnchor.add(node);
@@ -99,12 +106,16 @@ class PlazaSprites {
           ),
           color: linearColor(color),
           pulses: building.attention.anomalous,
-          lit: building.attention.lantern != LanternState.off,
+          lit:
+              building.attention.lantern != LanternState.off ||
+              building.task.state == PlazaTaskState.done,
         ),
       );
     }
     for (final beacon in world.beacons) {
-      final teal = linearColor(PlazaStyle.beaconColor(beacon, world));
+      final teal = linearColor(
+        PlazaStyle.beaconColor(beacon, world, palette: palette),
+      );
       final position = Vector3(beacon.markerX, beacon.markerY, beacon.markerZ);
       final dot = Sprite(color: teal);
       final dotNode = Node(
@@ -136,6 +147,10 @@ class PlazaSprites {
   }
 
   final Scene scene;
+
+  /// The hour the sprites burn in. It decides whether the street lamps are
+  /// lit at all, and what colour a roof lantern reads as against the sky.
+  final PlazaPalette palette;
   final PlazaWorld world;
   final List<_Lantern> _lanterns = [];
   final List<_BeaconSprite> _beacons = [];
@@ -164,8 +179,17 @@ class PlazaSprites {
         stops,
       );
     canvas.drawCircle(const ui.Offset(size / 2, size / 2), size / 2, paint);
-    final image = await recorder.endRecording().toImage(size, size);
-    return Texture2D.fromImage(image);
+    final picture = recorder.endRecording();
+    try {
+      final image = await picture.toImage(size, size);
+      try {
+        return await Texture2D.fromImage(image);
+      } finally {
+        image.dispose();
+      }
+    } finally {
+      picture.dispose();
+    }
   }
 
   /// Paints and uploads both textures once.

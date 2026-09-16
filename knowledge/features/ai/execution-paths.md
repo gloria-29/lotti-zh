@@ -5,33 +5,33 @@ description: The legacy prompt path, the skill/profile path, the category consen
 resource: ../../../lib/features/ai/services/skill_inference_runner.dart
 tags: [ai, skills, automation, consent, overrides, diagnostics]
 status: stable
-generated: { by: codex/gpt-5, at: 2026-08-10T01:20:00+02:00 }
-stale_after: 2026-10-19
+generated: { by: claude-code/fable-5.1, at: 2026-09-15T18:30:00Z }
+stale_after: 2026-10-22
 sources:
   - id: runner
     resource: ../../../lib/features/ai/services/skill_inference_runner.dart
     title: SkillInferenceRunner
-    last_modified: 2026-08-09
+    last_modified: 2026-09-12
   - id: skill-modal
     resource: ../../../lib/features/ai/ui/unified_ai_skills_modal.dart
     title: Unified AI skills modal
-    last_modified: 2026-08-09
+    last_modified: 2026-09-06
   - id: image-selector
     resource: ../../../lib/features/ai/ui/image_generation/reference_image_selection_widget.dart
     title: Shared reference-image selector
-    last_modified: 2026-08-10
+    last_modified: 2026-09-05
   - id: automation
     resource: ../../../lib/features/ai/services/profile_automation_service.dart
     title: ProfileAutomationService
-    last_modified: 2026-07-26
+    last_modified: 2026-09-06
   - id: prompt-builder
     resource: ../../../lib/features/ai/helpers/skill_prompt_builder.dart
     title: SkillPromptBuilder
-    last_modified: 2026-06-27
+    last_modified: 2026-08-21
   - id: unified
     resource: ../../../lib/features/ai/repository/unified_ai_inference_repository.dart
     title: UnifiedAiInferenceRepository (legacy prompt path)
-    last_modified: 2026-08-15
+    last_modified: 2026-08-20
   - id: image-paths
     resource: ../../../lib/utils/image_utils.dart
     title: Journal image path resolution
@@ -166,9 +166,8 @@ exactly the behaviour the switch is meant to make explicit.
 
 Because the fallback needs no profile, the settings switch is offered whenever
 *either* the selected profile carries automated skills *or* the fallback could
-run (`categoryAutomationAvailableProvider`) — otherwise a mobile install with an
-MLX Audio model and no selectable desktop-only profile would lose automation with
-no visible control to restore it.
+run (`categoryAutomationAvailableProvider`). This keeps recording automation
+controllable even when no profile is configured.
 
 Past the gate the automatic branch is intentionally strict:
 
@@ -236,8 +235,8 @@ slot populated, so a profile deliberately chosen for a task still wins every
 capability it does own, and only the missing one falls through.
 
 **Why the walk exists:** picking a thinking model by hand resolves the task to a
-bare model route. `ProfileResolver._resolveTypedSetup` returns a `ResolvedProfile`
-carrying a thinking model and nothing else — no capability slots, no
+bare model route. `ProfileResolver.resolveSetup` returns setup details whose
+`ResolvedProfile` carries a thinking model and nothing else — no capability slots, no
 `skillAssignments` — whenever `AgentInferenceSetup` has a
 `thinkingModelOverrideId` and no `baseProfileId`. Treating that as the last word
 switched the category's automatic transcription and image analysis off *as a side
@@ -293,9 +292,13 @@ task context.
 
 Two properties are contract rather than detail:
 
-- **The tiers come back through a pinned tool call, never a parser.** The skill
-  sends `entrySummaryTool` with `toolChoice` fixed to it, and
-  `parseEntrySummaryToolCall` decodes typed arguments — the same shape the
+- **The tiers come back through a tool call, never a parser.** The skill
+  sends `entrySummaryTool`, with `toolChoice` fixed to it for every model that
+  honours a pinned choice — `entrySummaryToolChoiceFor` omits it for the
+  DeepSeek family, which answers a pinned choice with the call written as
+  `<｜DSML｜ invoke …>` prose and an empty `tool_calls`, losing the summary
+  outright; the single-tool list is what steers those. `parseEntrySummaryToolCall`
+  decodes typed arguments — the same shape the
   agents' `update_report` uses. A rejected call (no tool call, wrong tool,
   missing field, one-liner over `entrySummaryOneLinerMaxChars`) buys exactly
   one forced retry, whose tokens are merged with the first attempt's so a model
@@ -337,20 +340,24 @@ Image analysis publishes the same three tiers through the same
 from analysis being the older, load-bearing artifact:
 
 - **Tiers are conditional on the model.** They are requested only when the
-  resolved vision model's `supportsFunctionCalling` is true. Many capable
+  resolved vision model's `supportsFunctionCalling` is true and the provider's
+  image route supports tools. Many capable
   vision models cannot call tools, and this skill shipped on a free-text
   contract long before the tiers existed — so tool support *upgrades* the
   output rather than gating it. Without it, no tool is attached, no tier
   instruction is appended (`SkillPromptBuilder`'s `requestTieredSummary`), and
   the result is byte-for-byte what it is today.
-- **A rejected tool call is not a failure and buys no retry.** A model that
-  answers in prose despite the pin simply lands on the untiered path with its
-  analysis intact. Losing an analysis to reclaim a one-liner would be a bad
-  trade — the inverse of the audio summary, where the tiers *are* the artifact
-  and a failed run costs nothing already persisted.
+- **Invalid shorter tiers do not discard a valid analysis or trigger a retry.**
+  If full tier validation fails, `parseEntrySummaryToolBody` recovers the
+  non-empty string `summary` from the first matching tool call's JSON object.
+  It saves that body without `oneLiner` or `tldr`. If the tool body is also
+  invalid or absent, streamed prose is the fallback. With neither a valid tool
+  body nor non-empty prose, the run fails as an empty analysis. Audio summaries
+  continue to require all three tiers and retry failed validation.
 
-When tiers do come back, the tool's `summary` argument becomes the analysis
-body; `response` is never the raw streamed prose in that case.
+The tool's valid `summary` argument takes precedence over streamed prose,
+whether all tiers validated or only the body was recovered. The consumption
+record hashes that same body before it is persisted, preserving provenance.
 
 The collapsed image card leads with a **thumbnail**, not a text line: an
 image's payload is the picture, so collapsing it to text alone would be harder
@@ -458,6 +465,17 @@ Skill types with an override slot — transcription, image analysis, prompt
 generation, image-prompt generation — open the model picker *before* firing
 `triggerSkillProvider`, so a single voice note, photo or prompt run can be routed
 to any modality-capable model without editing the profile.
+
+The candidate list is narrowed to the slot's modality (and, for prompt
+generation, to chat-capable models) **before** device availability is consulted.
+The installed-speech-model probe (`sherpaInstalledModelIdsProvider`) hashes
+every downloaded sherpa model once per process — gigabyte-scale reads with
+Whisper installed — so `needsSherpaAvailability` gates it on a candidate that
+actually routes through a sherpa provider. A text or image skill therefore never
+waits on speech-model verification; only a transcription tap with a sherpa
+candidate pays that first-per-process cost. Merely having a sherpa provider
+configured used to trigger the probe on every slot, which stalled the
+coding-prompt picker for seconds after each app start.
 
 ```mermaid
 stateDiagram-v2

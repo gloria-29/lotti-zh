@@ -39,9 +39,9 @@ Map<String, dynamic> _$SyncNodeProfileToJson(_SyncNodeProfile instance) =>
     };
 
 const _$NodeCapabilityEnumMap = {
-  NodeCapability.mlxAudio: 'mlxAudio',
   NodeCapability.omlxLlm: 'omlxLlm',
   NodeCapability.ollamaLlm: 'ollamaLlm',
   NodeCapability.voxtral: 'voxtral',
   NodeCapability.whisper: 'whisper',
+  NodeCapability.sherpa: 'sherpa',
 };

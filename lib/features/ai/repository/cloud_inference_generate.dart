@@ -52,7 +52,11 @@ class CloudInferenceGenerate {
     GeminiThinkingMode? geminiThinkingMode,
     ReasoningEffort? reasoningEffort,
     InferenceImpactCollector? impactCollector,
+    bool preferStreaming = false,
   }) {
+    if (provider?.inferenceProviderType == InferenceProviderType.sherpa) {
+      throw UnsupportedError('sherpa-onnx supports audio transcription only');
+    }
     developer.log(
       'CloudInferenceRepository.generate called with:\n'
       '  model: $model\n'
@@ -126,6 +130,7 @@ class CloudInferenceGenerate {
         toolChoice: toolChoice,
         reasoningEffort: reasoningEffort,
         impactCollector: impactCollector,
+        preferStreaming: preferStreaming,
       );
     }
 
@@ -161,7 +166,14 @@ class CloudInferenceGenerate {
       ),
     );
 
-    return _helpers.filterAnthropicPings(res).asBroadcastStream();
+    return _helpers
+        .filterAnthropicPings(
+          res,
+          onClose: overrideClient == null ? client.endSession : null,
+        )
+        .asBroadcastStream(
+          onCancel: (subscription) => unawaited(subscription.cancel()),
+        );
   }
 
   Stream<CreateChatCompletionStreamResponse> generateWithImages(
@@ -180,6 +192,9 @@ class CloudInferenceGenerate {
     GeminiThinkingMode? geminiThinkingMode,
     InferenceImpactCollector? impactCollector,
   }) {
+    if (provider?.inferenceProviderType == InferenceProviderType.sherpa) {
+      throw UnsupportedError('sherpa-onnx supports audio transcription only');
+    }
     final client =
         overrideClient ??
         OpenAIClient(

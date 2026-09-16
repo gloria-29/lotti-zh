@@ -5,13 +5,13 @@ description: The repeating patterns that are contract rather than coincidence �
 resource: ../../../lib/features/design_system/components
 tags: [design-system, components, accessibility, layout]
 status: stable
-generated: { by: codex/gpt-5, at: 2026-08-05T20:23:15Z }
-stale_after: 2027-02-08
+generated: { by: claude-code/fable-5.1, at: 2026-09-15T19:10:00Z }
+stale_after: 2027-03-15
 sources:
   - id: components
     resource: ../../../lib/features/design_system/components
     title: Design-system components
-    last_modified: 2026-08-16
+    last_modified: 2026-09-15
   - id: contact-row
     resource: ../../../lib/features/design_system/components/navigation/design_system_contact_row.dart
     title: DesignSystemContactRow — the support footer both navigation surfaces close with
@@ -31,7 +31,7 @@ sources:
   - id: navbar
     resource: ../../../lib/widgets/nav_bar/design_system_bottom_navigation_bar.dart
     title: Bottom navigation shell
-    last_modified: 2026-08-31
+    last_modified: 2026-09-15
   - id: measurement-capture
     resource: ../../../lib/pages/create/create_measurement_dialog.dart
     title: Measurement capture sheet — the hero value field and the box that focuses it
@@ -73,7 +73,10 @@ flag owns both the activated surface and selected semantics; feature code does
 not repaint selected chips with local status colours. A count or status that
 travels with the filter uses the chip's trailing slot with a `DsPill`. When the
 chip's semantic label already includes that value, the pill is excluded from
-semantics so a screen reader announces the count once.
+semantics so a screen reader announces the count once. The opt-in `outlined`
+treatment keeps idle filters transparent with a decorative border; selection
+uses the same activated surface and an interactive border. Hover and press
+retain the shared state palette.
 
 Visible control size and interaction size are separate contracts.
 `MaterialTapTargetSize.padded` gives `DesignSystemButton` a 48dp interaction
@@ -105,6 +108,26 @@ offered rather than the width it needs; and `RenderWrap` omits its own `spacing`
 from its intrinsic width, which under-measures a multi-action secondary group
 and lets the primary encroach on the gutter.
 
+`DesignSystemFilterActionBar` is the footer every filter modal commits with:
+`DesignSystemModalActionBar` in glass and `compactPrimary`, Clear as the leading
+secondary, Apply as the trailing primary carrying the confirm glyph, and an
+`extraSecondary` slot between them for the task filter's Save. A `null` handler
+disables its button rather than hiding it, so a Clear with nothing to clear
+stays where the hand expects it. Its `stickyClearance` is the scroll allowance
+a scrolling overview reserves under its last control when the bar floats — the
+bar's height on a bottom sheet, more once large text stacks the bar, less in a
+dialog — which is why no filter modal computes that inset itself. A sheet short
+enough to show everything at once (the linked-entries filter) lays the bar in
+flow under its last control instead, so nothing is reserved and no dead space
+sits above the footer. The task list, projects and linked-entries filters all
+commit through it, and the close button on each is a plain close that discards
+the draft; no modal commits through its close button.
+
+`DesignSystemFilterToggleRow` paints no hover or press ink. Next to the choice
+pills, whose hover *is* a token fill, a filled toggle row read as a selected
+state rather than a pointer resting on it; the toggle's own animation is the
+feedback, and the keyboard focus ring is the only decoration the row draws.
+
 The compact `DesignSystemCheckbox` is a 24dp control with no outer inset. A
 feature that needs a mobile-sized option target should not pad seven independent
 checkboxes into a loose stack; it should use
@@ -114,10 +137,22 @@ contiguous selected band per option. Checkbox-first lists can set
 `showSelectedBackground: false` when the checkmark is the deliberate sole state
 indicator; checked semantics and the full-row action remain unchanged.
 
+`ResizableDivider.layoutWidth` exposes its reserved row width for fit
+calculations; its wider pointer hit target overflows without consuming space.
+`ResizableDivider.reverse` controls a pane on the divider's right: dragging or
+pressing Left grows that pane, while the semantic Increase action always grows
+the announced width. Pointer direction and value direction are separate.
+
 The same rule applies to structural and operational surfaces:
 `DesignSystemProgressBar` owns determinate progress and its visible value,
 `DesignSystemSectionCard` owns grouped page content, and
-`DesignSystemTextInput` owns editable settings fields. The sync maintenance
+`DesignSystemTextInput` owns editable settings fields. Its default rounded
+shell uses `background.level01`; `shape: pill` uses `surface.enabled` and
+`radii.badgesPills` for conversation composers. `emphasizeTrailingIcon` gives
+the actionable suffix the interactive fill, preserving its tooltip, enabled
+state, and button semantics. Placeholder hints remain a single ellipsized line
+inside the field, including at enlarged text scales; their full accessible label
+remains on the editable node. The sync maintenance
 progress views, statistics page, and this-device profile are canonical
 adopters: feature code supplies state and copy, while these components supply
 the visual and semantic grammar. A progress header gives its label and trailing
@@ -203,6 +238,12 @@ and backfill refresh controls are the reference uses. It carries no label and
 no variant, so it cannot read as a surface's primary action; where a
 caption-tier *labelled* row is wanted, use `DesignSystemInlineAction` below
 instead.
+
+**Reduced motion is honoured at the component.** `DesignSystemSpinner` and
+`DesignSystemSkeleton` read `MediaQuery.disableAnimationsOf` in
+`didChangeDependencies` and stop their repeating controller under it, so
+every call site inherits the setting rather than each host remembering to
+guard its own `repeat()`.
 
 **Its busy state is the reason it is a component.** The spinner it swaps in is
 the same dimension as the glyph it replaces, so the control does not resize
@@ -290,6 +331,12 @@ accent on both border and label — for a demoted-but-*positive* action beside
 a danger primary, where the neutral outlined treatment reads as Cancel
 ("Verify" next to "Remove" must still look like a good idea).
 
+**`quiet`** is text-only in the neutral medium-emphasis ink — an exit or a
+dismissal beside a primary, which must never out-shout it, not even a held
+one. `tertiary` carries the interactive accent and reads as a way forward;
+Cancel is not one, and a teal Cancel beside a disabled Save was the brightest
+thing in the check-in composer's bar until this variant existed.
+
 ## Quieter than any tier: `DsQuietInk`
 
 Some targets must not look like buttons at all — breadcrumb crumbs, card-title
@@ -322,6 +369,51 @@ control that reads as one and keeps the shared hover fill. Reach for
 `DsQuietInk` only when a hover fill would manufacture a button shape the
 resting design deliberately does not have.
 
+`DesignSystemIconAction` takes an optional `tone` — the glyph's ink while
+live, the error ink for a destructive delete — and always drops to the
+low-emphasis step when disabled. `TldrHeader` takes `plain` for a card that
+is not an AI surface yet: a neutral badge tile, hairline border and
+medium-emphasis glyph instead of the accent it would otherwise disclaim.
+`DesignSystemModalActionBar`'s stacked layout (above `TextScales.large`)
+leads with the primary and centres the secondaries beneath it: a stacked
+bar must never put its exit above its one filled action.
+
+`DesignSystemSpinner`'s stroke is keyed on its size when not given —
+`BorderWidths.emphasis` for a glyph-sized spinner, the wide default for the
+standalone one — so no call site reaches for a spacing step as a stroke;
+`DesignSystemTextInput`'s rounded shell is `radii.l`, the narrative field's
+own radius. `TldrHeader` excludes only its badge and title from semantics
+and leaves the `subtitle` slot to speak for itself, so a host's status line
+can be a live region.
+
+`DesignSystemInlineCallout` also takes an optional `title` (subtitle above
+the message) and `actions` (buttons in a trailing-aligned wrap under the
+text, quietest first so the filled one sits on the rail every primary
+shares) and `announce`, which merges the title and message into one live
+node so a callout that arrives to report a failure is read once, whole —
+the shape the check-in composer's failure cards wear, so a failure reads as
+one system's callout rather than a bespoke box.
+
+## One line that sheds words, not letters: `DsTieredText`
+
+`DsTieredText`
+([captions/ds_tiered_text.dart](../../../lib/features/design_system/components/captions/ds_tiered_text.dart))
+takes a ladder of wordings, widest first, and renders the widest that fits
+its width on one line — `with Pip · last spoke Sat 1 Aug` → `with Pip`,
+`Qwen 3.5 Plus · Alibaba · via Melious.ai` → `Qwen 3.5 Plus`. Structured
+captions shed a whole segment and stay legible where an ellipsis would eat
+the one fact the line exists for. Only the narrowest tier may take
+`maxLines` (default one) before it ellipsizes, as the honest end of the
+ladder; every other tier is one line or not chosen. The rendered `Text`
+carries `semanticsLabel` — the full first tier unless given — so assistive
+technology hears what the screen shortened. A wording shaped `state ·
+detail` can wear two inks: with `tailStyle` set, everything from the first
+`tailSeparator` (`· ` by default) on takes that style, so a status line
+keeps its alert colour on the state word and its age in the meta ink; the
+widget is then a `Text.rich`, and a test reads the chosen wording through
+its span. Hosts: the check-in composer header, the briefing card's status
+line, and the agent identity region's model route and attribution rows.
+
 ## The floating readout: `DsTooltip`
 
 The design system's tooltip surface
@@ -350,7 +442,7 @@ glyph-only external destinations. Email comes first, followed by
 the Manual, GitHub and Discord. The envelope is intentionally no longer a
 labelled or otherwise privileged affordance: all four actions take the same
 target, icon theme, hover treatment, tooltip and semantic construction. The
-desktop sidebar pins the group beneath Settings; the mobile More sheet ends
+desktop sidebar pins the group beneath Settings; the mobile Navigate grid ends
 with it. See [navigation](../../architecture/navigation.md) for why nothing in
 it is an app destination.
 
@@ -359,9 +451,8 @@ together would break the row.** That control pins its target to
 `TapTargets.minimum` and treats the resulting 48×48 as a layout commitment for
 card headers and panel corners — it says in as many words not to put it in a
 dense row. This *is* a dense row, in the narrowest column the app has. It takes
-`DesignSystemFiveSlotNavBar.minTapTarget` instead: the floor the rest of this
-app's navigation chrome already uses, still above the 44 px platform guidance
-for touch.
+`TapTargets.compact` instead — the 44 px platform guidance for touch, four of
+which still fit the rail.
 
 **The four controls move as one trailing group.** One `Align.centerRight` owns
 the placement, and one `Row(mainAxisSize: min)` owns the uninterrupted action
@@ -523,19 +614,23 @@ override, and the semantics node enclosing each box.
 
 # Shell-aware overlay spacing
 
-The bottom navigation shell is an **app-level overlay docked flush against the
-screen's bottom edge**, not a normal `Scaffold.bottomNavigationBar`. Any
-screen-level FAB or status overlay hugging the bottom edge therefore needs
-explicit clearance.
+The mobile navigation launcher is an **app-level overlay floating over the
+bottom edge**, not a normal `Scaffold.bottomNavigationBar`. Any screen-level
+FAB or status overlay hugging the bottom edge therefore needs explicit
+clearance.
 
-The shell and its clearance wrapper live **outside this feature**, in
-`lib/widgets/nav_bar/`, and are only exercised through the DS widgetbook. The
-contract:
+The launcher and its clearance contract live **outside this feature**, in
+`lib/widgets/nav_bar/`. The DS widgetbook demonstrates the launcher;
+[`design_system_bottom_navigation_bar_test.dart`](../../../test/widgets/nav_bar/design_system_bottom_navigation_bar_test.dart)
+tests the clearance contract and its wrapper directly, and
+[`beamer_app_test.dart`](../../../test/beamer/beamer_app_test.dart) exercises
+their integration with the app shell, docked and slid away. The contract:
 
 - `DesignSystemBottomNavigationBar.occupiedHeight(context)` defines how much
-  vertical space the shell consumes — the bar including safe-area inset, plus the
-  height of the indicator overlay row currently riding above it, published by the
-  app shell.
+  vertical space the bottom stack consumes — the launcher including the
+  bottom safe-area inset it absorbs, plus the height of the activity island
+  currently riding above it, published by the app shell. Zero in the desktop
+  layout; only the island's part while the launcher has slid away.
 - `DesignSystemBottomNavigationFabPadding` is the default wrapper for
   screen-level FABs that need to stay above that shell. **Feature pages should use
   the wrapper rather than inventing local bottom offsets.**
@@ -546,10 +641,56 @@ contract:
   ask the app shell to slide the bar away; project, goal, habit, people and
   settings route helpers keep that decision tied to router state rather than
   widget timing.
-- `DesignSystemFiveSlotNavBar.contentHeight(context)` owns the slot-row height
-  contract. It **scales caption line height with `MediaQuery.textScalerOf` and
-  rounds fractional line boxes up to the logical pixel Flutter renders**, so
-  accessibility scales such as 1.3× cannot overflow the fixed row.
+- `DesignSystemBottomNavigationOverlayHeight` is the shell's scope for the
+  island's height and the launcher's docked state. Changing either notifies
+  existing page/FAB consumers without rebuilding their navigation stacks.
+- `MobileNavigationLauncher.barHeight(context)` owns launcher clearance, and is
+  `chipHeight` plus one `spacing.step2` and the bottom inset (never less than
+  `spacing.step6`). `chipHeight` measures the localized Navigate label at the
+  current text scaler inside symmetric `spacing.step4` padding and never falls
+  below `TapTargets.minimum`. **Docking a page action does not change it** —
+  both chips share that one height, and so does the round button the action
+  collapses to — so a page's clearance never moves as it gains or loses its
+  action. The chips are `DsGlassPill` / `DsGlassRoundButton`
+  ([glass_action_bar.dart](../../../lib/features/design_system/components/glass_action_bar.dart)):
+  no launcher-local fill, radius or alpha exists. Each chip wraps itself in
+  `DsGlassChipSurface`
+  ([glass_chip_surface.dart](../../../lib/features/design_system/components/glass_chip_surface.dart))
+  — the floating-surface shadow, the clip, and for a translucent chip the
+  `BackdropFilter` *inside* that clip, never around the row, so the
+  transparent gap between chips stays unblurred. An opaque chip passes
+  `blurred: false` and skips the filter it could not show through.
+- `MobileActivityIsland`
+  ([mobile_activity_island.dart](../../../lib/widgets/nav_bar/mobile_activity_island.dart))
+  is the one capsule that floats above the launcher while a timer or a
+  recording runs. It wears the same `DsGlassChipSurface`, `dsGlassChipFill`
+  and `dsGlassChipBorder` as the launcher chips — one glass dialect, not a
+  third. `capsuleHeight` is `spacing.step8` at the default text size and,
+  like `MobileNavigationLauncher.chipHeight`, grows with
+  `MediaQuery.textScalerOf` (the scaled subtitle2 line inside `spacing.step2`
+  of air, rounded up to the logical pixel) so large-text digits are never
+  clipped; `spacing.step3` of air sits below it, and `reservedHeight` is the
+  sum of the two and is what the shell's overlay scope publishes while the
+  island shows. Its two halves are buttons the
+  full capsule height that meet at the hairline and reach the capsule's ends
+  (they carry its insets), and the elapsed digits sit in `subtitle2` with
+  the tabular numeric features so a ticking clock never changes the
+  capsule's width. Under width pressure `bothHalvesFit` measures both times
+  the way the launcher's `labelsFit` measures its labels, and the recording
+  half drops to its orb before anything truncates. The contract for *when*
+  it shows is in
+  [navigation](../../architecture/navigation.md#the-activity-island).
+- `MobileNavigationLauncher.labelsFit(context, action)` decides between the
+  two-label row and the glyph-only companion, budgeting `DsGlassPill.intrinsicWidth`
+  against `availableRowWidth`. The pill
+  measures itself — padding, glyph, gap and label at the current text scale —
+  because a caller that restated that arithmetic would drift silently the day
+  the pill's own padding changed. The page
+  action is the half that gives: Navigate names the shell and has no icon-only
+  reading, while a `+` beside a list still reads as "add". It is consulted
+  only for a `MobileNavDockAction.worded` action — the two constructors carry
+  the page's own decision about wording, the same one its floating button
+  made, and a `.glyph` action is a `DsGlassRoundButton` at every width.
 
 # Accessibility is enforced at construction
 
@@ -674,3 +815,10 @@ stability than the exports provide.
 When a value is missing, the preferred fix is upstream or at the DS seam. Sneaking
 in a one-off literal because it looked close enough is exactly how design systems
 turn into decorative fiction.
+
+`DesignSystemChipSize.compactPillTouch` retains caption typography and pill
+radii while using the touch chip's minimum interaction height (`spacing.step9`).
+Its painted pill stays at content height and is centered inside the full target;
+tapping the transparent outer target still activates it. Scoped query filters
+use this variant. Hover/selection retain the shared palette, and ordinary
+`compactPill` metrics remain unchanged.

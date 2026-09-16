@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:clock/clock.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
@@ -11,10 +13,14 @@ import 'package:lotti/features/agents/model/agent_domain_entity.dart';
 import 'package:lotti/features/agents/model/agent_enums.dart';
 import 'package:lotti/features/agents/model/agent_link.dart';
 import 'package:lotti/features/agents/state/agent_providers.dart';
+import 'package:lotti/features/agents/state/task_agent_model_providers.dart';
 import 'package:lotti/features/agents/workflow/wake_result.dart';
 import 'package:lotti/features/ai/model/ai_config.dart';
+import 'package:lotti/features/ai/model/resolved_profile.dart';
 import 'package:lotti/features/ai/repository/ai_config_repository.dart';
 import 'package:lotti/features/ai/repository/cloud_inference_repository.dart';
+import 'package:lotti/features/ai/state/ai_runtime_settings_controller.dart';
+import 'package:lotti/features/ai/state/settings/ai_config_by_type_controller.dart';
 import 'package:lotti/features/ai/util/known_models.dart';
 import 'package:lotti/features/notifications/repository/notification_repository.dart';
 import 'package:lotti/features/relationships/repository/relationship_repository.dart';
@@ -24,10 +30,13 @@ import 'package:lotti/features/relationships/service/relationship_chat_service.d
 import 'package:lotti/features/relationships/state/relationship_agent_providers.dart';
 import 'package:lotti/features/relationships/workflow/relationship_agent_workflow.dart';
 import 'package:lotti/get_it.dart';
+import 'package:lotti/providers/service_providers.dart' show journalDbProvider;
+import 'package:lotti/services/db_notification.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../../helpers/fallbacks.dart';
 import '../../../mocks/mocks.dart';
+import '../../categories/test_utils.dart';
 
 void main() {
   setUpAll(registerAllFallbackValues);
@@ -82,6 +91,47 @@ void main() {
     addTearDown(c.dispose);
     return c;
   }
+
+  test('route edits and synced identities request scans, ordinary agent writes '
+      'do not', () async {
+    final updates = StreamController<Set<String>>.broadcast(sync: true);
+    addTearDown(updates.close);
+    final notifications = MockUpdateNotifications();
+    when(() => notifications.updateStream).thenAnswer((_) => updates.stream);
+    final manager = MockScheduledWakeManager();
+    final agentService = MockRelationshipAgentService();
+    when(
+      () => agentService.registerSubscription(agentId),
+    ).thenAnswer((_) async {});
+    final c = container(
+      overrides: [
+        maybeUpdateNotificationsProvider.overrideWithValue(notifications),
+        scheduledWakeManagerProvider.overrideWithValue(manager),
+        relationshipAgentServiceProvider.overrideWithValue(agentService),
+        aiConfigRepositoryProvider.overrideWithValue(MockAiConfigRepository()),
+      ],
+    );
+    final maintenance = c
+        .listen(relationshipRuntimeMaintenanceProvider, (_, _) {})
+        .read();
+    await c.read(defaultInferenceProfileControllerProvider.future);
+
+    updates.add({agentId, agentNotification});
+    verifyNever(manager.requestCheck);
+    for (final token in [
+      AgentNotificationScopes.inferenceSetup,
+      relationshipNotification,
+      categoriesNotification,
+    ]) {
+      updates.add({token});
+      verify(manager.requestCheck).called(1);
+    }
+    await maintenance.onIdentityReceived(identity());
+    verify(manager.requestCheck).called(1);
+    c.dispose();
+    updates.add({AgentNotificationScopes.inferenceSetup});
+    verifyNoMoreInteractions(manager);
+  });
 
   test(
     'the relationship_agent kind resolves to ITS registered runner — '
@@ -361,6 +411,41 @@ void main() {
     );
   });
 
+  group('relationshipCategoryProfileLookupProvider', () {
+    test(
+      "answers the category's default profile through the journal db, "
+      'and null for a category without one or a category that is gone',
+      () async {
+        final journalDb = MockJournalDb();
+        when(() => journalDb.getCategoryById('cat-with')).thenAnswer(
+          (_) async => CategoryTestUtils.createTestCategory(
+            id: 'cat-with',
+            name: 'Family',
+            defaultProfileId: 'profile-family',
+          ),
+        );
+        when(() => journalDb.getCategoryById('cat-without')).thenAnswer(
+          (_) async => CategoryTestUtils.createTestCategory(
+            id: 'cat-without',
+            name: 'Work',
+          ),
+        );
+        when(
+          () => journalDb.getCategoryById('cat-gone'),
+        ).thenAnswer((_) async => null);
+        final c = ProviderContainer(
+          overrides: [journalDbProvider.overrideWithValue(journalDb)],
+        );
+        addTearDown(c.dispose);
+        final lookup = c.read(relationshipCategoryProfileLookupProvider);
+
+        expect(await lookup('cat-with'), 'profile-family');
+        expect(await lookup('cat-without'), isNull);
+        expect(await lookup('cat-gone'), isNull);
+      },
+    );
+  });
+
   group('relationshipBriefingDisclosureProvider', () {
     const relationshipId = 'person-1';
     const profileId = 'profile-1';
@@ -368,6 +453,7 @@ void main() {
     late MockAiConfigRepository aiConfigRepository;
     late MockRelationshipRepository relationshipRepository;
     late MockAgentRepository agentRepository;
+    late MockJournalDb journalDb;
 
     final meliousProvider =
         AiConfig.inferenceProvider(
@@ -414,25 +500,27 @@ void main() {
             )
             as AiConfigInferenceProfile;
 
-    RelationshipEntry person({String? withProfileId}) => RelationshipEntry(
-      meta: Metadata(
-        id: relationshipId,
-        createdAt: DateTime(2026, 8),
-        updatedAt: DateTime(2026, 8),
-        dateFrom: DateTime(2026, 8),
-        dateTo: DateTime(2026, 8),
-      ),
-      data: RelationshipData(
-        title: 'Anna',
-        important: true,
-        profileId: withProfileId,
-        status: RelationshipStatus.active(
-          id: 'status-1',
-          createdAt: DateTime(2026, 8),
-          utcOffset: 0,
-        ),
-      ),
-    );
+    RelationshipEntry person({String? withProfileId, String? categoryId}) =>
+        RelationshipEntry(
+          meta: Metadata(
+            id: relationshipId,
+            createdAt: DateTime(2026, 8),
+            updatedAt: DateTime(2026, 8),
+            dateFrom: DateTime(2026, 8),
+            dateTo: DateTime(2026, 8),
+            categoryId: categoryId,
+          ),
+          data: RelationshipData(
+            title: 'Anna',
+            important: true,
+            profileId: withProfileId,
+            status: RelationshipStatus.active(
+              id: 'status-1',
+              createdAt: DateTime(2026, 8),
+              utcOffset: 0,
+            ),
+          ),
+        );
 
     setUp(() {
       aiConfigRepository = MockAiConfigRepository();
@@ -447,6 +535,10 @@ void main() {
       when(
         () => agentRepository.getEntity(any()),
       ).thenAnswer((_) async => null);
+      journalDb = MockJournalDb();
+      when(
+        () => journalDb.getCategoryById(any()),
+      ).thenAnswer((_) async => null);
     });
 
     Future<String?> disclosure() {
@@ -457,6 +549,7 @@ void main() {
             relationshipRepository,
           ),
           agentRepositoryProvider.overrideWithValue(agentRepository),
+          journalDbProvider.overrideWithValue(journalDb),
         ],
       );
       addTearDown(c.dispose);
@@ -464,6 +557,356 @@ void main() {
         relationshipBriefingDisclosureProvider(relationshipId).future,
       );
     }
+
+    AiConfigModel stubLocalSetup() {
+      when(
+        () => agentRepository.getLinksFrom(
+          agentId,
+          type: AgentLinkTypes.agentRelationship,
+        ),
+      ).thenAnswer(
+        (_) async => [
+          AgentLink.agentRelationship(
+            id: 'link',
+            fromId: agentId,
+            toId: relationshipId,
+            createdAt: DateTime(2026, 8),
+            updatedAt: DateTime(2026, 8),
+            vectorClock: null,
+          ),
+        ],
+      );
+      when(
+        () => relationshipRepository.getRelationshipByIdUnfiltered(
+          relationshipId,
+        ),
+      ).thenAnswer((_) async => person());
+      final selectedModel = model('model-local', 'ollama-provider');
+      when(
+        () => aiConfigRepository.getConfigsByType(AiConfigType.model),
+      ).thenAnswer((_) async => [selectedModel]);
+      when(
+        () => aiConfigRepository.getConfigById(profileId),
+      ).thenAnswer((_) async => profile(selectedModel.id));
+      when(
+        () => aiConfigRepository.getConfigById('ollama-provider'),
+      ).thenAnswer((_) async => ollamaProvider);
+      when(
+        () => aiConfigRepository.getConfigsByType(
+          AiConfigType.inferenceProvider,
+        ),
+      ).thenAnswer((_) async => [ollamaProvider]);
+      return selectedModel;
+    }
+
+    ProviderContainer setupContainer({
+      AgentIdentityEntity? Function()? loadIdentity,
+      List<Override> overrides = const [],
+    }) {
+      final c = ProviderContainer(
+        overrides: [
+          templateForAgentProvider.overrideWith((ref, id) async => null),
+          aiConfigRepositoryProvider.overrideWithValue(aiConfigRepository),
+          agentRepositoryProvider.overrideWithValue(agentRepository),
+          agentIdentityProvider(
+            agentId,
+          ).overrideWith(
+            (ref) async => loadIdentity == null ? identity() : loadIdentity(),
+          ),
+          relationshipRepositoryProvider.overrideWithValue(
+            relationshipRepository,
+          ),
+          journalDbProvider.overrideWithValue(journalDb),
+          ...overrides,
+        ],
+      );
+      addTearDown(c.dispose);
+      return c;
+    }
+
+    test(
+      'setup and disclosure recover when Settings selects a valid default',
+      () async {
+        String? defaultId = 'missing-profile';
+        when(
+          aiConfigRepository.getDefaultProfileId,
+        ).thenAnswer((_) async => defaultId);
+        when(() => aiConfigRepository.setDefaultProfileId(any())).thenAnswer((
+          call,
+        ) async {
+          defaultId = call.positionalArguments.single as String?;
+        });
+        final selectedModel = stubLocalSetup();
+        final c = setupContainer()
+          ..listen(taskAgentResolvedSetupProvider(agentId), (_, _) {});
+        await c.read(defaultInferenceProfileControllerProvider.future);
+        expect(
+          (await c.read(
+            taskAgentResolvedSetupProvider(agentId).future,
+          ))?.status,
+          AgentSetupResolutionStatus.broken,
+        );
+        await expectLater(
+          c.read(relationshipBriefingDisclosureProvider(relationshipId).future),
+          throwsA(
+            isA<RelationshipInferenceSetupUnavailable>().having(
+              (error) => error.toString(),
+              'diagnostic',
+              contains('No inference provider resolves'),
+            ),
+          ),
+        );
+        await c
+            .read(defaultInferenceProfileControllerProvider.notifier)
+            .selectProfile(profileId);
+        final setup = await c.read(
+          taskAgentResolvedSetupProvider(agentId).future,
+        );
+        expect(setup?.status, AgentSetupResolutionStatus.resolved);
+        expect(setup?.profile?.thinkingModelId, selectedModel.providerModelId);
+        expect(setup?.profile?.thinkingProvider.id, ollamaProvider.id);
+        expect(
+          await c.read(
+            relationshipBriefingDisclosureProvider(relationshipId).future,
+          ),
+          isNull,
+          reason:
+              'the newly selected local default can generate without cloud disclosure',
+        );
+      },
+    );
+
+    for (final token in [relationshipNotification, categoriesNotification]) {
+      test('setup follows synced route changes from $token', () async {
+        final selectedModel = stubLocalSetup();
+        final updates = StreamController<Set<String>>.broadcast(sync: true);
+        addTearDown(updates.close);
+        final notifications = MockUpdateNotifications();
+        when(
+          () => notifications.updateStream,
+        ).thenAnswer((_) => updates.stream);
+        final c = setupContainer(
+          overrides: [
+            maybeUpdateNotificationsProvider.overrideWithValue(notifications),
+          ],
+        );
+        final target = relationshipAgentResolvedSetupProvider(agentId);
+        c.listen(target, (_, _) {});
+        await c.read(defaultInferenceProfileControllerProvider.future);
+        expect(
+          (await c.read(target.future))?.status,
+          AgentSetupResolutionStatus.broken,
+        );
+
+        if (token == relationshipNotification) {
+          when(
+            () => relationshipRepository.getRelationshipByIdUnfiltered(
+              relationshipId,
+            ),
+          ).thenAnswer((_) async => person(withProfileId: profileId));
+        } else {
+          when(
+            () => relationshipRepository.getRelationshipByIdUnfiltered(
+              relationshipId,
+            ),
+          ).thenAnswer((_) async => person(categoryId: 'category'));
+          when(() => journalDb.getCategoryById('category')).thenAnswer(
+            (_) async => CategoryTestUtils.createTestCategory(
+              id: 'category',
+              name: 'Family',
+              defaultProfileId: profileId,
+            ),
+          );
+        }
+        updates.add({'unrelated-entry'});
+        await c.pump();
+        expect(
+          (await c.read(target.future))?.status,
+          AgentSetupResolutionStatus.broken,
+        );
+        updates.add({token});
+        final setup = await c.read(target.future);
+        expect(setup?.status, AgentSetupResolutionStatus.resolved);
+        expect(setup?.profile?.thinkingModelId, selectedModel.providerModelId);
+        expect(setup?.profile?.thinkingProvider.id, ollamaProvider.id);
+        c.dispose();
+        expect(
+          updates.hasListener,
+          isFalse,
+          reason: 'disposed setup must stop listening for route edits',
+        );
+      });
+    }
+
+    test(
+      'disabled AI does not silently use the valid default profile',
+      () async {
+        stubLocalSetup();
+        when(
+          aiConfigRepository.getDefaultProfileId,
+        ).thenAnswer((_) async => profileId);
+        final c = setupContainer(
+          loadIdentity: () => identity(
+            config: const AgentConfig(
+              inferenceSetup: AgentInferenceSetup(
+                mode: AgentInferenceSetupMode.disabled,
+                origin: AgentInferenceSetupOrigin.user,
+              ),
+            ),
+          ),
+        )..listen(relationshipAgentResolvedSetupProvider(agentId), (_, _) {});
+        final setup = await c.read(
+          relationshipAgentResolvedSetupProvider(agentId).future,
+        );
+        expect(setup?.status, AgentSetupResolutionStatus.disabled);
+        expect(setup?.profile, isNull);
+      },
+    );
+
+    test(
+      'a deleted identity has no setup or default inference route',
+      () async {
+        stubLocalSetup();
+        final c = setupContainer(
+          loadIdentity: () => null,
+        );
+        expect(
+          await c.read(relationshipAgentResolvedSetupProvider(agentId).future),
+          isNull,
+        );
+        verifyNever(
+          () => agentRepository.getLinksFrom(
+            agentId,
+            type: AgentLinkTypes.agentRelationship,
+          ),
+        );
+      },
+    );
+
+    for (final local in [true, false]) {
+      test(
+        'direct override discloses its own provider locality: local=$local',
+        () async {
+          final selectedProvider = local ? ollamaProvider : meliousProvider;
+          final selectedModel = model(
+            local ? 'model-local' : 'model-glm',
+            selectedProvider.id,
+          );
+          when(
+            () => relationshipRepository.getRelationshipByIdUnfiltered(
+              relationshipId,
+            ),
+          ).thenAnswer((_) async => person());
+          when(() => agentRepository.getEntity(any())).thenAnswer(
+            (_) async => identity(
+              config: AgentConfig(
+                inferenceSetup: AgentInferenceSetup(
+                  mode: AgentInferenceSetupMode.configured,
+                  origin: AgentInferenceSetupOrigin.user,
+                  thinkingModelOverrideId: selectedModel.id,
+                ),
+              ),
+            ),
+          );
+          when(
+            () => aiConfigRepository.getConfigById(selectedModel.id),
+          ).thenAnswer((_) async => selectedModel);
+          when(
+            () => aiConfigRepository.getConfigById(selectedProvider.id),
+          ).thenAnswer((_) async => selectedProvider);
+          expect(await disclosure(), local ? isNull : 'Melious');
+        },
+      );
+    }
+
+    test(
+      'changing the Settings default refreshes the disclosed provider',
+      () async {
+        String? selected;
+        when(
+          aiConfigRepository.getDefaultProfileId,
+        ).thenAnswer((_) async => selected);
+        when(
+          () => aiConfigRepository.setDefaultProfileId(profileId),
+        ).thenAnswer((_) async {
+          selected = profileId;
+        });
+        when(
+          () => relationshipRepository.getRelationshipByIdUnfiltered(
+            relationshipId,
+          ),
+        ).thenAnswer((_) async => person());
+        when(
+          () => aiConfigRepository.getConfigsByType(AiConfigType.model),
+        ).thenAnswer(
+          (_) async => [
+            model('model-glm', 'melious-provider'),
+            model('model-local', 'ollama-provider'),
+          ],
+        );
+        when(
+          () => aiConfigRepository.getConfigsByType(
+            AiConfigType.inferenceProvider,
+          ),
+        ).thenAnswer((_) async => [meliousProvider, ollamaProvider]);
+        when(
+          () => aiConfigRepository.getConfigById('melious-provider'),
+        ).thenAnswer((_) async => meliousProvider);
+        when(
+          () => aiConfigRepository.getConfigById('ollama-provider'),
+        ).thenAnswer((_) async => ollamaProvider);
+        when(
+          () => aiConfigRepository.getConfigById(profileId),
+        ).thenAnswer((_) async => profile('model-local'));
+        final manager = MockScheduledWakeManager();
+        final relationshipAgentService = MockRelationshipAgentService();
+        when(
+          () => relationshipAgentService.watchedRelationshipId(agentId),
+        ).thenAnswer((_) async => relationshipId);
+        when(
+          () => aiConfigRepository.watchConfigsByType(AiConfigType.model),
+        ).thenAnswer(
+          (_) => Stream.value([model('model-glm', 'melious-provider')]),
+        );
+        final c = ProviderContainer(
+          overrides: [
+            agentServiceProvider.overrideWithValue(MockAgentService()),
+            agentSyncServiceProvider.overrideWithValue(MockAgentSyncService()),
+            relationshipAgentServiceProvider.overrideWithValue(
+              relationshipAgentService,
+            ),
+            scheduledWakeManagerProvider.overrideWithValue(manager),
+            domainLoggerProvider.overrideWithValue(MockDomainLogger()),
+            aiConfigRepositoryProvider.overrideWithValue(aiConfigRepository),
+            relationshipRepositoryProvider.overrideWithValue(
+              relationshipRepository,
+            ),
+            agentRepositoryProvider.overrideWithValue(agentRepository),
+            journalDbProvider.overrideWithValue(journalDb),
+          ],
+        );
+        addTearDown(c.dispose);
+        c.listen(relationshipRuntimeMaintenanceProvider, (_, _) {});
+        final maintenance = c.read(relationshipRuntimeMaintenanceProvider);
+        final target = relationshipBriefingDisclosureProvider(relationshipId);
+        c.listen(target, (_, _) {});
+        expect(await c.read(target.future), 'Melious');
+        await c.read(
+          aiConfigByTypeControllerProvider(AiConfigType.model).future,
+        );
+        verify(manager.requestCheck).called(1);
+        await c
+            .read(defaultInferenceProfileControllerProvider.notifier)
+            .selectProfile(profileId);
+        expect(await c.read(target.future), isNull);
+        verify(manager.requestCheck).called(1);
+        expect(await maintenance.inferenceIsConfigured!(identity()), isTrue);
+        when(
+          () => relationshipAgentService.watchedRelationshipId(agentId),
+        ).thenAnswer((_) async => null);
+        expect(await maintenance.inferenceIsConfigured!(identity()), isFalse);
+      },
+    );
 
     test('a fully local profile needs no disclosure', () async {
       when(
@@ -572,6 +1015,77 @@ void main() {
       expect(await disclosure(), 'Acme');
     });
 
+    test("the category's default profile routes when neither the person nor "
+        'the agent pins one — the ordinary setup, and the one that used to '
+        'throw (ADR 0040 Decision 6)', () async {
+      // The category routes through Acme; the validated default model is
+      // not in the catalogue, so a named provider proves the category step.
+      final acmeProvider =
+          AiConfig.inferenceProvider(
+                id: 'acme-provider',
+                baseUrl: 'https://api.acme.ai',
+                apiKey: 'key',
+                name: 'Acme',
+                createdAt: DateTime(2026),
+                inferenceProviderType: InferenceProviderType.melious,
+              )
+              as AiConfigInferenceProvider;
+      when(
+        () => relationshipRepository.getRelationshipByIdUnfiltered(
+          relationshipId,
+        ),
+      ).thenAnswer((_) async => person(categoryId: 'cat-1'));
+      when(() => journalDb.getCategoryById('cat-1')).thenAnswer(
+        (_) async => CategoryTestUtils.createTestCategory(
+          id: 'cat-1',
+          name: 'Family',
+          defaultProfileId: profileId,
+        ),
+      );
+      when(
+        () => aiConfigRepository.getConfigById(profileId),
+      ).thenAnswer((_) async => profile('model-acme'));
+      when(
+        () => aiConfigRepository.getConfigById('model-acme'),
+      ).thenAnswer((_) async => model('model-acme', 'acme-provider'));
+      when(
+        () => aiConfigRepository.getConfigById('acme-provider'),
+      ).thenAnswer((_) async => acmeProvider);
+      when(
+        () => aiConfigRepository.getConfigsByType(AiConfigType.model),
+      ).thenAnswer((_) async => [model('model-acme', 'acme-provider')]);
+      when(
+        () => aiConfigRepository.getConfigsByType(
+          AiConfigType.inferenceProvider,
+        ),
+      ).thenAnswer((_) async => [acmeProvider]);
+
+      expect(await disclosure(), 'Acme');
+    });
+
+    test('a category with no default profile leaves the chain where it was: '
+        'no route resolves and the provider throws', () async {
+      when(
+        () => relationshipRepository.getRelationshipByIdUnfiltered(
+          relationshipId,
+        ),
+      ).thenAnswer((_) async => person(categoryId: 'cat-1'));
+      when(() => journalDb.getCategoryById('cat-1')).thenAnswer(
+        (_) async => CategoryTestUtils.createTestCategory(
+          id: 'cat-1',
+          name: 'Family',
+        ),
+      );
+
+      await expectLater(
+        disclosure(),
+        throwsA(isA<RelationshipInferenceSetupUnavailable>()),
+      );
+      // The shared stubs make every route fail, so the throw alone would
+      // pass without the category branch ever running: prove it ran.
+      verify(() => journalDb.getCategoryById('cat-1')).called(1);
+    });
+
     test('a dangling profile id falls through to the default cloud model '
         'and still disclosures — never silently local', () async {
       when(
@@ -598,7 +1112,10 @@ void main() {
         ),
       ).thenAnswer((_) async => person());
 
-      await expectLater(disclosure(), throwsStateError);
+      await expectLater(
+        disclosure(),
+        throwsA(isA<RelationshipInferenceSetupUnavailable>()),
+      );
     });
 
     test('the relationship read is UNFILTERED — a hidden private person '

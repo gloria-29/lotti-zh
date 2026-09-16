@@ -51,7 +51,157 @@ void main() {
     ).thenAnswer((_) async => profile);
   }
 
+  for (final chatState in [
+    'unset',
+    'available',
+    'missing-model',
+    'missing-provider',
+  ]) {
+    test(
+      'chat slot $chatState preserves independent agent overrides',
+      () async {
+        final thinking = testAiModel(
+          id: 'thinking-row',
+          providerModelId: 'thinking-native',
+          inferenceProviderId: 'agent-provider',
+        );
+        final override = testAiModel(
+          id: 'override-row',
+          providerModelId: 'override-native',
+          inferenceProviderId: 'agent-provider',
+        );
+        final chat = testAiModel(
+          id: 'chat-row',
+          providerModelId: 'chat-native',
+          inferenceProviderId: 'chat-provider',
+        );
+        final profile = testInferenceProfile(
+          id: 'profile',
+          thinkingModelId: thinking.id,
+        ).copyWith(chatModelId: chatState == 'unset' ? null : chat.id);
+        final configs = <String, AiConfig>{
+          profile.id: profile,
+          thinking.id: thinking,
+          override.id: override,
+          if (chatState != 'missing-model') chat.id: chat,
+          'agent-provider': testInferenceProvider(id: 'agent-provider'),
+          if (chatState != 'missing-provider')
+            'chat-provider': testInferenceProvider(id: 'chat-provider'),
+        };
+        when(
+          () => mockAiConfig.getConfigById(any()),
+        ).thenAnswer((call) async => configs[call.positionalArguments.first]);
+        when(
+          () => mockAiConfig.getConfigsByType(AiConfigType.model),
+        ).thenAnswer(
+          (_) async => configs.values.whereType<AiConfigModel>().toList(),
+        );
+        final setup = await resolver.resolveSetup(
+          const AgentInferenceSetup(
+            mode: AgentInferenceSetupMode.configured,
+            origin: AgentInferenceSetupOrigin.user,
+            baseProfileId: 'profile',
+            thinkingModelOverrideId: 'override-row',
+          ),
+        );
+        final resolved = setup.profile!;
+        expect(setup.status, AgentSetupResolutionStatus.resolved);
+        expect(resolved.thinkingModelId, 'override-native');
+        expect(resolved.chatModelUnavailable, chatState.startsWith('missing'));
+        if (chatState == 'available') {
+          expect(resolved.chatModelId, 'chat-native');
+          expect(resolved.chatModel, chat);
+          expect(resolved.chatProvider?.id, 'chat-provider');
+        } else if (chatState == 'unset') {
+          expect(resolved.effectiveChatModelId, 'override-native');
+          expect(resolved.effectiveChatModel, override);
+          expect(resolved.effectiveChatProvider.id, 'agent-provider');
+        }
+      },
+    );
+  }
+
   group('ProfileResolver', () {
+    test(
+      'standalone agents use Settings default and preserve explicit routes',
+      () async {
+        stubModelResolution(modelId: 'chosen-model');
+        stubProfile(
+          testInferenceProfile(id: 'default', thinkingModelId: 'chosen-model'),
+        );
+        when(
+          mockAiConfig.getDefaultProfileId,
+        ).thenAnswer((_) async => 'default');
+        final fallback = await resolver.resolveStandalone(
+          agentConfig: const AgentConfig(),
+          legacyModelId: 'glm-5.2',
+        );
+        expect(fallback.profile?.thinkingModelId, 'chosen-model');
+        expect(fallback.source, AgentSetupResolutionSource.baseProfile);
+        stubProfile(
+          testInferenceProfile(id: 'explicit', thinkingModelId: 'chosen-model'),
+        );
+        clearInteractions(mockAiConfig);
+        final explicit = await resolver.resolveStandalone(
+          agentConfig: const AgentConfig(profileId: 'explicit'),
+          legacyModelId: 'glm-5.2',
+        );
+        expect(explicit.source, AgentSetupResolutionSource.legacyAgentProfile);
+        verifyNever(mockAiConfig.getDefaultProfileId);
+        final disabled = await resolver.resolveStandalone(
+          agentConfig: const AgentConfig(
+            inferenceSetup: AgentInferenceSetup(
+              mode: AgentInferenceSetupMode.disabled,
+              origin: AgentInferenceSetupOrigin.user,
+            ),
+          ),
+          legacyModelId: 'glm-5.2',
+        );
+        expect(disabled.status, AgentSetupResolutionStatus.disabled);
+        verifyNever(mockAiConfig.getDefaultProfileId);
+      },
+    );
+
+    test(
+      'missing selected Settings default never switches to the built-in model',
+      () async {
+        stubModelResolution(modelId: 'glm-5.2');
+        when(
+          mockAiConfig.getDefaultProfileId,
+        ).thenAnswer((_) async => 'missing');
+        when(
+          () => mockAiConfig.getConfigById('missing'),
+        ).thenAnswer((_) async => null);
+        final result = await resolver.resolveStandalone(
+          agentConfig: const AgentConfig(),
+          legacyModelId: 'glm-5.2',
+        );
+        expect(result.status, AgentSetupResolutionStatus.broken);
+        expect(result.profile, isNull);
+        verifyNever(() => mockAiConfig.getConfigsByType(AiConfigType.model));
+      },
+    );
+
+    test(
+      'template agents without a usable legacy route use the Settings default',
+      () async {
+        stubModelResolution(modelId: 'chosen-model');
+        stubProfile(
+          testInferenceProfile(id: 'default', thinkingModelId: 'chosen-model'),
+        );
+        when(
+          mockAiConfig.getDefaultProfileId,
+        ).thenAnswer((_) async => 'default');
+        final result = await resolver.resolveDetailed(
+          agentConfig: const AgentConfig(),
+          template: makeTestTemplate(modelId: 'unavailable'),
+          version: makeTestTemplateVersion(modelId: 'unavailable'),
+        );
+        expect(result.profile?.thinkingModelId, 'chosen-model');
+        expect(result.source, AgentSetupResolutionSource.baseProfile);
+      },
+    );
+
     test('typed disabled setup blocks every legacy fallback', () async {
       final result = await resolver.resolveDetailed(
         agentConfig: const AgentConfig(

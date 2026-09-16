@@ -34,6 +34,21 @@ applied until the user confirms it.
 - **Learns from feedback.** Agents periodically hold a "one-on-one" — a
   conversation where the user's accumulated feedback is reviewed and the agent's
   own instructions are revised, with every change approved by the user first.
+- **Supports text and voice conversations.** Shared chat components serve goal
+  and relationship discussions and agent improvement, including recording,
+  transcription feedback, and expandable reasoning in improvement replies.
+- **Answers questions about earlier notes and meetings.** Ask from a task,
+  project or category, inspect saved verbatim quotes, and keep separate chats.
+  Discovery stays within the same category; hidden private sources also hide
+  derived answers and chat metadata. Deleting a chat asks whether to keep its
+  shared conclusions. Recording quotes can play a timed excerpt after explicit
+  preparation; answers can be read aloud using local text-to-speech when enabled.
+  The [query conversation
+  concept](../../../knowledge/features/agents/query-chat.md) defines the scope,
+  evidence and privacy contract.
+- **Prepares task changes in chat.** Ask for checklist items, time recordings,
+  or other supported task changes, then accept or dismiss the proposed changes
+  directly inside the conversation. Nothing is applied before acceptance.
 - **Shows its work.** An internals panel exposes the agent's reports,
   conversations, observations, token usage and activity, so its behaviour is
   inspectable rather than opaque.
@@ -43,7 +58,8 @@ applied until the user confirms it.
 The persisted agent runtime: agent identities and state, wake scheduling and
 throttling, the agent's own memory log, change proposals and the review gates in
 front of them, template and personality versioning, and the operator surfaces
-under *Settings → Agents*.
+under *Settings → Agents*. Shared conversation UI and voice-input state also
+live here; batch transcription is supplied by the AI feature.
 
 It does **not** implement inference. Providers, models, prompts and profiles
 belong to the [AI feature](../ai/README.md). It also does not own the user's
@@ -57,13 +73,14 @@ lib/features/agents/
 ├── wake/         # orchestrator, queue, runner, scheduling
 ├── workflow/     # one per agent kind, plus evolution and improver
 ├── service/      # creation, change-set confirmation, souls, templates
+├── query/        # scoped conversations, retrieval, evidence and shared conclusions
 ├── memory/       # author-time memory links
 ├── projection/   # the event log's pure fold, capture and checkpoint selection
 ├── database/     # agent.sqlite
 ├── sync/         # vector-clock stamping and outbox buffering
 ├── model/        # entities, links, enums
 ├── state/        # Riverpod providers and wiring
-└── ui/           # AI summary card, internals panel, settings tabs
+└── ui/           # summary card, internals, settings, shared chat and voice input
 ```
 
 ## What the store forgets, and what it never forgets

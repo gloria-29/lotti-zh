@@ -1,6 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotti/classes/entity_definitions.dart';
+import 'package:lotti/features/agents/model/query_chat_models.dart';
+import 'package:lotti/features/agents/query/query_chat_providers.dart';
+import 'package:lotti/features/agents/ui/query/query_companion.dart';
 import 'package:lotti/features/design_system/components/buttons/design_system_floating_action_button.dart';
 import 'package:lotti/features/design_system/components/chips/active_filter_chip.dart';
 import 'package:lotti/features/design_system/components/chips/design_system_chip.dart';
@@ -17,6 +20,7 @@ import 'package:lotti/features/keyboard/domain/app_command.dart';
 import 'package:lotti/features/keyboard/domain/app_command_handler.dart';
 import 'package:lotti/features/keyboard/ui/app_command_scope.dart';
 import 'package:lotti/features/keyboard/ui/list_detail_focus_traversal.dart';
+import 'package:lotti/features/plaza/ui/category_plaza_page.dart';
 import 'package:lotti/features/projects/model/projects_overview_models.dart';
 import 'package:lotti/features/projects/state/project_providers.dart';
 import 'package:lotti/features/projects/ui/pages/project_details_page.dart';
@@ -29,7 +33,9 @@ import 'package:lotti/features/user_activity/state/user_activity_service.dart';
 import 'package:lotti/get_it.dart';
 import 'package:lotti/l10n/app_localizations_context.dart';
 import 'package:lotti/services/nav_service.dart';
+import 'package:lotti/utils/platform.dart';
 import 'package:lotti/widgets/nav_bar/design_system_bottom_navigation_bar.dart';
+import 'package:lotti/widgets/nav_bar/mobile_navigation_launcher.dart';
 import 'package:material_ui/material_ui.dart';
 
 /// Top-level Projects tab.
@@ -39,7 +45,9 @@ import 'package:material_ui/material_ui.dart';
 /// and, on the right, [ProjectDetailsPage] for the project currently selected
 /// in `NavService.desktopSelectedProjectId`, falling back to an empty-state.
 /// With a selection, the list can move offstage into persisted focus mode while
-/// retaining its state. On mobile it shows only the list scaffold; tapping a
+/// retaining its state. Opening chat temporarily releases the list width when
+/// needed; closing chat restores the saved preference, and Show list/search
+/// closes a space-constrained chat before returning to browsing. On mobile it shows only the list scaffold; tapping a
 /// project beams to `/projects/<id>`.
 ///
 /// The list scaffold watches [visibleProjectGroupsProvider] (the raw
@@ -101,47 +109,86 @@ class _ProjectsTabPageState extends ConsumerState<ProjectsTabPage> {
         decoration: BoxDecoration(
           color: ShowcasePalette.page(context),
         ),
-        child: ValueListenableBuilder<String?>(
-          valueListenable: getIt<NavService>().desktopSelectedProjectId,
-          builder: (context, selectedProjectId, _) {
-            final canHideListPane = selectedProjectId != null;
-            final listPaneVisible =
-                !paneWidths.listPaneCollapsed || !canHideListPane;
+        child: LayoutBuilder(
+          builder: (context, constraints) => ValueListenableBuilder<String?>(
+            valueListenable: getIt<NavService>().desktopSelectedProjectId,
+            builder: (context, selectedProjectId, _) {
+              final canHideListPane = selectedProjectId != null;
+              final queryScope = selectedProjectId == null
+                  ? null
+                  : QueryScope(
+                      kind: QueryScopeKind.project,
+                      id: selectedProjectId,
+                    );
+              final queryOpen =
+                  queryScope != null &&
+                  ref.watch(queryPaneOpenProvider(queryScope));
+              // Fit-driven suppression keeps the saved list preference intact.
+              final queryNeedsListSpace =
+                  queryOpen &&
+                  constraints.maxWidth <
+                      listPaneWidth +
+                          ResizableDivider.layoutWidth +
+                          QueryCompanion.minimumDockedWidth(context);
+              final listPaneVisible =
+                  !canHideListPane ||
+                  (!paneWidths.listPaneCollapsed && !queryNeedsListSpace);
 
-            return ListDetailFocusTraversal(
-              debugLabel: 'projects-split',
-              listPaneVisible: listPaneVisible,
-              canHideListPane: canHideListPane,
-              onListPaneVisibilityChanged: (visible) {
-                if (visible) {
-                  paneController.expandListPane();
-                } else {
-                  paneController.collapseListPane();
+              void showList() {
+                if (queryNeedsListSpace) {
+                  ref.read(queryPaneOpenProvider(queryScope).notifier).open =
+                      false;
                 }
-              },
-              listPane: SizedBox(
-                width: listPaneWidth,
-                child: _ProjectsListScaffold(
-                  scrollController: _scrollController,
-                  searchFocusNode: _searchFocusNode,
-                ),
-              ),
-              divider: ResizableDivider(
-                currentValue: listPaneWidth,
-                minValue: minListPaneWidth,
-                maxValue: maxListPaneWidth,
-                onDrag: resolvedListPane.onDrag,
-              ),
-              detailPane: selectedProjectId != null
-                  ? _ProjectsDetailPane(
-                      key: ValueKey(selectedProjectId),
-                      projectId: selectedProjectId,
-                    )
-                  : DesktopDetailEmptyState(
-                      message: context.messages.desktopEmptyStateSelectProject,
+                paneController.expandListPane();
+              }
+
+              return AppCommandScope(
+                handlers: {
+                  AppCommandId.focusSearch: AppCommandHandler(
+                    invoke: (_) {
+                      showList();
+                      _focusSearch(isDesktop: true);
+                    },
+                  ),
+                },
+                child: ListDetailFocusTraversal(
+                  debugLabel: 'projects-split',
+                  focusListOnExternalReveal: !canHideListPane,
+                  listPaneVisible: listPaneVisible,
+                  canHideListPane: canHideListPane,
+                  onListPaneVisibilityChanged: (visible) {
+                    if (visible) {
+                      showList();
+                    } else {
+                      paneController.collapseListPane();
+                    }
+                  },
+                  listPane: SizedBox(
+                    width: listPaneWidth,
+                    child: _ProjectsListScaffold(
+                      scrollController: _scrollController,
+                      searchFocusNode: _searchFocusNode,
                     ),
-            );
-          },
+                  ),
+                  divider: ResizableDivider(
+                    currentValue: listPaneWidth,
+                    minValue: minListPaneWidth,
+                    maxValue: maxListPaneWidth,
+                    onDrag: resolvedListPane.onDrag,
+                  ),
+                  detailPane: selectedProjectId != null
+                      ? _ProjectsDetailPane(
+                          key: ValueKey(selectedProjectId),
+                          projectId: selectedProjectId,
+                        )
+                      : DesktopDetailEmptyState(
+                          message:
+                              context.messages.desktopEmptyStateSelectProject,
+                        ),
+                ),
+              );
+            },
+          ),
         ),
       );
     } else {
@@ -247,13 +294,22 @@ class _ProjectsListScaffold extends ConsumerWidget {
               currentProjectStatusFilterIds,
             )) ||
         filter.sortMode != ProjectsSortMode.actionable;
+    // While the mobile navigation launcher carries this page's create action
+    // on its own row (see [projectsTabDockAction]) the page floats no button
+    // of its own — a copy above the launcher would put two create affordances
+    // in the same corner.
+    final launcherOwnsCreateAction = mobileNavigationLauncherOwnsPageActions(
+      context,
+    );
     // Reserve room so the floating create button never lands on top of the
     // last project card. The FAB is lifted above the bottom nav by
     // `occupiedHeight`, so the scroll content must clear that plus the FAB's
     // own footprint (step12) — same clearance the AI settings list uses.
+    // With the action docked on the launcher there is no floating button to
+    // clear, and that allowance would be an empty gutter.
     final listBottomPadding =
         DesignSystemBottomNavigationBar.occupiedHeight(context) +
-        tokens.spacing.step12;
+        (launcherOwnsCreateAction ? 0 : tokens.spacing.step12);
     final categories = overview == null
         ? const <CategoryDefinition>[]
         : _filterCategoriesFromOverview(overview.groups);
@@ -266,7 +322,8 @@ class _ProjectsListScaffold extends ConsumerWidget {
         ) &&
         filter.selectedCategoryIds.isEmpty &&
         filter.textQuery.trim().isEmpty;
-    final floatingActionButton = visibleGroupsAsync.value == null
+    final floatingActionButton =
+        visibleGroupsAsync.value == null || launcherOwnsCreateAction
         ? null
         : DesignSystemFloatingActionButton(
             semanticLabel: context.messages.projectCreateButton,
@@ -346,6 +403,19 @@ class _ProjectsListScaffold extends ConsumerWidget {
                       title: context.messages.navTabTitleProjects,
                       renderHeader: false,
                       groups: groups,
+                      onExploreCategory: isDesktop
+                          ? (categoryId) {
+                              Navigator.of(
+                                context,
+                                rootNavigator: true,
+                              ).push<void>(
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      CategoryPlazaPage(categoryId: categoryId),
+                                ),
+                              );
+                            }
+                          : null,
                       query: filter.textQuery,
                       selectedProjectId: activeProjectId,
                       scrollController: scrollController,
@@ -544,3 +614,24 @@ List<CategoryDefinition> _filterCategoriesFromOverview(
       .whereType<CategoryDefinition>()
       .toList(growable: false);
 }
+
+/// The projects list's create action as the mobile navigation launcher shows
+/// it.
+///
+/// Glyph-only, like the floating button it replaces: this page is titled
+/// Projects and lists projects, so the plus needs no word to say what it
+/// makes.
+///
+/// Unconditional, where the floating button waits for the overview to load:
+/// the modal needs nothing from that query, and a chip appearing on the
+/// launcher's row one beat after the page would shift Navigate sideways
+/// under the user's thumb. On its own layer in the corner the same delay
+/// cost nothing.
+MobileNavDockAction projectsTabDockAction(
+  BuildContext context,
+  WidgetRef ref,
+) => MobileNavDockAction.glyph(
+  label: context.messages.projectCreateButton,
+  icon: LottiIcons.add,
+  onPressed: () => showProjectCreateModal(context: context),
+);

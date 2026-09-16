@@ -51,6 +51,8 @@ String? localizedChangeSummary(
   String toolName,
   Map<String, dynamic> args,
 ) => switch (toolName) {
+  TaskAgentToolNames.assignTaskLabel when args['labelName'] is String =>
+    messages.agentSummaryAssignLabel(args['labelName'] as String),
   TaskAgentToolNames.setTaskTitle => messages.agentSummarySetTitle(
     _string(args['title'], fallback: '?'),
   ),
@@ -87,6 +89,7 @@ String? localizedChangeSummary(
     messages.agentSummaryUpdateProjectStatus(
       _projectStatus(messages, args['status']),
     ),
+  'create_and_link_task' => _string(args['title'], fallback: '?'),
   ProjectAgentToolNames.createTask => messages.agentSummaryCreateTask(
     _string(args['title'], fallback: '?'),
   ),

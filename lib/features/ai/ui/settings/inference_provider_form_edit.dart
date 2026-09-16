@@ -1,6 +1,6 @@
 import 'dart:developer' as developer;
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:lotti/features/ai/constants/provider_config.dart';
 import 'package:lotti/features/ai/model/ai_config.dart';
 import 'package:lotti/features/ai/repository/ai_config_repository.dart';
@@ -14,6 +14,7 @@ import 'package:lotti/features/ai/ui/settings/services/ai_config_delete_service.
 import 'package:lotti/features/ai/ui/settings/util/ai_provider_visual.dart';
 import 'package:lotti/features/ai/ui/settings/widgets/ai_settings_search_bar.dart';
 import 'package:lotti/features/ai/ui/settings/widgets/form_components/form_components.dart';
+import 'package:lotti/features/ai/ui/settings/widgets/sherpa_models_section.dart';
 import 'package:lotti/features/ai/util/known_models.dart';
 import 'package:lotti/features/design_system/components/badges/design_system_badge.dart';
 import 'package:lotti/features/design_system/components/toasts/design_system_toast.dart';
@@ -218,44 +219,6 @@ class ProviderTypeField extends StatelessWidget {
   }
 }
 
-class EmbeddedProviderHint extends StatelessWidget {
-  const EmbeddedProviderHint({required this.providerType, super.key});
-
-  final InferenceProviderType providerType;
-
-  @override
-  Widget build(BuildContext context) {
-    final tokens = context.designTokens;
-    final visual = aiProviderVisual(
-      type: providerType,
-      tokens: tokens,
-      messages: context.messages,
-    );
-    return Container(
-      padding: EdgeInsets.all(tokens.spacing.step4),
-      decoration: BoxDecoration(
-        color: tokens.colors.background.level02,
-        borderRadius: BorderRadius.circular(tokens.radii.m),
-        border: Border.all(color: visual.accent.withValues(alpha: 0.24)),
-      ),
-      child: Row(
-        children: [
-          Icon(LottiIcons.memory, color: visual.accent),
-          SizedBox(width: tokens.spacing.step3),
-          Expanded(
-            child: Text(
-              context.messages.aiProviderEmbeddedRuntimeHint,
-              style: tokens.typography.styles.body.bodySmall.copyWith(
-                color: tokens.colors.text.mediumEmphasis,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 /// Section showing available known models that can be added to this provider.
 class AvailableModelsSection extends ConsumerWidget {
   const AvailableModelsSection({
@@ -271,6 +234,10 @@ class AvailableModelsSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final tokens = context.designTokens;
     final messages = context.messages;
+
+    if (providerType == InferenceProviderType.sherpa) {
+      return SherpaModelsSection(providerId: providerId);
+    }
 
     if (ProviderConfig.supportsDynamicCatalog(providerType)) {
       return _DynamicAvailableModelsSection(providerId: providerId);

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lotti/classes/check_in_data.dart';
 import 'package:lotti/classes/entry_link.dart';
 import 'package:lotti/classes/entry_text.dart';
 import 'package:lotti/classes/event_status.dart';
@@ -19,6 +20,7 @@ import 'package:lotti/utils/consts.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../../mocks/mocks.dart';
+import '../../../test_data/test_data.dart';
 import 'actual_time_blocks_provider_test_helpers.dart';
 
 void main() {
@@ -190,6 +192,77 @@ void main() {
       // the note's categoryId (since the note is the non-rating fallback).
       expect(blocks.single.taskId, isNull);
       expect(blocks.single.category.id, 'cat-note');
+    });
+
+    test('a check-in with a length is recorded time, titled by the person '
+        'and coloured by their category; one without a length stays off', () {
+      final day = DateTime(2026, 9, 6);
+      final person = testRelationship.copyWith(
+        meta: testRelationship.meta.copyWith(categoryId: 'cat-people'),
+      );
+      CheckInEntry checkIn(String id, DateTime from, Duration length) =>
+          CheckInEntry(
+            meta: Metadata(
+              id: id,
+              createdAt: from,
+              updatedAt: from,
+              dateFrom: from,
+              dateTo: from.add(length),
+              categoryId: 'cat-people',
+            ),
+            data: CheckInData(
+              relationshipId: person.meta.id,
+              interactionType: CheckInInteractionType.call,
+            ),
+            entryText: const EntryText(plainText: 'Talked about the move.'),
+          );
+      final longCall = checkIn(
+        'call-long',
+        day.add(const Duration(hours: 12, minutes: 44)),
+        const Duration(hours: 1, minutes: 15),
+      );
+      final shortCall = checkIn(
+        'call-short',
+        day.add(const Duration(hours: 18)),
+        const Duration(minutes: 15),
+      );
+      final noLength = checkIn(
+        'call-no-length',
+        day.add(const Duration(hours: 20)),
+        Duration.zero,
+      );
+
+      final blocks = actualTimeBlocksForEntries(
+        entries: [shortCall, noLength, longCall],
+        links: [
+          for (final call in [longCall, shortCall, noLength])
+            EntryLink.relationship(
+              id: 'l-${call.meta.id}',
+              fromId: person.meta.id,
+              toId: call.meta.id,
+              createdAt: day,
+              updatedAt: day,
+              vectorClock: null,
+            ),
+        ],
+        linkedFromById: {person.meta.id: person},
+        categoryById: (_) => null,
+        eventsEnabled: true,
+      );
+
+      expect(blocks.map((b) => b.id), [
+        'actual:call-long',
+        'actual:call-short',
+      ]);
+      expect(blocks.map((b) => b.end.difference(b.start)), [
+        const Duration(hours: 1, minutes: 15),
+        const Duration(minutes: 15),
+      ]);
+      expect(blocks.map((b) => b.title), ['Anna', 'Anna']);
+      expect(blocks.first.category.id, 'cat-people');
+      expect(blocks.first.type, TimeBlockType.manual);
+      expect(blocks.first.state, TimeBlockState.completed);
+      expect(blocks.first.taskId, isNull);
     });
 
     test('uses entry text → category name → entry id as title fallbacks', () {
@@ -624,6 +697,57 @@ void main() {
         () => db.basicLinksForEntryIds({walk.meta.id}),
       ).thenAnswer((_) async => const []);
     });
+
+    // A check-in's person is its relationshipId. The stored RelationshipLink
+    // is not a BasicLink, and a check-in can outlive a failed link write, so
+    // the block names the person with no stored link at all.
+    test(
+      'a check-in is titled by its person with no stored link at all',
+      () async {
+        final person = testRelationship;
+        final call = CheckInEntry(
+          meta: Metadata(
+            id: 'call',
+            createdAt: day,
+            updatedAt: day,
+            dateFrom: day.add(const Duration(hours: 13)),
+            dateTo: day.add(const Duration(hours: 14, minutes: 15)),
+          ),
+          data: CheckInData(
+            relationshipId: person.meta.id,
+            interactionType: CheckInInteractionType.call,
+          ),
+          entryText: const EntryText(plainText: 'Talked about the move.'),
+        );
+        when(
+          () => db.sortedCalendarEntries(
+            rangeStart: day,
+            rangeEnd: day.add(const Duration(days: 1)),
+          ),
+        ).thenAnswer((_) async => [call]);
+        when(
+          () => db.basicLinksForEntryIds({call.meta.id}),
+        ).thenAnswer((_) async => const []);
+        when(
+          () => db.getJournalEntitiesForIdsUnordered({person.meta.id}),
+        ).thenAnswer((_) async => [person]);
+        final container = ProviderContainer(
+          overrides: [
+            journalDbProvider.overrideWithValue(db),
+            healthSignalRefreshServiceProvider.overrideWithValue(null),
+          ],
+        );
+        addTearDown(container.dispose);
+
+        final blocks = await readActualBlocks(container, day);
+
+        expect(blocks.single.title, 'Anna');
+        expect(
+          blocks.single.end.difference(blocks.single.start),
+          const Duration(hours: 1, minutes: 15),
+        );
+      },
+    );
 
     // Workouts reach the journal only through the health import, and this
     // lane used to wait for a dashboard to ask for one.

@@ -1218,6 +1218,28 @@ void main() {
         ]);
         expect(messages.last, contains('requiredCorrections'));
         expect(messages.last, contains('processNarration'));
+        final timing =
+            verify(
+                  () => domainLogger.log(
+                    LogDomain.agentWorkflow,
+                    captureAny<String>(that: startsWith('wake stages:')),
+                    subDomain: 'timings',
+                  ),
+                ).captured.single
+                as String;
+        expect(timing, contains('run=${DomainLogger.sanitizeId(runKey)}'));
+        for (final phase in [
+          'preparationMs',
+          'modelToolsMs',
+          'persistenceMs',
+        ]) {
+          expect(
+            RegExp('$phase=[0-9]+').hasMatch(timing),
+            isTrue,
+            reason: phase,
+          );
+        }
+
         verify(
           () => domainLogger.log(
             LogDomain.agentWorkflow,
@@ -1456,7 +1478,7 @@ void main() {
         );
 
         expect(result.success, isFalse);
-        expect(result.error, contains('Network error'));
+        expect(result.error, 'Task agent workflow failed (_Exception)');
 
         // Verify state was updated with incremented failure count.
         final captured = verify(
@@ -1738,7 +1760,7 @@ void main() {
 
         // Should still return a failure result, not rethrow.
         expect(result.success, isFalse);
-        expect(result.error, contains('Network failure'));
+        expect(result.error, 'Task agent workflow failed (_Exception)');
       });
     });
 
@@ -1832,7 +1854,7 @@ void main() {
           // Should return error result (not throw), having logged via
           // developer.log fallback.
           expect(result.success, isFalse);
-          expect(result.error, contains('LLM unavailable'));
+          expect(result.error, 'Task agent workflow failed (_Exception)');
         },
       );
     });

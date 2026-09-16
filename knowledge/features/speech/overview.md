@@ -11,7 +11,7 @@ sources:
   - id: src
     resource: ../../../lib/features/speech
     title: Speech feature source
-    last_modified: 2026-08-05
+    last_modified: 2026-09-09
   - id: vu
     resource: ../../../lib/features/speech/state/vu_meter.dart
     title: VuMeter — sliding-window RMS→VU
@@ -102,8 +102,23 @@ stateDiagram-v2
 If paused it resumes; if already recording it stops and saves; otherwise it
 starts a new recording.
 
+Concurrent starts are rejected with `AudioRecordingFailure.busy` before changing
+the linked subject. Permission denial and failed starts return typed failures
+for localized UI feedback rather than silently swallowing the tap. The modal
+also disables Record while initialization is pending. Its startup cancellation
+callback checks route currency as well as mounting, preventing microphone
+startup as soon as dismissal begins, including the exit animation; a late platform start is
+stopped and its partial file discarded. A null stop/save result
+keeps the modal open with an error instead of dismissing as though it succeeded.
+`transcriptionHandledByCaller` hides automation controls and suppresses the
+recorder's automatic trigger for that recording. The flag survives dismissal
+and resets on stop/cancel; it never changes shared preferences. The caller owns
+the explicit request after save. Opening a new recording clears a previous
+category even when its new category is null.
+
+
 **Both `stop()` and `cancel()` land in `Stopped`, but only `stop()` persists.**
-`stop()` creates a `JournalAudio` and fires automatic prompts; `cancel()` stops
+`stop()` creates a `JournalAudio` and normally fires automatic prompts; `cancel()` stops
 the recorder, **deletes the partial file** and creates no entry — nothing is
 transcribed and no task agent is woken. The modal's discard control asks for
 confirmation first, so the page returns to exactly how it looked before.
@@ -125,9 +140,10 @@ the check *is* the permission request. The app shell watches
 frame of any route — a probe in `build()` popped the OS microphone dialog over
 the task list on a fresh install. Permission is requested lazily, in `record()`.
 
-## Every stop runs the automation, and a goal gets its own gate
+## Ordinary recordings run automation, and a goal gets its own gate
 
-`stop()` hands every created entry to `AutomaticPromptTrigger`, whichever
+Unless transcription is handled by its caller, `stop()` hands each linked
+created entry to `AutomaticPromptTrigger`, whichever
 control stopped it — the sheet's stop button, the sidebar's, or the floating
 indicator's. That is why the post-recording decision lives here and not in
 the surface that opened the recorder: a surface only learns of a recording it
@@ -163,11 +179,56 @@ subscribes to `media_kit` position, buffer and completion streams.
 Because it is app-wide, starting a recording pauses active playback rather than
 letting the two compete for the output device.
 
+## One player, one queue
+
+There is a single `media_kit.Player` behind every audio card on screen, so the
+controller **serializes every player-mutating call** — `playAudioNote`,
+`setAudioNote`, `play`, `pause`, `seek`, `setSpeed` — onto one queue. Each
+operation observes the finished state of the one before it; none of them can
+interleave across an `await` and issue `open`/`play` in an order neither chose.
+
+`playAudioNote(note)` is **the** entry point for "play this recording": it
+queues selection and playback as one operation. Calling `setAudioNote` and then
+`play` as two separate un-awaited calls is what made a second recording in a
+task play the first one — `play` ran while `setAudioNote` was still resolving
+the new path, took its reopen branch against the not-yet-replaced
+`state.audioNote`, and re-opened the previous file on top of the new one.
+
+Teardown does not go through that queue: the completion timer and provider
+disposal dispose the `Player` directly. A generation counter, bumped on every
+note change and every teardown, lets an operation suspended on an `await`
+detect that its player is gone and abandon the rest of its work rather than
+issue it against a disposed player.
+
+The states below are the **`media_kit.Player`'s** lifecycle — whether a native
+player exists and what it has loaded. They are not `AudioPlayerStatus`
+(`initializing`, `playing`, `paused`, `stopped`), which `AudioPlayerState`
+tracks separately and which the UI reads for its play/pause glyph.
+
+```mermaid
+stateDiagram-v2
+  [*] --> NoPlayer: build()
+  NoPlayer --> Opening: playAudioNote / setAudioNote — _ensurePlayer + open
+  Opening --> Loaded: open completed, generation unchanged
+  Opening --> NoPlayer: superseded — teardown won the race
+  Loaded --> Playing: play()
+  Playing --> Paused: pause()
+  Paused --> Playing: play() — media still loaded
+  Playing --> NoPlayer: completed → completion timer tears the Player down
+  Loaded --> Opening: playAudioNote(other note)
+  NoPlayer --> Opening: play() reopens state.audioNote
+```
+
 Waveforms are extracted by `AudioWaveformService` and exposed through
 `audioWaveformProvider`, which caches them so scrubbing does not re-analyse the
 file. The player, speed control, timeline, and waveform expose localized
 semantics; timeline and waveform scrubbing use slider semantics with five-second
-increment and decrement actions. Disk-cache writes queue their prune passes per service instance, so two
+increment and decrement actions. The progress bar throttles drag seeks at
+60 milliseconds, flushes the pending target on drag end or cancellation, and
+cancels its timer on disposal. Its elapsed-time checks use `clock.now()` so
+the timer and deadline advance together in fake-time widget tests.
+
+Disk-cache writes queue their prune passes per service instance, so two
 concurrent extractions cannot recursively list and delete the cache tree at the
 same time. Pruning retains the 1,000 newest files by modification time. A file
 that disappears after listing but before its metadata is read is treated as

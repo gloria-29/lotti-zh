@@ -7,6 +7,7 @@ import 'package:lotti/classes/journal_entities.dart';
 import 'package:lotti/features/ai/model/ai_config.dart';
 import 'package:lotti/features/ai/model/resolved_profile.dart';
 import 'package:lotti/features/ai/repository/gemini_thinking_config.dart';
+import 'package:lotti/features/ai/speech/sherpa_installed_models_provider.dart';
 import 'package:lotti/features/ai/state/consts.dart';
 import 'package:lotti/features/ai/state/profile_automation_providers.dart';
 import 'package:lotti/features/ai/state/skill_trigger_providers.dart';
@@ -327,6 +328,11 @@ class UnifiedAiModal {
   /// pass `null` as the override — same semantic as "no override" so
   /// the runner reads from the profile slot, and a deleted model
   /// between picker and runner falls back gracefully.
+  ///
+  /// Device availability of sherpa speech models is consulted only when a
+  /// slot-capable candidate actually belongs to a sherpa provider; the probe
+  /// is a once-per-process integrity hash of every downloaded model, which
+  /// no text or image skill should wait for.
   static Future<void> _handleSkillWithModelOverride({
     required BuildContext context,
     required JournalEntity journalEntity,
@@ -361,7 +367,13 @@ class UnifiedAiModal {
           in providerConfigs.whereType<AiConfigInferenceProvider>())
         provider.id: provider,
     };
-    final modalityCapable = allConfigs
+    // Narrow to what this slot can actually route BEFORE touching device
+    // state. The installed-model probe hashes every downloaded speech model
+    // once per process — gigabyte-scale reads with Whisper installed — and
+    // waiting on it whenever a sherpa provider merely existed stalled the
+    // coding-prompt picker for seconds after each app start, although a text
+    // or image skill can never dispatch to a speech model.
+    final candidates = allConfigs
         .whereType<AiConfigModel>()
         .where((model) => model.inputModalities.contains(config.modality))
         .where(
@@ -373,6 +385,17 @@ class UnifiedAiModal {
               ),
         )
         .toList();
+    final modalityCapable = modelsAvailableOnDevice(
+      models: candidates,
+      providers: providersById.values,
+      installedSherpaModelIds:
+          needsSherpaAvailability(
+            models: candidates,
+            providers: providersById.values,
+          )
+          ? await ref.read(sherpaInstalledModelIdsProvider.future)
+          : const {},
+    );
 
     // Match the profile's resolved slot to one of the offered models so the
     // picker can mark it default (exact AiConfigModel.id first, wire-level

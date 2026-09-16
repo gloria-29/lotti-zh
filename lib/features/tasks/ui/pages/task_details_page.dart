@@ -4,7 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotti/classes/journal_entities.dart';
+import 'package:lotti/features/agents/model/query_chat_models.dart';
 import 'package:lotti/features/agents/state/unified_suggestion_providers.dart';
+import 'package:lotti/features/agents/ui/query/query_companion.dart';
 import 'package:lotti/features/ai/helpers/automatic_image_analysis_trigger.dart';
 import 'package:lotti/features/ai/state/consts.dart';
 import 'package:lotti/features/ai/ui/animation/ai_running_animation.dart';
@@ -448,7 +450,14 @@ class _TaskDetailsPageState extends ConsumerState<TaskDetailsPage>
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => QueryCompanion(
+    scope: QueryScope(kind: QueryScopeKind.task, id: widget.taskId),
+    child: _buildDetail(context),
+  );
+
+  /// Data-dependent content stays inside the companion so a missing task
+  /// cannot strand an open discussion without its Close control.
+  Widget _buildDetail(BuildContext context) {
     final focusProvider = taskFocusControllerProvider(widget.taskId);
 
     void handleFocus(TaskFocusIntent? intent, {bool isInitialLoad = false}) {

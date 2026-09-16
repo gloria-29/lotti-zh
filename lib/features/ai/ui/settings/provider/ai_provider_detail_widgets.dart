@@ -1,5 +1,7 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotti/features/ai/constants/provider_config.dart';
 import 'package:lotti/features/ai/model/ai_config.dart';
+import 'package:lotti/features/ai/speech/sherpa_installed_models_provider.dart';
 import 'package:lotti/features/ai/ui/settings/inference_provider_form_edit.dart';
 import 'package:lotti/features/ai/ui/settings/provider/ai_provider_connection_section.dart';
 import 'package:lotti/features/ai/ui/settings/provider/ai_provider_models_section.dart';
@@ -19,7 +21,7 @@ import 'package:material_ui/material_ui.dart';
 /// when a profile uses this provider, and a danger-zone delete action. Wires
 /// the page-level callbacks ([onAddModel], [onEdit], etc.) down to the
 /// individual sections.
-class DetailBody extends StatelessWidget {
+class DetailBody extends ConsumerWidget {
   const DetailBody({
     required this.provider,
     required this.models,
@@ -53,11 +55,19 @@ class DetailBody extends StatelessWidget {
   final VoidCallback onRemove;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final tokens = context.designTokens;
-    final showsDynamicModelCatalog = ProviderConfig.supportsDynamicCatalog(
-      provider.inferenceProviderType,
+    final installedModels = modelsAvailableOnDevice(
+      models: models,
+      providers: [provider],
+      installedSherpaModelIds:
+          provider.inferenceProviderType == InferenceProviderType.sherpa
+          ? ref.watch(sherpaInstalledModelIdsProvider).value ?? const {}
+          : const {},
     );
+    final showsModelCatalog =
+        ProviderConfig.supportsDynamicCatalog(provider.inferenceProviderType) ||
+        provider.inferenceProviderType == InferenceProviderType.sherpa;
     // Pad the bottom by the height the app's bottom nav bar occupies
     // (zero on desktop, ~88pt on mobile with the home indicator) plus
     // the page's normal step6 gap, so the danger-zone card always
@@ -73,7 +83,7 @@ class DetailBody extends StatelessWidget {
         tokens.spacing.step6 + bottomInset,
       ),
       children: [
-        _HeaderStrip(provider: provider, modelCount: models.length),
+        _HeaderStrip(provider: provider, models: models),
         SizedBox(height: tokens.spacing.step5),
         ConnectionSection(provider: provider, onEdit: onEdit),
         SizedBox(height: tokens.spacing.step6),
@@ -81,13 +91,13 @@ class DetailBody extends StatelessWidget {
         // before scrolling on to the searchable catalog below.
         ModelsSection(
           provider: provider,
-          models: models,
+          models: installedModels,
           onAddModel: onAddModel,
           onModelTap: onModelTap,
           onDeleteModel: onDeleteModel,
         ),
         SizedBox(height: tokens.spacing.step6),
-        if (showsDynamicModelCatalog) ...[
+        if (showsModelCatalog) ...[
           AvailableModelsSection(
             providerId: provider.id,
             providerType: provider.inferenceProviderType,
@@ -109,14 +119,24 @@ class DetailBody extends StatelessWidget {
   }
 }
 
-class _HeaderStrip extends StatelessWidget {
-  const _HeaderStrip({required this.provider, required this.modelCount});
+class _HeaderStrip extends ConsumerWidget {
+  const _HeaderStrip({required this.provider, required this.models});
 
   final AiConfigInferenceProvider provider;
-  final int modelCount;
+  final List<AiConfigModel> models;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isEmbedded =
+        provider.inferenceProviderType == InferenceProviderType.sherpa;
+    final installed = isEmbedded
+        ? ref.watch(sherpaInstalledModelIdsProvider).value ?? <String>{}
+        : const <String>{};
+    final modelCount = isEmbedded
+        ? models
+              .where((model) => installed.contains(model.providerModelId))
+              .length
+        : models.length;
     final tokens = context.designTokens;
     final messages = context.messages;
     final visual = aiProviderVisual(
@@ -127,6 +147,7 @@ class _HeaderStrip extends StatelessWidget {
     final status = AiProviderCard.statusFor(
       provider: provider,
       modelCount: modelCount,
+      installedEmbeddedModelCount: isEmbedded ? modelCount : 0,
     );
     final displayName = provider.name.isNotEmpty
         ? provider.name
@@ -194,7 +215,13 @@ class _HeaderStrip extends StatelessWidget {
                   ),
                 ],
                 SizedBox(height: tokens.spacing.step3),
-                _StatusPill(status: status, modelCount: modelCount),
+                _StatusPill(
+                  status: status,
+                  modelCount: modelCount,
+                  offlineHint: isEmbedded
+                      ? messages.sherpaModelNotInstalled
+                      : null,
+                ),
               ],
             ),
           ),
@@ -205,10 +232,15 @@ class _HeaderStrip extends StatelessWidget {
 }
 
 class _StatusPill extends StatelessWidget {
-  const _StatusPill({required this.status, required this.modelCount});
+  const _StatusPill({
+    required this.status,
+    required this.modelCount,
+    this.offlineHint,
+  });
 
   final AiProviderCardStatus status;
   final int modelCount;
+  final String? offlineHint;
 
   @override
   Widget build(BuildContext context) {
@@ -227,7 +259,7 @@ class _StatusPill extends StatelessWidget {
       ),
       AiProviderCardStatus.offline => (
         tokens.colors.text.lowEmphasis,
-        messages.aiProviderCardOllamaHint,
+        offlineHint ?? messages.aiProviderCardOllamaHint,
         tokens.colors.text.highEmphasis,
       ),
     };

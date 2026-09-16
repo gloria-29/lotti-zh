@@ -1,12 +1,31 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lotti/classes/task.dart';
 import 'package:lotti/features/demo/media/demo_media_asset.dart';
+import 'package:lotti/features/demo/seed/demo_world.dart';
 import 'package:lotti/features/plaza/data/demo_world_projection.dart';
 import 'package:lotti/features/plaza/domain/plaza_task.dart';
 
 void main() {
   // The demo world is deterministic under a fixed clock, so project once.
   final tasks = plazaTasksFromDemoWorld(now: DateTime(2026, 7, 17, 10, 30));
+
+  test('demo cables retain real demo edges and stay within visible tasks', () {
+    final demo = ManualDemoWorld.penguinLogistics(now: manualDemoNow);
+    final edges = plazaConnectionsFromDemoWorld(now: manualDemoNow);
+    final taskIds = {for (final task in demo.tasks) task.meta.id};
+    expect(edges, isNotEmpty);
+    for (final edge in edges) {
+      expect(taskIds, containsAll([edge.fromId, edge.toId]));
+      expect(
+        demo.links.any((link) => link.id == edge.id),
+        isTrue,
+        reason: 'a cable must represent an actual fixture relationship',
+      );
+    }
+    expect(
+      plazaConnectionsFromDemoWorld(now: manualDemoNow).map((edge) => edge.id),
+      edges.map((edge) => edge.id),
+    );
+  });
 
   group('plazaTasksFromDemoWorld', () {
     test('projects every penguin task with a unique id and a title', () {
@@ -89,62 +108,6 @@ void main() {
       for (final task in covered) {
         expect(task.coverImageUrl, startsWith(demoMediaPublicBaseUrl));
       }
-    });
-
-    test('every task status arm maps to a plaza state', () {
-      final now = DateTime.utc(2026, 7, 17);
-      expect(
-        mapTaskStatusToPlazaState(
-          TaskStatus.open(id: 'a', createdAt: now, utcOffset: 0),
-        ),
-        PlazaTaskState.open,
-      );
-      expect(
-        mapTaskStatusToPlazaState(
-          TaskStatus.groomed(id: 'b', createdAt: now, utcOffset: 0),
-        ),
-        PlazaTaskState.open,
-      );
-      expect(
-        mapTaskStatusToPlazaState(
-          TaskStatus.inProgress(id: 'c', createdAt: now, utcOffset: 0),
-        ),
-        PlazaTaskState.inProgress,
-      );
-      expect(
-        mapTaskStatusToPlazaState(
-          TaskStatus.blocked(
-            id: 'd',
-            createdAt: now,
-            utcOffset: 0,
-            reason: 'ice',
-          ),
-        ),
-        PlazaTaskState.blocked,
-      );
-      expect(
-        mapTaskStatusToPlazaState(
-          TaskStatus.onHold(
-            id: 'e',
-            createdAt: now,
-            utcOffset: 0,
-            reason: 'ice',
-          ),
-        ),
-        PlazaTaskState.blocked,
-      );
-      expect(
-        mapTaskStatusToPlazaState(
-          TaskStatus.done(id: 'f', createdAt: now, utcOffset: 0),
-        ),
-        PlazaTaskState.done,
-      );
-      expect(
-        mapTaskStatusToPlazaState(
-          TaskStatus.rejected(id: 'g', createdAt: now, utcOffset: 0),
-        ),
-        PlazaTaskState.cancelled,
-      );
     });
 
     test('projection is reproducible under the fixed clock', () {

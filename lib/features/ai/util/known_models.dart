@@ -96,12 +96,12 @@ String? publisherForCuratedModel(String providerModelId) {
 }
 
 /// Known models for each inference provider type
-const Map<InferenceProviderType, List<KnownModel>> knownModelsByProvider = {
+final Map<InferenceProviderType, List<KnownModel>> knownModelsByProvider = {
+  InferenceProviderType.sherpa: sherpaSpeechModels,
   InferenceProviderType.alibaba: alibabaModels,
   InferenceProviderType.gemini: geminiModels,
   InferenceProviderType.melious: meliousModels,
   InferenceProviderType.mistral: mistralModels,
-  InferenceProviderType.mlxAudio: mlxAudioModels,
   InferenceProviderType.nebiusAiStudio: nebiusModels,
   InferenceProviderType.omlx: omlxModels,
   InferenceProviderType.ollama: ollamaModels,
@@ -111,17 +111,6 @@ const Map<InferenceProviderType, List<KnownModel>> knownModelsByProvider = {
   InferenceProviderType.whisper: whisperModels,
   InferenceProviderType.voxtral: voxtralModels,
 };
-
-/// Canonical MLX Audio model identifiers used by the native Apple bridge.
-const mlxAudioVoxtralRealtime4BitModelId =
-    'mlx-community/Voxtral-Mini-4B-Realtime-2602-4bit';
-const mlxAudioVoxtralRealtimeFp16ModelId =
-    'mlx-community/Voxtral-Mini-4B-Realtime-2602-fp16';
-const mlxAudioQwenAsrModelId = 'mlx-community/Qwen3-ASR-0.6B-8bit';
-const mlxAudioQwenAsr17B4BitModelId = 'mlx-community/Qwen3-ASR-1.7B-4bit';
-const mlxAudioQwenAsr17B8BitModelId = 'mlx-community/Qwen3-ASR-1.7B-8bit';
-const String mlxAudioRecommendedSttModelId = mlxAudioQwenAsr17B8BitModelId;
-const mlxAudioParakeetModelId = 'mlx-community/parakeet-tdt-0.6b-v3';
 
 /// Canonical Melious.ai model identifiers used by the curated default setup.
 ///
@@ -144,6 +133,10 @@ const String meliousMistralSmall4119BInstructModelId =
 /// "DeepSeek V4 Flash" in settings could only ever fail.
 const String meliousDeepseekV4FlashModelId = 'deepseek-v4-flash-0731';
 const String meliousQwen35122BA10BModelId = 'qwen3.5-122b-a10b';
+
+/// Flash candidates with explicitly evaluated task-agent prompt profiles.
+const String meliousDeepseekV41FlashModelId = 'deepseek-v4.1-flash';
+const String meliousGlm53FlashModelId = 'glm-5.3-flash';
 
 /// Qwen 3.8 flagships.
 ///
@@ -174,18 +167,6 @@ const String omlxRecommendedMultimodalModelId = omlxQwen36A35bA3b4BitModelId;
 const String omlxWhisperLargeV3ModelId = 'openai/whisper-large-v3';
 const String omlxWhisperLargeV3MlxModelId = 'whisper-large-v3-mlx';
 const String omlxWhisperLargeV3TurboModelId = 'whisper-large-v3-turbo';
-
-/// Whether [providerModelId] is a Qwen3-ASR checkpoint converted for MLX Audio.
-bool isMlxAudioQwenAsrModelId(String providerModelId) {
-  final normalized = providerModelId.toLowerCase();
-  return normalized.startsWith('mlx-community/qwen3-asr-');
-}
-
-/// Whether [model] can be offered as an MLX Audio speech-to-text install.
-bool isMlxAudioSpeechToTextModel(AiConfigModel model) {
-  return model.inputModalities.contains(Modality.audio) &&
-      model.outputModalities.contains(Modality.text);
-}
 
 /// Whether [providerModelId] identifies Mistral's dedicated OCR endpoint.
 bool isMistralOcrModelId(String providerModelId) =>

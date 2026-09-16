@@ -13,6 +13,11 @@ on:
       - "services/shared/matrix/**"
       - "tool/task_agent_model_eval_judge.py"
       - "tool/task_agent_model_eval_judge_test.py"
+      - "tool/deepseek_image_probe.py"
+      - "tool/deepseek_image_probe_test.py"
+      - "tool/penguin_query_eval.py"
+      - "tool/penguin_query_eval_test.py"
+      - "tool/lotti_gym*.py"
       - "tool/pr_screenshot_publish.py"
       - "tool/pr_screenshot_publish_test.py"
       - "tool/play_promote.py"
@@ -27,6 +32,11 @@ on:
       - "services/shared/matrix/**"
       - "tool/task_agent_model_eval_judge.py"
       - "tool/task_agent_model_eval_judge_test.py"
+      - "tool/deepseek_image_probe.py"
+      - "tool/deepseek_image_probe_test.py"
+      - "tool/penguin_query_eval.py"
+      - "tool/penguin_query_eval_test.py"
+      - "tool/lotti_gym*.py"
       - "tool/pr_screenshot_publish.py"
       - "tool/pr_screenshot_publish_test.py"
       - "tool/play_promote.py"
@@ -93,6 +103,17 @@ jobs:
 
       - name: Test
         run: python -m unittest tool/task_agent_model_eval_judge_test.py
+
+      - name: Test image inference probe
+        run: python -m unittest tool.deepseek_image_probe_test
+
+      - name: Test query latency runner
+        run: python -m unittest tool.penguin_query_eval_test
+
+      - name: Test LottiGym orchestration and verdicts
+        run: >-
+          python -m unittest tool.lotti_gym_test tool.lotti_gym_results_test
+          tool.lotti_gym_billing_test tool.lotti_gym_history_test
 
   pr-screenshot-publisher:
     name: PR Screenshot Publisher (test)

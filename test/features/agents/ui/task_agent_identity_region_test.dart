@@ -8,9 +8,14 @@ import 'package:lotti/features/ai/model/ai_config.dart';
 import 'package:lotti/features/design_system/theme/design_tokens.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../test_utils/screenshot_harness.dart' show loadAppFonts;
 import '../../../widget_test_utils.dart';
 
 void main() {
+  // Width-driven layout: pin the bundled fonts so the numbers below read
+  // the same whether or not another file in this isolate loaded them first
+  // (test/README.md, "Committed per-feature harnesses").
+  setUpAll(loadAppFonts);
   const route = InferenceRouteSnapshot(
     providerModelId: 'qwen3.5-plus',
     modelName: 'Qwen 3.5 Plus',
@@ -40,7 +45,9 @@ void main() {
     WidgetTester tester, {
     required TaskAgentModelIdentityViewData data,
     VoidCallback? onSetupTap,
+    String? trailingMeta,
     double? width,
+    TextScaler textScaler = TextScaler.noScaling,
   }) {
     if (width != null) {
       // MediaQuery alone does not resize the surface — the render view does,
@@ -56,10 +63,34 @@ void main() {
         TaskAgentIdentityRegion(
           data: data,
           onSetupTap: onSetupTap ?? () {},
+          trailingMeta: trailingMeta,
         ),
+        mediaQueryData: MediaQueryData.fromView(
+          tester.view,
+        ).copyWith(textScaler: textScaler),
       ),
     );
   }
+
+  testWidgets('at large text the attribution route drops under its label, on '
+      "the label's own column", (tester) async {
+    await pumpRegion(
+      tester,
+      data: const TaskAgentModelIdentityViewData(
+        presentation: TaskAgentIdentityPresentation.split,
+        currentRoute: route,
+        reportRoute: priorRoute,
+      ),
+      width: 600,
+      textScaler: const TextScaler.linear(1.6),
+    );
+    final label = tester.getRect(find.text('This report'));
+    // On its own line the route is whole, never a shorter tier.
+    final routeText = tester.getRect(find.text(priorRouteLabel));
+    expect(routeText.top, greaterThanOrEqualTo(label.bottom));
+    expect(routeText.left, closeTo(label.left, 1));
+    expect(tester.takeException(), isNull);
+  });
 
   Finder setupRowInk() => find.descendant(
     of: find.byType(TaskAgentIdentityRegion),
@@ -67,8 +98,43 @@ void main() {
   );
 
   /// Whether [finder]'s text was truncated rather than wrapped.
-  bool isTruncated(WidgetTester tester, Finder finder) =>
-      tester.renderObject<RenderParagraph>(finder).didExceedMaxLines;
+  // A tiered Text carries a semantics label, so its paragraph sits one
+  // level down.
+  bool isTruncated(WidgetTester tester, Finder finder) => tester
+      .renderObject<RenderParagraph>(
+        find.descendant(of: finder, matching: find.byType(RichText)),
+      )
+      .didExceedMaxLines;
+
+  testWidgets('trailing meta rides the setup row after the route, on every '
+      'wording tier', (tester) async {
+    await pumpRegion(
+      tester,
+      data: const TaskAgentModelIdentityViewData(
+        presentation: TaskAgentIdentityPresentation.combined,
+        currentRoute: route,
+        reportRoute: route,
+      ),
+      trailingMeta: '18.4K tokens',
+      width: 1000,
+    );
+    expect(find.text('$routeLabel · 18.4K tokens'), findsOneWidget);
+
+    // Narrow enough that the full wording cannot fit: the shorter tier is
+    // chosen, and the meta is still on it.
+    await pumpRegion(
+      tester,
+      data: const TaskAgentModelIdentityViewData(
+        presentation: TaskAgentIdentityPresentation.combined,
+        currentRoute: route,
+        reportRoute: route,
+      ),
+      trailingMeta: '18.4K tokens',
+      width: 330,
+    );
+    expect(find.text('$routeLabel · 18.4K tokens'), findsNothing);
+    expect(find.textContaining('· 18.4K tokens'), findsOneWidget);
+  });
 
   testWidgets('combined row is tappable, accessible, and at least step6 high', (
     tester,
@@ -272,9 +338,11 @@ void main() {
   testWidgets('a squeezed route sheds whole segments, not characters', (
     tester,
   ) async {
-    // Widths here are calibrated against the test font, whose glyphs advance
-    // ~1em each — far wider than Inter — so the rung a given pixel width
-    // selects is not the rung the same width selects in the app.
+    // Widths are calibrated against Inter, pinned in setUpAll. The tier text
+    // gets the surface less a fixed chrome — 48 px on the current row, ~97 px
+    // on the report row — and the tiers measure 231 / 155 / 84 px (current)
+    // and 184 / 131 / 49 px (report), so a 260 surface drops exactly the
+    // first tier on both rows.
     await pumpRegion(
       tester,
       data: const TaskAgentModelIdentityViewData(
@@ -282,7 +350,7 @@ void main() {
         currentRoute: route,
         reportRoute: priorRoute,
       ),
-      width: 520,
+      width: 260,
     );
 
     // The full wording no longer fits, so the publisher and the connective
@@ -326,7 +394,9 @@ void main() {
         currentRoute: route,
         reportRoute: route,
       ),
-      width: 260,
+      // 180 less the 48 px chrome holds the bare name (84 px) and not the
+      // middle tier (155 px).
+      width: 180,
     );
 
     // Last rung of the ladder: everything but the model is gone, and the
@@ -344,7 +414,7 @@ void main() {
         currentRoute: route,
         reportRoute: priorRoute,
       ),
-      width: 520,
+      width: 260,
     );
 
     // "This rep…" tells the reader strictly less than nothing, so the fixed

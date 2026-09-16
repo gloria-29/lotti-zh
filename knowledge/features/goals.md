@@ -5,21 +5,21 @@ description: Goal-driven agents — the deterministic Phase A tier evaluating cr
 resource: ../../lib/features/goals
 tags: [goals, agents, runtime, wake, evaluation]
 status: draft
-generated: { by: claude-code/opus-5, at: 2026-08-18T00:00:00Z }
+generated: { by: claude-code/fable-5.1, at: 2026-09-15T09:00:00Z }
 stale_after: 2027-02-22
 sources:
   - id: goals-src
     resource: ../../lib/features/goals
     title: Goals feature source
-    last_modified: 2026-08-30
+    last_modified: 2026-09-15
   - id: phase-a
     resource: ../../lib/features/goals/runtime/goal_agent_phase_a.dart
     title: GoalAgentPhaseA — the deterministic tick
-    last_modified: 2026-08-13
+    last_modified: 2026-08-17
   - id: signal-reader
     resource: ../../lib/features/goals/evaluation/goal_signal_reader.dart
     title: GoalSignalReader — journal-backed daily aggregates
-    last_modified: 2026-08-16
+    last_modified: 2026-08-29
   - id: evaluator
     resource: ../../lib/features/goals/evaluation/goal_progress_evaluator.dart
     title: GoalProgressEvaluator — pure criteria-tree fold
@@ -31,7 +31,7 @@ sources:
   - id: vocabulary
     resource: ../../lib/classes/goal_criterion.dart
     title: GoalCriterion tree (shared vocabulary in lib/classes)
-    last_modified: 2026-08-16
+    last_modified: 2026-08-17
   - id: trigger-tokens
     resource: ../../lib/classes/goal_trigger_tokens.dart
     title: Goal trigger tokens — cadence, escalation, baseline, report-refresh
@@ -39,15 +39,15 @@ sources:
   - id: goal-service
     resource: ../../lib/features/goals/service/goal_agent_service.dart
     title: GoalAgentService — lifecycle, subscriptions and report automation
-    last_modified: 2026-08-14
+    last_modified: 2026-08-18
   - id: progress-vocabulary
     resource: ../../lib/classes/goal_progress_models.dart
     title: Persisted per-dimension progress vocabulary
-    last_modified: 2026-08-12
+    last_modified: 2026-08-09
   - id: workflow
     resource: ../../lib/features/goals/workflow/goal_agent_workflow.dart
     title: GoalAgentWorkflow — the Phase B LLM tier
-    last_modified: 2026-08-14
+    last_modified: 2026-09-12
   - id: contract
     resource: ../../lib/features/goals/workflow/goal_agent_contract.dart
     title: Goal-agent contract (eval-graduated prompt + tools)
@@ -59,7 +59,7 @@ sources:
   - id: facts-renderer
     resource: ../../lib/features/goals/workflow/goal_facts_renderer.dart
     title: GoalFactsRenderer — the JSON fence Phase B consumes
-    last_modified: 2026-08-18
+    last_modified: 2026-08-30
   - id: chat-history
     resource: ../../lib/features/goals/service/goal_chat_history_service.dart
     title: GoalChatHistoryService — bounded dialogue and orphan recovery
@@ -71,7 +71,7 @@ sources:
   - id: checkin-compaction-strategy
     resource: ../../lib/features/goals/logic/goal_checkin_compaction_strategy.dart
     title: GoalCheckInCompactionStrategy — the seam the compaction eval measures across
-    last_modified: 2026-08-27
+    last_modified: 2026-09-04
   - id: compaction-eval
     resource: ../../docs/evaluations/goal_agent_models/compaction.md
     title: Check-in compaction evaluation — full vs truncate vs hierarchical
@@ -79,7 +79,7 @@ sources:
   - id: goal-agent-evals
     resource: ../../docs/evaluations/goal_agent_models/README.md
     title: Goal-agent model evaluation run book and results
-    last_modified: 2026-08-18
+    last_modified: 2026-08-27
   - id: tool-dispatcher
     resource: ../../lib/features/goals/workflow/goal_tool_dispatcher.dart
     title: GoalToolDispatcher — proposal persistence and spec revision routing
@@ -87,27 +87,27 @@ sources:
   - id: create-edit
     resource: ../../lib/features/goals/ui/pages/create_goal_agent_page.dart
     title: Goal create/edit flow — three-step creation, two-step editing
-    last_modified: 2026-08-16
+    last_modified: 2026-09-05
   - id: unified-goals-page
     resource: ../../lib/features/goals/ui/pages/unified_goals_page.dart
     title: UnifiedGoalsPage — flag-gated Goals + Habits merge (phase 1)
-    last_modified: 2026-08-16
+    last_modified: 2026-09-07
   - id: health-refresh
     resource: ../../lib/features/goals/service/goal_health_refresh_service.dart
     title: GoalHealthRefreshService — pulling health signals forward on entry
-    last_modified: 2026-08-17
+    last_modified: 2026-08-31
   - id: progress-card
     resource: ../../lib/features/goals/ui/goal_progress_card.dart
     title: GoalProgressCard — habit grids, signal series and the day-track grid
-    last_modified: 2026-08-17
+    last_modified: 2026-09-05
   - id: metric-series
     resource: ../../lib/features/goals/logic/goal_metric_series.dart
     title: Goal metric day-series maths, shared by the cards and the sheet
-    last_modified: 2026-08-17
+    last_modified: 2026-08-31
   - id: goal-routes
     resource: ../../lib/features/goals/ui/goal_routes.dart
     title: goal route helpers — every goal page path under /goals
-    last_modified: 2026-08-16
+    last_modified: 2026-08-18
   - id: measurable-capture
     resource: ../../lib/features/goals/service/goal_measurable_capture_service.dart
     title: Approval-gated measurable capture from goal chat
@@ -115,11 +115,11 @@ sources:
   - id: assessments
     resource: ../../lib/features/goals/service/goal_assessment_service.dart
     title: Separate daily assessment ledger
-    last_modified: 2026-08-12
+    last_modified: 2026-08-29
   - id: sync-dispatcher
     resource: ../../lib/features/goals/sync/goal_signal_sync_dispatcher.dart
     title: GoalSignalSyncDispatcher — the sync blind-spot bridge
-    last_modified: 2026-08-09
+    last_modified: 2026-08-13
   - id: adr-0054
     resource: ../../docs/adr/0054-deterministic-first-two-tier-wakes.md
     title: "ADR 0054: Deterministic-First Two-Tier Wakes"
@@ -127,11 +127,11 @@ sources:
   - id: chat-composer
     resource: ../../lib/features/agents/ui/chat/agent_chat_view.dart
     title: AgentChatView — voice-enabled goal chat composer
-    last_modified: 2026-08-14
+    last_modified: 2026-09-12
   - id: recorder-controller
-    resource: ../../lib/features/ai_chat/ui/controllers/chat_recorder_controller.dart
+    resource: ../../lib/features/agents/ui/chat/chat_recorder_controller.dart
     title: ChatRecorderController — shared voice recorder
-    last_modified: 2026-08-14
+    last_modified: 2026-09-12
 ---
 
 # Goal Agents — Runtime
@@ -195,12 +195,18 @@ flowchart TD
     CHECKIN[check-in linked to the goal\nJournalAudio / JournalEntry] --> CHECKINSTALE[mark report stale\nGoalCheckInNotifier — never a wake,\nconsumed by the next cadence tick]
     PB --> COMPACT[automatic report wake only:\ncompact pending check-ins\nminimal reasoning, ≤500 output tokens,\nkeyed by agentId+entryId]
     COMPACT --> FACTS[GoalFactsRenderer\nJSON fence: goal, evaluation,\nreporting, ads, personaTone,\nrecent dialogue + userVoice\ntarget ≤6k tokens, never transcripts]
-    FACTS --> CONV[one bounded conversation\nglm-5.2 default, profile override,\ntemperature 0, 8-tool contract]
+    FACTS --> CONV[one bounded conversation\nexplicit setup, Settings fallback,\ntemperature 0, 8-tool contract]
     CONV --> OUT[one transaction:\nreport+head, goalNudge writes,\nobservations, revision ChangeSet,\nvisible reply_to_user carrier]
     OUT --> FRESH{current report head advanced\nand no watched timer active?}
     FRESH -- yes --> REPORTDONE[clear report-stale watermark]
     FRESH -- no --> STAY[keep report stale]
 ```
+
+Goal workflow execution and model summaries share `ProfileResolver.resolveStandalone`:
+typed setup, legacy agent profile, then the device's Settings default. The
+validated `glm-5.2` built-in remains only when no Settings default was selected.
+See [profile resolution](ai/profile-resolution.md) for failure and precedence rules.
+
 
 ## Invariants
 
@@ -497,10 +503,15 @@ flowchart TD
   latest change, coverage, and actions as separate required slots; the strategy
   parses the same complete shape used by the eval classifier and assembles the
   localized model-authored sentences without injecting English headings.
+  For multi-criterion goals, every applicable slot must cover every criterion:
+  current values, rolling aggregates, previous-to-latest changes, and sample
+  counts stay in their corresponding sections instead of being scattered.
   Evaluated-period and rolling-standing slots must be non-empty. Completeness
   is judged strictly, but the *rules* read a lenient view
   (`GoalStructuredReport.lenient`) so a report the parser refused is still
-  checked for status tokens in prose and for quoting the deterministic
+  checked for status tokens in prose (only the camelCase identifiers —
+  `onTrack`, `atRisk`, `offTrack`, `insufficientData`; `recovering` and
+  `achieved` are ordinary words a report may use) and for quoting the deterministic
   aggregates — a wake gets one forced report retry, and a rejection naming
   only the shape would let those rules ambush it. Structured
   current actions carry a criterion id and survive only when deterministic
@@ -510,9 +521,17 @@ flowchart TD
   Policy rows P16 and
   P17 regress this distinction with the six-dimensional BP fixture; model
   results and context-shape experiments live in the goal-agent eval run book.
+  After retiring a stale banner, the prompt asks the model to re-evaluate
+  eligibility in the same wake, excluding the retired banner. If replacement
+  is still required, reuse an eligible top-rated banner before generating one.
+  The inference eval measures compliance before workflow recovery; the
+  outcome eval exercises the production workflow, including its forced retry.
   A wake with zero tool calls is legal (the no-op policy row) — the
   strategy never nags for output. Two deterministic exceptions are forced
-  with one pinned retry each: a wake missing its report where the status
+  with one forced retry each (`forcedToolChoiceFor` decides whether that retry
+  may also pin `tool_choice`: DeepSeek answers a pinned choice with prose and
+  an empty `tool_calls`, so for those models the retry sends the single tool
+  and no pin): a wake missing its report where the status
   transitioned, the detail page requested a refresh, **or the pending chat
   message asked for the standing report itself to be rewritten**; and policy
   row P5 (offTrack, no fresh ad, no cooldown) or an explicit new-banner
@@ -524,9 +543,11 @@ flowchart TD
   offer to rewrite), a matching FACTS-block instruction, and the model's own
   tool call as the language-independent carrier — and an explicit refusal
   ("don't make the report shorter") suppresses it, because forcing a rewrite
-  over a refusal destroys the report the user asked to keep. A first evaluation that lands at risk is
-  also ad-eligible, so a newly created goal does not wait for a three-day trend
-  before receiving its initial banner.
+  over a refusal destroys the report the user asked to keep. A first evaluation
+  that lands at risk is also ad-eligible, so a newly created goal does not wait
+  for a three-day trend before receiving its initial banner. The inference
+  catalog carries a dedicated first-evaluation case; established restraint
+  fixtures carry non-empty, non-worsening prior history.
   Interactive batches have a stricter publication fence: if any tool call is
   rejected, the wake fails before `persistOutputs`, including when the same
   model turn also supplied a plausible `reply_to_user` or a later accepted call
@@ -917,7 +938,11 @@ flowchart TD
   last failure's reason in an error line above the automation row. The line
   hides while a report wake runs (`goalReportWakeInFlightProvider`: the
   refresh workspace or any `goal-escalation:` workspace — never the
-  agent-wide flag, which every chat and subscription tick flips), clears on
+  agent-wide flag, which every chat and subscription tick flips). The
+  automation row's freshness word reads that same scoped flag
+  (`AgentAutomationRow.isRefreshingReport`): a report refresh in flight
+  reads *Out of date* until it lands, while a chat reply that keeps the
+  trigger on "Thinking…" leaves a fresh read fresh. The line clears on
   the next completed report wake, and yields to durable evidence newer than
   the failure's start: a `reportFreshAt` watermark (a successful refresh,
   local or synced) or a displayed report published later — a timed-out

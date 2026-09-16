@@ -493,13 +493,30 @@ void main() {
             find.text(_t('Sardine Logistics 14B', 'Sardinenlogistik 14B')),
             findsOneWidget,
           );
+          final coverArtist = find.text(
+            _t('Project Waddle Cover Artist', 'Project-Waddle-Titelkünstler'),
+          );
+          final settingsScrollable = find
+              .descendant(
+                of: find.byType(AiSettingsPage),
+                matching: find.byType(Scrollable),
+              )
+              .first;
+          // The settings header can push later models beyond the lazy list's
+          // built rows. Verify that they are reachable, then capture the top.
+          await tester.scrollUntilVisible(
+            coverArtist,
+            200,
+            scrollable: settingsScrollable,
+          );
+          await settleFrames(tester, 4);
+          expect(coverArtist.hitTestable(), findsOneWidget);
+          tester.state<ScrollableState>(settingsScrollable).position.jumpTo(0);
+          await settleFrames(tester, 4);
           expect(
-            find.text(
-              _t(
-                'Project Waddle Cover Artist',
-                'Project-Waddle-Titelkünstler',
-              ),
-            ),
+            find
+                .text(_t('Waddle Command 70B', 'Watschelkommando 70B'))
+                .hitTestable(),
             findsOneWidget,
           );
           await captureScreenshot(
@@ -512,6 +529,21 @@ void main() {
 
       testWidgets('$viewport AI profiles — $theme', (tester) async {
         await _withDevicePlatform(device, () async {
+          // An independently selected Chat route on the shared penguin fixture.
+          final profiles = [
+            for (final profile in manualDemoAiProfiles)
+              if (profile.id == manualProjectWaddleProfileId)
+                profile.copyWith(chatModelId: manualSardineLogisticsModelId)
+              else
+                profile,
+          ];
+          when(aiRepository.watchProfiles).thenAnswer(
+            (_) => Stream.value(profiles),
+          );
+          when(
+            () =>
+                aiRepository.watchConfigsByType(AiConfigType.inferenceProfile),
+          ).thenAnswer((_) => Stream.value(profiles));
           final world = ManualDemoWorld.penguinLogistics();
           await pumpSurface(
             tester,

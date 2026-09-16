@@ -8,8 +8,10 @@ import 'package:lotti/features/agents/tools/agent_tool_registry.dart';
 import 'package:lotti/features/agents/workflow/task_agent_evidence_synthesis.dart';
 import 'package:lotti/features/agents/workflow/task_agent_prompt_builder.dart';
 import 'package:lotti/features/agents/workflow/task_agent_report_editor.dart';
+import 'package:lotti/features/agents/workflow/task_agent_report_policy.dart';
 import 'package:lotti/features/ai/conversation/conversation_manager.dart';
 import 'package:lotti/features/ai/conversation/conversation_repository.dart';
+import 'package:lotti/features/ai/functions/lotti_checklist_update_handler.dart';
 import 'package:lotti/features/ai/model/ai_config.dart';
 import 'package:lotti/features/ai/model/inference_usage.dart';
 import 'package:lotti/features/ai/repository/inference_repository_interface.dart';
@@ -212,6 +214,7 @@ class LocalTaskAgentEvalScenario {
     this.requiredToolArgumentTermGroups = const {},
     this.forbiddenToolNames = const {},
     this.forbiddenToolArgumentTerms = const {},
+    this.checklistReopeningEvidence = const {},
   });
 
   final String id;
@@ -258,6 +261,12 @@ class LocalTaskAgentEvalScenario {
   /// Terms that must not appear in a specific tool's arguments.
   final Map<String, List<String>> forbiddenToolArgumentTerms;
 
+  /// Optional reopening of these user-checked items must cite the specified
+  /// newer evidence in a substantive reason. Every reason term group must
+  /// match; unrelated items, title edits and archiving remain disallowed.
+  /// This tests ordinary user toggles, never human-approved chat state.
+  final Map<String, List<List<String>>> checklistReopeningEvidence;
+
   Map<String, Object?> toJson() {
     return {
       'id': id,
@@ -280,6 +289,7 @@ class LocalTaskAgentEvalScenario {
       'requiredToolArgumentTermGroups': requiredToolArgumentTermGroups,
       'forbiddenToolNames': forbiddenToolNames.toList()..sort(),
       'forbiddenToolArgumentTerms': forbiddenToolArgumentTerms,
+      'checklistReopeningEvidence': checklistReopeningEvidence,
       'systemPromptChars': systemPrompt.length,
       'userMessageChars': userMessage.length,
       'userMessage': userMessage,
@@ -315,6 +325,12 @@ List<LocalTaskAgentEvalScenario> defaultMeliousTaskAgentEvalScenarios({
   ];
 }
 
+const _inferenceProfileCleanupTerms = [
+  'profile seeding',
+  'empty profile',
+  'inference profile',
+];
+
 LocalTaskAgentEvalScenario _implicitWorkflowPlanScenario(
   LocalTaskAgentEvalPromptVariant variant,
 ) {
@@ -329,7 +345,8 @@ LocalTaskAgentEvalScenario _implicitWorkflowPlanScenario(
     ],
     promptVariant: variant,
     requiredReportTermGroups: const [
-      ['profile seeding'],
+      _inferenceProfileCleanupTerms,
+      ['fix', 'clean', 'remove', 'prevent', 'no longer selectable', 'exclude'],
       ['pull request', 'pr'],
       ['review'],
       ['release'],
@@ -345,7 +362,7 @@ LocalTaskAgentEvalScenario _implicitWorkflowPlanScenario(
         // "empty inference profiles are no longer selectable" says the same
         // thing as "empty profile"; the item has to be about the profiles,
         // not phrased a particular way.
-        ['profile seeding', 'empty profile', 'inference profile'],
+        _inferenceProfileCleanupTerms,
         // "Fix the seeding so empty profiles are no longer selectable" is the
         // implementation step; demanding the literal verb passed only because
         // an earlier fixture happened to say "implementation".
@@ -364,16 +381,14 @@ LocalTaskAgentEvalScenario _implicitWorkflowPlanScenario(
 /// agent-evolution workflow rather than Lotti's seeded report contract.
 List<LocalTaskAgentEvalScenario>
 evolvedReportDirectiveTaskAgentEvalScenarios() {
-  final base = defaultMeliousTaskAgentEvalScenarios(
-    variants: const [LocalTaskAgentEvalPromptVariant.evidenceSynthesis],
-  );
+  final base = defaultMeliousTaskAgentEvalScenarios();
 
   LocalTaskAgentEvalScenario find(String id) =>
       base.firstWhere((scenario) => scenario.id == id);
 
   return [
     _withEvolvedReportDirective(
-      find('metadata_explicit_evidenceSynthesis'),
+      find('metadata_explicit_production'),
       id: 'metadata_explicit_evolved_decision_memo',
       reportDirective: _evolvedDecisionMemoDirective,
       requiredDirectiveTerms: const [
@@ -387,7 +402,7 @@ evolvedReportDirectiveTaskAgentEvalScenarios() {
       ],
     ),
     _withEvolvedReportDirective(
-      find('german_voice_plan_evidenceSynthesis'),
+      find('german_voice_plan_production'),
       id: 'german_voice_plan_evolved_delivery_coach',
       reportDirective: _evolvedGermanDeliveryCoachDirective,
       requiredDirectiveTerms: const [
@@ -400,7 +415,7 @@ evolvedReportDirectiveTaskAgentEvalScenarios() {
       ],
     ),
     _withEvolvedReportDirective(
-      find('progress_update_evidenceSynthesis'),
+      find('progress_update_production'),
       id: 'progress_update_evolved_risk_brief',
       reportDirective: _evolvedRiskBriefDirective,
       requiredDirectiveTerms: const [
@@ -410,13 +425,13 @@ evolvedReportDirectiveTaskAgentEvalScenarios() {
       forbiddenDirectiveTerms: const ['no blockers'],
     ),
     _withEvolvedReportDirective(
-      find('messy_german_transcript_evidenceSynthesis'),
+      find('messy_german_transcript_production'),
       id: 'messy_german_transcript_evolved_plain_language',
       reportDirective: _evolvedPlainLanguageDirective,
       forbiddenDirectiveTerms: const ['##', '|---'],
     ),
     _withEvolvedReportDirective(
-      find('active_deployment_constraint_evidenceSynthesis'),
+      find('active_deployment_constraint_production'),
       id: 'active_deployment_constraint_evolved_decision_memo',
       reportDirective: _evolvedDecisionMemoDirective,
       requiredDirectiveTerms: const [
@@ -426,7 +441,7 @@ evolvedReportDirectiveTaskAgentEvalScenarios() {
       forbiddenDirectiveTerms: const ['## decision needed'],
     ),
     _withEvolvedReportDirective(
-      find('spanish_mixed_context_evidenceSynthesis'),
+      find('spanish_mixed_context_production'),
       id: 'spanish_mixed_context_evolved_localized_partner',
       reportDirective: _evolvedLocalizedPartnerDirective,
       requiredDirectiveTerms: const [
@@ -439,7 +454,7 @@ evolvedReportDirectiveTaskAgentEvalScenarios() {
       ],
     ),
     _withEvolvedReportDirective(
-      find('external_link_and_completion_evidenceSynthesis'),
+      find('external_link_and_completion_production'),
       id: 'external_link_and_completion_evolved_release_evidence',
       reportDirective: _evolvedReleaseEvidenceDirective,
       requiredDirectiveTerms: const [
@@ -486,6 +501,7 @@ LocalTaskAgentEvalScenario _withEvolvedReportDirective(
     requiredToolArgumentTermGroups: source.requiredToolArgumentTermGroups,
     forbiddenToolNames: source.forbiddenToolNames,
     forbiddenToolArgumentTerms: source.forbiddenToolArgumentTerms,
+    checklistReopeningEvidence: source.checklistReopeningEvidence,
   );
 }
 
@@ -495,8 +511,9 @@ The one-liner states the current delivery call; the TLDR explains its practical
 consequence without repeating it. Start the full report with
 `## Recommendation` and one short evidence-backed paragraph. Follow with
 `## Next moves`, using one to four concrete bullets and retaining owners and
-dates when known. Add `## Decision needed` only when the user must resolve an
-active choice or dependency. Omit generic status headings, empty sections,
+dates when known. Add `## Decision needed` only when the user themselves must
+make a choice or unblock something; a constraint someone else owns is reported
+under the headings above, never as a decision for the user. Omit generic status headings, empty sections,
 tool narration, and repeated context.
 ''';
 
@@ -538,8 +555,9 @@ or describe task setup and checklist operations as progress.
 const _evolvedReleaseEvidenceDirective = '''
 Write a compact release note grounded only in recorded outcomes. Use exactly
 `## Outcome` for completed real-world work and `## Remaining` for work that is
-still pending. Add `## Evidence` only when a real external URL exists, using a
-descriptive Markdown link. Keep completion separate from deployment readiness.
+still pending. When a recorded real external URL exists you MUST add
+`## Evidence` with that URL as a descriptive Markdown link; omit the section
+entirely when no such URL exists. Keep completion separate from deployment readiness.
 Do not use generic achievement headings, expose internal IDs, or turn task
 state and checklist edits into accomplishments.
 ''';
@@ -815,8 +833,10 @@ LocalTaskAgentEvalScenario _germanPlanningScenario(
     // NOT `fertig`: it is a stem, and the live run tripped all three models on
     // "Figma-Prototyp fertigstellen" and "soll bis 30. September fertig sein"
     // — an infinitive TODO and a future deadline, neither of them a claim that
-    // anything is done. The remaining three are past participles, which cannot
-    // be read as forward-looking the same way.
+    // anything is done. The remaining three are past participles, but a modal
+    // passive still makes them forward-looking — "kann der Prototyp
+    // abgeschlossen werden" tripped a live run — so the matcher reads German
+    // modals and `sobald` as deferral cues.
     forbiddenReportClaims: const ['erledigt', 'abgeschlossen', 'umgesetzt'],
   );
 }
@@ -1045,15 +1065,22 @@ LocalTaskAgentEvalScenario _userCompletedItemScenario(
     systemPrompt: _buildEvalSystemPrompt(variant),
     userMessage: _userCompletedItemUserMessage,
     expectedToolCalls: const [],
-    // The invariant is that the user's checked item survives, which is what
-    // updateChecklistItems would violate. Adding a new investigation item is
-    // the context's own request — "Investigation is needed; no root cause
-    // yet" — so it must not count against the model.
-    forbiddenToolNames: const {TaskAgentToolNames.updateChecklistItems},
+    // Production permits a reasoned override when evidence is newer than the
+    // user's toggle. Preserving completion and adding investigation work is
+    // also valid. Neither path establishes scheduling intent.
+    checklistReopeningEvidence: const {
+      'item-sync-fix': [
+        ['qa'],
+        ['11:20'],
+        ['duplicate', 'sync'],
+        ['reappeared', 'resurfaced', 'again', 'recurrence', 'recurred'],
+      ],
+    },
     allowedExtraToolNames: const {
       TaskAgentToolNames.updateReport,
       TaskAgentToolNames.recordObservations,
       TaskAgentToolNames.addMultipleChecklistItems,
+      TaskAgentToolNames.updateChecklistItems,
     },
     isFirstWake: false,
     promptVariant: variant,
@@ -1519,7 +1546,8 @@ Apply only the explicit checklist and deadline changes. Preserve the legal
 review as pending and report Dana's retention-clause blocker.
 ''';
 
-const _noOpRefreshUserMessage = '''
+final _noOpRefreshUserMessage =
+    '''
 ## Current Task Context
 ```json
 {
@@ -1539,21 +1567,7 @@ const _noOpRefreshUserMessage = '''
 }
 ```
 
-## Previous Agent Report
-```json
-{
-  "oneLiner": "2025 return filed and receipt confirmed",
-  "tldr": "The signed return was submitted and the receipt is on file.",
-  "content": "## Achieved\n- Return filed\n- Submission receipt confirmed"
-}
-```
-
-## Changed Since Last Wake
-The sync engine reported label-tax as changed. The task, checklist, and log are
-identical to the previous wake.
-
-Check whether the report or task needs any action. Do not republish unchanged
-content.
+${TaskAgentReportPolicy.existingReportContext}${TaskAgentReportPolicy.changedEntitiesContext(triggerTokens: const ['label-tax'], hasReport: true)}${TaskAgentReportPolicy.closingInstruction}
 ''';
 
 const _duplicateChecklistUserMessage = '''
@@ -1583,7 +1597,8 @@ Add only genuinely missing checklist work. Preserve the two existing items and
 finish with the full report.
 ''';
 
-const _staleDeadlineUserMessage = '''
+final _staleDeadlineUserMessage =
+    '''
 ## Current Task Context
 ```json
 {
@@ -1606,20 +1621,7 @@ const _staleDeadlineUserMessage = '''
 }
 ```
 
-## Previous Agent Report
-```json
-{
-  "oneLiner": "Release QA underway for October 31",
-  "tldr": "The release remains targeted for October 31; release QA is pending.",
-  "content": "## What is left to do\n- Complete release QA"
-}
-```
-
-## Changed Since Last Wake
-Only the latest app-icon note is new.
-
-Respect the user's latest manual deadline and avoid republishing an unchanged
-report.
+${TaskAgentReportPolicy.existingReportContext}${TaskAgentReportPolicy.changedEntitiesContext(triggerTokens: const ['app-icon-note'], hasReport: true)}${TaskAgentReportPolicy.closingInstruction}
 ''';
 
 const _messyGermanTranscriptUserMessage = '''
@@ -1697,7 +1699,8 @@ Apply the explicit completion while preserving deployment as pending. The Legal
 approval gate is an active constraint and must remain visible in the report.
 ''';
 
-const _userCompletedItemUserMessage = '''
+final _userCompletedItemUserMessage =
+    '''
 ## Current Task Context
 ```json
 {
@@ -1710,8 +1713,8 @@ const _userCompletedItemUserMessage = '''
       "id": "item-sync-fix",
       "title": "Fix duplicate sync events",
       "isChecked": true,
-      "lastModifiedBy": "user",
-      "lastModifiedAt": "2026-07-10T08:00:00Z"
+      "checkedBy": "user",
+      "checkedAt": "2026-07-10T08:00:00Z"
     }
   ],
   "log": [
@@ -1721,20 +1724,7 @@ const _userCompletedItemUserMessage = '''
 }
 ```
 
-## Previous Agent Report
-```json
-{
-  "oneLiner": "Duplicate sync fix completed, monitoring remains",
-  "tldr": "The duplicate-event fix is complete and awaiting validation.",
-  "content": "## Achieved\n- Fixed duplicate sync events"
-}
-```
-
-## Changed Since Last Wake
-The QA note at 11:20 is new.
-
-Do not override the user's checked state without an explicit request. Update the
-report to surface the renewed sync risk and need for investigation.
+${TaskAgentReportPolicy.existingReportContext}${TaskAgentReportPolicy.changedEntitiesContext(triggerTokens: const ['qa-note'], hasReport: true)}${TaskAgentReportPolicy.closingInstruction}
 ''';
 
 const _spanishMixedContextUserMessage = '''
@@ -2168,7 +2158,8 @@ class LocalTaskAgentEvalCaseResult {
       scenario.forbiddenToolArgumentTerms.values.fold<int>(
         0,
         (sum, terms) => sum + terms.length,
-      );
+      ) +
+      (scenario.checklistReopeningEvidence.isEmpty ? 0 : 1);
 
   int get passedQualityCheckCount {
     if (scenario.requiresReport && reportToolCall == null) return 0;
@@ -2206,6 +2197,10 @@ class LocalTaskAgentEvalCaseResult {
       passed += entry.value
           .where((term) => !arguments.contains(term.toLowerCase()))
           .length;
+    }
+    if (scenario.checklistReopeningEvidence.isNotEmpty &&
+        _hasValidChecklistReopenings(scenario, toolCalls)) {
+      passed++;
     }
     return passed;
   }
@@ -2562,6 +2557,8 @@ class LocalTaskAgentInferenceEvalRunner {
           (executionMode == LocalTaskAgentEvalExecutionMode.singlePass ? 0 : 1),
     );
     final manager = conversationRepository.getConversation(conversationId);
+    InferenceUsage? usage;
+    var usedForcedReportRetry = false;
 
     try {
       try {
@@ -2577,12 +2574,15 @@ class LocalTaskAgentInferenceEvalRunner {
                   )
                   .toList(growable: false)
             : allTools;
-        var usage = await conversationRepository.sendMessage(
+        usage = await conversationRepository.sendMessage(
           conversationId: conversationId,
           message: scenario.userMessage,
           model: profile.providerModelId,
           provider: provider,
           inferenceRepo: inferenceRepository,
+          // The eval owns failure classification and resumption. A transport
+          // error must not fall through to report recovery as a normal stop.
+          rethrowInferenceErrors: true,
           tools: mutationTools,
           temperature: temperature,
           strategy: strategy,
@@ -2590,7 +2590,6 @@ class LocalTaskAgentInferenceEvalRunner {
           consumptionWakeRunKey: wakeRunKey,
           consumptionThreadId: scenario.id,
         );
-        var usedForcedReportRetry = false;
         var reportRevisionCompleted = true;
         var reportRevisionValid = true;
         var reportEditorAttempts = 0;
@@ -2620,6 +2619,7 @@ class LocalTaskAgentInferenceEvalRunner {
             model: profile.providerModelId,
             provider: provider,
             inferenceRepo: inferenceRepository,
+            rethrowInferenceErrors: true,
             // Same key: a forced retry is part of what the case cost, not a
             // separate wake. Billing it elsewhere would understate the price
             // of the models that need the retry most.
@@ -2792,6 +2792,9 @@ class LocalTaskAgentInferenceEvalRunner {
           latencyMs: stopwatch.elapsedMilliseconds,
           toolCalls: strategy.toolCalls,
           error: error,
+          usage: usage,
+          usedForcedReportRetry: usedForcedReportRetry,
+          consumption: consumptionForWakeRunKey?.call(wakeRunKey) ?? const [],
         );
       }
     } finally {
@@ -2853,18 +2856,28 @@ class LocalTaskAgentInferenceEvalRunner {
     );
   }
 
+  /// Preserve completed-call telemetry when a later inference request fails.
   LocalTaskAgentEvalCaseResult _inferenceFailedResult({
     required LocalTaskAgentEvalProfile profile,
     required LocalTaskAgentEvalScenario scenario,
     required int latencyMs,
     required List<LocalTaskAgentEvalToolCall> toolCalls,
     required Object error,
+    InferenceUsage? usage,
+    bool usedForcedReportRetry = false,
+    List<AiConsumptionEvent> consumption = const [],
   }) {
     return LocalTaskAgentEvalCaseResult(
       profile: profile,
       scenario: scenario,
       provider: provider,
       latencyMs: latencyMs,
+      inputTokens: usage?.inputTokens,
+      outputTokens: usage?.outputTokens,
+      thoughtsTokens: usage?.thoughtsTokens,
+      cachedInputTokens: usage?.cachedInputTokens,
+      usedForcedReportRetry: usedForcedReportRetry,
+      consumption: consumption,
       finalContent: 'Inference failed with exception: $error',
       errorMessage: error.toString(),
       toolCalls: toolCalls,
@@ -3019,6 +3032,10 @@ LocalTaskAgentEvalFailureCategory _classifyResult({
     return LocalTaskAgentEvalFailureCategory.unexpectedToolCall;
   }
 
+  if (!_hasValidChecklistReopenings(scenario, toolCalls)) {
+    return LocalTaskAgentEvalFailureCategory.forbiddenToolArguments;
+  }
+
   for (final expected in scenario.expectedToolCalls) {
     final matchingCalls = toolCalls
         .where((call) => call.name == expected.name)
@@ -3052,13 +3069,8 @@ LocalTaskAgentEvalFailureCategory _classifyResult({
   )) {
     return LocalTaskAgentEvalFailureCategory.forbiddenReportContent;
   }
-  // Separate from the term blacklist above, and separately named, because it
-  // fails for a different reason: the term list catches leaked internal ids,
-  // while this catches a report ASSERTING work that did not happen. It is the
-  // whole point of the scenarios that declare it — `user_completed_item_
-  // resurfaced` expects no tool calls at all, so "did the model claim the fix
-  // was verified?" is the only question it really asks. Until this was gated,
-  // those claims were counted in `qualityScore` and could not fail a run.
+  // Internal IDs are forbidden terms; unsupported completion claims are
+  // checked separately so a report may legitimately negate them.
   if (scenario.forbiddenReportClaims.any(
     (claim) => containsAffirmativeReportClaim(reportText, claim),
   )) {
@@ -3086,6 +3098,39 @@ LocalTaskAgentEvalFailureCategory _classifyResult({
   }
 
   return LocalTaskAgentEvalFailureCategory.none;
+}
+
+bool _hasValidChecklistReopenings(
+  LocalTaskAgentEvalScenario scenario,
+  List<LocalTaskAgentEvalToolCall> toolCalls,
+) {
+  if (scenario.checklistReopeningEvidence.isEmpty) return true;
+  for (final call in toolCalls.where(
+    (call) => call.name == TaskAgentToolNames.updateChecklistItems,
+  )) {
+    final items = call.jsonObjectArguments?['items'];
+    if (items is! List || items.isEmpty) return false;
+    for (final item in items) {
+      if (item is! Map<String, dynamic> ||
+          item['isChecked'] != false ||
+          item.keys.any(
+            (key) => !const {'id', 'isChecked', 'reason'}.contains(key),
+          )) {
+        return false;
+      }
+      final evidenceGroups = scenario.checklistReopeningEvidence[item['id']];
+      final reason = item['reason'];
+      if (evidenceGroups == null ||
+          reason is! String ||
+          reason.trim().length < LottiChecklistUpdateHandler.minReasonLength ||
+          evidenceGroups.any(
+            (group) => !containsAnyEvalTerm(reason.toLowerCase(), group),
+          )) {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 LocalTaskAgentEvalToolCall? _latestReportCall(

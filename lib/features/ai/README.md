@@ -11,11 +11,11 @@ one.
 ## What it does for the user
 
 - **Connects to AI providers.** Cloud services (Gemini, OpenAI, Anthropic,
-  Mistral, Melious, Alibaba) and local ones (Ollama, oMLX, MLX Audio on macOS)
+  Mistral, Melious, Alibaba) and local ones (Ollama, oMLX, Whisper, Voxtral)
   are set up the same way. Connecting a provider automatically offers a matching
   ready-made setup, so nobody has to assemble one model slot at a time.
-- **Transcribes voice notes**, using a cloud service or a model running entirely
-  on the user's own machine.
+- **Transcribes voice notes**, using a cloud service, a local server, or
+  downloaded sherpa-onnx speech models running directly on the device.
 - **Summarises a recording in three depths** — a one-line label, a short TLDR,
   and a full organised summary — written in the context of the task the
   recording belongs to, at the moment it was summarised.
@@ -39,7 +39,8 @@ one.
 Provider, model, prompt and inference-profile configuration; the built-in skill
 catalog; prompt assembly and context injection; routing a request to the right
 provider endpoint; the multi-turn conversation and tool-calling loop; local
-embeddings and vector search; and the AI settings surfaces.
+embeddings and vector search; shared batch audio transcription for agent voice
+input and Daily OS processing; and the AI settings surfaces.
 
 It does **not** decide when an agent wakes or what an agent's lifecycle looks
 like — that is the [agents feature](../agents/README.md). It also does not own

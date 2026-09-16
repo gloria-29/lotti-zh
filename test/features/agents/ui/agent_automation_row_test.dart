@@ -1,7 +1,7 @@
 import 'dart:ui' show Tristate;
 
 import 'package:clock/clock.dart';
-import 'package:flutter/semantics.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lotti/features/agents/ui/agent_automation_row.dart';
 import 'package:lotti/features/design_system/components/buttons/design_system_button.dart';
@@ -9,9 +9,14 @@ import 'package:lotti/features/design_system/components/toggles/design_system_to
 import 'package:lotti/features/design_system/theme/design_tokens.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../test_utils/screenshot_harness.dart' show loadAppFonts;
 import '../../../widget_test_utils.dart';
 
 void main() {
+  // Width-driven layout: pin the bundled fonts so the numbers below read
+  // the same whether or not another file in this isolate loaded them first
+  // (test/README.md, "Committed per-feature harnesses").
+  setUpAll(loadAppFonts);
   final now = DateTime(2026, 7, 16, 9);
 
   Widget subject({
@@ -19,6 +24,7 @@ void main() {
     bool automationBusy = false,
     bool inferenceAvailable = true,
     bool isRunning = false,
+    bool? isRefreshingReport,
     bool showCountdown = false,
     DateTime? nextWakeAt,
     bool hasReportContent = false,
@@ -34,6 +40,7 @@ void main() {
       automationBusy: automationBusy,
       inferenceAvailable: inferenceAvailable,
       isRunning: isRunning,
+      isRefreshingReport: isRefreshingReport,
       showCountdown: showCountdown,
       nextWakeAt: nextWakeAt,
       hasReportContent: hasReportContent,
@@ -408,6 +415,162 @@ void main() {
       },
     );
 
+    testWidgets(
+      'a run in flight reads Out of date even when the stale flag is off',
+      (tester) async {
+        // The summary on screen is the one the run is replacing, and the
+        // fresh watermark is written only once a wake succeeds — so the row
+        // must never say "Up to date" beside "Thinking…", whatever the
+        // caller's own flag says.
+        for (final compact in [false, true]) {
+          await pumpRow(
+            tester,
+            subject(
+              hasReportContent: true,
+              isRunning: true,
+              compact: compact,
+              onRunNow: () {},
+            ),
+          );
+
+          final reason = 'compact=$compact';
+          expect(find.text('Thinking…'), findsOneWidget, reason: reason);
+          expect(find.text('Out of date'), findsOneWidget, reason: reason);
+          expect(find.text('Up to date'), findsNothing, reason: reason);
+          expect(
+            find.byKey(const ValueKey('taskAgentStaleGlyph')),
+            findsOneWidget,
+            reason: reason,
+          );
+          expect(
+            find.byKey(const ValueKey('taskAgentFreshGlyph')),
+            findsNothing,
+            reason: reason,
+          );
+          expect(
+            tester
+                .widget<Tooltip>(
+                  find.ancestor(
+                    of: find.byKey(const ValueKey('taskAgentStaleGlyph')),
+                    matching: find.byType(Tooltip),
+                  ),
+                )
+                .message,
+            'This summary is out of date',
+            reason: reason,
+          );
+        }
+      },
+    );
+
+    testWidgets(
+      'stays Out of date when a countdown gives way to the run it scheduled',
+      (tester) async {
+        // The frame that broke trust: the countdown was the only evidence the
+        // summary was behind, the card hid it the moment the wake fired, and
+        // the word flipped to "Up to date" while the agent was still thinking.
+        await withClock(Clock.fixed(now), () async {
+          await pumpRow(
+            tester,
+            subject(
+              hasReportContent: true,
+              automaticUpdatesEnabled: true,
+              showCountdown: true,
+              nextWakeAt: now.add(const Duration(seconds: 30)),
+              onRunNow: () {},
+            ),
+          );
+          expect(find.text('Out of date'), findsOneWidget);
+          expect(find.text('Next update in 0:30'), findsOneWidget);
+
+          // Exactly what the card passes once the wake is running: the same
+          // deadline, the countdown withdrawn, the trigger in flight.
+          await pumpRow(
+            tester,
+            subject(
+              hasReportContent: true,
+              automaticUpdatesEnabled: true,
+              isRunning: true,
+              nextWakeAt: now.add(const Duration(seconds: 30)),
+              onRunNow: () {},
+            ),
+          );
+        });
+
+        expect(scheduleLabel(), findsNothing);
+        expect(find.text('Thinking…'), findsOneWidget);
+        expect(find.text('Out of date'), findsOneWidget);
+        expect(find.text('Up to date'), findsNothing);
+      },
+    );
+
+    testWidgets(
+      'a caller can say the run in flight is not replacing the summary',
+      (tester) async {
+        // A goal agent also runs for chat replies and subscription ticks.
+        // The trigger is busy either way — one wake per agent — but only a
+        // report refresh may make the word "Out of date".
+        for (final (refreshing, label, glyphKey) in [
+          (false, 'Up to date', 'taskAgentFreshGlyph'),
+          (true, 'Out of date', 'taskAgentStaleGlyph'),
+        ]) {
+          await pumpRow(
+            tester,
+            subject(
+              hasReportContent: true,
+              isRunning: true,
+              isRefreshingReport: refreshing,
+              onRunNow: () {},
+            ),
+          );
+
+          final reason = 'refreshing=$refreshing';
+          expect(find.text('Thinking…'), findsOneWidget, reason: reason);
+          expect(find.text(label), findsOneWidget, reason: reason);
+          expect(
+            find.byKey(ValueKey(glyphKey)),
+            findsOneWidget,
+            reason: reason,
+          );
+        }
+      },
+    );
+
+    testWidgets('after the run, the word follows the persisted flag alone', (
+      tester,
+    ) async {
+      // A finished run is not itself proof of freshness — the watermark is.
+      // A run that succeeded has advanced it; one that failed has not, and
+      // the word must not pretend otherwise.
+      for (final (staleAfterRun, glyphKey, label) in [
+        (false, 'taskAgentFreshGlyph', 'Up to date'),
+        (true, 'taskAgentStaleGlyph', 'Out of date'),
+      ]) {
+        await pumpRow(
+          tester,
+          subject(hasReportContent: true, isRunning: true, onRunNow: () {}),
+        );
+        expect(
+          find.text('Out of date'),
+          findsOneWidget,
+          reason: 'stale after run=$staleAfterRun',
+        );
+
+        await pumpRow(
+          tester,
+          subject(
+            hasReportContent: true,
+            isStale: staleAfterRun,
+            onRunNow: () {},
+          ),
+        );
+        final reason = 'stale after run=$staleAfterRun';
+        expect(find.text('Thinking…'), findsNothing, reason: reason);
+        expect(find.text(label), findsOneWidget, reason: reason);
+        expect(find.byKey(ValueKey(glyphKey)), findsOneWidget, reason: reason);
+      }
+    });
+
     testWidgets('Up to date shows with no countdown beside it', (
       tester,
     ) async {
@@ -668,7 +831,31 @@ void main() {
       final label = tester.widget<Text>(scheduleLabel());
       expect(label.maxLines, 2);
       expect(label.softWrap, isTrue);
-      expect(tester.getSize(scheduleLabel()).width, 320);
+      // The promise owns its line and is whole: no wider than the surface,
+      // nothing cut. (Under Inter at 1.3× the wording is ~211 px, so on a
+      // 320 surface it is one line; the wrap is exercised below.)
+      expect(tester.getSize(scheduleLabel()).width, lessThanOrEqualTo(320));
+      expect(
+        tester.renderObject<RenderParagraph>(scheduleLabel()).didExceedMaxLines,
+        isFalse,
+      );
+      expect(tester.takeException(), isNull);
+
+      // Narrower than the wording itself: the label is clamped to the surface
+      // and wraps to its second line rather than truncating.
+      await pumpRow(
+        tester,
+        subject(automaticUpdatesEnabled: true, onRunNow: () {}),
+        width: 200,
+        locale: const Locale('de'),
+        textScaler: const TextScaler.linear(1.3),
+      );
+      expect(tester.getSize(scheduleLabel()).width, 200);
+      expect(tester.widget<Text>(scheduleLabel()).maxLines, 2);
+      expect(
+        tester.renderObject<RenderParagraph>(scheduleLabel()).didExceedMaxLines,
+        isFalse,
+      );
       expect(tester.takeException(), isNull);
     });
 
@@ -843,6 +1030,9 @@ void main() {
       tester,
     ) async {
       await withClock(Clock.fixed(now), () async {
+        // Fully stacked — the trigger under its freshness word, not beside
+        // it — which under Inter at 1.3× needs a surface of 250 or less;
+        // 240 keeps clear of the edge.
         await pumpRow(
           tester,
           subject(
@@ -853,7 +1043,7 @@ void main() {
             nextWakeAt: now.add(const Duration(minutes: 1, seconds: 30)),
             onRunNow: () {},
           ),
-          width: 320,
+          width: 240,
           locale: const Locale('de'),
           textScaler: const TextScaler.linear(1.3),
         );

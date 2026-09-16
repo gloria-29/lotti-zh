@@ -36,6 +36,13 @@ Future<void> initConfigFlags(
   );
   await db.insertFlagIfNotExists(
     const ConfigFlag(
+      name: enableQueryChatFlag,
+      description: 'Enable experimental task, project and category chat?',
+      status: false,
+    ),
+  );
+  await db.insertFlagIfNotExists(
+    const ConfigFlag(
       name: enableAiSummaryTtsFlag,
       description: 'Enable local AI summary playback?',
       status: false,
@@ -221,4 +228,7 @@ const retiredConfigFlags = <String>[
   // the unified Goals surface (`enable_unified_goals`); the tab, its list
   // page and its `/agents` routes were removed with it.
   'enable_agents_page',
+  // The glass Navigate launcher became the only mobile navigation; the
+  // five-slot bar and More sheet this flag opted out of were removed with it.
+  'enable_mobile_navigation_launcher',
 ];

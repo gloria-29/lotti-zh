@@ -1,15 +1,23 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 import 'package:lotti/classes/relationship_trigger_tokens.dart';
 import 'package:lotti/features/agents/model/agent_constants.dart';
 import 'package:lotti/features/agents/model/agent_domain_entity.dart';
+import 'package:lotti/features/agents/model/agent_enums.dart';
 import 'package:lotti/features/agents/state/agent_providers.dart';
 import 'package:lotti/features/agents/state/agent_runtime_registry.dart';
 import 'package:lotti/features/ai/conversation/conversation_repository.dart';
+import 'package:lotti/features/ai/helpers/profile_automation_resolver.dart';
 import 'package:lotti/features/ai/helpers/profile_locality.dart';
+import 'package:lotti/features/ai/helpers/prompt_capability_filter.dart';
 import 'package:lotti/features/ai/model/ai_config.dart';
+import 'package:lotti/features/ai/model/resolved_profile.dart';
 import 'package:lotti/features/ai/repository/ai_config_repository.dart';
 import 'package:lotti/features/ai/repository/cloud_inference_repository.dart';
+import 'package:lotti/features/ai/state/ai_runtime_settings_controller.dart';
+import 'package:lotti/features/ai/state/settings/ai_config_by_type_controller.dart';
 import 'package:lotti/features/notifications/repository/notification_repository.dart';
 import 'package:lotti/features/relationships/repository/relationship_repository.dart';
 import 'package:lotti/features/relationships/runtime/relationship_agent_phase_a.dart';
@@ -19,6 +27,8 @@ import 'package:lotti/features/relationships/service/relationship_chat_service.d
 import 'package:lotti/features/relationships/service/relationship_reminder_service.dart';
 import 'package:lotti/features/relationships/workflow/relationship_agent_workflow.dart';
 import 'package:lotti/get_it.dart';
+import 'package:lotti/providers/service_providers.dart' show journalDbProvider;
+import 'package:lotti/services/db_notification.dart';
 
 /// The OS-reminder projection of the cadence verdict (ADR 0039, plan v2
 /// phase 8) — durable inbox rows first, OS alarms second.
@@ -57,6 +67,94 @@ final relationshipAgentServiceProvider = Provider<RelationshipAgentService>(
   name: 'relationshipAgentServiceProvider',
 );
 
+/// The person's category default profile — the third step of the
+/// relationship-agent resolution chain (ADR 0040 Decision 6), shared by the
+/// workflow and the briefing disclosure so both consult the same read: the
+/// `JournalDb` category row the automation resolver uses for a spoken
+/// check-in's transcript, so a category's default routes the briefing
+/// exactly as it routes the transcript.
+final relationshipCategoryProfileLookupProvider =
+    Provider<CategoryProfileLookup>(
+      (ref) => (categoryId) async {
+        final category = await ref
+            .read(journalDbProvider)
+            .getCategoryById(categoryId);
+        return category?.defaultProfileId;
+      },
+      name: 'relationshipCategoryProfileLookupProvider',
+    );
+
+/// The setup shown by the briefing and shared configuration sheet. Uses the
+/// same person/category/Settings default chain as inference, without a template.
+final FutureProviderFamily<ResolvedAgentSetup?, String>
+relationshipAgentResolvedSetupProvider = FutureProvider.autoDispose
+    .family<ResolvedAgentSetup?, String>((ref, agentId) async {
+      final identity = await ref.watch(agentIdentityProvider(agentId).future);
+      if (identity is! AgentIdentityEntity) return null;
+      ref.watch(
+        defaultInferenceProfileControllerProvider.select((v) => v.value),
+      );
+      for (final type in [
+        AiConfigType.inferenceProfile,
+        AiConfigType.model,
+        AiConfigType.inferenceProvider,
+      ]) {
+        ref.watch(
+          aiConfigByTypeControllerProvider(type).select((v) => v.value),
+        );
+      }
+      final subscription = ref
+          .watch(maybeUpdateNotificationsProvider)
+          ?.updateStream
+          .listen((ids) {
+            if (ids.contains(relationshipNotification) ||
+                ids.contains(categoriesNotification)) {
+              ref.invalidateSelf();
+            }
+          });
+      ref.onDispose(() => unawaited(subscription?.cancel()));
+      // Capture dependencies before database reads: a Settings/catalog update
+      // can invalidate this resolution while those reads are still in flight.
+      final agentRepository = ref.watch(agentRepositoryProvider);
+      final relationshipRepository = ref.watch(relationshipRepositoryProvider);
+      final aiConfigRepository = ref.watch(aiConfigRepositoryProvider);
+      final categoryProfileLookup = ref.watch(
+        relationshipCategoryProfileLookupProvider,
+      );
+      final links = await agentRepository.getLinksFrom(
+        agentId,
+        type: AgentLinkTypes.agentRelationship,
+      );
+      final relationship = links.isEmpty
+          ? null
+          : await relationshipRepository.getRelationshipByIdUnfiltered(
+              links.first.toId,
+            );
+      final resolved = await resolveRelationshipAgentModel(
+        relationship: relationship,
+        agentIdentity: identity,
+        aiConfigRepository: aiConfigRepository,
+        categoryProfileLookup: categoryProfileLookup,
+      );
+      return resolved?.setup ??
+          ResolvedAgentSetup(
+            status:
+                identity.config.inferenceSetup?.mode ==
+                    AgentInferenceSetupMode.disabled
+                ? AgentSetupResolutionStatus.disabled
+                : AgentSetupResolutionStatus.broken,
+          );
+    }, name: 'relationshipAgentResolvedSetupProvider');
+
+/// A missing or unusable route needs a configuration action, not an AI retry.
+class RelationshipInferenceSetupUnavailable implements Exception {
+  const RelationshipInferenceSetupUnavailable();
+
+  @override
+  String toString() =>
+      'No inference provider resolves for the relationship agent';
+}
+
 /// Phase B — the lease-elected LLM tier (briefing, banner, chat).
 final relationshipAgentWorkflowProvider = Provider<RelationshipAgentWorkflow>(
   (ref) => RelationshipAgentWorkflow(
@@ -68,6 +166,7 @@ final relationshipAgentWorkflowProvider = Provider<RelationshipAgentWorkflow>(
     cloudInferenceRepository: ref.watch(cloudInferenceRepositoryProvider),
     aiConfigRepository: ref.watch(aiConfigRepositoryProvider),
     domainLogger: ref.watch(domainLoggerProvider),
+    categoryProfileLookup: ref.watch(relationshipCategoryProfileLookupProvider),
   ),
   name: 'relationshipAgentWorkflowProvider',
 );
@@ -143,14 +242,67 @@ final relationshipAgentWakeRunnersProvider =
 /// The relationships contribution to `agentRuntimeMaintenanceProvider`.
 final relationshipRuntimeMaintenanceProvider =
     Provider<RelationshipRuntimeMaintenance>(
-      (ref) => RelationshipRuntimeMaintenance(
-        agentService: ref.watch(agentServiceProvider),
-        repository: ref.watch(agentRepositoryProvider),
-        syncService: ref.watch(agentSyncServiceProvider),
-        relationshipAgentService: ref.watch(relationshipAgentServiceProvider),
-        relationshipRepository: ref.watch(relationshipRepositoryProvider),
-        domainLogger: ref.watch(domainLoggerProvider),
-      ),
+      (ref) {
+        void requestCheck() {
+          if (ref.mounted) {
+            ref.read(scheduledWakeManagerProvider).requestCheck();
+          }
+        }
+
+        // Ordinary agent notifications include wake persistence itself;
+        // listening to those would turn each scan into another scan.
+        final subscription = ref
+            .watch(maybeUpdateNotificationsProvider)
+            ?.updateStream
+            .listen((ids) {
+              if (ids.contains(AgentNotificationScopes.inferenceSetup) ||
+                  ids.contains(relationshipNotification) ||
+                  ids.contains(categoriesNotification)) {
+                requestCheck();
+              }
+            });
+        ref
+          ..onDispose(() => unawaited(subscription?.cancel()))
+          ..listen(defaultInferenceProfileControllerProvider, (previous, next) {
+            if (next.hasValue && previous?.value != next.value) requestCheck();
+          });
+        for (final type in [
+          AiConfigType.inferenceProfile,
+          AiConfigType.model,
+          AiConfigType.inferenceProvider,
+        ]) {
+          ref.listen(aiConfigByTypeControllerProvider(type), (previous, next) {
+            if (next.hasValue && previous?.value != next.value) requestCheck();
+          });
+        }
+        return RelationshipRuntimeMaintenance(
+          agentService: ref.watch(agentServiceProvider),
+          repository: ref.watch(agentRepositoryProvider),
+          syncService: ref.watch(agentSyncServiceProvider),
+          relationshipAgentService: ref.watch(relationshipAgentServiceProvider),
+          relationshipRepository: ref.watch(relationshipRepositoryProvider),
+          domainLogger: ref.watch(domainLoggerProvider),
+          onIdentityRestored: requestCheck,
+          inferenceIsConfigured: (identity) async {
+            final relationshipId = await ref
+                .read(relationshipAgentServiceProvider)
+                .watchedRelationshipId(identity.agentId);
+            if (relationshipId == null) return false;
+            final relationship = await ref
+                .read(relationshipRepositoryProvider)
+                .getRelationshipByIdUnfiltered(relationshipId);
+            return await resolveRelationshipAgentModel(
+                  relationship: relationship,
+                  agentIdentity: identity,
+                  aiConfigRepository: ref.read(aiConfigRepositoryProvider),
+                  categoryProfileLookup: ref.read(
+                    relationshipCategoryProfileLookupProvider,
+                  ),
+                ) !=
+                null;
+          },
+        );
+      },
       name: 'relationshipRuntimeMaintenanceProvider',
     );
 
@@ -167,31 +319,51 @@ final relationshipRuntimeMaintenanceProvider =
 /// trigger surface must surface the failure rather than proceed silently.
 final FutureProviderFamily<String?, String>
 relationshipBriefingDisclosureProvider = FutureProvider.autoDispose
-    .family<String?, String>((ref, relationshipId) async {
-      final aiConfigRepository = ref.watch(aiConfigRepositoryProvider);
-      final relationship = await ref
-          .watch(relationshipRepositoryProvider)
-          .getRelationshipByIdUnfiltered(relationshipId);
-      final identity = await ref
-          .watch(agentRepositoryProvider)
-          .getEntity(relationshipAgentIdFor(relationshipId));
-      final resolved = await resolveRelationshipAgentModel(
-        relationship: relationship,
-        agentIdentity: identity is AgentIdentityEntity ? identity : null,
-        aiConfigRepository: aiConfigRepository,
-      );
-      if (resolved == null) {
-        throw StateError(
-          'no inference provider resolves for the relationship agent',
+    .family<String?, String>(
+      (ref, relationshipId) async {
+        final aiConfigRepository = ref.watch(aiConfigRepositoryProvider);
+        ref.watch(
+          defaultInferenceProfileControllerProvider.select(
+            (value) => value.value,
+          ),
         );
-      }
-      final profileId = resolved.profileId;
-      if (profileId != null) {
-        final config = await aiConfigRepository.getConfigById(profileId);
-        if (config is AiConfigInferenceProfile &&
-            await profileIsLocal(config, aiConfigRepository)) {
+        final relationshipRepository = ref.watch(
+          relationshipRepositoryProvider,
+        );
+        final agentRepository = ref.watch(agentRepositoryProvider);
+        final categoryProfileLookup = ref.watch(
+          relationshipCategoryProfileLookupProvider,
+        );
+        final relationship = await relationshipRepository
+            .getRelationshipByIdUnfiltered(relationshipId);
+        final identity = await agentRepository.getEntity(
+          relationshipAgentIdFor(relationshipId),
+        );
+        final resolved = await resolveRelationshipAgentModel(
+          relationship: relationship,
+          agentIdentity: identity is AgentIdentityEntity ? identity : null,
+          aiConfigRepository: aiConfigRepository,
+          categoryProfileLookup: categoryProfileLookup,
+        );
+        if (resolved == null) {
+          throw const RelationshipInferenceSetupUnavailable();
+        }
+        final profileId = resolved.profileId;
+        if (profileId != null) {
+          final config = await aiConfigRepository.getConfigById(profileId);
+          if (config is AiConfigInferenceProfile &&
+              await profileIsLocal(config, aiConfigRepository)) {
+            return null;
+          }
+        }
+        if (profileId == null &&
+            PromptCapabilityFilter.isLocalOnlyProviderType(
+              resolved.provider.inferenceProviderType,
+            )) {
           return null;
         }
-      }
-      return resolved.provider.name;
-    }, name: 'relationshipBriefingDisclosureProvider');
+        return resolved.provider.name;
+      },
+      name: 'relationshipBriefingDisclosureProvider',
+      retry: (_, _) => null,
+    );

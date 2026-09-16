@@ -9,6 +9,8 @@ import 'package:lotti/database/state/config_flag_provider.dart';
 import 'package:lotti/features/agents/model/agent_config.dart';
 import 'package:lotti/features/agents/model/agent_domain_entity.dart';
 import 'package:lotti/features/agents/model/agent_report_provenance.dart';
+import 'package:lotti/features/agents/model/query_chat_models.dart';
+import 'package:lotti/features/agents/query/query_chat_providers.dart';
 import 'package:lotti/features/agents/state/agent_providers.dart';
 import 'package:lotti/features/agents/state/change_set_providers.dart';
 import 'package:lotti/features/agents/state/task_agent_model_providers.dart';
@@ -19,6 +21,7 @@ import 'package:lotti/features/agents/ui/agent_model_sheet.dart';
 import 'package:lotti/features/agents/ui/ai_summary_card/assign_agent_cta_part.dart';
 import 'package:lotti/features/agents/ui/ai_summary_card/proposals_section_part.dart';
 import 'package:lotti/features/agents/ui/ai_summary_card/tldr_section_part.dart';
+import 'package:lotti/features/agents/ui/query/query_ask_button.dart';
 import 'package:lotti/features/agents/ui/task_agent_controls_footer.dart';
 import 'package:lotti/features/agents/ui/task_agent_model_identity.dart';
 import 'package:lotti/features/agents/ui/widgets/ai_card_chrome.dart';
@@ -648,6 +651,16 @@ class _AiSummaryShellState extends ConsumerState<_AiSummaryShell> {
         agentId: agentId,
       ),
     );
+    // *Chat* rides the Read more row at its trailing end: a compact pill
+    // beside the quiet links, not a full-width row under them.
+    // Null while query chat is off, so an invisible button never holds the
+    // row open or takes the body's trailing gap.
+    final chatButton = ref.watch(queryChatEnabledProvider)
+        ? QueryAskButton(
+            scope: QueryScope(kind: QueryScopeKind.task, id: widget.taskId),
+            chat: true,
+          )
+        : null;
     final reportBody = TldrBody(
       disclosureKey: const ValueKey('taskAgentReportDisclosure'),
       tldr: tldr,
@@ -655,6 +668,7 @@ class _AiSummaryShellState extends ConsumerState<_AiSummaryShell> {
       additionalReport: additionalReport,
       onToggle: () => setState(() => _expanded = !_expanded),
       onOpenInternals: () => _openInternals(agentName: subtitle),
+      trailing: chatButton,
     );
     // Nothing to propose, no section: an empty "Proposed changes" band cost a
     // divider and two paddings to say what the missing rows already said. A
@@ -776,6 +790,19 @@ class _AiSummaryShellState extends ConsumerState<_AiSummaryShell> {
               horizontal: tokens.spacing.cardPadding,
             ),
             child: reportBody,
+          ),
+        // No summary yet, so no Read more row to share: Chat keeps the same
+        // trailing corner on a row of its own.
+        if (!hasReportContent && chatButton != null)
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: tokens.spacing.cardPadding,
+              vertical: tokens.spacing.step2,
+            ),
+            child: Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: chatButton,
+            ),
           ),
         // Both hidden until the first value to avoid flashing empty state.
         ?proposalsBand,

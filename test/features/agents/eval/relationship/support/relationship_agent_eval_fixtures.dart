@@ -31,6 +31,7 @@ import 'package:lotti/classes/relationship_data.dart';
 import 'package:lotti/classes/relationship_trigger_tokens.dart';
 import 'package:lotti/classes/task.dart';
 import 'package:lotti/features/agents/model/agent_domain_entity.dart';
+import 'package:lotti/features/agents/model/proposal_ledger.dart';
 import 'package:lotti/features/relationships/runtime/relationship_agent_phase_a.dart';
 import 'package:lotti/features/relationships/workflow/relationship_facts_renderer.dart';
 import 'package:mocktail/mocktail.dart';
@@ -352,8 +353,10 @@ class RelationshipEvalWorld {
     this.previousReport,
     this.nudges = const [],
     this.preTransitionStatus,
+    this.proposals = const ProposalLedger.empty(),
   });
 
+  final ProposalLedger proposals;
   final RelationshipEntry relationship;
   final List<CheckInEntry> checkIns;
   final List<Task> linkedTasks;
@@ -403,12 +406,16 @@ Future<RelationshipCadenceDerivation> deriveEvalCadence(
 }
 
 /// Renders the world's FACTS block through the production renderer.
+///
+/// Pass [derivation] when the caller already derived the cadence for [now],
+/// so both reads describe the same wake.
 Future<String> renderEvalFacts(
   RelationshipEvalWorld world, {
   DateTime? now,
+  RelationshipCadenceDerivation? derivation,
 }) async {
   final at = now ?? relationshipEvalNow;
-  final derivation = await deriveEvalCadence(world, now: at);
+  derivation ??= await deriveEvalCadence(world, now: at);
   return const RelationshipFactsRenderer().render(
     relationship: world.relationship,
     derivation: derivation,
@@ -418,5 +425,6 @@ Future<String> renderEvalFacts(
     nudges: world.nudges,
     now: at,
     preTransitionStatus: world.preTransitionStatus,
+    proposals: world.proposals,
   );
 }

@@ -33,6 +33,7 @@ import 'package:lotti/features/agents/workflow/improver_agent_workflow.dart';
 import 'package:lotti/features/agents/workflow/project_agent_workflow.dart';
 import 'package:lotti/features/agents/workflow/task_agent_workflow.dart';
 import 'package:lotti/features/agents/workflow/template_evolution_workflow.dart';
+import 'package:lotti/features/agents/workflow/wake_result.dart';
 import 'package:lotti/features/ai/conversation/conversation_repository.dart';
 import 'package:lotti/features/ai/database/embedding_store.dart';
 import 'package:lotti/features/ai/model/ai_runtime_settings.dart';
@@ -725,6 +726,32 @@ void main() {
       },
     );
 
+    test(
+      'keeps maintenance listeners active between scheduled scans',
+      () async {
+        final changes = StreamController<int>.broadcast(sync: true);
+        addTearDown(changes.close);
+        final configuration = StreamProvider<int>((ref) => changes.stream);
+        final observed = <int>[];
+        final container = bench.createContainer(
+          runtimeMaintenance: (ref) {
+            ref.listen(configuration, (_, next) {
+              if (next.hasValue) observed.add(next.requireValue);
+            });
+            return const [];
+          },
+        );
+        await bench.initAndSubscribe(container);
+        await container.pump();
+        changes.add(1);
+        await pumpEventQueue();
+        expect(observed, [1]);
+        changes.add(2);
+        await pumpEventQueue();
+        expect(observed, [1, 2]);
+      },
+    );
+
     test('logs once and keeps aborted runtime restoration failed', () async {
       final domainLogger = MockDomainLogger();
       when(
@@ -885,9 +912,9 @@ void main() {
             'thread-fail',
           ),
           throwsA(
-            isA<StateError>().having(
-              (e) => e.message,
-              'message',
+            isA<WakeFailedException>().having(
+              (e) => e.reason,
+              'reason',
               'workflow failed',
             ),
           ),
@@ -1393,9 +1420,9 @@ void main() {
             'thread-day-fail',
           ),
           throwsA(
-            isA<StateError>().having(
-              (e) => e.message,
-              'message',
+            isA<WakeFailedException>().having(
+              (e) => e.reason,
+              'reason',
               'day workflow failed',
             ),
           ),
@@ -1445,9 +1472,9 @@ void main() {
             'thread-project-fail',
           ),
           throwsA(
-            isA<StateError>().having(
-              (e) => e.message,
-              'message',
+            isA<WakeFailedException>().having(
+              (e) => e.reason,
+              'reason',
               'project failed',
             ),
           ),
@@ -1616,9 +1643,9 @@ void main() {
             'thread-fail',
           ),
           throwsA(
-            isA<StateError>().having(
-              (e) => e.message,
-              'message',
+            isA<WakeFailedException>().having(
+              (e) => e.reason,
+              'reason',
               'improver failed',
             ),
           ),

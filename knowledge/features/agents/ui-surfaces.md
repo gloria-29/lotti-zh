@@ -5,7 +5,7 @@ description: The AI summary card and its proposal choreography, the internals pa
 resource: ../../../lib/features/agents/ui
 tags: [agents, ui, motion, accessibility]
 status: stable
-generated: { by: claude-code/opus-5, at: 2026-08-13T00:50:11Z }
+generated: { by: claude-code/fable-5.1, at: 2026-09-14T12:00:00Z }
 stale_after: 2026-10-12
 sources:
   - id: ui
@@ -19,7 +19,7 @@ sources:
   - id: automation-row
     resource: ../../../lib/features/agents/ui/agent_automation_row.dart
     title: Shared agent report automation controls
-    last_modified: 2026-08-13
+    last_modified: 2026-09-14
   - id: motion
     resource: ../../../lib/features/design_system/theme/motion_tokens.dart
     title: Motion tokens
@@ -60,7 +60,13 @@ Contents:
 
 - **TLDR header** (`AgentReportEntity.tldr`, falling back to the report's first
   paragraph) plus an inline expandable Goal / Achieved / Next / Learnings block
-  under a *Read more / Show less* pill.
+  under a *Read more / Show less* pill. *Chat* (`QueryAskButton(chat: true)`,
+  a small outlined pill announced as *Ask about this task*) rides the same row
+  at its trailing end through `TldrBody.trailing`. With no summary yet it
+  keeps that trailing corner on a row of its own, and it is absent while
+  query chat is off. The subtitle under *AI summary* is the agent's template
+  name when it has one (e.g. *Task Laura*), otherwise the agent's display
+  name; it is never the task title.
 - **Proposed changes** — rows from `unifiedSuggestionListProvider`, each a
   `PendingSuggestion`, confirmable or rejectable by tap or swipe (`> 70px` →
   confirm, `< -70px` → reject; in between snaps back). All confirms route
@@ -225,13 +231,28 @@ is measured in the *painted* style: tabular figures change digit advance, and
 measuring without them clips the payload.
 
 Freshness is a glyph **and** a word, never colour alone; the full sentence lives
-in the tooltip. **A visible countdown is itself proof the summary is behind**:
-`AgentAutomationRow` derives one outdated flag — the caller's `isStale` OR a
-ticking countdown — and the glyph, word and tooltip all read that flag, so the
-band never says "Up to date" beside "Next update in …", even when the caller's
-staleness watermark has not caught up with the scheduled wake. With automation on and nothing pending the line reads "Updates
-on changes", so flipping the switch never leaves a hole that resizes
-the card. The whole switch row is the interaction target — tapping the label
+in the tooltip. **A visible countdown, or a report refresh in flight, is itself
+proof the summary is behind**: `AgentAutomationRow` derives one outdated flag —
+the caller's `isStale` OR a ticking countdown OR the run in flight — and the
+glyph, word and tooltip all read that flag. So the band never says "Up to date"
+beside "Next update in …", even when the caller's staleness watermark has not
+caught up with the scheduled wake — and never beside "Thinking…" either. The
+summary on screen is the one the run is replacing, and `reportFreshAt` is
+written only once the wake succeeds (see
+[task agents](task-agents.md#freshness-watermarks)), so the word flips to "Up
+to date" only after the run has ended, and a failed run leaves it reading
+whatever the watermark says. Both cards hide the countdown while a run is in
+flight, which is exactly when the caller's flag is most likely still `false`:
+without the running term, that frame read "Up to date" with the spinner beside
+it. Which runs count is the caller's to say: `isRunning` (agent-wide, and what
+keeps the trigger busy) is the default, right for task agents whose every
+completed wake advances the watermark; the goal page passes
+`goalReportWakeInFlightProvider` as `isRefreshingReport`, because a goal
+agent's chat replies and Phase A subscription ticks hold the same lock without
+touching the read, and must not declare a fresh one out of date. With
+automation on and nothing pending
+the line reads "Updates on changes", so flipping the switch never leaves a
+hole that resizes the card. The whole switch row is the interaction target — tapping the label
 toggles the setting — on the band's shared `spacing.step8` minimum; the switch's
 own 40×24 track is too short in one dimension to be the target by itself. When
 setup is missing, the disabled toggle explains itself via an info tooltip and
@@ -439,7 +460,10 @@ dismissal cannot pop the task screen underneath.
 
 `taskAgentSetupOptionsProvider` retains the loaded profile/model/provider catalog
 across independently mounted Wolt pages, and consumers unwrap the last successful
-async value during refreshes, so navigation never flashes an empty page.
+async value during refreshes, so navigation never flashes an empty page. The
+catalog is derived from `aiConfigsByTypeProvider`, the repository's per-type
+config streams, so a model, provider or profile added or deleted — locally or
+through sync — recomputes it in place; no picker shows the list from app start.
 
 Daily OS reuses the same resolution and picker primitives without depending on
 the task-agent service: the planner's Stats tab detects `AgentKinds.dayAgent` and
@@ -459,7 +483,10 @@ card — the task agent section, the goal agent's read, and the relationship
 briefing — reaches the panel the same two ways. It is a thin shell —
 header, close button, scrim — hosting `AgentInternalsBody` once
 `agentIdentityProvider` resolves. A `barrierDismissible: true` route plus an
-explicit full-screen `GestureDetector` cover both pop paths.
+explicit full-screen `GestureDetector` cover both pop paths. The panel's colored
+background and side border are painted by its own `Material`, so conversation
+and report expansion tiles paint their ink on that surface. An opaque decorated
+box between those tiles and Material would trigger a framework assertion.
 
 `AgentInternalsBody` is the shared tabbed body — **Stats / Reports /
 Conversations / Observations / Activity** — used both inside the panel and as the
@@ -623,3 +650,11 @@ lookahead stay out of the inline sidebar and remain on the full page; additional
 in-window wakes collapse into the overflow row rather than turning the navigation
 rail into a wake manager. The collapsed icon-only sidebar suppresses the slot
 entirely.
+
+The shared proposal sections accept host row builders, and `ProposalRow` accepts
+optional confirmation/rejection callbacks and a details slot. Hosts without
+callbacks retain the task confirmation service. Relationship card/chat hosts
+supply their own scoped service and evidence/history details; see
+[deferred relationship suggestions](../relationships.md#deferred-task-suggestions).
+The kind resolver recognizes `create_and_link_task` by literal tool name,
+keeping shared agent UI independent of the relationship feature.

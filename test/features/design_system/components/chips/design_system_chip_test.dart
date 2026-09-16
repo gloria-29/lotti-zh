@@ -10,6 +10,93 @@ import '../../../../widget_test_utils.dart';
 
 void main() {
   group('DesignSystemChip', () {
+    testWidgets(
+      'compact touch pills respond at the edge of a forty-pixel target',
+      (tester) async {
+        var taps = 0;
+        await _pumpChip(
+          tester,
+          DesignSystemChip(
+            label: 'Notes',
+            outlined: true,
+            size: DesignSystemChipSize.compactPillTouch,
+            onPressed: () => taps++,
+          ),
+        );
+        final target = find.byType(InkWell).first;
+        final rect = tester.getRect(target);
+        expect(rect.height, greaterThanOrEqualTo(40));
+        final painted = tester.getRect(find.byType(Ink).first);
+        expect(painted.height, lessThan(rect.height));
+        expect(painted.center.dy, rect.center.dy);
+        expect(painted.contains(rect.topCenter + const Offset(0, 1)), isFalse);
+        await tester.tapAt(rect.topCenter + const Offset(0, 1));
+        expect(taps, 1);
+        expect(
+          tester.widget<Text>(find.text('Notes')).style?.fontSize ??
+              DefaultTextStyle.of(
+                tester.element(find.text('Notes')),
+              ).style.fontSize,
+          dsTokensLight.typography.styles.others.caption.fontSize,
+        );
+      },
+    );
+
+    testWidgets(
+      'outlined filters stay quiet until selected and retain activation semantics',
+      (tester) async {
+        var taps = 0;
+        Future<void> pump({required bool selected}) => _pumpChip(
+          tester,
+          DesignSystemChip(
+            label: 'Notes',
+            semanticsLabel: 'Notes',
+            outlined: true,
+            selected: selected,
+            size: DesignSystemChipSize.compactPill,
+            onPressed: () => taps++,
+          ),
+        );
+        await pump(selected: false);
+        expect(_chipDecoration(tester).color, Colors.transparent);
+        expect(
+          (_chipDecoration(tester).shape as RoundedRectangleBorder).side.color,
+          dsTokensLight.colors.decorative.level01,
+        );
+        await tester.tap(find.text('Notes'));
+        expect(taps, 1);
+        await pump(selected: true);
+        expect(
+          _chipDecoration(tester).color,
+          dsTokensLight.colors.surface.active,
+        );
+        expect(
+          (_chipDecoration(tester).shape as RoundedRectangleBorder).side.color,
+          dsTokensLight.colors.interactive.enabled,
+        );
+        final semantics = tester.ensureSemantics();
+        await tester.pump();
+        try {
+          expect(
+            tester.getSemantics(find.bySemanticsLabel('Notes')),
+            matchesSemantics(
+              label: 'Notes',
+              isButton: true,
+              hasEnabledState: true,
+              isEnabled: true,
+              hasSelectedState: true,
+              isSelected: true,
+              hasTapAction: true,
+              hasFocusAction: true,
+              isFocusable: true,
+            ),
+          );
+        } finally {
+          semantics.dispose();
+        }
+      },
+    );
+
     testWidgets('renders the enabled label-only chip from tokens', (
       tester,
     ) async {

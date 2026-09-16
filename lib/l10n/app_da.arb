@@ -438,6 +438,7 @@
   },
   "agentSummaryAddItem": "Tilføj: \"{title}\"",
   "agentSummaryArchiveItem": "Arkivér: \"{title}\"",
+  "agentSummaryAssignLabel": "Tildel etiket: \"{label}\"",
   "agentSummaryCheckItem": "Markér: \"{title}\"",
   "agentSummaryCreateFollowUp": "Opret opfølgningsopgave: \"{title}\"",
   "agentSummaryCreateFollowUpRelated": "Opret opfølgningsopgave: \"{title}\" — {relation}",
@@ -703,8 +704,6 @@
   "aiCardReadMore": "Læs mere",
   "aiCardShowLess": "Vis mindre",
   "aiCardTitle": "AI-oversigt",
-  "aiChatAssistantResponding": "Assistenten svarer",
-  "aiChatMessageCopied": "Kopieret til clipboard",
   "aiConfigFailedToLoadModelsGeneric": "Kunne ikke indlæse modellerne. Prøv venligst igen.",
   "aiConfigNoModelsAvailable": "Der er endnu ikke konfigureret AI-modeller. Tilføj venligst en i indstillingerne.",
   "aiConfigNoSuitableModelsAvailable": "Ingen modeller opfylder kravene til denne prompt. Konfigurer venligst modeller, der understøtter de nødvendige funktioner.",
@@ -904,44 +903,6 @@
   "aiInferenceErrorUnknownTitle": "Fejl",
   "aiInternalsTitle": "Agentens interne dele",
   "aiModelCardDeleteTooltip": "Slet model",
-  "aiModelDownloadCloseButton": "Luk",
-  "aiModelDownloadDialogDescription": "Lotti downloader {modelName} ind i MLX Audio-cachen og bruger den til lokal talebehandling.",
-  "@aiModelDownloadDialogDescription": {
-    "placeholders": {
-      "modelName": {
-        "type": "String"
-      }
-    }
-  },
-  "aiModelDownloadDialogTitle": "Installer {modelName}",
-  "@aiModelDownloadDialogTitle": {
-    "placeholders": {
-      "modelName": {
-        "type": "String"
-      }
-    }
-  },
-  "aiModelDownloadInstallTooltip": "Installationsmodel",
-  "aiModelDownloadOpenProgressTooltip": "Vis downloadfremskridt",
-  "aiModelDownloadStatusChecking": "Kontrol af modelstatus",
-  "aiModelDownloadStatusDownloading": "Downloader {percent}%",
-  "@aiModelDownloadStatusDownloading": {
-    "placeholders": {
-      "percent": {
-        "type": "int"
-      }
-    }
-  },
-  "aiModelDownloadStatusDownloadingIndeterminate": "Download",
-  "aiModelDownloadStatusFailed": "Download mislykkedes",
-  "aiModelDownloadStatusInstalled": "Installeret",
-  "aiModelDownloadStatusNotInstalled": "Ikke installeret",
-  "aiModelDownloadStatusUnsupported": "Apple Silicon påkrævet",
-  "aiModelInstallChoiceCancelButton": "Annuller",
-  "aiModelInstallChoiceDescription": "Vælg først den lokale tale-til-tekst-model til download. Du kan installere de andre senere fra modellisten.",
-  "aiModelInstallChoiceInstallButton": "Installationsmodel",
-  "aiModelInstallChoiceRecommended": "Anbefalet",
-  "aiModelInstallChoiceTitle": "Vælg MLX Audio-modellen",
   "aiModelPickerByProviderLabel": "Vælg en udbyder",
   "aiModelPickerCurrentDefaultLabel": "Nuværende betalingsstandard",
   "aiModelPickerProviderModelCount": "{count, plural, =1{1 model} other{{count} models}}",
@@ -1124,22 +1085,20 @@
   "aiProviderDetailRemoveDescription": "Det sletter udbyderen og alle modeller, der er afhængige af den. Det kan ikke gøres om.",
   "aiProviderDetailRemoveTitle": "Fjern denne udbyder",
   "aiProviderDetailValueUnset": "Ikke sat",
-  "aiProviderEmbeddedRuntimeHint": "Kører indlejret i Apple-appens proces. Ingen lokal server eller basis-URL er nødvendig.",
   "aiProviderGeminiName": "Google Gemini",
   "aiProviderGenericOpenAiName": "OpenAI-kompatibel",
   "aiProviderMeliousName": "Melious.ai",
   "aiProviderMistralName": "Mistral",
-  "aiProviderMlxAudioName": "MLX Audio (lokal)",
   "aiProviderNebiusAiStudioName": "Nebius AI Studio",
   "aiProviderOllamaName": "Ollama",
   "aiProviderOmlxName": "oMLX (lokal)",
   "aiProviderOpenAiName": "OpenAI",
   "aiProviderOpenRouterName": "OpenRouter",
+  "aiProviderSherpaName": "sherpa-onnx (på enheden)",
   "aiProviderTaglineAlibaba": "Qwen-modeller · multimodal · Lang kontekst",
   "aiProviderTaglineAnthropic": "Familien Claude · Lang kontekst",
   "aiProviderTaglineGemini": "Multimodal · Lydtransskription",
   "aiProviderTaglineMelious": "EU-vært · Dynamisk katalog · Eco-ruting",
-  "aiProviderTaglineMlxAudio": "Indlejret · Apple Silicon · Lokal lyd",
   "aiProviderTaglineOllama": "Kører lokalt · Ingen skyopkald",
   "aiProviderTaglineOmlx": "Lokal MLX-inferens: · OpenAI-kompatibel",
   "aiProviderTaglineOpenAi": "GPT-familien · Vision + ræsonnement",
@@ -1168,6 +1127,7 @@
   "aiSettingsCounterModels": "Modeller",
   "aiSettingsCounterProfiles": "Profiler",
   "aiSettingsCounterProviders": "Udbydere",
+  "aiSettingsDefaultProfileDescription": "Reserveprofil til agenter uden en konfigureret model på denne enhed.",
   "aiSettingsEmptyDescription": "Tilføj én for at låse op for transskription, billedgenkendelse, billedgenerering og semantisk søgning.",
   "aiSettingsEmptyTitle": "Ingen udbydere endnu",
   "aiSettingsFilterByCapabilityTooltip": "Filtrer efter {capability}-funktion",
@@ -1193,6 +1153,7 @@
   "aiSettingsModalityAudio": "Lyd",
   "aiSettingsModalityText": "Tekst",
   "aiSettingsModalityVision": "Vision",
+  "aiSettingsNoDefaultProfile": "Ingen standardprofil",
   "aiSettingsNoModelsConfigured": "Ingen AI-modeller konfigureret",
   "aiSettingsNoProvidersConfigured": "Ingen AI-udbydere konfigureret",
   "aiSettingsPageLead": "Konfigurer AI-udbydere, de modeller Lotti kan kalde, og inferensprofilerne, der bestemmer, hvilken model der håndterer hvilken opgave.",
@@ -1393,6 +1354,10 @@
   "audioRecordingResume": "Genoptag",
   "audioRecordings": "Lydoptagelser",
   "audioRecordingStop": "Stop",
+  "avatarCropHint": "Træk for at flytte · knib for at zoome",
+  "avatarCropPreviewLabel": "Sådan ser det ud på listen",
+  "avatarCropTitle": "Vælg ansigtet",
+  "avatarCropUse": "Brug foto",
   "backfillAdvancedRecoveryActions": "{count, plural, =1{1 handling} other{{count} handlinger}}",
   "@backfillAdvancedRecoveryActions": {
     "placeholders": {
@@ -1566,49 +1531,162 @@
   "chatInputStopRealtime": "Stop live-transskriptionen",
   "chatInputStopTranscribe": "Stop og transskribér",
   "chatInputTranscriptionFailed": "Optagelsen blev gemt, men transskriptionen mislykkedes. Prøv igen.",
+  "checkInAddMoreButton": "Tilføj mere",
+  "checkInAudioSaved": "{length} lyd gemt",
+  "checkInAudioSavedAsYouGo": "Lyden gemmes løbende på denne enhed",
+  "checkInAudioSavedRoute": "{length} lyd gemt · {route}",
   "checkInAvoidLabel": "Bedst at undgå",
-  "checkInDateLabel": "Hvornår?",
-  "checkInDeleteConfirmMessage": "Slet dette check-in? Det kan ikke fortrydes.",
-  "checkInDone": "Færdig",
-  "@checkInDone": {
-    "description": "Relationships redesign label."
+  "checkInComposerSubtitle": "med {name} · sidst {day}",
+  "checkInComposerSubtitleNoContact": "med {name} · intet check-in endnu",
+  "checkInComposerWithName": "med {name}",
+  "@checkInComposerWithName": {
+    "description": "The composer header's status line when only the person fits: the name is never shed.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   },
+  "checkInContextSummary": "{type} · {time} · {duration}",
+  "checkInDeleteConfirmMessage": "Slet dette check-in? Det kan ikke fortrydes.",
+  "checkInDictateButton": "Dikter",
+  "checkInDiscardDraftAudioKeptMessage": "Kassér dette check-in? Optagelsen bliver i journalen.",
+  "@checkInDiscardDraftAudioKeptMessage": {
+    "description": "The discard confirmation while a saved recording exists: the check-in goes, the audio stays in the journal."
+  },
+  "checkInDiscardDraftMessage": "Kassér dette check-in? Intet er gemt.",
+  "checkInDiscardDraftRecordingMessage": "Kassér dette check-in og optagelsen? Optagelsen bliver slettet.",
+  "checkInDiscardRecording": "Kassér",
+  "checkInDiscardRecordingBody": "Lyden slettes. Dit check-in forbliver åbent.",
+  "@checkInDiscardRecordingBody": {
+    "description": "Body of the confirmation before discarding a check-in recording: the audio is deleted, the composer stays open."
+  },
+  "checkInDismissButton": "Luk",
+  "checkInDurationChip": "Varighed",
+  "checkInDurationChipSemantics": "Varighed: {duration}. Skift",
+  "checkInDurationQuickPickHint": "Tryk på en længde for at gemme den, eller drej hjulet.",
+  "checkInDurationSemanticsLabel": "Sæt varigheden til {label}",
   "checkInEditTitle": "Redigér check-in",
   "checkInErrorCreateFailed": "Check-in kunne ikke gemmes. Prøv igen.",
   "checkInErrorDeleteFailed": "Check-in kunne ikke slettes. Prøv igen.",
-  "checkInHowDidItFeel": "Hvordan føltes det?",
-  "@checkInHowDidItFeel": {
-    "description": "Relationships redesign label."
-  },
-  "checkInHowDidYouConnect": "Hvordan havde I kontakt?",
-  "@checkInHowDidYouConnect": {
-    "description": "Relationships redesign label."
-  },
   "checkInInteractionCall": "Opkald",
   "checkInInteractionInPerson": "Personligt",
   "checkInInteractionLabel": "Hvordan talte I sammen?",
   "checkInInteractionMessage": "Besked",
   "checkInInteractionOther": "Andet",
   "checkInInteractionVideoCall": "Videoopkald",
-  "checkInNarrativeLabel": "Hvad talte I om?",
+  "checkInMicrophoneDeniedBody": "Slå den til for Lotti i systemindstillingerne, og tryk så på Dikter. Intet blev optaget.",
+  "checkInMicrophoneDeniedCalloutTitle": "Tillad mikrofonadgang",
+  "@checkInMicrophoneDeniedCalloutTitle": {
+    "description": "The refused-microphone card's title: the next step, since the header status already says the microphone is unavailable."
+  },
+  "checkInMoreCaptionFeeling": "Stemning",
+  "@checkInMoreCaptionFeeling": {
+    "description": "Folded More row caption segment while no feeling is chosen."
+  },
+  "checkInMoreCaptionNextTime": "næste gang",
+  "@checkInMoreCaptionNextTime": {
+    "description": "Folded More row caption segment while nothing is noted for next time."
+  },
+  "checkInMoreCaptionNextTimeSet": "næste gang noteret",
+  "@checkInMoreCaptionNextTimeSet": {
+    "description": "Folded More row caption segment once something is noted for next time."
+  },
+  "checkInMoreCaptionTopics": "emner",
+  "@checkInMoreCaptionTopics": {
+    "description": "Folded More row caption segment while no topics are entered."
+  },
+  "checkInMoreCaptionTopicsCount": "{count, plural, =1{1 emne} other{{count} emner}}",
+  "@checkInMoreCaptionTopicsCount": {
+    "description": "Folded More row caption segment: how many topics are entered.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkInMoreSection": "Mere",
+  "checkInNarrativeHint": "Hvad talte I om? Én linje er nok.",
+  "checkInNoDuration": "Ingen varighed",
+  "checkInOpenSettingsButton": "Åbn indstillinger",
+  "checkInOrTypeHint": "Eller skriv det her…",
   "checkInPayAttentionLabel": "Næste gang: vær opmærksom på",
-  "checkInPreparedOverline": "✦ LOTTI · FORBEREDT I MORGES",
+  "checkInPreparingLabel": "Forbereder lyd…",
+  "checkInRecorderBusyBody": "Stop den først fra optagelsesindikatoren, og prøv igen. Intet nyt blev optaget.",
+  "checkInRecorderBusyTitle": "Der kører allerede en optagelse",
+  "checkInRecordingFailedBody": "Mikrofonen kunne ikke startes. Prøv igen, eller skriv check-in’et. Intet blev optaget.",
+  "checkInRecordingFailedTitle": "Optagelsen startede ikke",
+  "checkInRecordingHint": "Tal helt normalt. Ordene dukker op her, når du stopper.",
+  "checkInRecordingNotSavedBody": "Optagelsen kunne ikke gemmes. Prøv igen, eller skriv check-in’et.",
+  "checkInRecordingNotSavedTitle": "Optagelsen kunne ikke gemmes",
+  "checkInReRecordButton": "Optag igen",
+  "checkInReRecordReplaceMessage": "Erstat dine redigerede ord med en ny optagelse?",
+  "@checkInReRecordReplaceMessage": {
+    "description": "Confirmation before Re-record when the transcript has been edited since it landed."
+  },
+  "checkInSaveBlockedEmpty": "Tilføj et par ord for at gemme",
+  "checkInSaveBlockedRecording": "Stop optagelsen for at gemme",
+  "checkInSaveBlockedRetry": "Skriv eller prøv igen for at gemme",
+  "checkInSaveBlockedTranscribing": "Venter på transskriptionen",
+  "checkInSaveButton": "Gem check-in",
+  "checkInSaveShortButton": "Gem",
+  "checkInSaveShortcutHint": "{shortcut} for at gemme",
   "checkInSentimentDelightful": "Skønt",
   "checkInSentimentDifficult": "Svært",
   "checkInSentimentGood": "Godt",
   "checkInSentimentLabel": "Hvordan føltes det?",
   "checkInSentimentNeutral": "Neutralt",
+  "checkInSentimentOptional": "Valgfrit. Udfyldes aldrig af agenten.",
   "checkInSentimentStrained": "Anstrengt",
+  "checkInSourceCall": "Fra det opkald, du startede fra denne side. Alt kan redigeres.",
+  "checkInSourceMessage": "Fra den besked, du sendte fra denne side. Alt kan redigeres.",
   "checkInSpeakButton": "Indtal check-in",
+  "checkInSpokenMinutes": "{count, plural, =1{1 minut} other{{count} minutter}}",
+  "@checkInSpokenMinutes": {
+    "description": "Minutes of a recording length, read by assistive technology.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkInSpokenSeconds": "{count, plural, =1{1 sekund} other{{count} sekunder}}",
+  "@checkInSpokenSeconds": {
+    "description": "Seconds of a recording length, read by assistive technology.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "checkInStartedLabel": "Startet",
+  "checkInStatusMicrophoneDenied": "Mikrofon ikke tilgængelig",
+  "checkInStatusPaused": "På pause",
+  "checkInStatusRecorderBusy": "Optageren er optaget",
+  "checkInStatusRecording": "Optager",
+  "checkInStatusRecordingFailed": "Optagelsen startede ikke",
+  "checkInStatusRecordingNotSaved": "Optagelsen blev ikke gemt",
+  "checkInStatusTranscriptionUnavailable": "Ingen transskriptionsmodel",
+  "checkInStatusTranscriptMissing": "Ingen transskription modtaget",
+  "checkInTimeChipSemantics": "Start: {time}. Skift",
   "checkInTopicsHint": "Kommasepareret, f.eks. arbejde, rejser",
   "checkInTopicsLabel": "Emner",
-  "checkInTranscribingLabel": "Transskriberer…",
-  "checkInTranscriptFailed": "Der kom ingen udskrift. Du kan skrive den selv.",
-  "checkInTranscriptUnavailable": "Transskription er ikke sat op for denne person. Tilføj en lydmodel og slå automatisk inferens til for deres kategori, eller skriv check-in selv.",
-  "checkInWriteInstead": "Skriv i stedet",
-  "@checkInWriteInstead": {
-    "description": "Relationships redesign label."
+  "checkInTranscribingEta": "som regel under et minut",
+  "@checkInTranscribingEta": {
+    "description": "The last, first-shed tier of the transcribing caption: a time expectation for the wait."
   },
+  "checkInTranscribingLabel": "Transskriberer…",
+  "checkInTranscriptAdded": "Transskription tilføjet",
+  "checkInTranscriptionUnavailableTitle": "Ingen transskriptionsmodel sat op",
+  "checkInTranscriptMissingBody": "Din optagelse på {length} er gemt i journalen, også hvis du kasserer dette check-in. Prøv igen om lidt.",
+  "checkInTranscriptMissingCalloutTitle": "Prøv igen, eller skriv det",
+  "@checkInTranscriptMissingCalloutTitle": {
+    "description": "The transcript-not-received card's title: the next step, since the header status already names the state."
+  },
+  "checkInTranscriptUnavailable": "Vælg en standardprofil til inferens med en transskriptionsmodel i AI-indstillinger, eller skriv din kontaktregistrering.",
+  "checkInTypeChipSemantics": "Type: {type}. Skift",
+  "checkInTypeInstead": "Skriv i stedet",
+  "checkInWordCount": "{count, plural, =1{1 ord} other{{count} ord}}",
   "checklistAddItem": "Tilføj en ny genstand",
   "checklistAiConfidenceLabel": "Selvtillid: {level}",
   "@checklistAiConfidenceLabel": {
@@ -1672,7 +1750,7 @@
   "configFlagEnableAiStreaming": "Aktiver AI-streaming til opgavehandlinger",
   "configFlagEnableAiStreamingDescription": "Stream AI-svar for opgaverelaterede handlinger. Slå fra for at buffere svarene og hold brugerfladen mere jævn.",
   "configFlagEnableAiSummaryTts": "AI-opsummering afspilning",
-  "configFlagEnableAiSummaryTtsDescription": "Vis den lokale tekst-til-tale-knap på opgave-AI-resuméer. Kræver en installeret MLX Audio TTS-model.",
+  "configFlagEnableAiSummaryTtsDescription": "Vis den lokale tekst-til-tale-knap på opgave-AI-resuméer. Kræver en installeret Supertonic TTS-model.",
   "configFlagEnableDailyOs": "Aktivér DailyOS",
   "configFlagEnableDailyOsDescription": "Vis DailyOS i hovednavigationen.",
   "configFlagEnableDashboardsPage": "Aktivér dashboards-siden",
@@ -1692,6 +1770,8 @@
   "configFlagEnableNotificationsDescription": "Modtag notifikationer om påmindelser, opdateringer og vigtige begivenheder.",
   "configFlagEnableProjects": "Muliggør projekter",
   "configFlagEnableProjectsDescription": "Vis projektstyringsfunktioner til at organisere opgaver i projekter.",
+  "configFlagEnableQueryChat": "Eksperimentel opgavechat",
+  "configFlagEnableQueryChatDescription": "Viser chats for opgaver, projekter og kategorier. Slået fra som standard.",
   "configFlagEnableRelationships": "Aktivér Personer-siden",
   "configFlagEnableRelationshipsDescription": "Vis Personer-fanen til at pleje dine personlige relationer.",
   "configFlagEnableSessionRatings": "Aktiver sessionsvurderinger",
@@ -2739,6 +2819,7 @@
   "designSystemTextareaWithCounterLabel": "Med tæller",
   "designSystemTextareaWithErrorLabel": "Med fejl",
   "designSystemTextareaWithHelperLabel": "Med hjælpetekst",
+  "designSystemTieredTextTitle": "Trinvis tekst i tre bredder",
   "designSystemTimePickerFormatsTitle": "Tidsformater",
   "designSystemTimePickerTwelveHourLabel": "12-timers",
   "designSystemTimePickerTwentyFourHourLabel": "24 timer i døgnet",
@@ -3390,6 +3471,8 @@
   "imageViewerPreviousTooltip": "Forrige billede",
   "inactiveLabel": "Inaktiv",
   "inactiveSwitchDescription": "Kan vælges til nye indførsler, når den er på",
+  "inferenceProfileChat": "Chatmodel",
+  "inferenceProfileChatUsesThinking": "Bruger tænkemodellen, når der ikke er valgt en",
   "inferenceProfileChooseModelTitle": "Vælg en model",
   "inferenceProfileChooseTitle": "Vælg en inferensprofil",
   "inferenceProfileCreateTitle": "Opret profil",
@@ -4062,21 +4145,13 @@
   "multiSelectNoItemsFound": "Ingen genstande fundet",
   "navSidebarManualBrowserHint": "Åbner i din browser",
   "navSidebarManualLabel": "Manual",
-  "navTabMoreSemanticsLabel": "{count, plural, =1{Mere, 1 ekstra destination} other{Mere, {count} yderligere destinationer}}",
-  "@navTabMoreSemanticsLabel": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "navTabTitleCalendar": "DailyOS",
   "navTabTitleEvents": "Begivenheder",
   "navTabTitleGoals": "Mål",
   "navTabTitleHabits": "Vaner",
   "navTabTitleInsights": "Indsigter",
   "navTabTitleJournal": "Logbog",
-  "navTabTitleMore": "Mere",
+  "navTabTitleNavigate": "Naviger",
   "navTabTitlePeople": "Personer",
   "navTabTitleProjects": "Projekter",
   "navTabTitleSettings": "Indstillinger",
@@ -4348,6 +4423,47 @@
   "panasScaleModerately": "Moderat",
   "panasScaleQuiteABit": "En hel del",
   "panasScaleVerySlightlyOrNotAtAll": "Meget lidt eller slet ikke",
+  "plazaBlockedReason": "blokeret — kræver en beslutning",
+  "plazaCategoryEmpty": "Denne kategori har ingen synlige projekter.",
+  "plazaClosedForNight": "LUKKET FOR NATTEN",
+  "plazaCloseHint": "Esc for at lukke",
+  "plazaControls": "WASD gå · hold Shift: 8× hastighed · træk for at se dig omkring · Tab næste fyr · H hjem · M overblik · / søg · T værktøjslinje · Esc luk · ⌘[ tilbage",
+  "plazaCornerAfter": "Drej efter {week}",
+  "plazaDebug": "Fejlfinding",
+  "plazaDecisionStrip": "KRÆVER EN BESLUTNING",
+  "plazaDoneCount": "{done} af {total} færdige",
+  "plazaDueOn": "frist {date}",
+  "plazaDueSoonReason": "frist {date} — afslut den",
+  "plazaEmpty": "Tilføj en opgave for at begynde at bygge projektets plads.",
+  "plazaEnterProject": "Gå ind i projektet",
+  "plazaExploreCategory": "Udforsk kategori",
+  "plazaExploreProject": "Udforsk projekt",
+  "plazaFlyThere": "Flyv dertil ›",
+  "plazaInProgressCount": "I gang: {count}",
+  "plazaLinks": "links {count}",
+  "plazaMeerkats": "Surikater",
+  "plazaMorningWalk": "Morgentur",
+  "plazaNeedsAttention": "Kræver opmærksomhed: {count}",
+  "plazaOpeningSoon": "ÅBNER SNART",
+  "plazaOpenLate": "SENT ÅBENT",
+  "plazaOverdueSince": "forsinket siden {date} — afslut eller flyt den",
+  "plazaOverview": "Overblik",
+  "plazaPaused": "På pause",
+  "plazaProjectOverdue": "Forsinkede opgaver: {count}",
+  "plazaSearchHint": "Søg efter opgaver, Enter for at flyve",
+  "plazaShowPenguins": "Pingviner",
+  "plazaSkyDay": "Dag",
+  "plazaSkyNight": "Nat",
+  "plazaStaleReason": "stille i {days} dage — tag fat igen",
+  "plazaStats": "{tasks} opgaver · {weeks} uger · {attention} kræver opmærksomhed",
+  "plazaTaskCount": "Opgaver: {count}",
+  "plazaTitle": "Plads",
+  "plazaToggleToolbar": "Vis / skjul værktøjslinjen",
+  "plazaToLet": "TIL LEJE",
+  "plazaTourControls": "Mellemrum: pause · bevæg dig for at afslutte",
+  "plazaUnavailable": "Denne enhed kan ikke vise 3D-verdenen.",
+  "plazaWeek": "U{week} · {date}",
+  "plazaWeekShort": "U{week}",
   "privateLabel": "Privat",
   "privateSwitchDescription": "Kun synlig, når private bidrag vises",
   "projectActionAddTask": "Tilføj opgave",
@@ -4679,6 +4795,129 @@
   "provisionedSyncSummaryHomeserver": "Synkroniseringsserver",
   "provisionedSyncSummaryUser": "Synkroniseringskonto",
   "provisionedSyncTitle": "Enheder",
+  "queryActionsAccept": "Acceptér",
+  "queryActionsDismiss": "Afvis",
+  "queryActionsIncomplete": "Nogle ændringer kunne ikke anvendes. Allerede anvendte ændringer gentages ikke, når du prøver igen.",
+  "queryActionsReview": "Foreslåede ændringer",
+  "queryActionsTarget": "For: {target}",
+  "queryAllSources": "Alle",
+  "queryArchiveChat": "Arkivér chat",
+  "queryArchiveConfirmation": "Chat arkiveret. Konklusionerne er stadig tilgængelige.",
+  "queryArchivedChats": "Arkiverede chats",
+  "queryArchivedReadOnly": "Denne chat er arkiveret. Gendan den for at fortsætte samtalen.",
+  "queryAsk": "Spørg",
+  "queryAskCategory": "Spørg om denne kategori",
+  "queryAskProject": "Spørg om dette projekt",
+  "queryAskTask": "Spørg om denne opgave",
+  "queryAudioFailed": "Lyden kunne ikke forberedes eller afspilles. Prøv igen.",
+  "queryAudioListen": "Lyt · {start}–{end}",
+  "queryAudioMissingFile": "Optagelsen er endnu ikke tilgængelig på denne enhed.",
+  "queryAudioNoMatch": "Citatet kunne ikke knyttes entydigt til optagelsen. Du kan stadig åbne hele posten.",
+  "queryAudioOpenRecording": "Åbn optagelse",
+  "queryAudioPlaying": "Afspiller {start}–{end}",
+  "queryAudioPrepare": "Forbered lyduddrag",
+  "queryAudioPreparing": "Forbereder lyd…",
+  "queryAudioReadAloud": "Læs svaret højt",
+  "queryAudioReading": "Læser svaret højt",
+  "queryAudioRetry": "Prøv lyd igen",
+  "queryAudioSetupDetails": "Opsætningsdetaljer",
+  "queryAudioSetupRequired": "Lyduddrag kræver en kompatibel transskriptionsmodel.",
+  "queryAudioStale": "Optagelsen er ændret. Forbered tidsstemplerne igen.",
+  "queryAudioStop": "Stop afspilningen",
+  "queryAudioTimingUnavailable": "Vælg Melious Whisper eller en understøttet Mistral Voxtral-transskriptionsmodel i agentens inferensprofil for at klargøre lyduddrag. Udbyderens URL skal bruge HTTPS.",
+  "queryAudioTooLarge": "Tidsstempler kan klargøres til optagelser på op til 25 MB. Vælg en mindre optagelse.",
+  "queryAudioUploadNotice": "Når tidsstempler forberedes, sendes denne optagelse til den transskriptionsudbyder, der er konfigureret for denne agent.",
+  "queryCategoryAgent": "Kategoriagent",
+  "queryChat": "Chat",
+  "queryChats": "Chats",
+  "queryChecked": "Tjekkede kilder: {count}",
+  "queryCloseChat": "Luk chat",
+  "queryCollapseChat": "Fold chat sammen",
+  "queryCopied": "Kopieret",
+  "queryCopyQuote": "Kopiér citat",
+  "queryCoverage": "Hvad blev søgt igennem?",
+  "queryCoverageCategory": "Denne kategori",
+  "queryCoverageExcluded": "Andre kategorier blev ikke gennemsøgt.",
+  "queryCoverageUnreadable": "Ingen søgbar tekst, da dette svar blev skrevet. Åbn optagelsen for at lytte til den.",
+  "queryCoverageWider": "Andre poster i denne kategori",
+  "queryDeleteChat": "Slet chat",
+  "queryDeleteExplanation": "Slet denne samtale? Vælg, hvad der sker med dens delte konklusioner. Kildeindlæg påvirkes ikke.",
+  "queryDeleteForget": "Slet og glem konklusioner",
+  "queryDeleteKeep": "Slet og behold konklusioner",
+  "queryDictated": "Du kan redigere transskriptionen, før du sender dit spørgsmål. Lyden kan allerede være sendt til din transskriptionsudbyder.",
+  "queryDraftProvisional": "Udkast · endnu ikke verificeret",
+  "queryDraftRetracted": "Udkastet til svaret kunne ikke verificeres. Prøv igen.",
+  "queryEarlierTextOmitted": "[Tidligere tekst vises ikke]",
+  "queryEmptyBody": "Spørg om beslutninger og tidligere arbejde. Svar skelner mellem opsummeringer og ordrette passager.",
+  "queryExactStoredText": "Præcis gemt tekst",
+  "queryExactText": "Vis nøjagtig tekst",
+  "queryExampleDecision": "Hvad blev vi enige om?",
+  "queryExampleMeeting": "På hvilket møde talte vi om det?",
+  "queryExampleSuggestion": "Var det en beslutning eller et forslag?",
+  "queryExpandChat": "Udvid chat",
+  "queryExpanding": "Kontrollerer andre poster i denne kategori…",
+  "queryFailed": "Søgningen kunne ikke afsluttes. Prøv igen.",
+  "queryForgetConclusions": "Glem konklusioner",
+  "queryHideExactText": "Skjul præcis tekst",
+  "queryHideSurrounding": "Skjul omgivende tekst",
+  "queryHomeOnly": "Kun udgangsområdet",
+  "queryHomeScope": "Udgangsområde",
+  "queryIncomplete": "Søgningen er ufuldstændig. Manglende belæg betyder ikke, at samtalen aldrig fandt sted.",
+  "queryIncompleteShort": "Nogle kilder kunne ikke kontrolleres.",
+  "queryInferenceUnavailable": "Ingen brugbar AI-opsætning. Konfigurér agentens model eller kategoriens standardprofil, og prøv igen.",
+  "queryKeepConclusions": "Behold konklusioner",
+  "queryLaterTextOmitted": "[Senere tekst vises ikke]",
+  "queryMachineTranscript": "Maskintransskription: nøjagtig gemt ordlyd, ikke kontrolleret mod lyden.",
+  "queryMemoryCount": "Tilgængelige konklusioner fra tidligere chats: {count}",
+  "queryMissingTranscripts": "{count, plural, one{1 optagelse havde ingen søgbar tekst, da dette svar blev skrevet.} other{{count} optagelser havde ingen søgbar tekst, da dette svar blev skrevet.}}",
+  "queryNewChat": "Ny chat",
+  "queryNoAgent": "Dette område har brug for sin sædvanlige agent. Gå tilbage til detaljerne for at tildele den.",
+  "queryNotes": "Noter",
+  "queryOpenCurrentEntry": "Åbn den aktuelle post",
+  "queryOpenEntry": "Åbn indlæg",
+  "queryOriginalsHome": "Gennemgår kun denne opgave og dens direkte tilknyttede poster.",
+  "queryOtherProject": "Uden for udgangsområdet",
+  "queryPreparingAnswer": "Forbereder et svar…",
+  "queryReachCategory": "Søger i dette område og i {category}.",
+  "queryReachCategoryOnly": "Søger inden for {category}.",
+  "queryReachHome": "Søger kun i dette område og dets tilknyttede poster.",
+  "queryReachUncategorized": "Søger kun i denne opgave og dens direkte tilknyttede indlæg uden kategori.",
+  "queryRecall": "Dette svar brugte gemte konklusioner.",
+  "queryRecordings": "Optagelser",
+  "queryRecordingTranscript": "Optagelsens transskription",
+  "queryRenameChat": "Omdøb chat",
+  "queryRestoreChat": "Gendan chat",
+  "querySavedConclusion": "Konklusion gemt {date}",
+  "querySavedQuote": "Dette gemte citat afspejler kilden, da svaret blev skrevet.",
+  "querySavedVersion": "Gemt version: {version}",
+  "@querySavedVersion": {
+    "description": "Identifies the historical text version by edit date or short content fingerprint.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "querySavedVersionUnavailable": "Versionsdato er ikke tilgængelig",
+  "querySearching": "Gennemgår tilgængelige oplysninger…",
+  "querySearchScope": "Søgeområde og filtre",
+  "querySourceAction": "{action}: {source}",
+  "querySourceChanged": "Kilden er ændret",
+  "querySourceDeleted": "Kilde slettet",
+  "querySourceMoved": "Kilde flyttet til en anden kategori",
+  "querySummaryBased": "Baseret på opsummeringer",
+  "querySummaryCoverage": "Dette svar bruger opsummeringer af opgaver eller projekter. De oprindelige poster blev ikke gennemgået.",
+  "querySummaryCurrent": "Åbn en opgave eller et projekt for at læse den aktuelle opsummering. Den kan være ændret siden dette svar.",
+  "querySummaryIncomplete": "Der mangler oplysninger i de tilgængelige opsummeringer.",
+  "querySummaryOwners": "Om dette svar",
+  "querySurroundingLimit": "Dette er det gemte uddrag, som muligvis ikke indeholder hele diskussionen.",
+  "querySurroundingText": "Vis omgivende tekst",
+  "queryTranscribing": "Transskriberer din optagelse. Lyden kan allerede være hos din udbyder.",
+  "queryUnavailable": "Dette område er ikke længere tilgængeligt med dine nuværende synlighedsindstillinger.",
+  "queryUnread": "Nyt svar",
+  "queryWelcomeCategory": "Spørg {agentName} om denne kategori",
+  "queryWelcomeProject": "Spørg {agentName} om dette projekt",
+  "queryWelcomeTask": "Spørg {agentName} om denne opgave",
   "queueCatchUpNowButton": "Følg med nu",
   "queueCatchUpNowDone": "Indhentning er smidt i gang — køen dræner mig.",
   "queueCatchUpNowError": "Indhentning mislykkedes: {reason}",
@@ -4788,23 +5027,41 @@
   "relationshipActionFailed": "Intet på denne enhed kan åbne det",
   "relationshipActionMessage": "Besked",
   "relationshipAddChannelButton": "Tilføj kontaktoplysning",
-  "relationshipAsk": "Spørg",
-  "@relationshipAsk": {
-    "description": "Relationships redesign label."
+  "relationshipAddChannelFromContacts": "eller fra kontakter",
+  "relationshipAgentAsOfBand": "{band} · opdateret {age}",
+  "relationshipAgentBriefNow": "Brief nu",
+  "relationshipAgentCall": "Ring til {name}",
+  "relationshipAgentFailedBody": "Udbyderen svarede med en fejl, før briefingen blev skrevet. Dine check-ins er uændrede.",
+  "relationshipAgentFailedNoModel": "Der er ikke sat en model op til briefinger. Vælg en under AI-indstillinger › Agenter. Detaljer findes under fanen Aktivitet.",
+  "relationshipAgentFailedPlain": "Seneste kørsel mislykkedes",
+  "relationshipAgentLastRunFailed": "Seneste kørsel mislykkedes · {time}",
+  "relationshipAgentMarkImportant": "Markér som vigtig",
+  "relationshipAgentNoAgent": "Ingen agent for denne person",
+  "relationshipAgentNoBriefingBody": "{count, plural, =0{Ingen briefing endnu. „Brief nu“ skriver en, når du har logget et check-in; den ser aldrig telefonnummer eller e-mail.} =1{Ingen briefing endnu. „Brief nu“ skriver en ud fra dit check-in; den ser aldrig telefonnummer eller e-mail.} other{Ingen briefing endnu. „Brief nu“ skriver en ud fra dine {count} check-ins; den ser aldrig telefonnummer eller e-mail.}}",
+  "relationshipAgentNotEnrolledBody": "Markér {name} som vigtig for at få en chat, påmindelser når der er gået et stykke tid, og en briefing.",
+  "relationshipAgentOnlyYourStartsUseAi": "Kun det, du selv starter, bruger AI",
+  "relationshipAgentOutOfDateNewCheckIn": "Forældet · nyt check-in {day}",
+  "relationshipAgentOutOfDateNewCheckInShort": "Forældet · nyt check-in",
+  "@relationshipAgentOutOfDateNewCheckInShort": {
+    "description": "The out-of-date status line's middle tier when the day does not fit beside the age pill."
   },
+  "relationshipAgentPausedBody": "Briefinger holder pause, mens denne person er i dvale eller arkiveret.",
+  "relationshipAgentProposedCount": "{count, plural, =1{1 forslag} other{{count} forslag}}",
+  "relationshipAgentReadingBody": "{count, plural, =0{Forbereder briefingen. Tager som regel under et minut.} =1{Læser 1 check-in. Tager som regel under et minut.} other{Læser {count} check-ins. Tager som regel under et minut.}}",
+  "relationshipAgentSeeActivity": "Se aktivitet",
+  "relationshipAgentSources": "Kilder: {count, plural, =1{1 check-in} other{{count} check-ins}} · kontaktkanaler sendes aldrig",
+  "relationshipAgentTryAgain": "Prøv igen",
+  "relationshipAgentWatching": "Agenten holder øje",
+  "relationshipAgentWatchingNextLook": "Agenten holder øje · næste kig {day}",
+  "relationshipAgentWriting": "Skriver briefingen…",
   "relationshipBannerSemanticLabel": "Relationsbanner for {personName}",
+  "relationshipBriefingAge": "{days, plural, =1{1 dag gammel} other{{days} dage gammel}}",
   "relationshipBriefingDisclosureBody": "Briefingen kører på {provider}. Noter om denne person sendes dertil til behandling.",
   "relationshipBriefingDisclosureConfirm": "Fortsæt",
   "relationshipBriefingDisclosureTitle": "Send til {provider}?",
-  "relationshipBriefingEmpty": "Ingen briefing endnu — Opdater mig laver en ud fra dine check-ins.",
   "relationshipBriefingRequested": "Briefing bestilt — den vises her om lidt.",
   "relationshipBriefingRequestFailed": "Kunne ikke bestille briefingen.",
   "relationshipBriefingTitle": "Briefing",
-  "relationshipBriefMeAgain": "Brief igen",
-  "@relationshipBriefMeAgain": {
-    "description": "Relationships redesign label."
-  },
-  "relationshipBriefMeButton": "Opdater mig",
   "relationshipCadenceEveryNDays": "{days, plural, =1{Hver dag} other{Hver {days}. dag}}",
   "relationshipCadenceFortnightly": "Hver anden uge",
   "relationshipCadenceLabel": "Kontaktrytme",
@@ -4818,18 +5075,13 @@
   "@relationshipCadenceOnTrack": {
     "description": "Relationships redesign label."
   },
+  "relationshipCadencePromptLabel": "Mind mig om det hver",
   "relationshipCadenceQuarterly": "Hvert kvartal",
   "relationshipCadenceWeekly": "Ugentligt",
+  "relationshipChatAgentSubtitle": "Kender dine check-ins, ikke kontaktvejene",
+  "relationshipChatAgentTitle": "{name} · briefingagent",
   "relationshipChatTooltip": "Chat om denne person",
   "relationshipChatUnavailable": "Ingen agent endnu — markér først personen som vigtig.",
-  "relationshipCheckedInLabel": "Check-in {date}",
-  "@relationshipCheckedInLabel": {
-    "placeholders": {
-      "date": {
-        "type": "String"
-      }
-    }
-  },
   "relationshipCheckInReminderBody": "Et godt tidspunkt at tage kontakt.",
   "relationshipCheckInReminderTitle": "Tag kontakt til {name}?",
   "@relationshipCheckInReminderTitle": {
@@ -4840,14 +5092,6 @@
     }
   },
   "relationshipCheckInsLabel": "Check-ins",
-  "relationshipCheckInTitle": "Check-in · {name}",
-  "@relationshipCheckInTitle": {
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "relationshipContactCardAction": "Kontaktkort",
   "@relationshipContactCardAction": {
     "description": "Relationships redesign label."
@@ -4858,6 +5102,14 @@
   "relationshipContactMissing": "Den kontakt findes ikke på denne enhed",
   "relationshipContactNoChanges": "Intet nyt at kopiere",
   "relationshipCreateTitle": "Tilføj person",
+  "relationshipDaysOver": "{count, plural, =1{1 dag forsinket} other{{count} dage forsinket}}",
+  "@relationshipDaysOver": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "relationshipDeleteConfirmMessage": "Deres check-ins slettes også. Det kan ikke fortrydes.",
   "relationshipDeleteConfirmTitle": "Slet {name}?",
   "relationshipDueDay": "Senest {day}",
@@ -4868,11 +5120,54 @@
       }
     }
   },
+  "relationshipDueSince": "Forfalden siden {day} · {count, plural, =1{1 dag forsinket} other{{count} dage forsinket}}",
+  "@relationshipDueSince": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipDueToday": "Skal kontaktes i dag",
+  "relationshipDurationHours": "{hours} t",
+  "@relationshipDurationHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipDurationHoursMinutes": "{hours} t {minutes}",
+  "@relationshipDurationHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipDurationMinutes": "{count} min",
+  "@relationshipDurationMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "relationshipEditTitle": "Redigér person",
   "relationshipErrorCreateFailed": "Personen kunne ikke gemmes. Prøv igen.",
   "relationshipErrorDeleteFailed": "Personen kunne ikke slettes. Prøv igen.",
   "relationshipErrorLinkTaskFailed": "Opgaven kunne ikke tilknyttes. Prøv igen.",
   "relationshipErrorUpdateFailed": "Ændringerne kunne ikke gemmes. Prøv igen.",
+  "relationshipFormImportantBody": "Slår en briefing, påmindelser og en chat til. Noter fra check-ins går til agenten, kontaktveje aldrig.",
+  "relationshipFormImportantBodyNamed": "Slår en briefing, påmindelser og en chat til for {name}. Noter fra check-ins går til agenten, kontaktveje aldrig.",
+  "relationshipFormReachTitle": "Sådan får du fat i dem",
+  "relationshipFormWhoTitle": "Hvem",
   "relationshipHealthNeedsAttention": "Kræver opmærksomhed",
   "relationshipHealthSteady": "Stabil",
   "relationshipHealthStrained": "Anstrengt",
@@ -4885,11 +5180,13 @@
   "relationshipImportEmpty": "Ingen kontakter på denne enhed",
   "relationshipImportFailed": "Kunne ikke tilføje nogen",
   "relationshipImportGrantButton": "Tillad adgang",
+  "relationshipImportImportantBody": "Briefinger, påmindelser og en chat. Uden det kører intet af sig selv.",
   "relationshipImportNoMatches": "Ingen kontakter matcher din søgning",
   "relationshipImportOpenSettings": "Åbn indstillinger",
   "relationshipImportPermissionBody": "Lotti læser kun dine kontakter, mens denne vælger er åben, og kopierer kun de personer, du vælger.",
   "relationshipImportRetry": "Prøv igen",
   "relationshipImportReviewButton": "{count, plural, =1{Gennemse 1} other{Gennemse {count}}}",
+  "relationshipImportReviewSubtitle": "{count, plural, =1{1 person valgt · kontaktoplysningerne bliver på denne enhed} other{{count} personer valgt · kontaktoplysningerne bliver på denne enhed}}",
   "relationshipImportReviewTitle": "Før du tilføjer dem",
   "relationshipImportSearchHint": "Søg i kontakter",
   "relationshipImportSettingsBody": "Adgang til kontakter er slået fra. Slå den til i systemindstillingerne for at importere personer.",
@@ -4899,79 +5196,175 @@
   "@relationshipJustAdded": {
     "description": "Relationships redesign label."
   },
-  "relationshipLastCheckInLabel": "Seneste check-in {date}",
-  "relationshipLinkContact": "Tilknyt kontakt",
-  "relationshipLinkedTasksLabel": "Opgaver",
-  "relationshipLinkTaskButton": "Link opgave",
-  "relationshipLogCheckIn": "Registrér check-in",
-  "relationshipLottisRead": "Lottis vurdering",
-  "@relationshipLottisRead": {
-    "description": "Relationships redesign label."
-  },
-  "relationshipLottisReadAsOf": "kl. {time}",
-  "@relationshipLottisReadAsOf": {
+  "relationshipLastSpoke": "sidst talt {time}",
+  "@relationshipLastSpoke": {
     "placeholders": {
       "time": {
         "type": "String"
       }
     }
   },
+  "relationshipLinkContact": "Tilknyt kontakt",
+  "relationshipLinkedTasksLabel": "Opgaver",
+  "relationshipLinkTaskButton": "Link opgave",
+  "relationshipLogCheckIn": "Registrér check-in",
+  "relationshipMoreActions": "Flere handlinger",
   "relationshipNameLabel": "Navn",
   "relationshipNameRequired": "Navn er påkrævet",
-  "relationshipNextByDay": "næste senest {day}",
-  "@relationshipNextByDay": {
+  "relationshipNextDueOn": "Næste gang {day}",
+  "@relationshipNextDueOn": {
     "placeholders": {
       "day": {
         "type": "String"
       }
     }
   },
+  "relationshipNextTimeTitle": "Næste gang",
   "relationshipNicknameLabel": "Kaldenavn",
   "relationshipNoCheckIns": "Ingen check-ins endnu — registrér et efter jeres næste snak.",
   "relationshipNoLinkedTasks": "Ingen opgaver linket endnu.",
+  "relationshipNotEnrolled": "Ikke fulgt",
   "relationshipNotFound": "Denne person følges ikke længere.",
-  "relationshipNudgesOn": "påmindelser til",
-  "@relationshipNudgesOn": {
-    "description": "Relationships redesign label."
-  },
-  "relationshipPostCallBody": "Du tog lige kontakt. Vil du logge et tjek-ind, mens det er friskt?",
-  "relationshipPostCallConfirm": "Log tjek-ind",
-  "relationshipPostCallDismiss": "Ikke nu",
-  "relationshipPostCallTitle": "Hvordan gik det med {name}?",
-  "@relationshipPostCallTitle": {
+  "relationshipOnTrackCadence": "På sporet · {cadence}",
+  "@relationshipOnTrackCadence": {
     "placeholders": {
-      "name": {
-        "type": "String",
-        "example": "Anna"
+      "cadence": {
+        "type": "String"
       }
     }
   },
-  "relationshipQuietForDays": "Ingen kontakt {count, plural, =1{i 1 dag} other{i {count} dage}}",
-  "@relationshipQuietForDays": {
+  "relationshipPayAttentionTo": "Vær opmærksom på",
+  "relationshipPhotoAddBanner": "Tilføj banner",
+  "relationshipPhotoAdjustCrop": "Justér beskæring",
+  "relationshipPhotoBanner": "Banner",
+  "relationshipPhotoCardTitle": "Foto",
+  "relationshipPhotoChange": "Skift",
+  "relationshipPhotoChoose": "Vælg fra biblioteket",
+  "relationshipPhotoDragToReposition": "Træk for at flytte",
+  "relationshipPhotoFace": "Ansigt",
+  "relationshipPhotoPrivacy": "Kun på dine enheder · agenten ser det aldrig",
+  "relationshipPhotoRemove": "Fjern foto",
+  "relationshipPhotoRemoveAction": "Fjern",
+  "relationshipPhotoSaveFailed": "Kunne ikke gemme fotoet",
+  "relationshipPhotoSheetTitle": "Foto af {name}",
+  "relationshipPostCallConfirm": "Log tjek-ind",
+  "relationshipPostCallDismiss": "Ikke nu",
+  "relationshipPostCallMeta": "startede kl. {time} · {minutes, plural, =0{under et minut} =1{cirka 1 min} other{cirka {minutes} min}}",
+  "@relationshipPostCallMeta": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipPostCallOfferCall": "Du ringede til {name} for {minutes, plural, =0{under et minut} =1{1 minut} other{{minutes} minutter}} siden — skal vi notere det, mens det er frisk?",
+  "@relationshipPostCallOfferCall": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipPostCallOfferMessage": "Du skrev til {name} for {minutes, plural, =0{under et minut} =1{1 minut} other{{minutes} minutter}} siden — skal vi notere det, mens det er frisk?",
+  "@relationshipPostCallOfferMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "relationshipProposalAdded": "Tilføjet → {title}",
+  "relationshipProposalEvidence": "Fra check-in den {date}",
+  "relationshipProposalUndoFailed": "Kunne ikke fortryde. Opgaven kan være blevet ændret.",
+  "relationshipReachPrivacy": "Bliver på denne enhed · deles aldrig med AI'en",
+  "relationshipReachTitle": "Kontakt",
+  "relationshipRelinkContact": "Tilknyt en anden kontakt",
+  "relationshipsEmptyState": "Tilføj de mennesker, du vil holde kontakten med.",
+  "relationshipsGroupDue": "Skal kontaktes",
+  "relationshipsPageTitle": "Personer",
+  "relationshipsSelectPersonHint": "Vælg en person for at se deres side.",
+  "relationshipsSummaryDueNow": "Skal kontaktes nu",
+  "relationshipsSummaryEnrolled": "/ {count} fulgt",
+  "@relationshipsSummaryEnrolled": {
     "placeholders": {
       "count": {
         "type": "int"
       }
     }
   },
-  "relationshipRelinkContact": "Tilknyt en anden kontakt",
-  "relationshipSeeAllCheckIns": "Se alle check-ins",
-  "@relationshipSeeAllCheckIns": {
-    "description": "Relationships redesign label."
+  "relationshipsSummaryNextDue": "Næste: {name} · {day}",
+  "@relationshipsSummaryNextDue": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
   },
-  "relationshipsEmptyState": "Tilføj de mennesker, du vil holde kontakten med.",
-  "relationshipsPageTitle": "Personer",
+  "relationshipsSummaryNoneDue": "Ingen venter",
+  "relationshipsSummaryNotEnrolled": "{count, plural, =1{1 person ikke fulgt} other{{count} personer ikke fulgt}}",
+  "@relationshipsSummaryNotEnrolled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "relationshipStatusActive": "Aktiv",
   "relationshipStatusArchived": "Arkiveret",
   "relationshipStatusDormant": "Hvilende",
   "relationshipStatusFieldLabel": "Status",
-  "relationshipStayingInTouch": "Holde kontakten",
-  "@relationshipStayingInTouch": {
-    "description": "Relationships redesign label."
+  "relationshipStatusLineAdded": "Lige tilføjet · {cadence}",
+  "@relationshipStatusLineAdded": {
+    "placeholders": {
+      "cadence": {
+        "type": "String"
+      }
+    }
   },
-  "relationshipStayInTouch": "Hold kontakten",
-  "@relationshipStayInTouch": {
-    "description": "Relationships redesign label."
+  "relationshipStatusLineAddedFirstDue": "Lige tilføjet · {cadence} · første gang senest {day}",
+  "@relationshipStatusLineAddedFirstDue": {
+    "placeholders": {
+      "cadence": {
+        "type": "String"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipStatusLineContacted": "{type} · {time} · {cadence}",
+  "@relationshipStatusLineContacted": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "cadence": {
+        "type": "String"
+      }
+    }
+  },
+  "relationshipTasksLinkedCount": "{count, plural, =1{1 tilknyttet} other{{count} tilknyttede}}",
+  "@relationshipTasksLinkedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "relationshipTimestampToday": "I dag",
   "relationshipTimestampYesterday": "I går",
@@ -5458,7 +5851,6 @@
   "settingsSyncConflictsSubtitle": "Løs synkroniseringskonflikter",
   "settingsSyncNodeProfileCapabilitiesEmpty": "Ingen opdaget — automatisk udløser af synkroniseret lydinferens vil ikke målrette denne enhed.",
   "settingsSyncNodeProfileCapabilitiesLabel": "Opdagede AI-kapaciteter",
-  "settingsSyncNodeProfileCapabilityMlxAudio": "MLX Audio (lokal)",
   "settingsSyncNodeProfileCapabilityOllamaLlm": "Ollama LLM",
   "settingsSyncNodeProfileCapabilityOmlxLlm": "oMLX LLM",
   "settingsSyncNodeProfileCapabilityVoxtral": "Voxtral (lokal)",
@@ -5473,6 +5865,8 @@
   "settingsSyncOutboxTitle": "Sync Outbox",
   "settingsSyncStatsSubtitle": "Inspicer synkroniserings-pipelinemetrikker",
   "settingsSyncSubtitle": "Konfigurer synkronisering og vis statistikker",
+  "settingsSystemHealthSubtitle": "Analysér de seneste logfiler og kopiér en rapport, du kan dele",
+  "settingsSystemHealthTitle": "Systemtilstand",
   "settingsThemingAutomatic": "Automatisk",
   "settingsThemingDark": "Mørkt udseende",
   "settingsThemingLight": "Lys udseende",
@@ -5485,6 +5879,51 @@
   "settingsV2UnimplementedTitle": "Panel endnu ikke implementeret",
   "settingsWhatsNewSubtitle": "Se de seneste opdateringer og funktioner",
   "settingsWhatsNewTitle": "Hvad er nyt",
+  "sherpaAllFamilies": "Alle familier",
+  "sherpaCatalogMatches": "{count} af {total} modeller",
+  "sherpaDeleteModel": "Fjern {model} fra denne enhed",
+  "@sherpaDeleteModel": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaDownloadAction": "Download",
+  "sherpaDownloadModel": "Download {model}",
+  "@sherpaDownloadModel": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaInstalledModelsTitle": "Installerede modeller",
+  "sherpaInstallingModel": "Installerer model",
+  "sherpaLanguageCantonese": "Kantonesisk",
+  "sherpaModelCatalogTitle": "Modelkatalog",
+  "sherpaModelConfigurationError": "Modellen er downloadet, men dens konfiguration kunne ikke gemmes.",
+  "sherpaModelError": "Modelhandlingen mislykkedes. Prøv igen.",
+  "sherpaModelFamily": "Modelfamilie",
+  "sherpaModelInstalled": "Downloadet",
+  "sherpaModelNotInstalled": "Download en model på denne enhed",
+  "sherpaModelSizeGB": "{size} GB · Flersproget",
+  "@sherpaModelSizeGB": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaModelSizeMB": "{size} MB · Flersproget",
+  "@sherpaModelSizeMB": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "sherpaProviderDescription": "Transskriber på denne enhed uden en server. Download en model, og vælg den derefter i din inferensprofil.",
   "sidebarActiveSectionTitle": "Aktivitet",
   "sidebarActivityCollapseTooltip": "Kollapsaktivitet",
   "sidebarActivityExpandTooltip": "Udvid aktiviteten",
@@ -5526,6 +5965,9 @@
   "speechDictionaryWarning": "Store ordbøger ({count} termer) kan øge API-omkostningerne",
   "speechModalSelectLanguage": "Vælg sprog",
   "speechModalTitle": "Talutegenkendelse",
+  "speechSettingsAutoPrepareChatAudio": "Klargør chatlyd automatisk",
+  "speechSettingsChatAudioDescription": "Klargør nye chatsvar på denne enhed, så afspilningen starter hurtigere. Lyden afspilles først, når du trykker på afspil.",
+  "speechSettingsChatAudioLabel": "Chatlyd",
   "speechSettingsModelDescription": "On-device talemodel",
   "speechSettingsModelDownloadsOnce": "Downloads én gang",
   "speechSettingsModelLabel": "Model",
@@ -5800,6 +6242,33 @@
   "syncWizardStepConnect": "Forbind",
   "syncWizardStepGetCode": "Hent kode",
   "syncWizardStepStatus": "Trin {step} af 3: {label}",
+  "systemHealthAnalyzedWindow": "Analyseret {start} → {end}",
+  "systemHealthChooseModelTitle": "Vælg model",
+  "systemHealthCopiedToast": "Rapporten er kopieret. Kendte mønstre af personlige data er fjernet.",
+  "systemHealthCopyButton": "Kopiér rapport",
+  "systemHealthCustomFromLabel": "Fra",
+  "systemHealthCustomToLabel": "Til",
+  "systemHealthDescription": "Gennemgår logfilerne på denne enhed for fejl, advarsler og langsomme forespørgsler, fjerner kendte mønstre af personlige data og skriver en kort rapport, som du kan indsætte i en kodeassistent.",
+  "systemHealthDomainsDescription": "De domæner, der er slået til her, er dem, der analyseres – samme indstilling som afgør, hvad der logges. Langsomme forespørgsler tages med, når logning af dem er slået til.",
+  "systemHealthDomainsTitle": "Logdomæner",
+  "systemHealthFailedTitle": "Analysen mislykkedes",
+  "systemHealthGeneratedAt": "Oprettet {time}",
+  "systemHealthHideDigest": "Skjul sammendrag",
+  "systemHealthModelDescription": "Skriver fundene ud fra det anonymiserede sammendrag. Foreslår tænkemodellen fra din standardprofil.",
+  "systemHealthModelNone": "Kun sammendrag, ingen model",
+  "systemHealthModelNoneDescription": "Vælg en standardprofil til inferens, eller tilføj en agentisk tekstmodel for at få fund.",
+  "systemHealthModelTitle": "Model",
+  "systemHealthPresetCustom": "Brugerdefineret",
+  "systemHealthPresetLast14Days": "14 dage",
+  "systemHealthPresetLast24Hours": "24 t",
+  "systemHealthPresetLast7Days": "7 dage",
+  "systemHealthPreviousReportsDescription": "Hver rapport gemmes på denne enhed. Tryk på en for at vise den igen.",
+  "systemHealthPreviousReportsTitle": "Tidligere rapporter",
+  "systemHealthRangeTitle": "Tidsrum",
+  "systemHealthReportTitle": "Rapport",
+  "systemHealthRunButton": "Kør analyse",
+  "systemHealthSavedTo": "Gemt i {path}",
+  "systemHealthShowDigest": "Vis sammendrag",
   "taskActionBarAudioRecordingActive": "Lydoptagelse i gang",
   "taskActionBarMoreActions": "Flere aktioner",
   "taskActionBarOpenRunningTimer": "Åben løbetimer",

@@ -15,6 +15,7 @@ import 'package:lotti/features/agents/wake/wake_queue.dart';
 import 'package:lotti/features/agents/wake/wake_runner.dart';
 import 'package:lotti/features/agents/wake/wake_suppression_tracker.dart';
 import 'package:lotti/features/agents/wake/wake_throttle_coordinator.dart';
+import 'package:lotti/features/agents/workflow/wake_result.dart';
 import 'package:lotti/features/ai/model/ai_runtime_settings.dart';
 import 'package:lotti/features/sync/vector_clock.dart';
 import 'package:lotti/services/db_notification.dart';
@@ -928,7 +929,8 @@ class WakeOrchestrator with AgentErrorLogging {
   /// Starts a periodic safety-net timer that ensures the queue is eventually
   /// drained even if a deferred drain timer fails to fire.
   ///
-  /// Triggers [processNext] whenever the queue has pending jobs. Re-entering
+  /// Triggers [processNext] for due/immediate jobs, or an active drain.
+  /// A future-only idle queue waits for its deadline. Re-entering
   /// an active drain is intentional: it either wakes the healthy scheduler or
   /// force-resets one whose last progress exceeded [_drainTimeout]. We do not
   /// check `_deferredDrainTimers.isEmpty` because a stale or cancelled timer
@@ -936,7 +938,19 @@ class WakeOrchestrator with AgentErrorLogging {
   void _startSafetyNet() {
     _safetyNetTimer?.cancel();
     _safetyNetTimer = Timer.periodic(safetyNetInterval, (_) {
-      if (!queue.isEmpty) {
+      // Active drains always retain watchdog recovery. An idle queue whose
+      // only work is deferred has its own deadline timers; the safety net
+      // resumes attempts when the wall-clock deadline is due, even if one of
+      // those timers was lost.
+      final needsDrain =
+          _isDraining ||
+          queue.hasJobWhere(
+            (job) =>
+                job.reason != WakeReason.subscription.name ||
+                job.drainImmediately ||
+                !_isThrottled(job.agentId),
+          );
+      if (!queue.isEmpty && needsDrain) {
         _log('safety-net drain: queue=${queue.length}');
         unawaited(processNext());
       }

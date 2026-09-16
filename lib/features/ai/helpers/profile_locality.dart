@@ -3,7 +3,7 @@ import 'package:lotti/features/ai/model/ai_config.dart';
 import 'package:lotti/features/ai/repository/ai_config_repository.dart';
 
 /// True iff every populated model id on [profile] resolves to a local
-/// inference provider (`ollama`, `omlx`, `voxtral`, `whisper`, `mlxAudio`).
+/// inference provider (`ollama`, `omlx`, `voxtral`, `whisper`).
 ///
 /// Operates on the raw [AiConfigInferenceProfile] (not on a `ResolvedProfile`)
 /// because `ProfileResolver` silently drops optional slots whose provider
@@ -31,6 +31,7 @@ Future<bool> profileIsLocal(
   // high-end slot) doesn't hit the lookup maps twice.
   final referencedModelIds = <String>{
     profile.thinkingModelId,
+    ?profile.chatModelId,
     if (profile.thinkingHighEndModelId != null) profile.thinkingHighEndModelId!,
     if (profile.imageRecognitionModelId != null)
       profile.imageRecognitionModelId!,

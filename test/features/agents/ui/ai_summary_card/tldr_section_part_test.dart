@@ -9,6 +9,7 @@ import 'package:lotti/features/design_system/theme/design_tokens.dart';
 import 'package:lotti/features/tts/ui/widgets/tts_play_button.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../../test_utils/screenshot_harness.dart' show loadAppFonts;
 import '../../../../widget_test_utils.dart';
 import '../../../tts/test_utils.dart';
 import '../../test_data/constants.dart';
@@ -43,6 +44,10 @@ class _DisclosureHarnessState extends State<_DisclosureHarness> {
 }
 
 void main() {
+  // Width-driven layout: pin the bundled fonts so the numbers below read
+  // the same whether or not another file in this isolate loaded them first
+  // (test/README.md, "Committed per-feature harnesses").
+  setUpAll(loadAppFonts);
   TestWidgetsFlutterBinding.ensureInitialized();
 
   AgentReportEntity report({String? tldr, String content = 'Full report.'}) =>
@@ -97,7 +102,201 @@ void main() {
     });
   });
 
+  group('TldrHeader.plain', () {
+    testWidgets('a plain header wears a neutral tile, not the AI accent', (
+      tester,
+    ) async {
+      Future<Container> badgeFor({required bool plain}) async {
+        await tester.pumpWidget(
+          makeTestableWidgetWithScaffold(
+            TldrHeader(
+              agentName: 'No agent for this person',
+              icon: LottiIcons.people,
+              plain: plain,
+            ),
+          ),
+        );
+        return tester.widget<Container>(
+          find
+              .descendant(
+                of: find.byType(TldrHeader),
+                matching: find.byType(Container),
+              )
+              .first,
+        );
+      }
+
+      DsTokens tokens() => tester.element(find.byType(TldrHeader)).designTokens;
+      final plain = await badgeFor(plain: true);
+      expect(
+        (plain.decoration! as BoxDecoration).color,
+        tokens().colors.background.level03,
+      );
+      expect(
+        tester.widget<Icon>(find.byIcon(LottiIcons.people)).color,
+        tokens().colors.text.mediumEmphasis,
+      );
+      final accented = await badgeFor(plain: false);
+      expect(
+        (accented.decoration! as BoxDecoration).color,
+        tokens().colors.aiCard.accentSoft,
+      );
+      expect(
+        tester.widget<Icon>(find.byIcon(LottiIcons.people)).color,
+        tokens().colors.aiCard.accent,
+      );
+    });
+  });
+
+  group('TldrHeader semantics', () {
+    testWidgets('the badge and title are one labelled node; the subtitle '
+        'speaks for itself, live region included', (tester) async {
+      await tester.pumpWidget(
+        makeTestableWidgetWithScaffold(
+          TldrHeader(
+            title: 'Briefing',
+            agentName: 'Writing the briefing…',
+            subtitle: Semantics(
+              liveRegion: true,
+              child: const Text('Writing the briefing…'),
+            ),
+            onAgentTap: () {},
+          ),
+        ),
+      );
+      // Excluded from the header's own node, the subtitle would be silent;
+      // here it is findable — and live — on its own.
+      expect(find.bySemanticsLabel('Writing the briefing…'), findsOneWidget);
+      final node = tester.getSemantics(find.text('Writing the briefing…'));
+      expect(node.flagsCollection.isLiveRegion, isTrue);
+      // The header's own node is the title alone: the name is the subtitle's
+      // to speak, and folding it into the label would read the status twice.
+      expect(find.bySemanticsLabel('Briefing'), findsOneWidget);
+      expect(
+        find.bySemanticsLabel('Briefing. Writing the briefing…'),
+        findsNothing,
+      );
+    });
+  });
+
+  group('TldrBody.bodyStyle', () {
+    testWidgets('a trailing action rides the disclosure row at its end, and '
+        'keeps a row of its own when there is nothing more to read', (
+      tester,
+    ) async {
+      const action = SizedBox(
+        key: ValueKey('trailing-action'),
+        width: 60,
+        height: 32,
+      );
+      await tester.pumpWidget(
+        makeTestableWidgetWithScaffold(
+          TldrBody(
+            tldr: 'Summary first.',
+            expanded: false,
+            additionalReport: 'Full report details.',
+            onToggle: () {},
+            disclosureKey: const ValueKey('disclosure'),
+            trailing: action,
+          ),
+        ),
+      );
+      final body = tester.getRect(find.byType(TldrBody));
+      final trailing = tester.getRect(
+        find.byKey(const ValueKey('trailing-action')),
+      );
+      final link = tester.getRect(find.byKey(const ValueKey('disclosure')));
+      expect(trailing.right, moreOrLessEquals(body.right));
+      expect(trailing.center.dy, moreOrLessEquals(link.center.dy, epsilon: 1));
+
+      // Nothing further to read: no Read more, but the action still stands
+      // at the trailing edge, on its own line under the prose.
+      await tester.pumpWidget(
+        makeTestableWidgetWithScaffold(
+          TldrBody(
+            tldr: 'Summary first.',
+            expanded: false,
+            additionalReport: null,
+            onToggle: () {},
+            disclosureKey: const ValueKey('disclosure'),
+            trailing: action,
+          ),
+        ),
+      );
+      expect(find.byKey(const ValueKey('disclosure')), findsNothing);
+      final lone = tester.getRect(
+        find.byKey(const ValueKey('trailing-action')),
+      );
+      final alone = tester.getRect(find.byType(TldrBody));
+      final prose = tester.getRect(find.byType(AgentMarkdownView));
+      expect(lone.right, moreOrLessEquals(alone.right));
+      expect(lone.top, greaterThanOrEqualTo(prose.bottom));
+    });
+
+    testWidgets('reads at the compact summary size unless the host sets its '
+        'own tier', (tester) async {
+      Future<TextStyle?> styleFor(TextStyle? bodyStyle) async {
+        await tester.pumpWidget(
+          makeTestableWidgetWithScaffold(
+            TldrBody(
+              tldr: 'Summary first.',
+              expanded: false,
+              additionalReport: null,
+              onToggle: () {},
+              disclosureKey: const ValueKey('disclosure'),
+              bodyStyle: bodyStyle,
+            ),
+          ),
+        );
+        return tester
+            .widget<AgentMarkdownView>(find.byType(AgentMarkdownView))
+            .style;
+      }
+
+      final compact = await styleFor(null);
+      final tokens = tester.element(find.byType(TldrBody)).designTokens;
+      expect(
+        compact?.fontSize,
+        tokens.typography.styles.body.bodySmall.fontSize,
+      );
+      expect(compact?.color, tokens.colors.aiCard.bodyText);
+
+      final medium = await styleFor(tokens.typography.styles.body.bodyMedium);
+      expect(
+        medium?.fontSize,
+        tokens.typography.styles.body.bodyMedium.fontSize,
+      );
+      // The host sets the tier; the card still owns the ink.
+      expect(medium?.color, tokens.colors.aiCard.bodyText);
+    });
+  });
+
   group('TldrHeader', () {
+    testWidgets('a subtitle widget stands in for the name caption, and the '
+        'badge can wear another glyph', (tester) async {
+      await tester.pumpWidget(
+        makeTestableWidget(
+          TldrHeader(
+            agentName: 'Not shown, not announced',
+            title: 'Briefing',
+            subtitle: const Text('as of 3 h ago', key: ValueKey('subtitle')),
+            icon: LottiIcons.people,
+            onAgentTap: () {},
+          ),
+        ),
+      );
+
+      expect(find.byKey(const ValueKey('subtitle')), findsOneWidget);
+      expect(find.text('Not shown, not announced'), findsNothing);
+      expect(find.byIcon(LottiIcons.people), findsOneWidget);
+      expect(find.byIcon(LottiIcons.aiSpark), findsNothing);
+      expect(find.bySemanticsLabel('Briefing'), findsOneWidget);
+      expect(
+        find.bySemanticsLabel('Briefing. Not shown, not announced'),
+        findsNothing,
+      );
+    });
+
     testWidgets('keeps identity primary and exposes optional playback', (
       tester,
     ) async {
@@ -333,14 +532,12 @@ void main() {
       // which reads as a typo, not as shortening. One line and an ellipsis at
       // least tells the reader something was left out.
       Future<void> pumpAt(double width) {
-        tester.view
-          ..physicalSize = Size(width, 400)
-          ..devicePixelRatio = 1;
         return tester.pumpWidget(
           makeTestableWidget(
             TldrHeader(agentName: 'Task Laura', onAgentTap: () {}),
             locale: const Locale('de'),
             mediaQueryData: phoneMediaQueryData.copyWith(
+              size: Size(width, 400),
               textScaler: const TextScaler.linear(1.3),
             ),
           ),
@@ -350,7 +547,12 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await pumpAt(320);
+      // The header measures the longest run between break opportunities, and
+      // the hyphen is one: "KI-" / "Zusammenfassung" is a legitimate break, so
+      // only a slot narrower than "Zusammenfassung" (200–210 px under Inter
+      // at 1.3×) forces the single line. The slot is the surface less 80; a
+      // 320 phone still wraps at the hyphen, 270 leaves 190 and cannot.
+      await pumpAt(270);
       final title = find.text('KI-Zusammenfassung');
       expect(title, findsOneWidget);
       expect(tester.widget<Text>(title).maxLines, 1);

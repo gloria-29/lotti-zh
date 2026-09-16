@@ -12,11 +12,10 @@ const _logTag = 'ProfileResolver';
 
 /// Resolves the inference profile for an agent wake.
 ///
-/// Resolution order:
-///   1. `agentConfig.profileId` (agent-level override)
-///   2. `version.profileId` (version snapshot)
-///   3. `template.profileId` (template default)
-///   4. Legacy fallback: `version.modelId ?? template.modelId`
+/// Typed inference setups are authoritative. Legacy agents select their first
+/// configured profile id (agent, version, template), then try the legacy model,
+/// then the device's Settings default. Standalone agents consult that default
+/// before their built-in model, and use the built-in only when none was selected.
 ///
 /// Only the thinking slot is fatal — if it cannot be resolved, `null` is
 /// returned and the wake should be aborted. Other slots fail gracefully.
@@ -56,7 +55,7 @@ class ProfileResolver {
   }) async {
     final setup = agentConfig.inferenceSetup;
     if (setup != null) {
-      return _resolveTypedSetup(setup);
+      return resolveSetup(setup);
     }
     return _resolveLegacySetup(
       agentConfig: agentConfig,
@@ -76,6 +75,52 @@ class ProfileResolver {
     return _buildResolvedProfile(config);
   }
 
+  /// Resolves the device's deliberately selected fallback profile.
+  Future<ResolvedProfile?> resolveDefaultProfile() async {
+    final id = await _aiConfigRepository.getDefaultProfileId();
+    return id == null ? null : resolveByProfileId(id);
+  }
+
+  /// Resolves agents without templates: explicit setup/profile, Settings
+  /// default, then the legacy built-in model only if no default was selected.
+  Future<ResolvedAgentSetup> resolveStandalone({
+    required AgentConfig agentConfig,
+    required String legacyModelId,
+  }) async {
+    final setup = agentConfig.inferenceSetup;
+    if (setup != null) return resolveSetup(setup);
+    final explicitId = agentConfig.profileId;
+    if (explicitId != null) {
+      final profile = await resolveByProfileId(explicitId);
+      if (profile != null) {
+        return _resolvedDetails(
+          profile: profile,
+          source: AgentSetupResolutionSource.legacyAgentProfile,
+        );
+      }
+    }
+    final defaultId = await _aiConfigRepository.getDefaultProfileId();
+    if (defaultId != null) {
+      final profile = await resolveByProfileId(defaultId);
+      if (profile != null) {
+        return _resolvedDetails(
+          profile: profile,
+          source: AgentSetupResolutionSource.baseProfile,
+        );
+      }
+    }
+    if (defaultId == null) {
+      final legacy = await _resolveFromModelId(legacyModelId);
+      if (legacy != null) {
+        return _resolvedDetails(
+          profile: legacy,
+          source: AgentSetupResolutionSource.legacyModel,
+        );
+      }
+    }
+    return const ResolvedAgentSetup(status: AgentSetupResolutionStatus.broken);
+  }
+
   Future<ResolvedProfile?> _resolveFromProfile(
     String profileId, {
     ResolvedInferenceProvider? thinkingOverride,
@@ -85,7 +130,9 @@ class ProfileResolver {
     return _buildResolvedProfile(config, thinkingOverride: thinkingOverride);
   }
 
-  Future<ResolvedAgentSetup> _resolveTypedSetup(
+  /// Resolves an authoritative agent setup without requiring a template.
+  /// Disabled or broken setups never fall through to legacy/default routes.
+  Future<ResolvedAgentSetup> resolveSetup(
     AgentInferenceSetup setup,
   ) async {
     if (setup.mode == AgentInferenceSetupMode.disabled) {
@@ -181,6 +228,13 @@ class ProfileResolver {
       );
     }
 
+    final fallback = await resolveDefaultProfile();
+    if (fallback != null) {
+      return _resolvedDetails(
+        profile: fallback,
+        source: AgentSetupResolutionSource.baseProfile,
+      );
+    }
     return const ResolvedAgentSetup(
       status: AgentSetupResolutionStatus.legacyUnknown,
       source: AgentSetupResolutionSource.legacyModel,
@@ -237,6 +291,13 @@ class ProfileResolver {
     }
 
     // Resolve optional slots (non-fatal).
+    final chatSlot = config.chatModelId == null
+        ? null
+        : await resolveInferenceProviderForProfileSlot(
+            modelId: config.chatModelId!,
+            aiConfigRepository: _aiConfigRepository,
+            logTag: _logTag,
+          );
     final thinkingHighEndSlot = config.thinkingHighEndModelId != null
         ? await resolveInferenceProviderForProfileSlot(
             modelId: config.thinkingHighEndModelId!,
@@ -273,6 +334,10 @@ class ProfileResolver {
       thinkingModelId: thinkingSlot.model.providerModelId,
       thinkingProvider: thinkingSlot.provider,
       thinkingModel: thinkingSlot.model,
+      chatModelId: chatSlot?.model.providerModelId,
+      chatProvider: chatSlot?.provider,
+      chatModel: chatSlot?.model,
+      chatModelUnavailable: config.chatModelId != null && chatSlot == null,
       thinkingHighEndModelId: thinkingHighEndSlot?.model.providerModelId,
       thinkingHighEndProvider: thinkingHighEndSlot?.provider,
       thinkingHighEndModel: thinkingHighEndSlot?.model,

@@ -1,13 +1,17 @@
 ---
 type: Feature Module
 title: Provider routing
-description: The routing table behind CloudInferenceRepository, per-provider catalogs and quirks, the audio transcoding pipeline, Gemini thinking modes, and the macOS-only MLX Audio bridge.
+description: The routing table behind CloudInferenceRepository, per-provider catalogs and quirks, the audio transcoding pipeline, Gemini thinking modes, and local HTTP transcription.
 resource: ../../../lib/features/ai/repository/cloud_inference_repository.dart
-tags: [ai, providers, routing, audio, gemini, mlx]
+tags: [ai, providers, routing, audio, gemini]
 status: stable
-generated: { by: codex/gpt-6, at: 2026-09-05T15:30:00Z }
+generated: { by: codex/gpt-6, at: 2026-09-12T12:48:35Z }
 stale_after: 2026-10-19
 sources:
+  - id: melious
+    resource: ../../../lib/features/ai/repository/melious_inference_repository.dart
+    title: Melious request shaping and response parsing
+    last_modified: 2026-09-12
   - id: router
     resource: ../../../lib/features/ai/repository/cloud_inference_repository.dart
     title: CloudInferenceRepository facade
@@ -37,19 +41,19 @@ sources:
 # One facade, two collaborators
 
 `CloudInferenceRepository` is the central router despite its name — it also
-handles local providers such as Ollama, Whisper, Voxtral and MLX Audio.
+handles local providers such as Ollama, Whisper, Voxtral and oMLX.
 
 It is a thin **facade**: every public method delegates to
 `CloudInferenceGenerate` (text + image) or `CloudInferenceGenerateMore` (audio,
 multi-turn, image generation, model install/cleanup), both sharing one
-`CloudInferenceRequestHelpers`. The mockable surface and all call sites are
-unchanged.
+`CloudInferenceRequestHelpers`. The facade remains the mockable surface. Its `generate` method can request
+streaming while keeping an impact collector for buffered fallback.
 
 | Operation | Dedicated branches | Fallback |
 |-----------|--------------------|----------|
 | `generate()` | Ollama, Gemini, Mistral, Melious | OpenAI-compatible chat streaming; explicit reasoning effort forwarded where supported, omitted from Mistral |
 | `generateWithImages()` | Ollama, Melious, Mistral OCR (`/v1/ocr` for `mistral-ocr-*`) | OpenAI-compatible multimodal chat; Gemini receives `reasoning_effort` |
-| `generateWithAudio()` | Whisper, Voxtral, MLX Audio native bridge, oMLX/OpenAI/Mistral/Melious transcription endpoints, temporary-MP3 Mistral and Melious Voxtral chat audio | OpenAI-compatible audio chat completions; Gemini receives `reasoning_effort` |
+| `generateWithAudio()` | embedded sherpa, Whisper, Voxtral, oMLX/OpenAI/Mistral/Melious transcription endpoints, temporary-MP3 Mistral and Melious Voxtral chat audio | OpenAI-compatible audio chat completions; Gemini receives `reasoning_effort` |
 | `generateWithMessages()` | Gemini, Ollama, Mistral, Melious | OpenAI-compatible full-history chat; reasoning effort omitted from Mistral |
 | `generateImage()` | Gemini, Alibaba DashScope, Melious | Unsupported — throws for every other provider type |
 
@@ -158,12 +162,29 @@ A subscriber that explicitly cancels cannot receive the terminal accounting
 exception. The runner currently has no cancellation-accounting hook, so charges
 incurred before such a cancellation are not persisted through this path.
 
-Buffered vision requests preserve the caller's forced tool choice as well as
-its tool schema. Collecting Melious impact data must not turn a required
-structured image summary into an automatic, optional tool call.
+Buffered and streaming requests use the same tool-choice policy, independent
+of impact collection. Tool schemas are preserved. **DeepSeek V4.1 Flash has a
+narrow exception:** `resolveToolChoice` changes a named choice to `auto` only
+when exactly one tool is advertised and its name matches the requested tool.
+This avoids Melious returning malformed DSML instead of summary arguments.
+The caller still validates structured output, since automatic choice permits
+prose. Other models, mode choices, missing/mismatched schemas, and multiple-tool
+requests keep the caller's choice; the workaround never makes another tool
+callable. Explicit `required` mode also failed in the diagnostic but is not
+rewritten by this named-choice workaround.
+
+Lotti sends OpenAI-compatible JSON to the provider; it does not install chat
+templates, decode DSML, or configure model-specific stop tokens. The controlled
+live comparison and reproduction commands are in the
+[DeepSeek image probe](../../../tool/deepseek_image_probe.md).
 
 **Reference-image generation is rejected explicitly** rather than silently
 ignored, because Melious currently documents only text-to-image generation.
+
+Buffered chat requests use an owned `AbortableRequest`. Cancelling the synthetic
+stream aborts that request without closing the shared client or cancelling a
+sibling chat. This lets a shorter query deadline stop waiting for the longer
+HTTP timeout; it does not change request payloads or enable incremental text.
 
 ## Melious reports cost and impact only off the streaming path
 
@@ -179,7 +200,7 @@ endpoint has to opt in:
 
 | Endpoint | How it buffers | Impact captured |
 |----------|----------------|-----------------|
-| `POST /chat/completions` | `_nonStreamingChat` when a collector is supplied — deliberately forfeiting incremental deltas, since Melious reports impact only when not streaming | Yes |
+| `POST /chat/completions` | `_nonStreamingChat` when a collector is supplied, unless `generateText` requests `preferStreaming` | Buffered responses only |
 | `POST /audio/transcriptions` (whisper-class ids) | Always one buffered POST | Yes, via `executeTranscription`'s `onSuccessResponse` hook |
 | `POST /chat/completions` with temporary-MP3 audio (Voxtral ids) | Always buffered | Yes |
 | `POST /images/generations` | Always buffered | Yes |
@@ -189,6 +210,21 @@ that ignores the parameter silently records nothing — the call still succeeds
 and the transcript still arrives, which is why the gap is invisible until the
 consumption charts come up short. Fields Melious omits leave the collector
 untouched rather than writing zeros.
+
+Scoped query synthesis opts into `preferStreaming` and requests a trailing token
+usage event. Its collector remains available, but the streamed responses tested
+with GLM-5.3 and DeepSeek Flash v4.1 omit billing and environmental impact.
+Streaming cost/energy therefore remains unavailable. An initial HTTP 400/422
+whose structured error names `stream` or `stream_options` permits one buffered
+fallback with identical model and reasoning settings. Authentication, overload,
+timeout, unrelated malformed requests and streams that already emitted data do
+not trigger fallback. Buffered fallback retains returned usage and impact.
+
+The ping filter subscribes lazily and owns upstream cancellation. The Melious
+SDK adapter and generic text compatibility route also close their own client
+on cancellation/completion; an injected caller-owned compatibility client is
+not closed. Cancelling the last broadcast listener cancels its owned upstream
+subscription, including while waiting for the first token.
 
 A small curated static catalog exists for immediate setup before live-catalog
 rows are installed: `deepseek-v4-pro`, `glm-5.2`, `gemma-4-26b-a4b`,
@@ -382,69 +418,6 @@ Gemini and the model is a Gemini-3 variant, defaulting to `low` unless a
 per-invocation mode is passed. Non-Gemini providers and non-Gemini-3 models leave
 reasoning effort unset.
 
-# MLX Audio
-
-**MLX Audio is intentionally not a localhost provider.** Flutter owns
-provider/model configuration and progress state, while `MlxAudioChannel` talks to
-platform Swift over `com.matthiasn.lotti/mlx_audio`.
-
-```mermaid
-flowchart LR
-  UI["AI setup / model cards"] --> Config["AiConfig provider + models"]
-  Config --> Progress["mlxAudioModelProgressProvider"]
-  Progress --> Native["MlxAudio Swift bridge (macOS only)"]
-  Native -->|Apple Silicon macOS| MLX["MLX Audio Swift"]
-  Native -->|Intel macOS| Unsupported["unsupported status"]
-  Progress -->|iOS / Android / Linux / Windows| NoPlugin["unsupported<br/>(no plugin registered)"]
-  Audio["generateWithAudio()"] --> Installed{"model installed?"}
-  Installed -->|yes| Native
-  Installed -->|no| Missing["not-installed error"]
-```
-
-**The native bridge ships only on macOS.** The Swift file compiles without the
-MLX package and returns `unsupported` on Intel macOS; iOS, Android, Linux and
-Windows do not register the plugin at all. The Dart channel short-circuits every
-method when `Platform.isMacOS` is false: `getModelStatus` returns `unsupported`,
-action methods throw `PlatformException(code: 'UNSUPPORTED')`, and the event
-stream emits nothing.
-
-Three other places are gated consistently: the FTUE provider picker hides the MLX
-Audio tile on non-macOS, `ProfileAutomationService._fallbackCandidateRank` demotes
-MLX rows past every cloud and local non-MLX candidate on non-macOS, and the
-sync-node capability probe refuses to advertise `mlxAudio`. Mobile devices
-therefore defer audio inference to a capable desktop via the synced-audio
-auto-trigger.
-
-**iOS does not ship the bridge at all.** The 1.7B Qwen3-ASR model that gives
-acceptable accuracy on macOS triggered immediate OOM on iPhone hardware, so
-`ios/Runner` no longer links `mlx-swift` / `mlx-audio-swift` /
-`swift-huggingface` and no longer registers the plugin. The iOS bundle is
-correspondingly smaller.
-
-The seeded catalog includes Voxtral Realtime, Qwen3-ASR 0.6B, Qwen3-ASR 1.7B
-4-bit and 8-bit, and Parakeet. Setup asks which STT model to install
-first, with **Qwen3-ASR 1.7B 8-bit preselected** because it is much faster than
-Voxtral Realtime in post-recording use.
-
-**Inference never implicitly downloads a model.** `installModel` is the only MLX
-Audio path that downloads from Hugging Face; transcription runs first verify the
-cache contains a complete model and otherwise return a not-installed failure.
-(Scoped to MLX Audio deliberately — [text-to-speech](../tts.md) fetches its own
-Supertonic model over a separate path.) This
-keeps a recording-triggered STT run from starting a multi-GB background download
-or loading a partial cache. The Swift bridge logs resource snapshots at
-`transcribe.request`, model load, audio preparation and generation, so native
-crash reports can be matched to the last MLX step that ran.
-
-Download status is centralized in `MlxAudioModelProgressStore`, which owns the
-single native EventChannel subscription and keeps the latest payload by model id.
-That prevents overview rows from stealing the native stream from the modal, and
-lets a running download be reopened from the model row.
-
-AI-summary speech uses the independent on-device
-[Supertonic TTS pipeline](../tts.md); MLX Audio now owns transcription and model
-download lifecycle only.
-
 # Speech dictionaries
 
 `UnifiedAiInferenceRepository` and `SkillInferenceRunner` resolve category
@@ -452,9 +425,14 @@ dictionary terms through `PromptBuilderHelper.getSpeechDictionaryTerms()`.
 
 | Path | How terms are delivered |
 |------|-------------------------|
-| MLX Audio | Forwarded across the channel with the request; Qwen3-ASR uses the list as prompt context |
 | Chat-audio (including temporary-MP3 Mistral and Melious Voxtral) | Appended as a dictionary block to the user message |
 | Mistral transcription-only models | The dedicated `context_bias` parameter |
 
 Decoder-level dictionary/G2P integration remains a separate native-bridge
 follow-up, pending a stable SDK surface.
+
+# Embedded recognition
+
+Sherpa branches before HTTP client construction in `generateWithAudio`. Model
+installation, background decoding, cancellation, and platform packaging are
+documented in [embedded speech recognition](embedded-speech.md).

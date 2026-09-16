@@ -8,13 +8,24 @@ import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:lotti/classes/audio_transcript_timing.dart';
+import 'package:lotti/features/agents/query/query_text_inference.dart';
 import 'package:lotti/features/ai/model/ai_call_impact.dart';
 import 'package:lotti/features/ai/model/ai_config.dart';
 import 'package:lotti/features/ai/repository/melious_inference_repository.dart';
 import 'package:lotti/features/ai/repository/transcription_exception.dart';
 import 'package:lotti/features/ai/skills/entry_summary_tool.dart';
 import 'package:lotti/features/ai/util/image_processing_utils.dart';
+import 'package:lotti/features/ai_consumption/model/ai_attribution.dart';
+import 'package:lotti/features/ai_consumption/model/ai_consumption_enums.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:openai_dart/openai_dart.dart';
+// The SDK exception requires an enum omitted from its public barrel.
+import 'package:openai_dart/src/generated/client.dart' show HttpMethod;
+
+import '../../../helpers/fallbacks.dart';
+import '../../../mocks/mocks.dart';
+import '../../ai_consumption/test_utils.dart';
 
 class _ChatStreamProbe {
   _ChatStreamProbe({required this.content});
@@ -95,6 +106,157 @@ File _temporaryMp3File([List<int> bytes = const [0x49, 0x44, 0x33]]) {
 }
 
 void main() {
+  setUpAll(registerAllFallbackValues);
+  group('DeepSeek V4.1 forced tool compatibility', () {
+    const model = 'deepseek-v4.1-flash';
+    const tools = [entrySummaryTool];
+    const otherTool = ChatCompletionTool(
+      type: ChatCompletionToolType.function,
+      function: FunctionObject(name: 'other_tool'),
+    );
+
+    for (final buffered in [false, true]) {
+      for (final path in ['text', 'messages', 'images']) {
+        test(
+          '$path buffered=$buffered sends auto with the sole tool',
+          () async {
+            final probe = _ChatStreamProbe(content: 'Analysis');
+            Map<String, dynamic>? body;
+            final repository = MeliousInferenceRepository(
+              chatCompletionStreamFactory: probe.call,
+              httpClient: MockClient((request) async {
+                body = jsonDecode(request.body) as Map<String, dynamic>;
+                return http.Response(
+                  jsonEncode({
+                    'choices': [
+                      {
+                        'finish_reason': 'tool_calls',
+                        'message': {
+                          'tool_calls': [
+                            {
+                              'id': 'summary-call',
+                              'type': 'function',
+                              'function': {
+                                'name': entrySummaryToolName,
+                                'arguments': jsonEncode({
+                                  'oneLiner': 'A penguin on ice.',
+                                  'tldr': 'A penguin stands on an ice floe.',
+                                  'summary': '## Image\nA penguin on ice.',
+                                }),
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  }),
+                  200,
+                );
+              }),
+            );
+            addTearDown(repository.close);
+            final collector = buffered ? InferenceImpactCollector() : null;
+            final stream = switch (path) {
+              'text' => repository.generateText(
+                prompt: 'Summarize the penguin.',
+                model: model,
+                baseUrl: 'https://api.melious.ai/v1',
+                apiKey: 'test-key',
+                tools: tools,
+                toolChoice: entrySummaryToolChoiceFor('glm-5.3-flash'),
+                impactCollector: collector,
+              ),
+              'messages' => repository.generateTextWithMessages(
+                messages: const [
+                  ChatCompletionMessage.user(
+                    content: ChatCompletionUserMessageContent.string(
+                      'Summarize the penguin.',
+                    ),
+                  ),
+                ],
+                model: model,
+                baseUrl: 'https://api.melious.ai/v1',
+                apiKey: 'test-key',
+                tools: tools,
+                toolChoice: entrySummaryToolChoiceFor('glm-5.3-flash'),
+                impactCollector: collector,
+              ),
+              _ => repository.generateWithImages(
+                prompt: 'Summarize the penguin.',
+                images: const ['cGVuZ3Vpbg=='],
+                model: model,
+                baseUrl: 'https://api.melious.ai/v1',
+                apiKey: 'test-key',
+                tools: tools,
+                toolChoice: entrySummaryToolChoiceFor('glm-5.3-flash'),
+                impactCollector: collector,
+              ),
+            };
+            final chunks = await stream.toList();
+            final request = body ?? probe.requests.single.toJson();
+            expect(request['tool_choice'], 'auto');
+            expect(request['tools'], [entrySummaryTool.toJson()]);
+            expect(request['stream'], !buffered);
+            expect(request['model'], model);
+            if (buffered) {
+              final call =
+                  chunks.single.choices!.single.delta!.toolCalls!.single;
+              expect(call.function!.name, entrySummaryToolName);
+              expect(jsonDecode(call.function!.arguments!), {
+                'oneLiner': 'A penguin on ice.',
+                'tldr': 'A penguin stands on an ice floe.',
+                'summary': '## Image\nA penguin on ice.',
+              });
+            }
+          },
+        );
+      }
+    }
+
+    test('does not relax other models, modes, or ambiguous tool lists', () {
+      const auto = ChatCompletionToolChoiceOption.mode(
+        ChatCompletionToolChoiceMode.auto,
+      );
+      const required = ChatCompletionToolChoiceOption.mode(
+        ChatCompletionToolChoiceMode.required,
+      );
+      const none = ChatCompletionToolChoiceOption.mode(
+        ChatCompletionToolChoiceMode.none,
+      );
+      for (final candidate in ['deepseek-v4-flash-0731', 'gemma-4-26b-a4b']) {
+        expect(
+          MeliousInferenceRepository.resolveToolChoice(
+            candidate,
+            tools,
+            entrySummaryToolChoiceFor('glm-5.3-flash'),
+          ),
+          entrySummaryToolChoiceFor('glm-5.3-flash'),
+        );
+      }
+      for (final choice in [null, auto, required, none]) {
+        expect(
+          MeliousInferenceRepository.resolveToolChoice(model, tools, choice),
+          choice,
+        );
+      }
+      for (final offered in <List<ChatCompletionTool>?>[
+        null,
+        [],
+        [otherTool],
+        [entrySummaryTool, otherTool],
+      ]) {
+        expect(
+          MeliousInferenceRepository.resolveToolChoice(
+            model,
+            offered,
+            entrySummaryToolChoiceFor('glm-5.3-flash'),
+          ),
+          entrySummaryToolChoiceFor('glm-5.3-flash'),
+        );
+      }
+    });
+  });
+
   group('MeliousInferenceRepository', () {
     const baseUrl = 'https://api.melious.ai/v1';
     const apiKey = 'sk-mel-test';
@@ -473,6 +635,228 @@ void main() {
       },
     );
 
+    test(
+      'preferred streaming retains collector and cancels before first token',
+      () async {
+        var stopped = false;
+        CreateChatCompletionRequest? sent;
+        final source = StreamController<CreateChatCompletionStreamResponse>(
+          onCancel: () => stopped = true,
+        );
+        final repository = MeliousInferenceRepository(
+          httpClient: MockClient(
+            (_) async => http.Response('{"choices":[]}', 200),
+          ),
+          chatCompletionStreamFactory:
+              ({required baseUrl, required apiKey, required request}) {
+                sent = request;
+                return source.stream;
+              },
+        );
+        addTearDown(repository.close);
+        final impact = InferenceImpactCollector();
+        final subscription = repository
+            .generateText(
+              prompt: 'synthetic',
+              model: 'deepseek-v4.1-flash',
+              baseUrl: baseUrl,
+              apiKey: apiKey,
+              preferStreaming: true,
+              impactCollector: impact,
+            )
+            .listen((_) {});
+        expect(sent?.stream, isTrue);
+        expect(sent?.streamOptions?.includeUsage, isTrue);
+        await subscription.cancel();
+        expect(stopped, isTrue);
+        expect(impact.impact, isNull);
+        await source.close();
+      },
+    );
+
+    test(
+      'explicit stream rejection falls back with the identical model',
+      () async {
+        final requests = <Map<String, dynamic>>[];
+        final repository = MeliousInferenceRepository(
+          httpClient: MockClient((request) async {
+            requests.add(jsonDecode(request.body) as Map<String, dynamic>);
+            return http.Response(
+              jsonEncode({
+                'choices': [
+                  {
+                    'message': {'content': 'Recorded [1]'},
+                  },
+                ],
+              }),
+              200,
+            );
+          }),
+          chatCompletionStreamFactory:
+              ({required baseUrl, required apiKey, required request}) =>
+                  Stream.error(
+                    OpenAIClientException(
+                      message: 'unsupported',
+                      uri: Uri.parse(baseUrl),
+                      method: HttpMethod.post,
+                      code: 400,
+                      body: {
+                        'error': {'param': 'stream'},
+                      },
+                    ),
+                  ),
+        );
+        addTearDown(repository.close);
+        final chunks = await repository
+            .generateText(
+              prompt: 'synthetic',
+              model: 'glm-5.3-flash',
+              baseUrl: baseUrl,
+              apiKey: apiKey,
+              preferStreaming: true,
+            )
+            .toList();
+        expect(chunks.first.choices?.first.delta?.content, 'Recorded [1]');
+        expect(requests.single['model'], 'glm-5.3-flash');
+        expect(requests.single['stream'], isFalse);
+      },
+    );
+
+    for (final shape in [
+      'overload',
+      'other parameter',
+      'invalid body',
+      'no detail',
+      'partial',
+      'sync error',
+    ]) {
+      test('stream failure $shape never silently reruns inference', () async {
+        var bufferedCalls = 0;
+        final error = shape == 'sync error'
+            ? StateError('synthetic failure')
+            : OpenAIClientException(
+                message: 'synthetic failure',
+                uri: Uri.parse(baseUrl),
+                method: HttpMethod.post,
+                code: shape == 'overload' ? 503 : 400,
+                body: switch (shape) {
+                  'other parameter' => {
+                    'error': {'param': 'model'},
+                  },
+                  'invalid body' => 'invalid JSON',
+                  'no detail' => <String, dynamic>{},
+                  _ => {
+                    'error': {'param': 'stream'},
+                  },
+                },
+              );
+        final repository = MeliousInferenceRepository(
+          httpClient: MockClient((_) async {
+            bufferedCalls++;
+            return http.Response('{}', 200);
+          }),
+          chatCompletionStreamFactory:
+              ({required baseUrl, required apiKey, required request}) {
+                if (error is StateError) throw error;
+                return Stream.multi((controller) {
+                  if (shape == 'partial') {
+                    controller.add(
+                      const CreateChatCompletionStreamResponse(
+                        id: 'partial',
+                        object: 'chat.completion.chunk',
+                        created: 0,
+                        choices: [],
+                      ),
+                    );
+                  }
+                  controller
+                    ..addError(error)
+                    ..close();
+                });
+              },
+        );
+        addTearDown(repository.close);
+        await expectLater(
+          repository
+              .generateText(
+                prompt: 'synthetic',
+                model: 'deepseek-v4.1-flash',
+                baseUrl: baseUrl,
+                apiKey: apiKey,
+                preferStreaming: true,
+                impactCollector: InferenceImpactCollector(),
+              )
+              .toList(),
+          throwsA(same(error)),
+        );
+        expect(bufferedCalls, 0);
+      });
+    }
+
+    test(
+      'default SDK streaming decodes text and usage through the HTTP boundary',
+      () async {
+        final sent = <Map<String, dynamic>>[];
+        final transport = MockClient((request) async {
+          sent.add(jsonDecode(request.body) as Map<String, dynamic>);
+          return http.Response(
+            'data: ${jsonEncode({
+              'id': 'synthetic-stream',
+              'object': 'chat.completion.chunk',
+              'created': 0,
+              'model': 'glm-5.3',
+              'choices': [
+                {
+                  'index': 0,
+                  'delta': {'content': 'Recorded penguins'},
+                },
+              ],
+            })}\n\n'
+            'data: ${jsonEncode({
+              'id': 'synthetic-stream',
+              'object': 'chat.completion.chunk',
+              'created': 0,
+              'model': 'glm-5.3',
+              'choices': <Object?>[],
+              'usage': {'prompt_tokens': 8, 'completion_tokens': 2, 'total_tokens': 10},
+            })}\n\ndata: [DONE]\n\n',
+            200,
+            headers: {'content-type': 'text/event-stream'},
+          );
+        });
+        final repository = MeliousInferenceRepository(httpClient: transport);
+        addTearDown(repository.close);
+        final sdkClient = MockHttpClient();
+        when(() => sdkClient.send(any())).thenAnswer(
+          (call) => transport.send(
+            call.positionalArguments.single as http.BaseRequest,
+          ),
+        );
+        final chunks = await http.runWithClient(
+          () => repository
+              .generateText(
+                prompt: 'Synthetic penguin question',
+                model: 'glm-5.3',
+                baseUrl: baseUrl,
+                apiKey: apiKey,
+                preferStreaming: true,
+                impactCollector: InferenceImpactCollector(),
+              )
+              .toList(),
+          () => sdkClient,
+        );
+        expect(
+          chunks.first.choices?.single.delta?.content,
+          'Recorded penguins',
+        );
+        expect(chunks.last.usage?.totalTokens, 10);
+        expect(sent.single['stream'], isTrue);
+        expect(sent.single['stream_options'], {'include_usage': true});
+        expect(sent.single['model'], 'glm-5.3');
+        verify(sdkClient.close).called(1);
+      },
+    );
+
     test('generateText streams text and sends prompt request body', () async {
       final probe = _ChatStreamProbe(content: 'melious response');
       final repository = MeliousInferenceRepository(
@@ -499,6 +883,7 @@ void main() {
       final request = probe.requests.single;
       expect(request.model.toString(), contains('minimax-m2.7'));
       expect(request.stream, isTrue);
+      expect(request.streamOptions, isNull);
       expect(request.temperature, 0.2);
       expect(request.maxCompletionTokens, 128);
       expect(request.messages, hasLength(2));
@@ -1016,6 +1401,111 @@ void main() {
             cleaned++;
           }
         }
+      }
+
+      test(
+        'timed uploads restore recording offsets after every part succeeds',
+        () async {
+          var calls = 0;
+          List<AudioTimedSegment>? timing;
+          final repository = MeliousInferenceRepository(
+            audioSegmentEncoder: segments,
+            httpClient: MockClient.streaming((request, _) async {
+              calls++;
+              expect(
+                (request as http.MultipartRequest).fields['response_format'],
+                'verbose_json',
+              );
+              expect(timing, isNull, reason: 'No partial timing is exposed');
+              return http.StreamedResponse(
+                Stream.value(
+                  utf8.encode(
+                    jsonEncode({
+                      'text': 'Part $calls',
+                      'segments': [
+                        {'text': 'Part $calls', 'start': 10.25, 'end': 11.5},
+                      ],
+                    }),
+                  ),
+                ),
+                200,
+              );
+            }),
+          );
+          addTearDown(repository.close);
+          final result = await repository
+              .transcribeAudio(
+                model: 'whisper-large-v3',
+                audioBase64: audio,
+                baseUrl: baseUrl,
+                apiKey: apiKey,
+                onSegments: (value) => timing = value,
+              )
+              .single;
+          expect(timing!.map((s) => s.startMilliseconds), [
+            10250,
+            1210250,
+            2410250,
+          ]);
+          expect(timing!.map((s) => s.endMilliseconds), [
+            11500,
+            1211500,
+            2411500,
+          ]);
+          expect(
+            result.choices!.single.delta!.content,
+            'Part 1\n\nPart 2\n\nPart 3',
+          );
+          expect(calls, 3);
+          expect(cleaned, 3);
+        },
+      );
+
+      for (final invalid in ['missing', 'outside part']) {
+        test(
+          '$invalid timing discards every part and stops later uploads',
+          () async {
+            var calls = 0;
+            var callbacks = 0;
+            final repository = MeliousInferenceRepository(
+              audioSegmentEncoder: segments,
+              httpClient: MockClient((_) async {
+                calls++;
+                return http.Response(
+                  jsonEncode({
+                    'text': 'Part $calls',
+                    'segments': calls == 2 && invalid == 'missing'
+                        ? null
+                        : [
+                            {
+                              'text': 'Part $calls',
+                              'start': 1,
+                              'end': calls == 2 ? 1201 : 2,
+                            },
+                          ],
+                  }),
+                  200,
+                );
+              }),
+            );
+            addTearDown(repository.close);
+            await expectLater(
+              repository
+                  .transcribeAudio(
+                    model: 'whisper-large-v3',
+                    audioBase64: audio,
+                    baseUrl: baseUrl,
+                    apiKey: apiKey,
+                    onSegments: (_) => callbacks++,
+                  )
+                  .toList(),
+              throwsA(isA<TranscriptionException>()),
+            );
+            expect(calls, 2);
+            expect(callbacks, 0);
+            expect(cleaned, 2);
+          },
+        );
       }
 
       test(
@@ -2619,6 +3109,179 @@ void main() {
     const baseUrl = 'https://api.melious.ai/v1';
     const apiKey = 'key';
 
+    test(
+      'completed response impact survives cancellation without late text',
+      () {
+        fakeAsync((async) {
+          final pending = Completer<http.Response>();
+          var requested = false;
+          final repository = MeliousInferenceRepository(
+            httpClient: MockClient((_) {
+              requested = true;
+              // A response already in flight can win the HTTP abort race.
+              return pending.future;
+            }),
+          );
+          addTearDown(repository.close);
+          final collector = InferenceImpactCollector();
+          final received = <CreateChatCompletionStreamResponse>[];
+          final subscription = repository
+              .generateText(
+                prompt: 'synthetic question',
+                model: 'deepseek-v4.1-flash',
+                baseUrl: baseUrl,
+                apiKey: apiKey,
+                impactCollector: collector,
+              )
+              .listen(received.add);
+          async.flushMicrotasks();
+          expect(requested, isTrue);
+          unawaited(subscription.cancel());
+          pending.complete(
+            http.Response(
+              jsonEncode({
+                'choices': [
+                  {
+                    'message': {'content': 'Do not emit after cancellation'},
+                  },
+                ],
+                'billing_cost': {'credits': '0.0007'},
+                'environment_impact': {'energy_kwh': 0.0031},
+              }),
+              200,
+            ),
+          );
+          async.flushMicrotasks();
+          expect(received, isEmpty);
+          expect(collector.impact?.costCreditsDecimal, '0.0007');
+          expect(collector.impact?.energyKwh, 0.0031);
+        });
+      },
+    );
+
+    for (final deadline in [false, true]) {
+      test(
+        'query cancellation deadline=$deadline aborts only its HTTP call',
+        () async {
+          late FakeAsync fakeClock;
+          late Future<Object?> outcome;
+          late Future<String> sibling;
+          fakeAsync((async) {
+            fakeClock = async;
+            final pending = <Completer<http.StreamedResponse>>[];
+            final aborted = <bool>[];
+            final repository = MeliousInferenceRepository(
+              httpClient: MockClient.streaming((request, _) {
+                final index = pending.length;
+                final response = Completer<http.StreamedResponse>();
+                pending.add(response);
+                aborted.add(false);
+                if (request is http.AbortableRequest) {
+                  unawaited(
+                    request.abortTrigger!.then((_) {
+                      aborted[index] = true;
+                      if (!response.isCompleted) {
+                        response.completeError(
+                          http.RequestAbortedException(request.url),
+                        );
+                      }
+                    }),
+                  );
+                }
+                return response.future;
+              }),
+            );
+            addTearDown(repository.close);
+            final accounting = AiInteractionCaptureTestBench.create();
+            Stream<CreateChatCompletionStreamResponse> raw() =>
+                repository.generateText(
+                  prompt: 'synthetic question',
+                  model: 'deepseek-v4.1-flash',
+                  baseUrl: baseUrl,
+                  apiKey: apiKey,
+                  impactCollector: InferenceImpactCollector(),
+                );
+            Stream<String> generate() => accounting.capture
+                .captureStream(
+                  workType: AiWorkType.textGeneration,
+                  interactionKind: AiInteractionKind.chatCompletion,
+                  responseType: AiConsumptionResponseType.textGeneration,
+                  providerType: InferenceProviderType.melious,
+                  modelId: 'deepseek-v4.1-flash',
+                  requestText: 'synthetic question',
+                  invoke: raw,
+                  responseText: (chunk) =>
+                      chunk.choices?.firstOrNull?.delta?.content ?? '',
+                )
+                .map(
+                  (chunk) => chunk.choices?.firstOrNull?.delta?.content ?? '',
+                );
+            final cancellation = QueryCancellation();
+            outcome = cancellation
+                .collect(generate())
+                .then<Object?>(
+                  (_) => fail('Cancelled query must not return an answer'),
+                  onError: (Object error) => error,
+                );
+            sibling = generate().join();
+            async.flushMicrotasks();
+            try {
+              expect(pending, hasLength(2));
+              if (deadline) {
+                async.elapse(const Duration(minutes: 2));
+              } else {
+                cancellation.cancel();
+              }
+              async.flushMicrotasks();
+              expect(aborted, [true, false]);
+              pending[1].complete(
+                http.StreamedResponse(
+                  Stream.value(
+                    utf8.encode(
+                      '{"choices":[{"message":{"content":"sibling answer"}}]}',
+                    ),
+                  ),
+                  200,
+                ),
+              );
+              async.flushMicrotasks();
+            } finally {
+              for (final response in pending) {
+                if (!response.isCompleted) {
+                  response.complete(
+                    http.StreamedResponse(
+                      Stream.value(utf8.encode('{"choices":[]}')),
+                      200,
+                    ),
+                  );
+                }
+              }
+              async.flushMicrotasks();
+            }
+          });
+          // Cancellation may return Dart's shared root-zone null future.
+          // Drain both microtask queues without advancing real or fake time.
+          Object? failure;
+          String? siblingAnswer;
+          unawaited(outcome.then<void>((value) => failure = value));
+          unawaited(sibling.then<void>((value) => siblingAnswer = value));
+          for (
+            var turn = 0;
+            turn < 20 && (failure == null || siblingAnswer == null);
+            turn++
+          ) {
+            await Future<void>.value();
+            fakeClock.flushMicrotasks();
+          }
+          expect(
+            failure,
+            deadline ? isA<TimeoutException>() : isA<QueryCancelled>(),
+          );
+          expect(siblingAnswer, 'sibling answer');
+        },
+      );
+    }
+
     MeliousInferenceRepository repositoryWith(MockClientHandler handler) {
       final repository = MeliousInferenceRepository(
         httpClient: MockClient(handler),
@@ -2879,7 +3542,7 @@ void main() {
               apiKey: apiKey,
               images: const ['abc123'],
               tools: [entrySummaryTool],
-              toolChoice: entrySummaryToolChoice,
+              toolChoice: entrySummaryToolChoiceFor('glm-5.3-flash'),
               impactCollector: InferenceImpactCollector(),
             )
             .toList();

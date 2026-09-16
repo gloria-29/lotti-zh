@@ -6,6 +6,7 @@ import 'dart:typed_data';
 
 import 'package:clock/clock.dart';
 import 'package:http/http.dart' as http;
+import 'package:lotti/classes/audio_transcript_timing.dart';
 import 'package:lotti/features/ai/model/ai_call_impact.dart';
 import 'package:lotti/features/ai/model/ai_config.dart';
 import 'package:lotti/features/ai/repository/cloud_inference_request_helpers.dart';
@@ -116,6 +117,32 @@ class MeliousInferenceRepository extends TranscriptionRepository {
     }
     if (requested == null) return _defaultRequiredReasoningEffort;
     if (requested == ReasoningEffort.high) return _maxRequiredReasoningEffort;
+    return requested;
+  }
+
+  /// Avoids Melious' broken forced-tool mode for DeepSeek V4.1 Flash.
+  ///
+  /// Live text and image probes on 2026-09-12 returned literal DSML with
+  /// `true` instead of arguments for named and `required` choices; `auto`
+  /// returned structured calls. Only relax a named choice when the advertised
+  /// tool list already contains exactly that tool, so no other tool becomes
+  /// callable. Callers must still validate the result: `auto` permits prose.
+  /// Other models and unconstrained agent conversations retain their choices.
+  static ChatCompletionToolChoiceOption? resolveToolChoice(
+    String model,
+    List<ChatCompletionTool>? tools,
+    ChatCompletionToolChoiceOption? requested,
+  ) {
+    if (model.trim() == meliousDeepseekV41FlashModelId &&
+        tools != null &&
+        tools.length == 1 &&
+        requested
+            is ChatCompletionToolChoiceOptionChatCompletionNamedToolChoice &&
+        requested.value.function.name == tools.single.function.name) {
+      return const ChatCompletionToolChoiceOption.mode(
+        ChatCompletionToolChoiceMode.auto,
+      );
+    }
     return requested;
   }
 
@@ -313,8 +340,10 @@ class MeliousInferenceRepository extends TranscriptionRepository {
   /// Melious returns `environment_impact` + `billing_cost` (only present on
   /// non-streaming responses); the parsed impact is written to the collector and
   /// the buffered reply is re-emitted as a single synthetic stream chunk so
-  /// existing consumers are unchanged. Without a collector the original
-  /// streaming path is used verbatim.
+  /// existing consumers are unchanged. [preferStreaming] retains the collector
+  /// but requests incremental text and token usage. Only an explicit initial
+  /// rejection of a streaming parameter permits one same-model buffered
+  /// fallback; other errors and partial responses are never retried here.
   Stream<CreateChatCompletionStreamResponse> generateText({
     required String prompt,
     required String model,
@@ -327,6 +356,7 @@ class MeliousInferenceRepository extends TranscriptionRepository {
     ChatCompletionToolChoiceOption? toolChoice,
     ReasoningEffort? reasoningEffort,
     InferenceImpactCollector? impactCollector,
+    bool preferStreaming = false,
   }) {
     final messages = [
       if (systemMessage != null)
@@ -335,7 +365,7 @@ class MeliousInferenceRepository extends TranscriptionRepository {
         content: ChatCompletionUserMessageContent.string(prompt),
       ),
     ];
-    if (impactCollector != null) {
+    if (impactCollector != null && !preferStreaming) {
       return _nonStreamingChat(
         messages: messages,
         model: model,
@@ -349,21 +379,113 @@ class MeliousInferenceRepository extends TranscriptionRepository {
         impactCollector: impactCollector,
       );
     }
-    final stream = _chatCompletionStreamFactory(
-      baseUrl: baseUrl,
-      apiKey: apiKey,
-      request: _helpers.createBaseRequest(
-        messages: messages,
-        model: model,
-        temperature: temperature,
-        maxCompletionTokens: maxCompletionTokens,
-        tools: tools,
-        toolChoice: toolChoice,
-        reasoningEffort: resolveReasoningEffort(model, reasoningEffort),
-      ),
-    );
+    final request = _helpers
+        .createBaseRequest(
+          messages: messages,
+          model: model,
+          temperature: temperature,
+          maxCompletionTokens: maxCompletionTokens,
+          tools: tools,
+          toolChoice: resolveToolChoice(model, tools, toolChoice),
+          reasoningEffort: resolveReasoningEffort(model, reasoningEffort),
+        )
+        .copyWith(
+          streamOptions: preferStreaming
+              ? const ChatCompletionStreamOptions(includeUsage: true)
+              : null,
+        );
+    late StreamController<CreateChatCompletionStreamResponse> controller;
+    StreamSubscription<CreateChatCompletionStreamResponse>? subscription;
+    var emitted = false;
+    var cancelled = false;
+    bool permitsFallback(Object error) {
+      if (!preferStreaming ||
+          emitted ||
+          error is! OpenAIClientException ||
+          (error.code != 400 && error.code != 422)) {
+        return false;
+      }
+      var body = error.body;
+      if (body is String) {
+        try {
+          body = jsonDecode(body);
+        } catch (_) {
+          return false;
+        }
+      }
+      final detail = body is Map ? body['error'] : null;
+      final parameter = detail is Map ? detail['param'] : null;
+      return parameter == 'stream' || parameter == 'stream_options';
+    }
 
-    return _helpers.filterAnthropicPings(stream).asBroadcastStream();
+    void finishError(Object error, StackTrace stack) {
+      if (cancelled) return;
+      controller.addError(error, stack);
+      unawaited(controller.close());
+    }
+
+    void listen(
+      Stream<CreateChatCompletionStreamResponse> source, {
+      required bool fallback,
+    }) {
+      subscription = source.listen(
+        (chunk) {
+          if (cancelled) return;
+          emitted = true;
+          controller.add(chunk);
+        },
+        onError: (Object error, StackTrace stack) {
+          if (cancelled) return;
+          if (!fallback && permitsFallback(error)) {
+            listen(
+              _nonStreamingChat(
+                messages: messages,
+                model: model,
+                baseUrl: baseUrl,
+                apiKey: apiKey,
+                temperature: temperature,
+                maxCompletionTokens: maxCompletionTokens,
+                tools: tools,
+                toolChoice: toolChoice,
+                reasoningEffort: reasoningEffort,
+                impactCollector: impactCollector ?? InferenceImpactCollector(),
+              ),
+              fallback: true,
+            );
+          } else {
+            finishError(error, stack);
+          }
+        },
+        onDone: () => unawaited(controller.close()),
+        cancelOnError: true,
+      );
+    }
+
+    controller = StreamController<CreateChatCompletionStreamResponse>(
+      onListen: () {
+        try {
+          listen(
+            _helpers.filterAnthropicPings(
+              _chatCompletionStreamFactory(
+                baseUrl: baseUrl,
+                apiKey: apiKey,
+                request: request,
+              ),
+            ),
+            fallback: false,
+          );
+        } catch (error, stack) {
+          finishError(error, stack);
+        }
+      },
+      onCancel: () {
+        cancelled = true;
+        return subscription?.cancel();
+      },
+    );
+    return controller.stream.asBroadcastStream(
+      onCancel: (subscription) => unawaited(subscription.cancel()),
+    );
   }
 
   /// Generates with full conversation history through Melious' OpenAI-compatible
@@ -403,7 +525,7 @@ class MeliousInferenceRepository extends TranscriptionRepository {
         temperature: temperature,
         maxCompletionTokens: maxCompletionTokens,
         tools: tools,
-        toolChoice: toolChoice,
+        toolChoice: resolveToolChoice(model, tools, toolChoice),
         reasoningEffort: resolveReasoningEffort(model, reasoningEffort),
       ),
     );
@@ -464,7 +586,7 @@ class MeliousInferenceRepository extends TranscriptionRepository {
         temperature: temperature,
         maxCompletionTokens: maxCompletionTokens,
         tools: tools,
-        toolChoice: toolChoice,
+        toolChoice: resolveToolChoice(model, tools, toolChoice),
         reasoningEffort: resolveReasoningEffort(model, null),
       ),
     ).asBroadcastStream();
@@ -477,7 +599,10 @@ class MeliousInferenceRepository extends TranscriptionRepository {
     required CreateChatCompletionRequest request,
   }) {
     final client = OpenAIClient(baseUrl: baseUrl, apiKey: apiKey);
-    return client.createChatCompletionStream(request: request);
+    return const CloudInferenceRequestHelpers().filterAnthropicPings(
+      client.createChatCompletionStream(request: request),
+      onClose: client.endSession,
+    );
   }
 
   /// Non-streaming Melious chat: one raw POST that returns the full body
@@ -489,7 +614,9 @@ class MeliousInferenceRepository extends TranscriptionRepository {
   /// no incremental deltas — `onProgress` in the unified path fires only once,
   /// when the call completes (or [_chatCompletionTimeout] trips). Melious only
   /// reports impact/cost on non-streaming responses, and streaming display is
-  /// not needed for the measured call sites.
+  /// not needed for the measured call sites. Cancelling the stream aborts only
+  /// its HTTP request, so a query deadline does not wait for the longer backend
+  /// timeout or close the shared client used by sibling requests.
   Stream<CreateChatCompletionStreamResponse> _nonStreamingChat({
     required List<ChatCompletionMessage> messages,
     required String model,
@@ -501,73 +628,101 @@ class MeliousInferenceRepository extends TranscriptionRepository {
     List<ChatCompletionTool>? tools,
     ChatCompletionToolChoiceOption? toolChoice,
     ReasoningEffort? reasoningEffort,
-  }) async* {
-    final result = await _postChatCompletion(
-      baseUrl: baseUrl,
-      apiKey: apiKey,
-      request: _helpers.createBaseRequest(
-        messages: messages,
-        model: model,
-        temperature: temperature,
-        maxCompletionTokens: maxCompletionTokens,
-        tools: tools,
-        toolChoice: toolChoice,
-        reasoningEffort: resolveReasoningEffort(model, reasoningEffort),
-        stream: false,
-      ),
-    );
-    if (result.impact.hasData) {
-      impactCollector.impact = result.impact;
+  }) {
+    final abort = Completer<void>();
+    var cancelled = false;
+    late final StreamController<CreateChatCompletionStreamResponse> controller;
+    Future<void> run() async {
+      try {
+        final result = await _postChatCompletion(
+          baseUrl: baseUrl,
+          apiKey: apiKey,
+          abortTrigger: abort.future,
+          request: _helpers.createBaseRequest(
+            messages: messages,
+            model: model,
+            temperature: temperature,
+            maxCompletionTokens: maxCompletionTokens,
+            tools: tools,
+            toolChoice: resolveToolChoice(model, tools, toolChoice),
+            reasoningEffort: resolveReasoningEffort(model, reasoningEffort),
+            stream: false,
+          ),
+        );
+        if (result.impact.hasData) {
+          impactCollector.impact = result.impact;
+        }
+        if (cancelled) return;
+
+        final id = 'melious-chat-${const Uuid().v4()}';
+        controller.add(
+          CreateChatCompletionStreamResponse(
+            id: id,
+            created: 0,
+            model: model,
+            choices: [
+              ChatCompletionStreamResponseChoice(
+                index: 0,
+                finishReason: result.finishReason,
+                delta: ChatCompletionStreamResponseDelta(
+                  content: result.content.isEmpty ? null : result.content,
+                  toolCalls: result.toolCalls.isEmpty ? null : result.toolCalls,
+                ),
+              ),
+            ],
+          ),
+        );
+        // Trailing usage-only chunk, mirroring the streaming API's final usage
+        // frame that consumers read token counts from.
+        final usage = result.usage;
+        if (usage != null) {
+          controller.add(
+            CreateChatCompletionStreamResponse(
+              id: id,
+              created: 0,
+              model: model,
+              choices: const [],
+              usage: usage,
+            ),
+          );
+        }
+      } catch (error, stack) {
+        if (!cancelled) controller.addError(error, stack);
+      } finally {
+        unawaited(controller.close());
+      }
     }
 
-    final id = 'melious-chat-${const Uuid().v4()}';
-    yield CreateChatCompletionStreamResponse(
-      id: id,
-      created: 0,
-      model: model,
-      choices: [
-        ChatCompletionStreamResponseChoice(
-          index: 0,
-          finishReason: result.finishReason,
-          delta: ChatCompletionStreamResponseDelta(
-            content: result.content.isEmpty ? null : result.content,
-            toolCalls: result.toolCalls.isEmpty ? null : result.toolCalls,
-          ),
-        ),
-      ],
+    controller = StreamController<CreateChatCompletionStreamResponse>(
+      onListen: () => unawaited(run()),
+      onCancel: () {
+        cancelled = true;
+        if (!abort.isCompleted) abort.complete();
+      },
     );
-    // Trailing usage-only chunk, mirroring the streaming API's final usage
-    // frame that consumers read token counts from.
-    final usage = result.usage;
-    if (usage != null) {
-      yield CreateChatCompletionStreamResponse(
-        id: id,
-        created: 0,
-        model: model,
-        choices: const [],
-        usage: usage,
-      );
-    }
+    return controller.stream;
   }
 
   Future<_MeliousChatResult> _postChatCompletion({
     required String baseUrl,
     required String apiKey,
+    required Future<void> abortTrigger,
     required CreateChatCompletionRequest request,
     Duration timeout = _chatCompletionTimeout,
   }) async {
     final uri = _buildEndpointUri(baseUrl, 'chat/completions');
     try {
-      final response = await httpClient
-          .post(
-            uri,
-            headers: {
+      final upload =
+          http.AbortableRequest('POST', uri, abortTrigger: abortTrigger)
+            ..headers.addAll({
               'Content-Type': 'application/json',
               'Accept': 'application/json',
               'Authorization': 'Bearer ${apiKey.trim()}',
-            },
-            body: jsonEncode(request.toJson()),
-          )
+            })
+            ..body = jsonEncode(request.toJson());
+      final response = await httpClient
+          .send(upload)
+          .then(http.Response.fromStream)
           .timeout(timeout);
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
@@ -669,6 +824,10 @@ class MeliousInferenceRepository extends TranscriptionRepository {
   /// Recordings above the upload limit use consecutive temporary MP3 parts.
   /// Only the complete combined transcript is emitted; cancellation stops
   /// subsequent parts and aborts the current upload. Source bytes are preserved.
+  /// [onSegments] requests verbose JSON and receives validated timing only
+  /// after every upload succeeds. Split uploads use recording-relative offsets;
+  /// an injected segment encoder must preserve the standard twenty-minute
+  /// non-final part boundaries.
   ///
   /// [contextBiasTerms] are speech-dictionary words/phrases forwarded as the
   /// OpenAI-standard `prompt` form field to bias recognition toward names and
@@ -689,6 +848,7 @@ class MeliousInferenceRepository extends TranscriptionRepository {
     List<String>? contextBiasTerms,
     Duration? timeout,
     InferenceImpactCollector? impactCollector,
+    void Function(List<AudioTimedSegment>)? onSegments,
   }) {
     final normalizedBaseUrl = baseUrl.trim();
     final normalizedApiKey = apiKey.trim();
@@ -714,6 +874,7 @@ class MeliousInferenceRepository extends TranscriptionRepository {
       contextBiasTerms: contextBiasTerms,
       timeout: timeout,
       impactCollector: impactCollector,
+      onSegments: onSegments,
     );
   }
 
@@ -726,12 +887,14 @@ class MeliousInferenceRepository extends TranscriptionRepository {
     List<String>? contextBiasTerms,
     Duration? timeout,
     InferenceImpactCollector? impactCollector,
+    void Function(List<AudioTimedSegment>)? onSegments,
   }) {
     var canceled = false;
     final abortTrigger = Completer<void>();
     final incurredImpact = impactCollector ?? InferenceImpactCollector();
     var completedSegments = 0;
     CompletionUsage? usage;
+    final timedSegments = <AudioTimedSegment>[];
     late final StreamController<CreateChatCompletionStreamResponse> controller;
     Future<void> run() async {
       try {
@@ -753,17 +916,49 @@ class MeliousInferenceRepository extends TranscriptionRepository {
             filename: filename,
             normalizedBaseUrl: baseUrl,
             normalizedApiKey: apiKey,
-            responseFormat: responseFormat,
+            responseFormat: onSegments == null
+                ? responseFormat
+                : 'verbose_json',
             contextBiasTerms: contextBiasTerms,
             timeout: timeout,
             impactCollector: incurredImpact,
             abortTrigger: abortTrigger.future,
+            onSegments: onSegments == null
+                ? null
+                : (segments) {
+                    final offset =
+                        completedSegments *
+                        transcriptionUploadSegmentDuration.inMilliseconds;
+                    if (bytes.length > maxTranscriptionUploadBytes &&
+                        segments.last.endMilliseconds >
+                            transcriptionUploadSegmentDuration.inMilliseconds) {
+                      throw const FormatException(
+                        'Timing exceeds its upload part',
+                      );
+                    }
+                    timedSegments.addAll(
+                      segments.map(
+                        (segment) => segment.copyWith(
+                          startMilliseconds: segment.startMilliseconds + offset,
+                          endMilliseconds: segment.endMilliseconds + offset,
+                        ),
+                      ),
+                    );
+                    if (timedSegments.length > 30000) {
+                      throw const FormatException(
+                        'Excessive transcript segments',
+                      );
+                    }
+                  },
           ).first;
         }
 
         if (bytes.length <= maxTranscriptionUploadBytes) {
           final result = await upload(bytes, 'audio.m4a');
-          if (!canceled) controller.add(result);
+          if (!canceled) {
+            onSegments?.call(timedSegments);
+            controller.add(result);
+          }
         } else {
           final texts = <String>[];
           CreateChatCompletionStreamResponse? last;
@@ -784,6 +979,7 @@ class MeliousInferenceRepository extends TranscriptionRepository {
                 'Audio preparation produced no segments',
               );
             }
+            onSegments?.call(timedSegments);
             controller.add(
               last.copyWith(
                 choices: [
@@ -849,29 +1045,32 @@ class MeliousInferenceRepository extends TranscriptionRepository {
     List<String>? contextBiasTerms,
     Duration? timeout,
     InferenceImpactCollector? impactCollector,
+    void Function(List<AudioTimedSegment>)? onSegments,
   }) {
     return executeTranscription(
       providerName: _providerName,
       responseIdPrefix: 'melious-transcription-',
       audioLengthForLog: audioBytes.length,
       timeout: timeout,
-      onSuccessResponse: impactCollector == null
-          ? null
-          : (decoded, response) {
-              final impact = MeliousCallImpact.fromResponseJson(
-                decoded,
-                costCreditsDecimal:
-                    MeliousCallImpact.costDecimalFromResponseBody(
-                      response.body,
-                    ),
-              );
-              if (impact.hasData) {
-                impactCollector.impact = MeliousCallImpact.combine(
-                  impactCollector.impact,
-                  impact,
-                );
-              }
-            },
+      onSuccessResponse: (decoded, response) {
+        if (impactCollector != null) {
+          final impact = MeliousCallImpact.fromResponseJson(
+            decoded,
+            costCreditsDecimal: MeliousCallImpact.costDecimalFromResponseBody(
+              response.body,
+            ),
+          );
+          if (impact.hasData) {
+            impactCollector.impact = MeliousCallImpact.combine(
+              impactCollector.impact,
+              impact,
+            );
+          }
+        }
+        if (onSegments != null) {
+          onSegments(parseTimedTranscriptSegments(decoded['segments']));
+        }
+      },
       sendRequest: (requestTimeout, timeoutErrorMessage) async {
         final uri = _buildEndpointUri(
           normalizedBaseUrl,
@@ -883,6 +1082,8 @@ class MeliousInferenceRepository extends TranscriptionRepository {
                 uri,
                 abortTrigger: abortTrigger,
               )
+              // Timing requests must not redirect private audio off HTTPS.
+              ..followRedirects = onSegments == null
               ..headers['Authorization'] = 'Bearer $normalizedApiKey'
               ..files.add(
                 http.MultipartFile.fromBytes(

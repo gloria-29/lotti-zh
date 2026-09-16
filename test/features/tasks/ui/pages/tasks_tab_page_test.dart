@@ -4,6 +4,8 @@ import 'dart:async';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:lotti/classes/entity_definitions.dart';
@@ -40,6 +42,7 @@ import 'package:lotti/services/entities_cache_service.dart';
 import 'package:lotti/services/nav_service.dart';
 import 'package:lotti/services/time_service.dart';
 import 'package:lotti/widgets/nav_bar/design_system_bottom_navigation_bar.dart';
+import 'package:lotti/widgets/nav_bar/mobile_navigation_launcher.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -202,13 +205,31 @@ void main() {
     );
   }
 
+  List<Override> pageOverrides() => [
+    journalPageScopeProvider.overrideWithValue(true),
+    journalPageControllerProvider(true).overrideWith(() => fakeController),
+    taskAgentServiceProvider.overrideWithValue(MockTaskAgentService()),
+  ];
+
+  /// The desktop list pane reads the desktop selection; stub it before
+  /// pumping the page at [desktopLayoutMediaQueryData].
+  void stubDesktopSelection() => when(
+    () => mockNavService.desktopSelectedTaskId,
+  ).thenReturn(ValueNotifier<String?>(null));
+
+  /// [desktop] pumps the page on a desktop-wide window — the one place it
+  /// still floats its own create button. On a phone the mobile navigation
+  /// launcher docks that action on its own row, so the FAB tests below run
+  /// at desktop width.
   Widget buildSubject({
     required JournalPageState state,
     TasksTabCreateTaskCallback? onCreateTaskPressed,
     TasksTabPageController? controller,
     MediaQueryData? mediaQueryData,
+    bool desktop = false,
   }) {
     fakeController = FakeJournalPageController(state);
+    if (desktop) stubDesktopSelection();
 
     return makeTestableWidgetNoScroll(
       AppCommandHost(
@@ -219,7 +240,33 @@ void main() {
           controller: controller,
         ),
       ),
-      mediaQueryData: mediaQueryData,
+      mediaQueryData: desktop ? desktopLayoutMediaQueryData : mediaQueryData,
+      overrides: pageOverrides(),
+    );
+  }
+
+  /// Renders only a [Consumer] in the page's provider scope, for the two
+  /// launcher entry points that are plain functions over a `WidgetRef`
+  /// rather than part of the page's tree. The [Scaffold] is what the failed
+  /// create's toast presents into.
+  Widget buildRefProbe({
+    required JournalPageState state,
+    required void Function(BuildContext context, WidgetRef ref) onBuild,
+  }) {
+    fakeController = FakeJournalPageController(state);
+
+    return makeTestableWidgetNoScroll(
+      Scaffold(
+        body: Consumer(
+          builder: (context, ref, _) {
+            // Keeps the list's controller alive, so the docked action reads
+            // live filters the way the page does.
+            ref.watch(journalPageControllerProvider(true));
+            onBuild(context, ref);
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
       overrides: [
         journalPageScopeProvider.overrideWithValue(true),
         journalPageControllerProvider(true).overrideWith(() => fakeController),
@@ -246,6 +293,7 @@ void main() {
           calls++;
           receivedContext = filterContext;
         },
+        desktop: true,
       ),
     );
     await tester.pump();
@@ -277,6 +325,7 @@ void main() {
         onCreateTaskPressed: (ref, filterContext) async {
           receivedContext = filterContext;
         },
+        desktop: true,
       ),
     );
     await tester.pump();
@@ -479,6 +528,7 @@ void main() {
           onCreateTaskPressed: (ref, filterContext) async {
             createdCategoryId = filterContext.categoryId;
           },
+          desktop: true,
         ),
       );
       await tester.pump();
@@ -548,7 +598,7 @@ void main() {
           labelIds: any(named: 'labelIds'),
         ),
       ).thenAnswer((_) => result.future);
-      await tester.pumpWidget(buildSubject(state: state()));
+      await tester.pumpWidget(buildSubject(state: state(), desktop: true));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
       final message = tester
@@ -600,6 +650,7 @@ void main() {
       buildSubject(
         state: state(selectedLabelIds: const {'label-1'}),
         // Do NOT provide onCreateTaskPressed — exercises default path
+        desktop: true,
       ),
     );
     await tester.pump();
@@ -680,6 +731,7 @@ void main() {
       ).thenAnswer((_) => assignment.future);
 
       fakeController = FakeJournalPageController(state());
+      stubDesktopSelection();
       await tester.pumpWidget(
         makeTestableWidgetNoScroll(
           const AppCommandHost(
@@ -687,6 +739,7 @@ void main() {
             platform: TargetPlatform.windows,
             child: TasksTabPage(),
           ),
+          mediaQueryData: desktopLayoutMediaQueryData,
           overrides: [
             journalPageScopeProvider.overrideWithValue(true),
             journalPageControllerProvider(
@@ -722,11 +775,7 @@ void main() {
   testWidgets('uses the design-system FAB with bottom-nav padding', (
     tester,
   ) async {
-    await tester.pumpWidget(
-      buildSubject(
-        state: state(),
-      ),
-    );
+    await tester.pumpWidget(buildSubject(state: state(), desktop: true));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
@@ -734,15 +783,159 @@ void main() {
     expect(find.byType(DesignSystemFloatingActionButton), findsOneWidget);
   });
 
+  group('the mobile navigation launcher owns the create action', () {
+    testWidgets(
+      'the task list drops its floating button so the launcher can dock the '
+      'same action on its own row',
+      (tester) async {
+        await tester.pumpWidget(buildSubject(state: state()));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        expect(find.byType(DesignSystemFloatingActionButton), findsNothing);
+        // The clearance wrapper goes with it: nothing is left to pad away
+        // from the launcher.
+        expect(
+          find.byType(DesignSystemBottomNavigationFabPadding),
+          findsNothing,
+        );
+        // The page itself is untouched — only the action moved.
+        expect(find.byType(TabSectionHeader), findsWidgets);
+      },
+    );
+
+    testWidgets(
+      'a desktop window keeps the floating button — the sidebar replaces the '
+      'launcher there',
+      (tester) async {
+        await tester.pumpWidget(buildSubject(state: state(), desktop: true));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        expect(find.byType(DesignSystemFloatingActionButton), findsOneWidget);
+      },
+    );
+
+    testWidgets('tasksTabDockAction words the chip the way the FAB words '
+        'itself', (tester) async {
+      MobileNavDockAction? docked;
+      await tester.pumpWidget(
+        buildRefProbe(
+          state: state(),
+          onBuild: (context, ref) => docked = tasksTabDockAction(context, ref),
+        ),
+      );
+      await tester.pump();
+
+      final messages = tester.element(find.byType(Consumer)).messages;
+      expect(docked, isNotNull);
+      expect(docked!.label, messages.addActionCreateTask);
+      expect(docked!.icon, LottiIcons.add);
+      expect(docked!.semanticLabel, isNull);
+    });
+
+    testWidgets(
+      'the docked action creates a task under the filters the list carries '
+      'at tap time, not the ones the shell last built with',
+      (tester) async {
+        final createdTask = TestTaskFactory.create(
+          id: 'docked-task',
+          title: 'Docked',
+          categoryId: 'cat-1',
+          dateFrom: DateTime(2026, 4, 8, 9),
+          dateTo: DateTime(2026, 4, 8, 10),
+        );
+        when(
+          () => mockPersistenceLogic.createTaskEntry(
+            data: any(named: 'data'),
+            entryText: any(named: 'entryText'),
+            categoryId: any(named: 'categoryId'),
+            labelIds: any(named: 'labelIds'),
+          ),
+        ).thenAnswer((_) async => createdTask);
+
+        MobileNavDockAction? docked;
+        await tester.pumpWidget(
+          buildRefProbe(
+            state: state(selectedLabelIds: const {'label-1'}),
+            onBuild: (context, ref) =>
+                docked = tasksTabDockAction(context, ref),
+          ),
+        );
+        await tester.pump();
+
+        // The list's filters move on after the shell built the row.
+        fakeController.updateState(
+          state(
+            selectedLabelIds: const {'label-2'},
+            selectedCategoryIds: const {'cat-9'},
+          ),
+        );
+        await tester.pump();
+
+        docked!.onPressed();
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        final captured = verify(
+          () => mockPersistenceLogic.createTaskEntry(
+            data: any(named: 'data'),
+            entryText: any(named: 'entryText'),
+            categoryId: captureAny(named: 'categoryId'),
+            labelIds: captureAny(named: 'labelIds'),
+          ),
+        ).captured;
+        expect(
+          captured,
+          containsAll(<Object?>[
+            'cat-9',
+            ['label-2'],
+          ]),
+        );
+        verify(
+          () => mockNavService.beamToNamed('/tasks/docked-task', data: null),
+        ).called(1);
+      },
+    );
+
+    testWidgets(
+      'createTaskFromTaskListFilters surfaces a failed create as a toast '
+      'instead of navigating',
+      (tester) async {
+        when(
+          () => mockPersistenceLogic.createTaskEntry(
+            data: any(named: 'data'),
+            entryText: any(named: 'entryText'),
+            categoryId: any(named: 'categoryId'),
+            labelIds: any(named: 'labelIds'),
+          ),
+        ).thenThrow(Exception('nope'));
+
+        WidgetRef? probeRef;
+        await tester.pumpWidget(
+          buildRefProbe(
+            state: state(),
+            onBuild: (context, ref) => probeRef = ref,
+          ),
+        );
+        await tester.pump();
+
+        await createTaskFromTaskListFilters(probeRef!);
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        verifyNever(
+          () => mockNavService.beamToNamed(any(), data: any(named: 'data')),
+        );
+      },
+    );
+  });
+
   testWidgets(
     'the worded FAB matches the task action bar: 48 high, one step4 above '
     'the content edge',
     (tester) async {
-      await tester.pumpWidget(
-        buildSubject(
-          state: state(),
-        ),
-      );
+      await tester.pumpWidget(buildSubject(state: state(), desktop: true));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
 

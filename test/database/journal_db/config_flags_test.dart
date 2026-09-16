@@ -70,6 +70,7 @@ void main() {
         enableTooltipFlag: true,
         enableAiStreamingFlag: true,
         enableAiSummaryTtsFlag: false,
+        enableQueryChatFlag: false,
         recordLocationFlag: false,
         resendAttachments: false,
         enableLoggingFlag: false,
@@ -98,6 +99,23 @@ void main() {
           entry.value,
           reason: 'flag default mismatch: ${entry.key}',
         );
+      }
+    });
+
+    test('reinitializing flags preserves task chat opt-in', () async {
+      await initConfigFlags(db, inMemoryDatabase: true);
+      final flag = (await db.getConfigFlagByName(
+        enableQueryChatFlag,
+      ))!;
+      try {
+        await db.upsertConfigFlag(flag.copyWith(status: true));
+        await initConfigFlags(db, inMemoryDatabase: true);
+        expect(
+          await db.getConfigFlag(enableQueryChatFlag),
+          isTrue,
+        );
+      } finally {
+        await db.upsertConfigFlag(flag.copyWith(status: false));
       }
     });
 
@@ -159,6 +177,30 @@ void main() {
         expect(secondNames, firstNames);
       },
     );
+
+    test('the retired mobile navigation launcher flag is neither seeded nor '
+        'kept — the launcher is the only mobile navigation now', () async {
+      // The name is spelled out: the constant is gone with the flag, and a
+      // reintroduced constant must not quietly resurrect the row.
+      const retired = 'enable_mobile_navigation_launcher';
+      expect(retiredConfigFlags, contains(retired));
+
+      // An install that had opted in keeps nothing behind.
+      await db.upsertConfigFlag(
+        const ConfigFlag(
+          name: retired,
+          description: 'Enable the mobile navigation launcher?',
+          status: true,
+        ),
+      );
+      await initConfigFlags(db, inMemoryDatabase: true);
+
+      expect(await db.getConfigFlagByName(retired), isNull);
+      expect(
+        (await db.watchConfigFlags().first).map((f) => f.name),
+        isNot(contains(retired)),
+      );
+    });
 
     test('deletes retired flags left behind by older installs', () async {
       // Dropping a seed call is not enough: upgraded installs retain the

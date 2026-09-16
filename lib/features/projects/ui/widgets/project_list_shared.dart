@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:lotti/features/categories/domain/category_icon.dart';
+import 'package:lotti/features/design_system/components/buttons/design_system_icon_action.dart';
 import 'package:lotti/features/design_system/components/lists/grouped_card_row_interactions.dart';
 import 'package:lotti/features/design_system/theme/design_tokens.dart';
 import 'package:lotti/features/projects/model/projects_overview_models.dart';
@@ -63,12 +64,14 @@ class ProjectGroupSection extends StatefulWidget {
     required this.group,
     required this.selectedProjectId,
     required this.onProjectSelected,
+    this.onExplorePlaza,
     super.key,
   });
 
   final ProjectCategoryGroup group;
   final String? selectedProjectId;
   final ValueChanged<ProjectListItemData> onProjectSelected;
+  final VoidCallback? onExplorePlaza;
 
   @override
   State<ProjectGroupSection> createState() => _ProjectGroupSectionState();
@@ -113,6 +116,20 @@ class _ProjectGroupSectionState extends State<ProjectGroupSection> {
                 children: [
                   Expanded(child: ProjectGroupHeader(group: widget.group)),
                   SizedBox(width: tokens.spacing.step2),
+                  // The world is entered from the header's trailing corner,
+                  // where this list's other row-level actions sit, rather
+                  // than from a button on a row of its own under every
+                  // category. It handles its own tap, so the header's
+                  // InkWell never folds the group behind it.
+                  if (widget.onExplorePlaza != null &&
+                      widget.group.category != null) ...[
+                    DesignSystemIconAction(
+                      icon: LottiIcons.map,
+                      tooltip: context.messages.plazaExploreCategory,
+                      onPressed: widget.onExplorePlaza,
+                    ),
+                    SizedBox(width: tokens.spacing.step2),
+                  ],
                   Icon(
                     _expanded ? LottiIcons.collapse : LottiIcons.expand,
                     color: ShowcasePalette.mediumText(context),

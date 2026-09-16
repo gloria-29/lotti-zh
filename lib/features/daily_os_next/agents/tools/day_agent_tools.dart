@@ -218,7 +218,13 @@ const dayAgentTools = <AgentToolDefinition>[
     parameters: {
       'type': 'object',
       'properties': {
-        'dayId': {'type': 'string'},
+        'dayId': {
+          'type': 'string',
+          'description':
+              'The day id for this wake, copied from `<day>.dayId` — for '
+              'example dayplan-2026-09-17. It is never blank and never '
+              'another day: a call naming a different day is rejected.',
+        },
       },
       'required': ['dayId'],
       'additionalProperties': false,
@@ -272,7 +278,13 @@ const dayAgentTools = <AgentToolDefinition>[
     parameters: {
       'type': 'object',
       'properties': {
-        'dayId': {'type': 'string'},
+        'dayId': {
+          'type': 'string',
+          'description':
+              'The day id for this wake, copied from `<day>.dayId` — for '
+              'example dayplan-2026-09-17. It is never blank and never '
+              'another day: a call naming a different day is rejected.',
+        },
         'dayDate': {
           'type': 'string',
           'description': 'ISO-8601 date-time for the local day being drafted.',
@@ -286,7 +298,9 @@ const dayAgentTools = <AgentToolDefinition>[
         'blocks': {
           'type': 'array',
           'description':
-              'The complete resulting plan. When planning_window is closed, '
+              'The complete resulting plan. While planning_window is open it '
+              'must not be empty: if nothing can be placed, send one buffer '
+              'block whose note says why. When planning_window is closed, '
               'use [] for an empty baseline or repeat every baseline block '
               'unchanged; never add or remove a block.',
           'items': {
@@ -297,11 +311,12 @@ const dayAgentTools = <AgentToolDefinition>[
               'taskId': {
                 'type': 'string',
                 'description':
-                    'REQUIRED when the block corresponds to one of the '
-                    'tasks listed under drafting.decidedTasks. Omit only '
-                    'for buffer / calendar blocks that have no backing '
-                    'task, or for manual blocks that do not map to a '
-                    'decided task.',
+                    'REQUIRED whenever the block does the work of a task you '
+                    'were shown — whether it came from drafting.decidedTasks '
+                    'or from the task corpus. It is what links the block to '
+                    'that task, so a block without it tracks no time and '
+                    'moves no status. Omit it only for buffer / calendar '
+                    'blocks that have no backing task.',
               },
               'categoryId': {'type': 'string'},
               'start': {
@@ -346,12 +361,20 @@ const dayAgentTools = <AgentToolDefinition>[
                 'type': 'string',
                 'minLength': 1,
                 'description':
-                    'Why this block belongs here. REQUIRED whenever type is '
-                    '"ai" — the tool handler rejects ai blocks without a '
-                    'non-empty reason.',
+                    'Why this block belongs here. Every block carries one, '
+                    'and for an "ai" block it must be non-empty — the tool '
+                    'handler rejects the whole draft otherwise. For a buffer '
+                    'or calendar block a short phrase is enough.',
               },
               'note': {'type': 'string'},
             },
+            // `reason` is deliberately NOT required here, though the writer
+            // rejects an ai block without one. A closed-window wake must echo
+            // its baseline blocks exactly, and a legacy block may carry a null
+            // reason: requiring the field would leave that echo no valid form
+            // — invent a reason and the repeat is no longer exact, omit it and
+            // the call is off-schema. The rule lives in the field description,
+            // which is where it can be conditional on the block type.
             'required': ['title', 'categoryId', 'start', 'end', 'type'],
             'additionalProperties': false,
           },
@@ -361,8 +384,18 @@ const dayAgentTools = <AgentToolDefinition>[
           'items': {
             'type': 'object',
             'properties': {
-              'start': {'type': 'string'},
-              'end': {'type': 'string'},
+              'start': {
+                'type': 'string',
+                'description':
+                    'ISO-8601 band start time on the plan day, like the '
+                    'block times — not a bare "09:00".',
+              },
+              'end': {
+                'type': 'string',
+                'description':
+                    'ISO-8601 band end time on the plan day, like the block '
+                    'times — not a bare "17:00".',
+              },
               'level': {
                 'type': 'string',
                 'enum': ['high', 'low', 'secondWind'],
@@ -404,7 +437,13 @@ const dayAgentTools = <AgentToolDefinition>[
     parameters: {
       'type': 'object',
       'properties': {
-        'dayId': {'type': 'string'},
+        'dayId': {
+          'type': 'string',
+          'description':
+              'The day id for this wake, copied from `<day>.dayId` — for '
+              'example dayplan-2026-09-17. It is never blank and never '
+              'another day: a call naming a different day is rejected.',
+        },
         'baselinePlanId': {
           'type': 'string',
           'description':

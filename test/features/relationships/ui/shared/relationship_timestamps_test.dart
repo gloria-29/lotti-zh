@@ -11,6 +11,8 @@ import 'package:lotti/l10n/app_localizations.dart';
 import 'package:lotti/themes/legacy_material_bridge.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../../widget_test_utils.dart';
+
 void main() {
   final now = DateTime(2026, 8, 18, 14, 20);
 
@@ -117,10 +119,39 @@ void main() {
     });
   });
 
-  group('relationshipTimeLabel', () {
-    test('renders HH:MM with leading zeros', () {
-      expect(relationshipTimeLabel(DateTime(2026, 8, 18, 7, 9)), '07:09');
-      expect(relationshipTimeLabel(DateTime(2026, 8, 18, 14, 20)), '14:20');
+  group('relationshipTimeLabelOf', () {
+    Future<String> labelUnder(
+      WidgetTester tester, {
+      required bool alwaysUse24HourFormat,
+    }) async {
+      late String label;
+      await tester.pumpWidget(
+        makeTestableWidget(
+          Builder(
+            builder: (context) {
+              label = relationshipTimeLabelOf(
+                context,
+                DateTime(2026, 8, 18, 14, 5),
+              );
+              return const SizedBox.shrink();
+            },
+          ),
+          mediaQueryData: MediaQueryData(
+            alwaysUse24HourFormat: alwaysUse24HourFormat,
+          ),
+        ),
+      );
+      return label;
+    }
+
+    testWidgets("follows the device's clock format, as the time wheel does", (
+      tester,
+    ) async {
+      expect(await labelUnder(tester, alwaysUse24HourFormat: true), '14:05');
+      expect(
+        await labelUnder(tester, alwaysUse24HourFormat: false),
+        '2:05 PM',
+      );
     });
   });
 
@@ -402,6 +433,65 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(rendered, 'Do');
+    });
+  });
+
+  group('relationshipDurationLabelOf', () {
+    Future<String?> labelFor(WidgetTester tester, Duration duration) async {
+      late String? rendered;
+      await tester.pumpWidget(
+        MaterialApp(
+          builder: LegacyMaterialBridge.builder,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            ...GlobalMaterialLocalizations.delegates,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: Builder(
+            builder: (context) {
+              rendered = relationshipDurationLabelOf(context, duration);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      return rendered;
+    }
+
+    testWidgets('nothing for a zero or negative duration — a check-in with '
+        'no length shows no duration at all', (tester) async {
+      expect(await labelFor(tester, Duration.zero), isNull);
+      expect(await labelFor(tester, const Duration(minutes: -5)), isNull);
+    });
+
+    testWidgets('minutes under an hour', (tester) async {
+      expect(await labelFor(tester, const Duration(minutes: 11)), '11 min');
+      expect(await labelFor(tester, const Duration(minutes: 59)), '59 min');
+    });
+
+    testWidgets('whole hours', (tester) async {
+      expect(await labelFor(tester, const Duration(hours: 1)), '1 h');
+      expect(await labelFor(tester, const Duration(hours: 3)), '3 h');
+    });
+
+    testWidgets('hours and minutes, minutes zero-padded', (tester) async {
+      expect(
+        await labelFor(tester, const Duration(hours: 1, minutes: 5)),
+        '1 h 05',
+      );
+      expect(
+        await labelFor(tester, const Duration(hours: 2, minutes: 30)),
+        '2 h 30',
+      );
+    });
+
+    testWidgets('seconds do not round up', (tester) async {
+      expect(await labelFor(tester, const Duration(seconds: 59)), isNull);
+      expect(
+        await labelFor(tester, const Duration(minutes: 10, seconds: 59)),
+        '10 min',
+      );
     });
   });
 }

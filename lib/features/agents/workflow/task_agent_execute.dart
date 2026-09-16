@@ -13,6 +13,9 @@ extension TaskAgentExecute on TaskAgentWorkflow {
     required String threadId,
   }) async {
     final agentId = agentIdentity.id;
+    final preparationTimer = Stopwatch()..start();
+    final conversationTimer = Stopwatch();
+    final persistenceTimer = Stopwatch();
 
     _log(
       'wake start: agent=${DomainLogger.sanitizeId(agentId)}, '
@@ -386,6 +389,13 @@ extension TaskAgentExecute on TaskAgentWorkflow {
         threadId: threadId,
         runKey: runKey,
         domainLogger: domainLogger,
+        userApprovedChecklistStateResolver: (itemId) async {
+          final entity = await journalDb.journalEntityById(itemId);
+          return entity is ChecklistItem &&
+                  entity.data.checkedStateApproval != null
+              ? entity.data.isChecked
+              : null;
+        },
         checklistItemStateResolver: (itemId) async {
           final entity = await journalDb.journalEntityById(itemId);
           if (entity is ChecklistItem) {
@@ -580,6 +590,8 @@ extension TaskAgentExecute on TaskAgentWorkflow {
       // 7. Invoke the LLM and execute tool calls via AgentToolExecutor.
       final inferenceTemperature =
           TaskAgentEvidenceSynthesis.usesCompactScaffold(modelId) ? 0.0 : 0.3;
+      preparationTimer.stop();
+      conversationTimer.start();
       var usage = await conversationRepository.sendMessage(
         conversationId: conversationId,
         message: userMessage,
@@ -597,15 +609,16 @@ extension TaskAgentExecute on TaskAgentWorkflow {
         rethrowInferenceErrors: true,
       );
 
-      // 7b. Forced-report retry. A first wake needs an initial report, and a
-      // wake that successfully changed task state needs a fresh report. With
-      // no successful mutation, an existing report remains authoritative and
-      // avoiding a retry preserves the no-op wake path.
+      // 7b. First reports and material mutations require publication. Label
+      // and language housekeeping alone preserve an existing report.
       final reportMissing = strategy.extractReportContent().isEmpty;
-      final hasSuccessfulMutations = strategy
-          .extractSuccessfulMutations()
-          .isNotEmpty;
-      if (reportMissing && (lastReport == null || hasSuccessfulMutations)) {
+      final reportWasRequired = TaskAgentReportPolicy.requiresReport(
+        hasExistingReport: lastReport != null,
+        successfulToolNames: strategy.extractSuccessfulMutations().map(
+          (mutation) => mutation.toolName,
+        ),
+      );
+      if (reportMissing && reportWasRequired) {
         final retryUsage = await _forceUpdateReportIfMissing(
           conversationId: conversationId,
           modelId: modelId,
@@ -697,7 +710,6 @@ extension TaskAgentExecute on TaskAgentWorkflow {
         );
       }
       if (reportEditorRouteEligible && effectiveReport == null) {
-        final reportWasRequired = lastReport == null || hasSuccessfulMutations;
         await strategy.recordWorkflowResult(
           toolName: reportWasRequired
               ? '${TaskAgentReportEditor.auditToolPrefix}_failed'
@@ -785,6 +797,9 @@ extension TaskAgentExecute on TaskAgentWorkflow {
         }
       }
 
+      conversationTimer.stop();
+      persistenceTimer.start();
+
       // Persist token usage as a synced entity (non-fatal on failure).
       await _persistTokenUsage(
         usage: usage,
@@ -818,9 +833,8 @@ extension TaskAgentExecute on TaskAgentWorkflow {
       final reportTldr = effectiveReport?.tldr ?? strategy.extractReportTldr();
       final reportOneLiner =
           effectiveReport?.oneLiner ?? strategy.extractReportOneLiner();
-      if (reportContent.isEmpty &&
-          (lastReport == null || hasSuccessfulMutations)) {
-        // Initial wakes and successful mutations require a current report.
+      if (reportContent.isEmpty && reportWasRequired) {
+        // Initial wakes and material mutations require a current report.
         // An empty report is valid only when an existing projection remains
         // authoritative because the wake applied no material change.
         _log(
@@ -914,8 +928,19 @@ extension TaskAgentExecute on TaskAgentWorkflow {
         );
       }
 
-      return WakeResult(success: false, error: e.toString());
+      return WakeResult.failed(kind: 'Task agent', error: e);
     } finally {
+      preparationTimer.stop();
+      conversationTimer.stop();
+      persistenceTimer.stop();
+      _log(
+        'wake stages: agent=${DomainLogger.sanitizeId(agentId)} '
+        'run=${DomainLogger.sanitizeId(runKey)} '
+        'preparationMs=${preparationTimer.elapsedMilliseconds} '
+        'modelToolsMs=${conversationTimer.elapsedMilliseconds} '
+        'persistenceMs=${persistenceTimer.elapsedMilliseconds}',
+        subDomain: 'timings',
+      );
       // 12. Clean up in-memory conversation to prevent resource leaks.
       conversationRepository.deleteConversation(conversationId);
     }

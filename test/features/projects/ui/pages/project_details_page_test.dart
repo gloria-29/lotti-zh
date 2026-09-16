@@ -7,18 +7,25 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lotti/classes/journal_entities.dart';
 import 'package:lotti/classes/project_data.dart';
 import 'package:lotti/database/settings_db.dart';
+import 'package:lotti/database/state/config_flag_provider.dart';
 import 'package:lotti/features/agents/model/agent_domain_entity.dart';
 import 'package:lotti/features/agents/model/agent_enums.dart';
+import 'package:lotti/features/agents/model/query_chat_models.dart';
+import 'package:lotti/features/agents/query/query_chat_providers.dart';
 import 'package:lotti/features/agents/service/project_recommendation_service.dart';
 import 'package:lotti/features/agents/state/agent_providers.dart';
 import 'package:lotti/features/agents/state/change_set_providers.dart';
 import 'package:lotti/features/agents/state/project_agent_providers.dart';
 import 'package:lotti/features/agents/state/task_agent_providers.dart';
+import 'package:lotti/features/agents/ui/chat/chat_recorder_controller.dart';
+import 'package:lotti/features/agents/ui/query/query_chat_pane.dart';
 import 'package:lotti/features/ai/model/ai_config.dart';
 import 'package:lotti/features/ai/state/inference_profile_controller.dart';
 import 'package:lotti/features/categories/ui/widgets/category_picker_sheet.dart';
 import 'package:lotti/features/design_system/theme/design_system_theme.dart';
 import 'package:lotti/features/design_system/theme/design_tokens.dart';
+import 'package:lotti/features/plaza/state/project_plaza_provider.dart';
+import 'package:lotti/features/plaza/ui/project_plaza_page.dart';
 import 'package:lotti/features/projects/repository/project_repository.dart';
 import 'package:lotti/features/projects/service/project_lifecycle_service.dart';
 import 'package:lotti/features/projects/state/project_detail_controller.dart';
@@ -43,6 +50,7 @@ import '../../../../test_utils/material_ui_finders.dart';
 import '../../../../widget_test_utils.dart';
 import '../../../agents/test_data/entity_factories.dart';
 import '../../../agents/test_data/template_factories.dart';
+import '../../../agents/ui/evolution/widgets/evolution_recorder_test_utils.dart';
 import '../../../ai/test_utils.dart';
 import '../../../categories/test_utils.dart';
 import '../../test_utils.dart';
@@ -266,6 +274,88 @@ void main() {
     await tester.pump();
     await tester.pump();
   }
+
+  testWidgets('Ask keeps project details mounted in a companion until Close', (
+    tester,
+  ) async {
+    const scope = QueryScope(kind: QueryScopeKind.project, id: _projectId);
+    await pumpPageWithData(
+      tester,
+      controllerState: ProjectDetailState.initial().copyWith(
+        project: testProject,
+        isLoading: false,
+      ),
+      record: testRecord,
+      extraOverrides: [
+        queryChatEnabledProvider.overrideWithValue(true),
+        queryChatTargetProvider(scope).overrideWith(
+          (ref) async => QueryChatTarget(
+            scope: scope,
+            label: testProject.data.title,
+            agent: null,
+          ),
+        ),
+        configFlagProvider(
+          'private',
+        ).overrideWith((ref) => Stream.value(false)),
+        chatRecorderControllerProvider.overrideWith(
+          TranscriptEmittingController.new,
+        ),
+      ],
+    );
+    final detail = tester.element(find.byType(ProjectMobileDetailContent));
+    await tester.tap(find.text('Ask'));
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<QueryChatPane>(find.byType(QueryChatPane)).scope,
+      scope,
+    );
+    expect(
+      tester.element(find.byType(ProjectMobileDetailContent)),
+      same(detail),
+    );
+    expect(
+      tester.widget<QueryChatPane>(find.byType(QueryChatPane)).companion,
+      isTrue,
+    );
+    await tester.tap(find.byIcon(LottiIcons.close).last);
+    await tester.pumpAndSettle();
+    expect(find.byType(QueryChatPane), findsNothing);
+    expect(
+      tester.element(find.byType(ProjectMobileDetailContent)),
+      same(detail),
+    );
+    expect(find.text(testProject.data.title), findsWidgets);
+  });
+
+  testWidgets('project explorer opens only the selected project and returns', (
+    tester,
+  ) async {
+    await pumpPageWithData(
+      tester,
+      controllerState: ProjectDetailState.initial().copyWith(
+        project: testProject,
+        isLoading: false,
+      ),
+      record: testRecord,
+      extraOverrides: [
+        projectPlazaProvider(
+          _projectId,
+        ).overrideWith((ref) => Stream.value(null)),
+      ],
+    );
+    await tester.tap(find.text('Explore project'));
+    await tester.pumpAndSettle();
+    final plaza = tester.widget<ProjectPlazaPage>(
+      find.byType(ProjectPlazaPage),
+    );
+    expect(plaza.projectId, _projectId);
+    expect(find.text('Project not found'), findsOneWidget);
+    Navigator.of(tester.element(find.byType(ProjectPlazaPage))).pop();
+    await tester.pumpAndSettle();
+    expect(find.byType(ProjectPlazaPage), findsNothing);
+    expect(find.text(testProject.data.title), findsWidgets);
+  });
 
   group('ProjectDetailsPage', () {
     test(

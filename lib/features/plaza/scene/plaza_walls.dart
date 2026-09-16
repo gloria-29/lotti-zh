@@ -56,42 +56,54 @@ extension _PlazaWallsBuilder on PlazaSceneController {
     required LanternState state,
     required Vector4 tint,
     required double uOffset,
+    bool groundFloor = true,
     LanternState? shops,
     int variant = 0,
     int family = 0,
   }) {
-    final ground = math.min(
-      PlazaSceneController.shopfrontHeight,
-      height * 0.45,
-    );
-    final shop = UnlitMaterial()..baseColorFactor = tint;
-    _shopfrontMaterials
-        .putIfAbsent((shops ?? state, variant), () => [])
-        .add(shop);
-    parent.add(
-      Node(
-        localTransform: Matrix4.translation(
-          Vector3(dx, -height / 2 + ground / 2, dz),
-        )..rotateY(yaw),
-        mesh: Mesh(
-          tiledQuad(
-            width,
-            ground,
-            uRepeat: width / WallTextures.shopfrontWidth,
-            vRepeat: ground / WallTextures.shopfrontHeight,
-            uOffset: uOffset,
+    final ground = groundFloor
+        ? math.min(
+            PlazaSceneController.shopfrontHeight,
+            height,
+          )
+        : 0.0;
+    // Textured skins need the same depth separation as facade plates.
+    // Their geometric offset alone loses precision on distant towers after
+    // batching changes draw order, letting the opaque body hide the windows.
+    if (ground > 0) {
+      final shop = UnlitMaterial()
+        ..baseColorFactor = tint
+        ..depthBias = PlazaSceneController.plateDepthBias;
+      _shopfrontMaterials
+          .putIfAbsent((shops ?? state, variant), () => [])
+          .add(shop);
+      parent.add(
+        Node(
+          localTransform: Matrix4.translation(
+            Vector3(dx, -height / 2 + ground / 2, dz),
+          )..rotateY(yaw),
+          mesh: Mesh(
+            tiledQuad(
+              width,
+              ground,
+              uRepeat: width / WallTextures.shopfrontWidth,
+              vRepeat: ground / WallTextures.shopfrontHeight,
+              uOffset: uOffset,
+            ),
+            shop,
           ),
-          shop,
         ),
-      ),
-    );
+      );
+    }
     final upper = height - ground;
     if (upper <= 0.1) return;
     final floors = (upper / WallTextures.storeyHeight).floor();
     final storeys = floors * WallTextures.storeyHeight;
     final cornice = upper - storeys;
     if (floors > 0) {
-      final windows = UnlitMaterial()..baseColorFactor = tint;
+      final windows = UnlitMaterial()
+        ..baseColorFactor = tint
+        ..depthBias = PlazaSceneController.plateDepthBias;
       _wallMaterials.putIfAbsent((state, family), () => []).add(windows);
       parent.add(
         Node(
@@ -122,7 +134,7 @@ extension _PlazaWallsBuilder on PlazaSceneController {
           )..rotateY(yaw),
           mesh: Mesh(
             ccwQuad(width, cornice),
-            PlazaSceneController._corniceMaterial,
+            _corniceMaterial,
           ),
         ),
       );
@@ -131,8 +143,7 @@ extension _PlazaWallsBuilder on PlazaSceneController {
 
   /// Windowed walls ([_windowedWall]) on [faces] of the [w] × [d] box
   /// under [parent], in that order, whose centre sits at half [height].
-  /// Each face tiles from its own hashed offset so it starts at its own
-  /// shop, unless [perFaceOffset] is off and every face shares one.
+  /// Each face tiles from its own hashed offset so it starts at its own shop.
   void _windowedBox(
     Node parent, {
     required String id,
@@ -142,7 +153,7 @@ extension _PlazaWallsBuilder on PlazaSceneController {
     required LanternState state,
     required Vector4 tint,
     List<_Face> faces = _Face.values,
-    bool perFaceOffset = true,
+    bool groundFloor = true,
     LanternState? shops,
     int variant = 0,
     int family = 0,
@@ -166,7 +177,8 @@ extension _PlazaWallsBuilder on PlazaSceneController {
         height: height,
         state: state,
         tint: tint,
-        uOffset: stableUnit(id, perFaceOffset ? 'tile$yaw' : 'tile') * 3,
+        uOffset: stableUnit(id, 'tile$yaw') * 3,
+        groundFloor: groundFloor,
         shops: shops,
         variant: variant,
         family: family,

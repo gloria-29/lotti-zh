@@ -3,6 +3,31 @@ import 'package:lotti/features/ai/constants/provider_config.dart';
 import 'package:lotti/features/ai/model/ai_config.dart';
 
 void main() {
+  test('embedded speech defaults include its name and empty endpoint', () {
+    expect(ProviderConfig.defaultBaseUrls[InferenceProviderType.sherpa], '');
+    expect(
+      ProviderConfig.defaultNames[InferenceProviderType.sherpa],
+      'sherpa-onnx',
+    );
+  });
+
+  test('embedded speech is usable without credentials or an endpoint', () {
+    final provider = AiConfigInferenceProvider(
+      id: 'sherpa',
+      name: 'sherpa',
+      baseUrl: '',
+      apiKey: '',
+      createdAt: DateTime(2024),
+      inferenceProviderType: InferenceProviderType.sherpa,
+    );
+    expect(provider.isUsable, isTrue);
+    expect(ProviderConfig.usesBaseUrl(InferenceProviderType.sherpa), isFalse);
+    expect(
+      ProviderConfig.requiresApiKey(InferenceProviderType.sherpa),
+      isFalse,
+    );
+  });
+
   group('ProviderConfig', () {
     group('defaultBaseUrls', () {
       test('should contain all provider types', () {
@@ -14,7 +39,7 @@ void main() {
             InferenceProviderType.genericOpenAi,
             InferenceProviderType.melious,
             InferenceProviderType.mistral,
-            InferenceProviderType.mlxAudio,
+
             InferenceProviderType.nebiusAiStudio,
             InferenceProviderType.omlx,
             InferenceProviderType.ollama,
@@ -23,25 +48,22 @@ void main() {
             InferenceProviderType.openRouter,
             InferenceProviderType.whisper,
             InferenceProviderType.voxtral,
+            InferenceProviderType.sherpa,
           ]),
         );
       });
 
       test('should have valid URLs', () {
         for (final entry in ProviderConfig.defaultBaseUrls.entries) {
-          if (ProviderConfig.usesBaseUrl(entry.key)) {
-            expect(
-              entry.value,
-              isNotEmpty,
-              reason: '${entry.key} should have a non-empty URL',
-            );
-          } else {
-            expect(
-              entry.value,
-              isEmpty,
-              reason: '${entry.key} is embedded and should not use Base URL',
-            );
+          if (entry.key == InferenceProviderType.sherpa) {
+            expect(entry.value, isEmpty);
+            continue;
           }
+          expect(
+            entry.value,
+            isNotEmpty,
+            reason: '${entry.key} should have a non-empty URL',
+          );
         }
       });
 
@@ -91,7 +113,7 @@ void main() {
             InferenceProviderType.genericOpenAi,
             InferenceProviderType.melious,
             InferenceProviderType.mistral,
-            InferenceProviderType.mlxAudio,
+
             InferenceProviderType.nebiusAiStudio,
             InferenceProviderType.omlx,
             InferenceProviderType.ollama,
@@ -100,6 +122,7 @@ void main() {
             InferenceProviderType.openRouter,
             InferenceProviderType.whisper,
             InferenceProviderType.voxtral,
+            InferenceProviderType.sherpa,
           ]),
         );
       });
@@ -156,9 +179,10 @@ void main() {
           ProviderConfig.noApiKeyRequired,
           containsAll([
             InferenceProviderType.ollama,
-            InferenceProviderType.mlxAudio,
+
             InferenceProviderType.whisper,
             InferenceProviderType.voxtral,
+            InferenceProviderType.sherpa,
           ]),
         );
       });
@@ -247,24 +271,6 @@ void main() {
       });
     });
 
-    group('usesBaseUrl', () {
-      test('returns false only for mlxAudio', () {
-        expect(
-          ProviderConfig.usesBaseUrl(InferenceProviderType.mlxAudio),
-          isFalse,
-        );
-        for (final type in InferenceProviderType.values) {
-          if (type != InferenceProviderType.mlxAudio) {
-            expect(
-              ProviderConfig.usesBaseUrl(type),
-              isTrue,
-              reason: '$type talks to an HTTP base URL and must use one',
-            );
-          }
-        }
-      });
-    });
-
     group('supportsDynamicCatalog', () {
       test('is true exactly for the dynamic-catalog providers', () {
         expect(
@@ -341,17 +347,6 @@ void main() {
           baseUrl: '   ',
         ).isUsable,
         isFalse,
-      );
-    });
-
-    test('mlxAudio needs neither key nor base URL', () {
-      expect(
-        provider(
-          type: InferenceProviderType.mlxAudio,
-          apiKey: '',
-          baseUrl: '',
-        ).isUsable,
-        isTrue,
       );
     });
 

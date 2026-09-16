@@ -9,7 +9,7 @@ part 'ai_config.g.dart';
 ///
 /// Drives request shaping (auth, base URL defaults, payload quirks), the
 /// provider picker chrome, and FTUE presets. Most entries are OpenAI-compatible
-/// cloud APIs; [ollama] and [mlxAudio] run locally on-device. The value is
+/// cloud APIs; [ollama] and [omlx] connect to local services. The value is
 /// persisted as the enum name, so order can change freely but names must not.
 enum InferenceProviderType {
   alibaba,
@@ -18,7 +18,6 @@ enum InferenceProviderType {
   genericOpenAi,
   melious,
   mistral,
-  mlxAudio,
   nebiusAiStudio,
   omlx,
   openAi,
@@ -26,6 +25,7 @@ enum InferenceProviderType {
   ollama,
   voxtral,
   whisper,
+  sherpa,
 }
 
 /// A kind of content a model can take as input or emit as output.
@@ -157,6 +157,10 @@ sealed class AiConfig with _$AiConfig {
 
     /// Model config id for agentic thinking (tool calling, reasoning).
     required String thinkingModelId,
+
+    /// Optional model config id for interactive query chat. When unset,
+    /// chat uses the agent's resolved thinking model.
+    String? chatModelId,
 
     /// Model config id for high-end thinking tasks (e.g. coding prompt
     /// generation) where quality matters more than speed/cost.

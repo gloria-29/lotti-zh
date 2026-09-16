@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lotti/database/settings_db.dart';
 import 'package:lotti/features/ai/model/ai_config.dart';
+import 'package:lotti/features/ai/speech/sherpa_installed_models_provider.dart';
 import 'package:lotti/features/ai/state/ai_runtime_settings_controller.dart';
 import 'package:lotti/features/ai/state/inference_profile_controller.dart';
 import 'package:lotti/features/ai/state/profile_usage_provider.dart';
@@ -18,13 +19,13 @@ import 'package:lotti/features/ai/ui/settings/widgets/ai_settings_floating_actio
 import 'package:lotti/features/ai/ui/settings/widgets/config_error_state.dart';
 import 'package:lotti/features/ai/ui/settings/widgets/config_loading_state.dart';
 import 'package:lotti/features/ai/ui/settings/widgets/ftue/ai_pick_provider_modal.dart';
-import 'package:lotti/features/ai/ui/settings/widgets/mlx_audio_model_download_dialog.dart';
 import 'package:lotti/features/ai/ui/settings/widgets/v2/ai_card_action_menu.dart';
 import 'package:lotti/features/ai/ui/settings/widgets/v2/ai_settings_cards.dart';
 import 'package:lotti/features/ai/ui/settings/widgets/v2/ai_settings_empty_view.dart';
 import 'package:lotti/features/ai/ui/settings/widgets/v2/ai_settings_header_bar.dart';
 import 'package:lotti/features/ai/ui/settings/widgets/v2/ai_settings_tab_bar.dart';
-import 'package:lotti/features/ai/util/mlx_audio_model_progress_store.dart';
+import 'package:lotti/features/design_system/components/toasts/design_system_toast.dart';
+import 'package:lotti/features/design_system/components/toasts/toast_messenger.dart';
 import 'package:lotti/features/design_system/theme/design_tokens.dart';
 import 'package:lotti/get_it.dart';
 import 'package:lotti/l10n/app_localizations_context.dart';
@@ -249,16 +250,12 @@ class _AiSettingsPageState extends ConsumerState<AiSettingsPage>
     );
   }
 
-  Future<void> _handleInstallMlxAudioModel(AiConfigModel model) async {
-    await MlxAudioModelDownloadDialog.show(context: context, model: model);
-  }
-
   Future<void> _handleAddProvider() async {
     // Two-tier picker behaviour, but a single modal widget now:
     //
     //  - Fresh users (dismiss flag NOT set) see [AiPickProviderModal]
     //    with its FTUE chrome — branded tile lineup (Gemini, OpenAI,
-    //    Anthropic, Alibaba, MLX Audio, Ollama, Voxtral), the
+    //    Anthropic, Alibaba, oMLX, Ollama, Voxtral), the
     //    "Don't show again" button, and the FTUE subtitle/footer.
     //
     //  - Users who tapped "Don't show again" once before see the
@@ -362,6 +359,18 @@ class _AiSettingsPageState extends ConsumerState<AiSettingsPage>
   Widget build(BuildContext context) {
     final tokens = context.designTokens;
     final aiRuntimeSettings = ref.watch(aiRuntimeSettingsControllerProvider);
+    final defaultProfileId = ref
+        .watch(defaultInferenceProfileControllerProvider)
+        .value;
+    final profiles =
+        ref
+            .watch(
+              aiConfigByTypeControllerProvider(AiConfigType.inferenceProfile),
+            )
+            .value
+            ?.whereType<AiConfigInferenceProfile>()
+            .toList() ??
+        const <AiConfigInferenceProfile>[];
     return Scaffold(
       backgroundColor: tokens.colors.background.level01,
       floatingActionButton: AiSettingsFloatingActionButton(
@@ -391,6 +400,24 @@ class _AiSettingsPageState extends ConsumerState<AiSettingsPage>
               child: AiSettingsHeaderBar(
                 searchController: _searchController,
                 onSearchClear: _handleSearchClear,
+                profiles: profiles,
+                defaultProfileId: defaultProfileId,
+                onDefaultProfileChanged: (id) async {
+                  try {
+                    await ref
+                        .read(
+                          defaultInferenceProfileControllerProvider.notifier,
+                        )
+                        .selectProfile(id);
+                  } on Object {
+                    if (context.mounted) {
+                      context.showToast(
+                        tone: DesignSystemToastTone.error,
+                        title: context.messages.commonError,
+                      );
+                    }
+                  }
+                },
                 agentWakeConcurrency: aiRuntimeSettings.agentWakeConcurrency,
                 onAgentWakeConcurrencyChanged: (value) => ref
                     .read(aiRuntimeSettingsControllerProvider.notifier)
@@ -449,6 +476,17 @@ class _AiSettingsPageState extends ConsumerState<AiSettingsPage>
     final models =
         modelsAsync.value?.whereType<AiConfigModel>().toList() ??
         const <AiConfigModel>[];
+    final availableModels = modelsAvailableOnDevice(
+      models: models,
+      providers: providers ?? const [],
+      installedSherpaModelIds:
+          (providers ?? const <AiConfigInferenceProvider>[]).any(
+            (provider) =>
+                provider.inferenceProviderType == InferenceProviderType.sherpa,
+          )
+          ? ref.watch(sherpaInstalledModelIdsProvider).value ?? const {}
+          : const {},
+    );
     final profiles =
         profilesAsync.value?.whereType<AiConfigInferenceProfile>().toList() ??
         const <AiConfigInferenceProfile>[];
@@ -473,7 +511,7 @@ class _AiSettingsPageState extends ConsumerState<AiSettingsPage>
             child: AiSettingsTabBar(
               tabController: _tabController,
               providerCount: 0,
-              modelCount: models.length,
+              modelCount: availableModels.length,
               profileCount: profiles.length,
               onTabChanged: _handleTabChange,
             ),
@@ -498,12 +536,12 @@ class _AiSettingsPageState extends ConsumerState<AiSettingsPage>
           child: AiSettingsTabBar(
             tabController: _tabController,
             providerCount: providers!.length,
-            modelCount: models.length,
+            modelCount: availableModels.length,
             profileCount: profiles.length,
             onTabChanged: _handleTabChange,
           ),
         ),
-      ..._buildActiveTabBody(providers!, models, profiles),
+      ..._buildActiveTabBody(providers!, models, profiles, availableModels),
     ];
   }
 
@@ -511,6 +549,7 @@ class _AiSettingsPageState extends ConsumerState<AiSettingsPage>
     List<AiConfigInferenceProvider> providers,
     List<AiConfigModel> models,
     List<AiConfigInferenceProfile> profiles,
+    List<AiConfigModel> availableModels,
   ) {
     switch (_filterState.activeTab) {
       case AiSettingsTab.providers:
@@ -550,7 +589,7 @@ class _AiSettingsPageState extends ConsumerState<AiSettingsPage>
               },
             ),
           ),
-          _buildModelsList(models, providers),
+          _buildModelsList(availableModels, providers),
         ];
       case AiSettingsTab.profiles:
         return [_buildProfilesGrid(profiles, models, providers)];

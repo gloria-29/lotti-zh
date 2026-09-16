@@ -16,6 +16,15 @@ checkout. Both materialize native libraries under `build/native_assets/`;
 overlapping builds can remove a library while another test process is loading
 it. Use separate checkouts for concurrent desktop and VM runs.
 
+## Plaza skeleton tests
+
+`test/features/plaza/scene/test_utils.dart` reads the shipped penguin and meerkat node
+hierarchies, inverse bind matrices and morph deltas without allocating GPU buffers. Use this
+fixture for skeleton and IK checks; a native Flutter GPU run is still needed
+for skin deformation, eyelid coverage and appearance. Sample motion with explicit seconds,
+never wall-clock delays. The animation concept and its invariants live in
+[Project plaza](../knowledge/features/plaza.md#ambient-companions).
+
 ## Standalone Material UI
 
 Widget tests use `package:material_ui/material_ui.dart` and the shared app
@@ -33,6 +42,48 @@ to a generic tree-build check.
 Theme and localization wiring is documented in
 [design tokens and theming](../knowledge/features/design_system/tokens-and-theming.md#standalone-material-and-legacy-dependencies).
 
+## Shared widget hosts and large suites
+
+Import `widget_test_utils.dart` for the stable shared API. Its implementations
+live in `helpers/test_app.dart` (app hosts and themes), `test_get_it.dart`
+(services), `test_view.dart` (surface size), `paint_position_recorder.dart`
+(paint offsets), and `widget_assertions.dart` (style assertions).
+
+App hosts derive MediaQuery from the actual rendered constraints by default,
+including the binding’s legacy `setSurfaceSize` override. Prefer
+`setTestSurfaceSize` or an explicit device fixture; do not combine conflicting
+viewport overrides. To exercise
+phone layout, pass `phoneMediaQueryData` or an explicit device fixture:
+`mediaQueryData` with a nonzero size configures both logical MediaQuery size and
+physical render dimensions, including device pixel ratio. View overrides reset
+in teardown. Flags-only fixtures such as reduced motion inherit the current
+viewport. Scaffold hosts bound nested pages and lists by the available viewport, without
+an additional 800-pixel cap.
+Caller-supplied theme extensions survive automatic design-token installation.
+The harness contracts live in `widget_test_utils_test.dart`.
+
+Large suites can keep one discoverable `_test.dart` entry point while moving
+scenario registration into named Dart `part` files. The journal controller
+suite demonstrates this under `features/journal/state/journal_page_controller_cases/`:
+the entry point owns imports, shared fixtures, setup and group boundaries; each
+part registers a related set of scenarios. Parts are not independently
+executable and must not use the `_test.dart` suffix. Compare discovered test
+names before and after a move to catch omissions or duplicate registration.
+
+The skill inference runner follows the same pattern in
+`features/ai/services/skill_inference_runner_cases/`. Its entry point preserves
+registration order, `test_setup.dart` owns the shared fixture lifecycle, and
+private extensions register each scenario against that fixture. Prompt property
+generators and their isolated bench live in `prompt_generation_scenarios.dart`.
+Run `features/ai/services/skill_inference_runner_test.dart` to execute the suite;
+the scenario parts are not separate test targets.
+
+The sync queue coordinator uses
+`features/sync/queue/queue_pipeline_coordinator_cases/` for lifecycle, ingress,
+history, recovery, and integration scenarios. Its shared fixture owns the stream
+and database lifecycle; all scenarios run through
+`features/sync/queue/queue_pipeline_coordinator_test.dart`.
+
 ## Shared process state
 
 The optimized CI runner executes many test files in one isolate.
@@ -41,7 +92,23 @@ every test for Mocktail matchers, DevLogger output and captured logs, Google
 Fonts runtime fetching, Drift's multiple-database warning policy, and GetIt's
 reassignment policy. Tests still own every GetIt registration, stream,
 database, timer, and platform-channel handler they create; clean those up in
-the suite's teardown.
+the suite's teardown. Two more things nobody restores for you: the
+`lib/utils/platform.dart` flags (`isMacOS`, `isDesktop`, …) are plain
+globals, so a test that assigns one restores it in `addTearDown` — a
+generated-scenario test that forgets leaves the *last* scenario's value for
+every file after it — and the painting binding's `imageCache` carries
+whatever earlier files decoded, so assert a *delta* on its size, never an
+absolute.
+
+## Model assessment
+
+LottiGym's offline orchestration checks run with
+`python3 -m unittest tool.lotti_gym_test tool.lotti_gym_results_test
+tool.lotti_gym_billing_test tool.lotti_gym_history_test`.
+Its Dart catalog is checked by `test/tool/lotti_gym_catalog_test.dart`.
+These checks make no model calls. Live assessment, resume and artifact
+interpretation are documented in
+[LottiGym and model evaluation](../knowledge/features/ai/model-evaluation.md).
 
 ## Aged-history cost gates
 
@@ -76,6 +143,20 @@ callbacks, `whenComplete` futures and status listeners have not fired, and a
 start frame, then the duration, then a little past it — or sample in small steps
 until the state you are waiting for appears, and assert you saw it.
 
+## A focus change lands a frame late; a pulsing placeholder never settles
+
+`FocusNode.requestFocus()` applies in a microtask, and the listeners that
+rebuild on it (`ListenableBuilder(listenable: focusNode)`) mark their element
+dirty only then — so after `requestFocus()` the first `pump()` shows the old
+frame and the second shows the focused one. Pump twice before asserting on
+anything focus-driven (the check-in composer's field border, its keyboard bar).
+
+A widget that breathes for as long as a state lasts — the transcript skeleton,
+the running briefing's spinner, a `DesignSystemButton` wearing `isLoading` —
+keeps an `AnimationController` repeating, so `pumpAndSettle()` times out on
+it. Pump by hand through such a phase (`pump(const Duration(milliseconds:
+100))` a few times) and settle only once it has ended.
+
 ## Image decoding never completes inside `testWidgets`
 
 `testWidgets` runs the body under FakeAsync, and the engine's completions —
@@ -104,6 +185,18 @@ opens in-memory databases and seeds them — the full-shell recipe in
 `setUp` and dispose it in `tearDown`, both of which run on the real event
 loop, and keep only the pumping inside the test.
 
+## Screenshot capture tests
+
+Use `ScreenshotHost` to control OS commands, portal responses and window calls
+in `test/utils/screenshots_test.dart`. Registering a `WindowManager` in GetIt
+cannot intercept capture's global `windowManager`, and filesystem overrides do
+not replace `Process.start` or `Process.run`. Keep the output future open when
+testing process timeouts: an already-drained stream misses hangs before exit.
+Assert that both subscriptions are cancelled while pipes remain open, and that
+a subsequent capture completes; killing a parent need not close a child’s pipes.
+Entry-creation tests inject `createScreenshot(capture: ...)` and assert the saved
+image, link, category and geolocation request using the real journal database.
+
 ## Simulating a platform without a directory watch
 
 `FileWatcherMixin` polls where `FileSystemEntity.isWatchSupported` is false
@@ -111,7 +204,7 @@ loop, and keep only the pumping inside the test.
 `IOOverrides.runZoned(body, fsWatchIsSupported: () => false)` or
 `fsWatch: (_, _, _) => throw const FileSystemException(...)` — no seam in
 production code, and timers created inside the zone still run on the test's
-fake clock (`test/features/tasks/ui/file_watcher_mixin_test.dart`).
+fake clock (`test/widgets/media/file_watcher_mixin_test.dart`).
 
 ## Platform-channel calls in widgets (e.g. HapticFeedback)
 
@@ -129,6 +222,22 @@ tearDown(() {
 ```
 
 (Example: `test/features/habits/ui/widgets/habit_completion_card_test.dart`, whose swipe / one-tap-complete paths await a haptic before persisting.)
+
+## `thenThrow` on a `Future`-returning mock does not reject the future
+
+Stubbing an async method with `thenThrow` (for example
+`when(() => db.getConfigFlag(any())).thenThrow(StateError('x'))`) leaves the
+awaited call completing normally in this Mocktail version, so a test that
+expects the failure path passes through the success path instead. Stub async
+failures with `thenAnswer((_) async => throw StateError('x'))`, which rejects
+the returned future the way production code does
+(`test/features/system_health/state/system_health_controller_test.dart`).
+
+## Semantics handles in widget tests
+
+Dispose a handle from `tester.ensureSemantics()` in a `try/finally` inside the
+test body. Flutter verifies that handles are released before `addTearDown`
+callbacks run, so registering only `addTearDown(handle.dispose)` is too late.
 
 ## Streams & async teardown
 
@@ -199,6 +308,9 @@ counter increment alone does not prove that a decoded cover reached the GPU.
 An empty `UnskinnedGeometry` with explicit local bounds also needs no GPU
 upload: `plaza_boxes_test.dart` uses it to verify shared geometry and material
 identity and the placement of scaled meshes under unscaled anchors.
+`plaza_architecture_test.dart` supplies the same GPU-free boxes to check
+architectural relief, sign clearance, bounded detail and the simplified skyline
+recipe. Native captures still verify window-skin depth and light falloff.
 
 ## Hover-divider tests: `test_utils/hover_divider_harness.dart`
 
@@ -438,6 +550,20 @@ behavior belongs in exactly one of these six suites; direct coverage for
 `WakeQueue`, `WakeRunner`, `WakeThrottleCoordinator`, `WakeSuppressionTracker`,
 and `ScheduledWakeManager` remains in each collaborator's mirrored test file.
 
+## Drift routes a query by the zone it is issued in
+
+`db.transaction(() async { ... })` runs its body in a zone, and drift sends any
+query issued from that zone — or from a Timer, stream callback or un-awaited
+future created inside it — to that transaction's executor. Once the closure
+returns and the transaction commits, such a query fails with `Bad state: This
+database or transaction runner has already been closed`. No mock reproduces
+this, so a regression test for it needs a real in-memory database: open
+`AgentDatabase(inMemoryDatabase: true, background: false)`, have the mocked
+repository methods issue genuine selects against it, and trigger the code under
+test from inside `db.transaction(...)`. The pattern is
+`test/features/agents/wake/scheduled_wake_manager_test.dart` ("requestCheck
+from inside an agent-database transaction zone").
+
 ## Mocktail global-state hygiene
 
 Mocktail stores argument matchers (`any`, `captureAny`) in **process-global**
@@ -457,6 +583,40 @@ survive the reset by design, and stubs live on mock instances, so
 `setUpAll`-created stubs keep working. If you see a stub or `verify` that
 matches in isolation but fails in a bundled run, suspect a matcher leak in a
 test that ran earlier in the bundle — or the mixin-default pitfall below.
+
+## GetIt and view state leak across files in a bundle too
+
+`getIt` and the test view (`physicalSize`, `devicePixelRatio`) are shared by
+every file the optimizer bundles into a shard, so a `setUp` that registers a
+service — including through `ensureThemingServicesRegistered()`, which adds
+`UpdateNotifications` and `SettingsDb` — must clear it again in `tearDown`
+(`await getIt.reset()` or the matching `unregister`), and a view resized in
+`setUp` goes back with `view.reset()`, never by writing a size you believe
+is the default. The symptom of a leak is a file that passes alone and fails
+in CI with `Type X is already registered inside GetIt` or a pixel-shifted
+layout, with the victim named and the culprit not.
+
+The other half of the defence is the victim's: a test whose assertion
+depends on layout width — a `DsTieredText` picking a tier, a `Wrap`
+folding, a `LayoutBuilder` branch — pins the view itself in its pump helper
+(`tester.view..physicalSize = Size(width, h)..devicePixelRatio = 1` with
+`addTearDown(tester.view.reset)`), rather than trusting the default it
+inherited from whatever ran before. A `MediaQueryData(size:)` override does
+not do this: layout measures the view, not the media query.
+
+To find the culprit, reproduce CI's order locally — the shard, the same
+`--test-randomize-ordering-seed` the job log prints, and the FVM SDK:
+
+```bash
+fvm dart run tool/ci/run_tests.dart --exclude-tags 'glados || performance || eval-live' \
+  --total-shards=10 --shard-index=7 --test-randomize-ordering-seed=0 --no-pub
+```
+
+Then bisect the files that ran before the victim with a hand-made bundle —
+a throwaway `test/.leak_bisect_test.dart` that imports a prefix of them as
+`c0…cN` plus the victim and calls each `main` inside a `group`, exactly as
+the optimizer does — halving the prefix until one file leaks against the
+victim on its own.
 
 ## Stubbing mixin-declared methods: mirror the production call shape
 
@@ -533,15 +693,34 @@ The `tags` argument is a passthrough to `package:test`'s `test()`. It works the 
 ### Why the tag matters for CI
 
 CI runs two parallel test lanes — a ten-shard standard matrix plus a Glados job — followed by a final Codecov status job gated on both:
-- **Unit & Widget Tests** — ten deterministic shards, excluding `glados` and `performance`.
+- **Unit & Widget Tests** — ten deterministic shards, excluding `glados`, `performance`, and opt-in `eval-live` suites.
 - **Glados Property Tests** — tagged property tests with separate coverage.
 - **Performance Budgets** — tagged stopwatch tests, scheduled weekly and available through workflow dispatch. Deterministic query-count gates stay in the standard lane.
 
-All lanes use `tool/ci/run_tests.dart`. It generates a sorted optimized bundle
+All lanes use `tool/ci/run_tests.dart`. Shard flags are consumed by this runner
+before Flutter starts. It assigns whole files greedily by source size, largest
+first, with path tie-breaks, then generates imports only for that shard. The
+assignment is deterministic for a checkout and every eligible file belongs to
+exactly one shard. Flutter receives no shard flags, avoiding double filtering.
+Source size is a balancing heuristic, not a prediction of test duration.
+
+The runner generates a sorted optimized bundle
 plus `test/.test_targets.json`. A suite with library metadata (`@Tags`,
 `@Timeout`, `@TestOn`, `@Skip`, and other annotations) runs as a standalone file
 so the test runner receives the original metadata. Opting out of optimization
 never opts out of execution. Both generated files are ignored by Git.
+For a shared timeout that does not require isolation, pass a common
+`Timeout` to each test (as in `database/labels_performance_test.dart`).
+Test-level timeouts survive both standalone and bundled execution without
+forcing another compilation.
+
+Before compilation, the runner omits suites whose literal library `@Tags`
+match a positive `--exclude-tags` disjunction (for example,
+`glados || performance || eval-live`). Other expressions and unknown metadata
+are left to Flutter. Include selectors never prune suites: an untagged library
+can still contain tagged tests. Mixed suites keep running, including the label
+query-count checks and the celebration rendering assertions. CI excludes live
+model evaluations in every lane; run those explicitly using their env gates.
 
 Codecov merges all ten standard shards and the Glados report; the final status
 job runs after all eleven uploads succeed. The performance lane does not upload
@@ -549,7 +728,12 @@ coverage. Every unit/property/performance job uploads its JSON event report and
 ordering seed even on failure, and summarizes failures, skips, incomplete tests,
 and durations measured from each test's start to completion. The timing tool is
 `test/tool/analyze_test_timings.dart`; concurrent completion gaps are not test
-durations.
+durations. The runner logs target-preparation time; the first standard shard
+also enables Dart and Flutter verbose timings to distinguish build hooks,
+compilation, execution, and coverage collection from suite-loading time.
+Native hook outputs and `flutter_scene`'s generated package assets are cached
+together, keyed by runner OS/architecture, `.fvmrc`, and both pubspec manifests.
+The hooks still validate dependencies and build inputs before reusing outputs.
 
 The weekly run shuffles test order using its recorded workflow run number as the
 seed. Workflow dispatch accepts a `seed` to reproduce the order; `0` keeps
@@ -558,7 +742,7 @@ declaration order. This changes test ordering, not Glados's generated inputs.
 ### Local commands
 
 Use targeted files during development. These broader targets are for explicitly
-requested suite runs:
+requested suite runs. These Make targets exclude opt-in live-model evaluations:
 
 ```bash
 make test_standard      # excludes glados and performance; resets coverage/
@@ -573,7 +757,7 @@ make test               # unit, widget and property tests; excludes performance
 To reproduce one standard CI shard without replacing an existing coverage report:
 
 ```bash
-fvm dart run tool/ci/run_tests.dart --exclude-tags 'glados || performance' \
+fvm dart run tool/ci/run_tests.dart --exclude-tags 'glados || performance || eval-live' \
   --total-shards=10 --shard-index=0 --test-randomize-ordering-seed=0 --no-pub
 ```
 

@@ -1629,6 +1629,12 @@ abstract class AppLocalizations {
   /// **'Archive: \"{title}\"'**
   String agentSummaryArchiveItem(Object title);
 
+  /// Review sentence for assigning a visible label to a task.
+  ///
+  /// In en, this message translates to:
+  /// **'Assign label: \"{label}\"'**
+  String agentSummaryAssignLabel(String label);
+
   /// No description provided for @agentSummaryCheckItem.
   ///
   /// In en, this message translates to:
@@ -2618,18 +2624,6 @@ abstract class AppLocalizations {
   /// **'AI summary'**
   String get aiCardTitle;
 
-  /// No description provided for @aiChatAssistantResponding.
-  ///
-  /// In en, this message translates to:
-  /// **'Assistant is responding'**
-  String get aiChatAssistantResponding;
-
-  /// No description provided for @aiChatMessageCopied.
-  ///
-  /// In en, this message translates to:
-  /// **'Copied to clipboard'**
-  String get aiChatMessageCopied;
-
   /// No description provided for @aiConfigFailedToLoadModelsGeneric.
   ///
   /// In en, this message translates to:
@@ -3164,108 +3158,6 @@ abstract class AppLocalizations {
   /// **'Delete model'**
   String get aiModelCardDeleteTooltip;
 
-  /// No description provided for @aiModelDownloadCloseButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Close'**
-  String get aiModelDownloadCloseButton;
-
-  /// No description provided for @aiModelDownloadDialogDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Lotti will download {modelName} into the MLX Audio cache and use it for local speech processing.'**
-  String aiModelDownloadDialogDescription(String modelName);
-
-  /// No description provided for @aiModelDownloadDialogTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Install {modelName}'**
-  String aiModelDownloadDialogTitle(String modelName);
-
-  /// No description provided for @aiModelDownloadInstallTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Install model'**
-  String get aiModelDownloadInstallTooltip;
-
-  /// No description provided for @aiModelDownloadOpenProgressTooltip.
-  ///
-  /// In en, this message translates to:
-  /// **'Show download progress'**
-  String get aiModelDownloadOpenProgressTooltip;
-
-  /// No description provided for @aiModelDownloadStatusChecking.
-  ///
-  /// In en, this message translates to:
-  /// **'Checking model status'**
-  String get aiModelDownloadStatusChecking;
-
-  /// No description provided for @aiModelDownloadStatusDownloading.
-  ///
-  /// In en, this message translates to:
-  /// **'Downloading {percent}%'**
-  String aiModelDownloadStatusDownloading(int percent);
-
-  /// No description provided for @aiModelDownloadStatusDownloadingIndeterminate.
-  ///
-  /// In en, this message translates to:
-  /// **'Downloading'**
-  String get aiModelDownloadStatusDownloadingIndeterminate;
-
-  /// No description provided for @aiModelDownloadStatusFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Download failed'**
-  String get aiModelDownloadStatusFailed;
-
-  /// No description provided for @aiModelDownloadStatusInstalled.
-  ///
-  /// In en, this message translates to:
-  /// **'Installed'**
-  String get aiModelDownloadStatusInstalled;
-
-  /// No description provided for @aiModelDownloadStatusNotInstalled.
-  ///
-  /// In en, this message translates to:
-  /// **'Not installed'**
-  String get aiModelDownloadStatusNotInstalled;
-
-  /// No description provided for @aiModelDownloadStatusUnsupported.
-  ///
-  /// In en, this message translates to:
-  /// **'Apple Silicon required'**
-  String get aiModelDownloadStatusUnsupported;
-
-  /// No description provided for @aiModelInstallChoiceCancelButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Cancel'**
-  String get aiModelInstallChoiceCancelButton;
-
-  /// No description provided for @aiModelInstallChoiceDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Pick the local speech-to-text model to download first. You can install the others later from the model list.'**
-  String get aiModelInstallChoiceDescription;
-
-  /// No description provided for @aiModelInstallChoiceInstallButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Install model'**
-  String get aiModelInstallChoiceInstallButton;
-
-  /// No description provided for @aiModelInstallChoiceRecommended.
-  ///
-  /// In en, this message translates to:
-  /// **'Recommended'**
-  String get aiModelInstallChoiceRecommended;
-
-  /// No description provided for @aiModelInstallChoiceTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Choose MLX Audio model'**
-  String get aiModelInstallChoiceTitle;
-
   /// No description provided for @aiModelPickerByProviderLabel.
   ///
   /// In en, this message translates to:
@@ -3710,12 +3602,6 @@ abstract class AppLocalizations {
   /// **'Not set'**
   String get aiProviderDetailValueUnset;
 
-  /// No description provided for @aiProviderEmbeddedRuntimeHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Runs embedded in the Apple app process. No local server or Base URL is required.'**
-  String get aiProviderEmbeddedRuntimeHint;
-
   /// No description provided for @aiProviderGeminiName.
   ///
   /// In en, this message translates to:
@@ -3739,12 +3625,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Mistral'**
   String get aiProviderMistralName;
-
-  /// No description provided for @aiProviderMlxAudioName.
-  ///
-  /// In en, this message translates to:
-  /// **'MLX Audio (local)'**
-  String get aiProviderMlxAudioName;
 
   /// No description provided for @aiProviderNebiusAiStudioName.
   ///
@@ -3776,6 +3656,12 @@ abstract class AppLocalizations {
   /// **'OpenRouter'**
   String get aiProviderOpenRouterName;
 
+  /// No description provided for @aiProviderSherpaName.
+  ///
+  /// In en, this message translates to:
+  /// **'sherpa-onnx (on device)'**
+  String get aiProviderSherpaName;
+
   /// No description provided for @aiProviderTaglineAlibaba.
   ///
   /// In en, this message translates to:
@@ -3799,12 +3685,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'EU-hosted · dynamic catalog · eco routing'**
   String get aiProviderTaglineMelious;
-
-  /// No description provided for @aiProviderTaglineMlxAudio.
-  ///
-  /// In en, this message translates to:
-  /// **'Embedded · Apple Silicon · local audio'**
-  String get aiProviderTaglineMlxAudio;
 
   /// No description provided for @aiProviderTaglineOllama.
   ///
@@ -3974,6 +3854,12 @@ abstract class AppLocalizations {
   /// **'Providers'**
   String get aiSettingsCounterProviders;
 
+  /// No description provided for @aiSettingsDefaultProfileDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Fallback for agents without a configured inference route on this device.'**
+  String get aiSettingsDefaultProfileDescription;
+
   /// No description provided for @aiSettingsEmptyDescription.
   ///
   /// In en, this message translates to:
@@ -4039,6 +3925,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Vision'**
   String get aiSettingsModalityVision;
+
+  /// No description provided for @aiSettingsNoDefaultProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'No default profile'**
+  String get aiSettingsNoDefaultProfile;
 
   /// No description provided for @aiSettingsNoModelsConfigured.
   ///
@@ -4585,6 +4477,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Stop'**
   String get audioRecordingStop;
+
+  /// No description provided for @avatarCropHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to move · pinch to zoom'**
+  String get avatarCropHint;
+
+  /// No description provided for @avatarCropPreviewLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'How it will look on the list'**
+  String get avatarCropPreviewLabel;
+
+  /// No description provided for @avatarCropTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the face'**
+  String get avatarCropTitle;
+
+  /// No description provided for @avatarCropUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Use photo'**
+  String get avatarCropUse;
 
   /// No description provided for @backfillAdvancedRecoveryActions.
   ///
@@ -5276,17 +5192,59 @@ abstract class AppLocalizations {
   /// **'The recording was captured, but transcribing it failed. Please try again.'**
   String get chatInputTranscriptionFailed;
 
+  /// No description provided for @checkInAddMoreButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Add more'**
+  String get checkInAddMoreButton;
+
+  /// No description provided for @checkInAudioSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'{length} of audio saved'**
+  String checkInAudioSaved(String length);
+
+  /// No description provided for @checkInAudioSavedAsYouGo.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio saved to this device as you go'**
+  String get checkInAudioSavedAsYouGo;
+
+  /// No description provided for @checkInAudioSavedRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'{length} of audio saved · {route}'**
+  String checkInAudioSavedRoute(String length, String route);
+
   /// No description provided for @checkInAvoidLabel.
   ///
   /// In en, this message translates to:
   /// **'Better to avoid'**
   String get checkInAvoidLabel;
 
-  /// No description provided for @checkInDateLabel.
+  /// No description provided for @checkInComposerSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'When?'**
-  String get checkInDateLabel;
+  /// **'with {name} · last spoke {day}'**
+  String checkInComposerSubtitle(String name, String day);
+
+  /// No description provided for @checkInComposerSubtitleNoContact.
+  ///
+  /// In en, this message translates to:
+  /// **'with {name} · no check-in yet'**
+  String checkInComposerSubtitleNoContact(String name);
+
+  /// The composer header's status line when only the person fits: the name is never shed.
+  ///
+  /// In en, this message translates to:
+  /// **'with {name}'**
+  String checkInComposerWithName(String name);
+
+  /// No description provided for @checkInContextSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{type} · {time} · {duration}'**
+  String checkInContextSummary(String type, String time, String duration);
 
   /// No description provided for @checkInDeleteConfirmMessage.
   ///
@@ -5294,11 +5252,71 @@ abstract class AppLocalizations {
   /// **'Delete this check-in? This cannot be undone.'**
   String get checkInDeleteConfirmMessage;
 
-  /// Relationships redesign label.
+  /// No description provided for @checkInDictateButton.
   ///
   /// In en, this message translates to:
-  /// **'Done'**
-  String get checkInDone;
+  /// **'Dictate'**
+  String get checkInDictateButton;
+
+  /// The discard confirmation while a saved recording exists: the check-in goes, the audio stays in the journal.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard this check-in? The recording stays in the journal.'**
+  String get checkInDiscardDraftAudioKeptMessage;
+
+  /// No description provided for @checkInDiscardDraftMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard this check-in? Nothing has been saved.'**
+  String get checkInDiscardDraftMessage;
+
+  /// No description provided for @checkInDiscardDraftRecordingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard this check-in and the recording? The recording will be deleted.'**
+  String get checkInDiscardDraftRecordingMessage;
+
+  /// No description provided for @checkInDiscardRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get checkInDiscardRecording;
+
+  /// Body of the confirmation before discarding a check-in recording: the audio is deleted, the composer stays open.
+  ///
+  /// In en, this message translates to:
+  /// **'The audio is deleted. Your check-in stays open.'**
+  String get checkInDiscardRecordingBody;
+
+  /// No description provided for @checkInDismissButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get checkInDismissButton;
+
+  /// No description provided for @checkInDurationChip.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get checkInDurationChip;
+
+  /// No description provided for @checkInDurationChipSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration: {duration}. Change'**
+  String checkInDurationChipSemantics(String duration);
+
+  /// No description provided for @checkInDurationQuickPickHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a length to save it, or spin the wheel.'**
+  String get checkInDurationQuickPickHint;
+
+  /// No description provided for @checkInDurationSemanticsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Set duration to {label}'**
+  String checkInDurationSemanticsLabel(String label);
 
   /// No description provided for @checkInEditTitle.
   ///
@@ -5317,18 +5335,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not delete the check-in. Please try again.'**
   String get checkInErrorDeleteFailed;
-
-  /// Relationships redesign label.
-  ///
-  /// In en, this message translates to:
-  /// **'How did it feel?'**
-  String get checkInHowDidItFeel;
-
-  /// Relationships redesign label.
-  ///
-  /// In en, this message translates to:
-  /// **'How did you connect?'**
-  String get checkInHowDidYouConnect;
 
   /// No description provided for @checkInInteractionCall.
   ///
@@ -5366,11 +5372,77 @@ abstract class AppLocalizations {
   /// **'Video call'**
   String get checkInInteractionVideoCall;
 
-  /// No description provided for @checkInNarrativeLabel.
+  /// No description provided for @checkInMicrophoneDeniedBody.
   ///
   /// In en, this message translates to:
-  /// **'What did you talk about?'**
-  String get checkInNarrativeLabel;
+  /// **'Turn it on for Lotti in system settings, then tap Dictate. Nothing was recorded.'**
+  String get checkInMicrophoneDeniedBody;
+
+  /// The refused-microphone card's title: the next step, since the header status already says the microphone is unavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow microphone access'**
+  String get checkInMicrophoneDeniedCalloutTitle;
+
+  /// Folded More row caption segment while no feeling is chosen.
+  ///
+  /// In en, this message translates to:
+  /// **'Feeling'**
+  String get checkInMoreCaptionFeeling;
+
+  /// Folded More row caption segment while nothing is noted for next time.
+  ///
+  /// In en, this message translates to:
+  /// **'next time'**
+  String get checkInMoreCaptionNextTime;
+
+  /// Folded More row caption segment once something is noted for next time.
+  ///
+  /// In en, this message translates to:
+  /// **'next time noted'**
+  String get checkInMoreCaptionNextTimeSet;
+
+  /// Folded More row caption segment while no topics are entered.
+  ///
+  /// In en, this message translates to:
+  /// **'topics'**
+  String get checkInMoreCaptionTopics;
+
+  /// Folded More row caption segment: how many topics are entered.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 topic} other{{count} topics}}'**
+  String checkInMoreCaptionTopicsCount(int count);
+
+  /// No description provided for @checkInMoreSection.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get checkInMoreSection;
+
+  /// No description provided for @checkInNarrativeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What did you talk about? One line is enough.'**
+  String get checkInNarrativeHint;
+
+  /// No description provided for @checkInNoDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'No duration'**
+  String get checkInNoDuration;
+
+  /// No description provided for @checkInOpenSettingsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get checkInOpenSettingsButton;
+
+  /// No description provided for @checkInOrTypeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Or type it here…'**
+  String get checkInOrTypeHint;
 
   /// No description provided for @checkInPayAttentionLabel.
   ///
@@ -5378,11 +5450,107 @@ abstract class AppLocalizations {
   /// **'Next time, pay attention to'**
   String get checkInPayAttentionLabel;
 
-  /// No description provided for @checkInPreparedOverline.
+  /// No description provided for @checkInPreparingLabel.
   ///
   /// In en, this message translates to:
-  /// **'✦ LOTTI · PREPARED THIS MORNING'**
-  String get checkInPreparedOverline;
+  /// **'Preparing audio…'**
+  String get checkInPreparingLabel;
+
+  /// No description provided for @checkInRecorderBusyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop it from the recording indicator first, then try again. Nothing new was recorded.'**
+  String get checkInRecorderBusyBody;
+
+  /// No description provided for @checkInRecorderBusyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A recording is already running'**
+  String get checkInRecorderBusyTitle;
+
+  /// No description provided for @checkInRecordingFailedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The microphone could not be started. Try again, or type the check-in. Nothing was recorded.'**
+  String get checkInRecordingFailedBody;
+
+  /// No description provided for @checkInRecordingFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording didn\'t start'**
+  String get checkInRecordingFailedTitle;
+
+  /// No description provided for @checkInRecordingHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Speak normally. Words appear here when you stop.'**
+  String get checkInRecordingHint;
+
+  /// No description provided for @checkInRecordingNotSavedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The recording could not be saved. Try again, or type the check-in.'**
+  String get checkInRecordingNotSavedBody;
+
+  /// No description provided for @checkInRecordingNotSavedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording couldn\'t be saved'**
+  String get checkInRecordingNotSavedTitle;
+
+  /// No description provided for @checkInReRecordButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Re-record'**
+  String get checkInReRecordButton;
+
+  /// Confirmation before Re-record when the transcript has been edited since it landed.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace your edited words with a new take?'**
+  String get checkInReRecordReplaceMessage;
+
+  /// No description provided for @checkInSaveBlockedEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a few words to save'**
+  String get checkInSaveBlockedEmpty;
+
+  /// No description provided for @checkInSaveBlockedRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop recording to save'**
+  String get checkInSaveBlockedRecording;
+
+  /// No description provided for @checkInSaveBlockedRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Type or retry to save'**
+  String get checkInSaveBlockedRetry;
+
+  /// No description provided for @checkInSaveBlockedTranscribing.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for the transcript'**
+  String get checkInSaveBlockedTranscribing;
+
+  /// No description provided for @checkInSaveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save check-in'**
+  String get checkInSaveButton;
+
+  /// No description provided for @checkInSaveShortButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get checkInSaveShortButton;
+
+  /// No description provided for @checkInSaveShortcutHint.
+  ///
+  /// In en, this message translates to:
+  /// **'{shortcut} to save'**
+  String checkInSaveShortcutHint(String shortcut);
 
   /// No description provided for @checkInSentimentDelightful.
   ///
@@ -5414,17 +5582,107 @@ abstract class AppLocalizations {
   /// **'Neutral'**
   String get checkInSentimentNeutral;
 
+  /// No description provided for @checkInSentimentOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional. Never filled in by the agent.'**
+  String get checkInSentimentOptional;
+
   /// No description provided for @checkInSentimentStrained.
   ///
   /// In en, this message translates to:
   /// **'Strained'**
   String get checkInSentimentStrained;
 
+  /// No description provided for @checkInSourceCall.
+  ///
+  /// In en, this message translates to:
+  /// **'From the call you placed from this page. Everything is editable.'**
+  String get checkInSourceCall;
+
+  /// No description provided for @checkInSourceMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'From the message you sent from this page. Everything is editable.'**
+  String get checkInSourceMessage;
+
   /// Button on the check-in sheet that records a spoken check-in and prefills the narrative with its transcript.
   ///
   /// In en, this message translates to:
   /// **'Speak check-in'**
   String get checkInSpeakButton;
+
+  /// Minutes of a recording length, read by assistive technology.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 minute} other{{count} minutes}}'**
+  String checkInSpokenMinutes(int count);
+
+  /// Seconds of a recording length, read by assistive technology.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 second} other{{count} seconds}}'**
+  String checkInSpokenSeconds(int count);
+
+  /// No description provided for @checkInStartedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Started'**
+  String get checkInStartedLabel;
+
+  /// No description provided for @checkInStatusMicrophoneDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Microphone unavailable'**
+  String get checkInStatusMicrophoneDenied;
+
+  /// No description provided for @checkInStatusPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'Paused'**
+  String get checkInStatusPaused;
+
+  /// No description provided for @checkInStatusRecorderBusy.
+  ///
+  /// In en, this message translates to:
+  /// **'Recorder busy'**
+  String get checkInStatusRecorderBusy;
+
+  /// No description provided for @checkInStatusRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording'**
+  String get checkInStatusRecording;
+
+  /// No description provided for @checkInStatusRecordingFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording didn\'t start'**
+  String get checkInStatusRecordingFailed;
+
+  /// No description provided for @checkInStatusRecordingNotSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording not saved'**
+  String get checkInStatusRecordingNotSaved;
+
+  /// No description provided for @checkInStatusTranscriptionUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No transcription model'**
+  String get checkInStatusTranscriptionUnavailable;
+
+  /// No description provided for @checkInStatusTranscriptMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Transcript not received'**
+  String get checkInStatusTranscriptMissing;
+
+  /// No description provided for @checkInTimeChipSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Started: {time}. Change'**
+  String checkInTimeChipSemantics(String time);
 
   /// No description provided for @checkInTopicsHint.
   ///
@@ -5438,29 +5696,65 @@ abstract class AppLocalizations {
   /// **'Topics'**
   String get checkInTopicsLabel;
 
+  /// The last, first-shed tier of the transcribing caption: a time expectation for the wait.
+  ///
+  /// In en, this message translates to:
+  /// **'usually under a minute'**
+  String get checkInTranscribingEta;
+
   /// Progress label shown on the check-in sheet while a spoken check-in is being transcribed.
   ///
   /// In en, this message translates to:
   /// **'Transcribing…'**
   String get checkInTranscribingLabel;
 
-  /// Message shown when a spoken check-in produced no transcript and the user has to type the narrative.
+  /// No description provided for @checkInTranscriptAdded.
   ///
   /// In en, this message translates to:
-  /// **'No transcript came back. You can type it instead.'**
-  String get checkInTranscriptFailed;
+  /// **'Transcript added'**
+  String get checkInTranscriptAdded;
+
+  /// No description provided for @checkInTranscriptionUnavailableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No transcription model set up'**
+  String get checkInTranscriptionUnavailableTitle;
+
+  /// No description provided for @checkInTranscriptMissingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your {length} recording is saved in the journal, even if you cancel this check-in. Try again in a moment.'**
+  String checkInTranscriptMissingBody(String length);
+
+  /// The transcript-not-received card's title: the next step, since the header status already names the state.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again, or type it'**
+  String get checkInTranscriptMissingCalloutTitle;
 
   /// Shown when a spoken check-in cannot run at all because no transcription is configured for the person or their category.
   ///
   /// In en, this message translates to:
-  /// **'Transcription is not set up for this person. Add an audio model and turn on automatic inference for their category, or type the check-in.'**
+  /// **'Choose a default inference profile with a transcription model in AI settings, or write your check-in.'**
   String get checkInTranscriptUnavailable;
 
-  /// Relationships redesign label.
+  /// No description provided for @checkInTypeChipSemantics.
   ///
   /// In en, this message translates to:
-  /// **'Write instead'**
-  String get checkInWriteInstead;
+  /// **'Interaction: {type}. Change'**
+  String checkInTypeChipSemantics(String type);
+
+  /// No description provided for @checkInTypeInstead.
+  ///
+  /// In en, this message translates to:
+  /// **'Type instead'**
+  String get checkInTypeInstead;
+
+  /// No description provided for @checkInWordCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 word} other{{count} words}}'**
+  String checkInWordCount(int count);
 
   /// No description provided for @checklistAddItem.
   ///
@@ -5729,7 +6023,7 @@ abstract class AppLocalizations {
   /// No description provided for @configFlagEnableAiSummaryTtsDescription.
   ///
   /// In en, this message translates to:
-  /// **'Show the local text-to-speech button on task AI summaries. Requires an installed MLX Audio TTS model.'**
+  /// **'Show the local text-to-speech button on task AI summaries. Requires an installed Supertonic TTS model.'**
   String get configFlagEnableAiSummaryTtsDescription;
 
   /// No description provided for @configFlagEnableDailyOs.
@@ -5845,6 +6139,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show project management features for organizing tasks into projects.'**
   String get configFlagEnableProjectsDescription;
+
+  /// No description provided for @configFlagEnableQueryChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Experimental task chat'**
+  String get configFlagEnableQueryChat;
+
+  /// No description provided for @configFlagEnableQueryChatDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Show chat for tasks, projects and categories. Disabled by default.'**
+  String get configFlagEnableQueryChatDescription;
 
   /// No description provided for @configFlagEnableRelationships.
   ///
@@ -9985,6 +10291,12 @@ abstract class AppLocalizations {
   /// **'With helper text'**
   String get designSystemTextareaWithHelperLabel;
 
+  /// No description provided for @designSystemTieredTextTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tiered text at three widths'**
+  String get designSystemTieredTextTitle;
+
   /// No description provided for @designSystemTimePickerFormatsTitle.
   ///
   /// In en, this message translates to:
@@ -13118,6 +13430,18 @@ abstract class AppLocalizations {
   /// **'Can be chosen for new entries when on'**
   String get inactiveSwitchDescription;
 
+  /// No description provided for @inferenceProfileChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat model'**
+  String get inferenceProfileChat;
+
+  /// No description provided for @inferenceProfileChatUsesThinking.
+  ///
+  /// In en, this message translates to:
+  /// **'Uses thinking model when unset'**
+  String get inferenceProfileChatUsesThinking;
+
   /// No description provided for @inferenceProfileChooseModelTitle.
   ///
   /// In en, this message translates to:
@@ -16101,12 +16425,6 @@ abstract class AppLocalizations {
   /// **'Manual'**
   String get navSidebarManualLabel;
 
-  /// No description provided for @navTabMoreSemanticsLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{More, 1 additional destination} other{More, {count} additional destinations}}'**
-  String navTabMoreSemanticsLabel(int count);
-
   /// No description provided for @navTabTitleCalendar.
   ///
   /// In en, this message translates to:
@@ -16143,11 +16461,11 @@ abstract class AppLocalizations {
   /// **'Logbook'**
   String get navTabTitleJournal;
 
-  /// No description provided for @navTabTitleMore.
+  /// No description provided for @navTabTitleNavigate.
   ///
   /// In en, this message translates to:
-  /// **'More'**
-  String get navTabTitleMore;
+  /// **'Navigate'**
+  String get navTabTitleNavigate;
 
   /// No description provided for @navTabTitlePeople.
   ///
@@ -17199,6 +17517,252 @@ abstract class AppLocalizations {
   /// **'Very slightly or not at all'**
   String get panasScaleVerySlightlyOrNotAtAll;
 
+  /// No description provided for @plazaBlockedReason.
+  ///
+  /// In en, this message translates to:
+  /// **'blocked — needs a decision'**
+  String get plazaBlockedReason;
+
+  /// No description provided for @plazaCategoryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'This category has no visible projects.'**
+  String get plazaCategoryEmpty;
+
+  /// No description provided for @plazaClosedForNight.
+  ///
+  /// In en, this message translates to:
+  /// **'CLOSED FOR THE NIGHT'**
+  String get plazaClosedForNight;
+
+  /// No description provided for @plazaCloseHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Esc to close'**
+  String get plazaCloseHint;
+
+  /// No description provided for @plazaControls.
+  ///
+  /// In en, this message translates to:
+  /// **'WASD walk · hold Shift: 8× speed · drag to look · Tab next beacon · H home · M overview · / search · T toolbar · Esc dismiss · ⌘[ back'**
+  String get plazaControls;
+
+  /// No description provided for @plazaCornerAfter.
+  ///
+  /// In en, this message translates to:
+  /// **'Corner after {week}'**
+  String plazaCornerAfter(String week);
+
+  /// No description provided for @plazaDebug.
+  ///
+  /// In en, this message translates to:
+  /// **'Debug'**
+  String get plazaDebug;
+
+  /// No description provided for @plazaDecisionStrip.
+  ///
+  /// In en, this message translates to:
+  /// **'NEEDS A DECISION'**
+  String get plazaDecisionStrip;
+
+  /// No description provided for @plazaDoneCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{done} of {total} done'**
+  String plazaDoneCount(int done, int total);
+
+  /// No description provided for @plazaDueOn.
+  ///
+  /// In en, this message translates to:
+  /// **'due {date}'**
+  String plazaDueOn(String date);
+
+  /// No description provided for @plazaDueSoonReason.
+  ///
+  /// In en, this message translates to:
+  /// **'due {date} — finish it'**
+  String plazaDueSoonReason(String date);
+
+  /// No description provided for @plazaEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a task to start building this project’s plaza.'**
+  String get plazaEmpty;
+
+  /// No description provided for @plazaEnterProject.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter project'**
+  String get plazaEnterProject;
+
+  /// No description provided for @plazaExploreCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore category'**
+  String get plazaExploreCategory;
+
+  /// No description provided for @plazaExploreProject.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore project'**
+  String get plazaExploreProject;
+
+  /// No description provided for @plazaFlyThere.
+  ///
+  /// In en, this message translates to:
+  /// **'Fly there ›'**
+  String get plazaFlyThere;
+
+  /// No description provided for @plazaInProgressCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} in progress'**
+  String plazaInProgressCount(int count);
+
+  /// No description provided for @plazaLinks.
+  ///
+  /// In en, this message translates to:
+  /// **'links {count}'**
+  String plazaLinks(int count);
+
+  /// Checkbox label for showing meerkat characters in Plaza.
+  ///
+  /// In en, this message translates to:
+  /// **'Meerkats'**
+  String get plazaMeerkats;
+
+  /// No description provided for @plazaMorningWalk.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning walk'**
+  String get plazaMorningWalk;
+
+  /// No description provided for @plazaNeedsAttention.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} need attention'**
+  String plazaNeedsAttention(int count);
+
+  /// No description provided for @plazaOpeningSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'OPENING SOON'**
+  String get plazaOpeningSoon;
+
+  /// No description provided for @plazaOpenLate.
+  ///
+  /// In en, this message translates to:
+  /// **'OPEN LATE'**
+  String get plazaOpenLate;
+
+  /// No description provided for @plazaOverdueSince.
+  ///
+  /// In en, this message translates to:
+  /// **'overdue since {date} — finish or move it'**
+  String plazaOverdueSince(String date);
+
+  /// No description provided for @plazaOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get plazaOverview;
+
+  /// No description provided for @plazaPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'Paused'**
+  String get plazaPaused;
+
+  /// No description provided for @plazaProjectOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue tasks: {count}'**
+  String plazaProjectOverdue(int count);
+
+  /// No description provided for @plazaSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search tasks, Enter to fly'**
+  String get plazaSearchHint;
+
+  /// No description provided for @plazaShowPenguins.
+  ///
+  /// In en, this message translates to:
+  /// **'Penguins'**
+  String get plazaShowPenguins;
+
+  /// Segment label for the daylight sky in the Plaza world.
+  ///
+  /// In en, this message translates to:
+  /// **'Day'**
+  String get plazaSkyDay;
+
+  /// Segment label for the night sky in the Plaza world.
+  ///
+  /// In en, this message translates to:
+  /// **'Night'**
+  String get plazaSkyNight;
+
+  /// No description provided for @plazaStaleReason.
+  ///
+  /// In en, this message translates to:
+  /// **'quiet for {days} days — pick it back up'**
+  String plazaStaleReason(int days);
+
+  /// No description provided for @plazaStats.
+  ///
+  /// In en, this message translates to:
+  /// **'{tasks} tasks · {weeks} weeks · {attention} need attention'**
+  String plazaStats(int tasks, int weeks, int attention);
+
+  /// No description provided for @plazaTaskCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Tasks: {count}'**
+  String plazaTaskCount(int count);
+
+  /// No description provided for @plazaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Plaza'**
+  String get plazaTitle;
+
+  /// Tooltip on the Plaza top bar's toolbar button, which shows and hides the toolbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Show / hide toolbar'**
+  String get plazaToggleToolbar;
+
+  /// No description provided for @plazaToLet.
+  ///
+  /// In en, this message translates to:
+  /// **'TO LET'**
+  String get plazaToLet;
+
+  /// No description provided for @plazaTourControls.
+  ///
+  /// In en, this message translates to:
+  /// **'Space: pause · move to exit'**
+  String get plazaTourControls;
+
+  /// No description provided for @plazaUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This device cannot display the 3D world.'**
+  String get plazaUnavailable;
+
+  /// No description provided for @plazaWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'W{week} · {date}'**
+  String plazaWeek(int week, String date);
+
+  /// No description provided for @plazaWeekShort.
+  ///
+  /// In en, this message translates to:
+  /// **'W{week}'**
+  String plazaWeekShort(int week);
+
   /// No description provided for @privateLabel.
   ///
   /// In en, this message translates to:
@@ -18189,6 +18753,696 @@ abstract class AppLocalizations {
   /// **'Devices'**
   String get provisionedSyncTitle;
 
+  /// No description provided for @queryActionsAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get queryActionsAccept;
+
+  /// No description provided for @queryActionsDismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get queryActionsDismiss;
+
+  /// No description provided for @queryActionsIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Some changes could not be applied. Applied changes will not be repeated when you retry.'**
+  String get queryActionsIncomplete;
+
+  /// No description provided for @queryActionsReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Proposed changes'**
+  String get queryActionsReview;
+
+  /// Identifies the existing target of an inline chat action.
+  ///
+  /// In en, this message translates to:
+  /// **'For: {target}'**
+  String queryActionsTarget(String target);
+
+  /// No description provided for @queryAllSources.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get queryAllSources;
+
+  /// No description provided for @queryArchiveChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive chat'**
+  String get queryArchiveChat;
+
+  /// No description provided for @queryArchiveConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat archived. Its conclusions remain available.'**
+  String get queryArchiveConfirmation;
+
+  /// No description provided for @queryArchivedChats.
+  ///
+  /// In en, this message translates to:
+  /// **'Archived chats'**
+  String get queryArchivedChats;
+
+  /// No description provided for @queryArchivedReadOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'This chat is archived. Restore it to continue the conversation.'**
+  String get queryArchivedReadOnly;
+
+  /// No description provided for @queryAsk.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask'**
+  String get queryAsk;
+
+  /// No description provided for @queryAskCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask about this category'**
+  String get queryAskCategory;
+
+  /// No description provided for @queryAskProject.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask about this project'**
+  String get queryAskProject;
+
+  /// No description provided for @queryAskTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask about this task'**
+  String get queryAskTask;
+
+  /// No description provided for @queryAudioFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio could not be prepared or played. Try again.'**
+  String get queryAudioFailed;
+
+  /// Play the original recording between these timestamps
+  ///
+  /// In en, this message translates to:
+  /// **'Listen · {start}–{end}'**
+  String queryAudioListen(String start, String end);
+
+  /// No description provided for @queryAudioMissingFile.
+  ///
+  /// In en, this message translates to:
+  /// **'The recording isn’t available on this device yet.'**
+  String get queryAudioMissingFile;
+
+  /// No description provided for @queryAudioNoMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'This quote could not be matched unambiguously to the recording. You can still open the full entry.'**
+  String get queryAudioNoMatch;
+
+  /// No description provided for @queryAudioOpenRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Open recording'**
+  String get queryAudioOpenRecording;
+
+  /// The fixed excerpt interval being played, not elapsed playback progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Playing {start}–{end}'**
+  String queryAudioPlaying(String start, String end);
+
+  /// No description provided for @queryAudioPrepare.
+  ///
+  /// In en, this message translates to:
+  /// **'Prepare audio excerpt'**
+  String get queryAudioPrepare;
+
+  /// No description provided for @queryAudioPreparing.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing audio…'**
+  String get queryAudioPreparing;
+
+  /// No description provided for @queryAudioReadAloud.
+  ///
+  /// In en, this message translates to:
+  /// **'Read answer aloud'**
+  String get queryAudioReadAloud;
+
+  /// No description provided for @queryAudioReading.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading answer aloud'**
+  String get queryAudioReading;
+
+  /// No description provided for @queryAudioRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry audio'**
+  String get queryAudioRetry;
+
+  /// No description provided for @queryAudioSetupDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Setup details'**
+  String get queryAudioSetupDetails;
+
+  /// No description provided for @queryAudioSetupRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio excerpts need a compatible transcription model.'**
+  String get queryAudioSetupRequired;
+
+  /// No description provided for @queryAudioStale.
+  ///
+  /// In en, this message translates to:
+  /// **'The recording has changed. Prepare the timestamps again.'**
+  String get queryAudioStale;
+
+  /// No description provided for @queryAudioStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop audio'**
+  String get queryAudioStop;
+
+  /// No description provided for @queryAudioTimingUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'To prepare excerpts, select Melious Whisper or a supported Mistral Voxtral transcription model in this agent’s inference profile. The provider URL must use HTTPS.'**
+  String get queryAudioTimingUnavailable;
+
+  /// No description provided for @queryAudioTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing timestamps supports recordings up to 25 MB. Choose a smaller recording.'**
+  String get queryAudioTooLarge;
+
+  /// No description provided for @queryAudioUploadNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing timestamps sends this recording to the transcription provider configured for this agent.'**
+  String get queryAudioUploadNotice;
+
+  /// No description provided for @queryCategoryAgent.
+  ///
+  /// In en, this message translates to:
+  /// **'Category agent'**
+  String get queryCategoryAgent;
+
+  /// No description provided for @queryChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat'**
+  String get queryChat;
+
+  /// No description provided for @queryChats.
+  ///
+  /// In en, this message translates to:
+  /// **'Chats'**
+  String get queryChats;
+
+  /// No description provided for @queryChecked.
+  ///
+  /// In en, this message translates to:
+  /// **'Sources checked: {count}'**
+  String queryChecked(int count);
+
+  /// No description provided for @queryCloseChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Close chat'**
+  String get queryCloseChat;
+
+  /// No description provided for @queryCollapseChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse chat'**
+  String get queryCollapseChat;
+
+  /// No description provided for @queryCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied'**
+  String get queryCopied;
+
+  /// No description provided for @queryCopyQuote.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy quote'**
+  String get queryCopyQuote;
+
+  /// No description provided for @queryCoverage.
+  ///
+  /// In en, this message translates to:
+  /// **'What was searched'**
+  String get queryCoverage;
+
+  /// No description provided for @queryCoverageCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'This category'**
+  String get queryCoverageCategory;
+
+  /// No description provided for @queryCoverageExcluded.
+  ///
+  /// In en, this message translates to:
+  /// **'Other categories were not searched.'**
+  String get queryCoverageExcluded;
+
+  /// No description provided for @queryCoverageUnreadable.
+  ///
+  /// In en, this message translates to:
+  /// **'No searchable text when this answer was written. Open the recording to inspect it.'**
+  String get queryCoverageUnreadable;
+
+  /// No description provided for @queryCoverageWider.
+  ///
+  /// In en, this message translates to:
+  /// **'Other entries in this category'**
+  String get queryCoverageWider;
+
+  /// No description provided for @queryDeleteChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete chat'**
+  String get queryDeleteChat;
+
+  /// No description provided for @queryDeleteExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this conversation? Choose what happens to its shared conclusions. Source entries are unaffected.'**
+  String get queryDeleteExplanation;
+
+  /// No description provided for @queryDeleteForget.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete and forget conclusions'**
+  String get queryDeleteForget;
+
+  /// No description provided for @queryDeleteKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete and keep conclusions'**
+  String get queryDeleteKeep;
+
+  /// No description provided for @queryDictated.
+  ///
+  /// In en, this message translates to:
+  /// **'You can edit the transcript before sending your question. Audio may already have been sent to your transcription provider.'**
+  String get queryDictated;
+
+  /// No description provided for @queryDraftProvisional.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft · not yet verified'**
+  String get queryDraftProvisional;
+
+  /// No description provided for @queryDraftRetracted.
+  ///
+  /// In en, this message translates to:
+  /// **'The draft answer could not be verified. Try again.'**
+  String get queryDraftRetracted;
+
+  /// No description provided for @queryEarlierTextOmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'[Earlier text not shown]'**
+  String get queryEarlierTextOmitted;
+
+  /// No description provided for @queryEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask about decisions and earlier work. Answers distinguish summaries from exact passages.'**
+  String get queryEmptyBody;
+
+  /// No description provided for @queryExactStoredText.
+  ///
+  /// In en, this message translates to:
+  /// **'Exact stored text'**
+  String get queryExactStoredText;
+
+  /// No description provided for @queryExactText.
+  ///
+  /// In en, this message translates to:
+  /// **'Show exact text'**
+  String get queryExactText;
+
+  /// No description provided for @queryExampleDecision.
+  ///
+  /// In en, this message translates to:
+  /// **'What did we agree on?'**
+  String get queryExampleDecision;
+
+  /// No description provided for @queryExampleMeeting.
+  ///
+  /// In en, this message translates to:
+  /// **'In which meeting did we discuss this?'**
+  String get queryExampleMeeting;
+
+  /// No description provided for @queryExampleSuggestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Was that a decision or a suggestion?'**
+  String get queryExampleSuggestion;
+
+  /// No description provided for @queryExpandChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Expand chat'**
+  String get queryExpandChat;
+
+  /// No description provided for @queryExpanding.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking other entries in this category…'**
+  String get queryExpanding;
+
+  /// No description provided for @queryFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The search could not finish. Try again.'**
+  String get queryFailed;
+
+  /// No description provided for @queryForgetConclusions.
+  ///
+  /// In en, this message translates to:
+  /// **'Forget conclusions'**
+  String get queryForgetConclusions;
+
+  /// No description provided for @queryHideExactText.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide exact text'**
+  String get queryHideExactText;
+
+  /// No description provided for @queryHideSurrounding.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide surrounding text'**
+  String get queryHideSurrounding;
+
+  /// No description provided for @queryHomeOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Home scope only'**
+  String get queryHomeOnly;
+
+  /// No description provided for @queryHomeScope.
+  ///
+  /// In en, this message translates to:
+  /// **'Home scope'**
+  String get queryHomeScope;
+
+  /// No description provided for @queryIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Coverage is incomplete. Missing evidence does not mean the discussion never happened.'**
+  String get queryIncomplete;
+
+  /// No description provided for @queryIncompleteShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Some sources could not be checked.'**
+  String get queryIncompleteShort;
+
+  /// No description provided for @queryInferenceUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No usable inference setup. Configure the agent’s model or the category’s default profile, then retry.'**
+  String get queryInferenceUnavailable;
+
+  /// No description provided for @queryKeepConclusions.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep conclusions'**
+  String get queryKeepConclusions;
+
+  /// No description provided for @queryLaterTextOmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'[Later text not shown]'**
+  String get queryLaterTextOmitted;
+
+  /// No description provided for @queryMachineTranscript.
+  ///
+  /// In en, this message translates to:
+  /// **'Machine transcript: exact stored wording, not checked against the audio.'**
+  String get queryMachineTranscript;
+
+  /// No description provided for @queryMemoryCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Conclusions available from earlier chats: {count}'**
+  String queryMemoryCount(int count);
+
+  /// No description provided for @queryMissingTranscripts.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 recording had no searchable text when this answer was written.} other{{count} recordings had no searchable text when this answer was written.}}'**
+  String queryMissingTranscripts(int count);
+
+  /// No description provided for @queryNewChat.
+  ///
+  /// In en, this message translates to:
+  /// **'New chat'**
+  String get queryNewChat;
+
+  /// No description provided for @queryNoAgent.
+  ///
+  /// In en, this message translates to:
+  /// **'This scope needs its usual agent assignment before you can chat. Return to details to configure it.'**
+  String get queryNoAgent;
+
+  /// No description provided for @queryNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get queryNotes;
+
+  /// No description provided for @queryOpenCurrentEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'Open current entry'**
+  String get queryOpenCurrentEntry;
+
+  /// No description provided for @queryOpenEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'Open entry'**
+  String get queryOpenEntry;
+
+  /// No description provided for @queryOriginalsHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Checks this task and its directly linked entries only.'**
+  String get queryOriginalsHome;
+
+  /// No description provided for @queryOtherProject.
+  ///
+  /// In en, this message translates to:
+  /// **'Beyond the home scope'**
+  String get queryOtherProject;
+
+  /// No description provided for @queryPreparingAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing an answer…'**
+  String get queryPreparingAnswer;
+
+  /// No description provided for @queryReachCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Searches this scope and {category}.'**
+  String queryReachCategory(String category);
+
+  /// No description provided for @queryReachCategoryOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Searches within {category}.'**
+  String queryReachCategoryOnly(String category);
+
+  /// No description provided for @queryReachHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Searches only this scope and its linked entries.'**
+  String get queryReachHome;
+
+  /// No description provided for @queryReachUncategorized.
+  ///
+  /// In en, this message translates to:
+  /// **'Searches this task and its directly linked uncategorized entries only.'**
+  String get queryReachUncategorized;
+
+  /// No description provided for @queryRecall.
+  ///
+  /// In en, this message translates to:
+  /// **'This answer used saved conclusions.'**
+  String get queryRecall;
+
+  /// No description provided for @queryRecordings.
+  ///
+  /// In en, this message translates to:
+  /// **'Recordings'**
+  String get queryRecordings;
+
+  /// No description provided for @queryRecordingTranscript.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording transcript'**
+  String get queryRecordingTranscript;
+
+  /// No description provided for @queryRenameChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename chat'**
+  String get queryRenameChat;
+
+  /// No description provided for @queryRestoreChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore chat'**
+  String get queryRestoreChat;
+
+  /// Creation time of an accessible saved conclusion; makes no assertion about its origin chat availability.
+  ///
+  /// In en, this message translates to:
+  /// **'Conclusion saved {date}'**
+  String querySavedConclusion(String date);
+
+  /// No description provided for @querySavedQuote.
+  ///
+  /// In en, this message translates to:
+  /// **'This saved quote reflects the source when the answer was written.'**
+  String get querySavedQuote;
+
+  /// Identifies the historical text version by edit date or short content fingerprint.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved version: {version}'**
+  String querySavedVersion(String version);
+
+  /// No description provided for @querySavedVersionUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Version date unavailable'**
+  String get querySavedVersionUnavailable;
+
+  /// No description provided for @querySearching.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking available information…'**
+  String get querySearching;
+
+  /// No description provided for @querySearchScope.
+  ///
+  /// In en, this message translates to:
+  /// **'Search scope and filters'**
+  String get querySearchScope;
+
+  /// Accessible action label identifying its evidence source or selected chat.
+  ///
+  /// In en, this message translates to:
+  /// **'{action}: {source}'**
+  String querySourceAction(String action, String source);
+
+  /// No description provided for @querySourceChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Source has changed'**
+  String get querySourceChanged;
+
+  /// No description provided for @querySourceDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Source deleted'**
+  String get querySourceDeleted;
+
+  /// No description provided for @querySourceMoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Source moved to another category'**
+  String get querySourceMoved;
+
+  /// No description provided for @querySummaryBased.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on summaries'**
+  String get querySummaryBased;
+
+  /// No description provided for @querySummaryCoverage.
+  ///
+  /// In en, this message translates to:
+  /// **'This answer uses task or project summaries. Original entries were not inspected.'**
+  String get querySummaryCoverage;
+
+  /// No description provided for @querySummaryCurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'Open a task or project to inspect its current summary. It may have changed since this answer.'**
+  String get querySummaryCurrent;
+
+  /// No description provided for @querySummaryIncomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Some information is missing from the available summaries.'**
+  String get querySummaryIncomplete;
+
+  /// No description provided for @querySummaryOwners.
+  ///
+  /// In en, this message translates to:
+  /// **'About this answer'**
+  String get querySummaryOwners;
+
+  /// No description provided for @querySurroundingLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'This is the saved excerpt, which may not include the full discussion.'**
+  String get querySurroundingLimit;
+
+  /// No description provided for @querySurroundingText.
+  ///
+  /// In en, this message translates to:
+  /// **'Show surrounding text'**
+  String get querySurroundingText;
+
+  /// No description provided for @queryTranscribing.
+  ///
+  /// In en, this message translates to:
+  /// **'Transcribing your recording. Audio may already be with your provider.'**
+  String get queryTranscribing;
+
+  /// No description provided for @queryUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This scope is no longer available with your current visibility settings.'**
+  String get queryUnavailable;
+
+  /// No description provided for @queryUnread.
+  ///
+  /// In en, this message translates to:
+  /// **'New answer'**
+  String get queryUnread;
+
+  /// No description provided for @queryWelcomeCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask {agentName} about this category'**
+  String queryWelcomeCategory(String agentName);
+
+  /// No description provided for @queryWelcomeProject.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask {agentName} about this project'**
+  String queryWelcomeProject(String agentName);
+
+  /// No description provided for @queryWelcomeTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask {agentName} about this task'**
+  String queryWelcomeTask(String agentName);
+
   /// No description provided for @queueCatchUpNowButton.
   ///
   /// In en, this message translates to:
@@ -18381,17 +19635,161 @@ abstract class AppLocalizations {
   /// **'Add channel'**
   String get relationshipAddChannelButton;
 
-  /// Relationships redesign label.
+  /// No description provided for @relationshipAddChannelFromContacts.
   ///
   /// In en, this message translates to:
-  /// **'Ask'**
-  String get relationshipAsk;
+  /// **'or from contacts'**
+  String get relationshipAddChannelFromContacts;
+
+  /// No description provided for @relationshipAgentAsOfBand.
+  ///
+  /// In en, this message translates to:
+  /// **'{band} · as of {age}'**
+  String relationshipAgentAsOfBand(String age, String band);
+
+  /// No description provided for @relationshipAgentBriefNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Brief now'**
+  String get relationshipAgentBriefNow;
+
+  /// No description provided for @relationshipAgentCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Call {name}'**
+  String relationshipAgentCall(String name);
+
+  /// No description provided for @relationshipAgentFailedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The provider returned an error before the briefing was written. Your check-ins are unchanged.'**
+  String get relationshipAgentFailedBody;
+
+  /// No description provided for @relationshipAgentFailedNoModel.
+  ///
+  /// In en, this message translates to:
+  /// **'No model is set up for briefings. Choose one under AI Settings › Agents. Details are in the Activity tab.'**
+  String get relationshipAgentFailedNoModel;
+
+  /// No description provided for @relationshipAgentFailedPlain.
+  ///
+  /// In en, this message translates to:
+  /// **'Last run failed'**
+  String get relationshipAgentFailedPlain;
+
+  /// No description provided for @relationshipAgentLastRunFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Last run failed · {time}'**
+  String relationshipAgentLastRunFailed(String time);
+
+  /// No description provided for @relationshipAgentMarkImportant.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark important'**
+  String get relationshipAgentMarkImportant;
+
+  /// No description provided for @relationshipAgentNoAgent.
+  ///
+  /// In en, this message translates to:
+  /// **'No agent for this person'**
+  String get relationshipAgentNoAgent;
+
+  /// No description provided for @relationshipAgentNoBriefingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No briefing yet. Brief now writes one once you have logged a check-in; it never sees the phone number or email.} =1{No briefing yet. Brief now writes one from your check-in; it never sees the phone number or email.} other{No briefing yet. Brief now writes one from your {count} check-ins; it never sees the phone number or email.}}'**
+  String relationshipAgentNoBriefingBody(int count);
+
+  /// No description provided for @relationshipAgentNotEnrolledBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark {name} as important to get a chat, nudges when it has been a while, and a briefing.'**
+  String relationshipAgentNotEnrolledBody(String name);
+
+  /// No description provided for @relationshipAgentOnlyYourStartsUseAi.
+  ///
+  /// In en, this message translates to:
+  /// **'Only what you start yourself uses AI'**
+  String get relationshipAgentOnlyYourStartsUseAi;
+
+  /// No description provided for @relationshipAgentOutOfDateNewCheckIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Out of date · new check-in {day}'**
+  String relationshipAgentOutOfDateNewCheckIn(String day);
+
+  /// The out-of-date status line's middle tier when the day does not fit beside the age pill.
+  ///
+  /// In en, this message translates to:
+  /// **'Out of date · new check-in'**
+  String get relationshipAgentOutOfDateNewCheckInShort;
+
+  /// No description provided for @relationshipAgentPausedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Briefings pause while this person is dormant or archived.'**
+  String get relationshipAgentPausedBody;
+
+  /// No description provided for @relationshipAgentProposedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 proposed} other{{count} proposed}}'**
+  String relationshipAgentProposedCount(int count);
+
+  /// No description provided for @relationshipAgentReadingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Preparing the briefing. Usually under a minute.} =1{Reading 1 check-in. Usually under a minute.} other{Reading {count} check-ins. Usually under a minute.}}'**
+  String relationshipAgentReadingBody(int count);
+
+  /// No description provided for @relationshipAgentSeeActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'See activity'**
+  String get relationshipAgentSeeActivity;
+
+  /// No description provided for @relationshipAgentSources.
+  ///
+  /// In en, this message translates to:
+  /// **'Sources: {count, plural, =1{1 check-in} other{{count} check-ins}} · contact channels never sent'**
+  String relationshipAgentSources(int count);
+
+  /// No description provided for @relationshipAgentTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get relationshipAgentTryAgain;
+
+  /// No description provided for @relationshipAgentWatching.
+  ///
+  /// In en, this message translates to:
+  /// **'Agent watching'**
+  String get relationshipAgentWatching;
+
+  /// No description provided for @relationshipAgentWatchingNextLook.
+  ///
+  /// In en, this message translates to:
+  /// **'Agent watching · next look {day}'**
+  String relationshipAgentWatchingNextLook(String day);
+
+  /// No description provided for @relationshipAgentWriting.
+  ///
+  /// In en, this message translates to:
+  /// **'Writing the briefing…'**
+  String get relationshipAgentWriting;
 
   /// Accessibility label of one relationship nudge banner; personName is the person's name.
   ///
   /// In en, this message translates to:
   /// **'Relationship banner for {personName}'**
   String relationshipBannerSemanticLabel(String personName);
+
+  /// No description provided for @relationshipBriefingAge.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =1{1 day old} other{{days} days old}}'**
+  String relationshipBriefingAge(int days);
 
   /// Confirm dialog body before a cloud-bound briefing; provider is the inference provider name.
   ///
@@ -18411,12 +19809,6 @@ abstract class AppLocalizations {
   /// **'Send to {provider}?'**
   String relationshipBriefingDisclosureTitle(String provider);
 
-  /// No description provided for @relationshipBriefingEmpty.
-  ///
-  /// In en, this message translates to:
-  /// **'No briefing yet — Brief me prepares one from your check-ins.'**
-  String get relationshipBriefingEmpty;
-
   /// No description provided for @relationshipBriefingRequested.
   ///
   /// In en, this message translates to:
@@ -18434,18 +19826,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Briefing'**
   String get relationshipBriefingTitle;
-
-  /// Relationships redesign label.
-  ///
-  /// In en, this message translates to:
-  /// **'Brief me again'**
-  String get relationshipBriefMeAgain;
-
-  /// No description provided for @relationshipBriefMeButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Brief me'**
-  String get relationshipBriefMeButton;
 
   /// No description provided for @relationshipCadenceEveryNDays.
   ///
@@ -18489,6 +19869,12 @@ abstract class AppLocalizations {
   /// **'On track'**
   String get relationshipCadenceOnTrack;
 
+  /// No description provided for @relationshipCadencePromptLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Nudge me every'**
+  String get relationshipCadencePromptLabel;
+
   /// No description provided for @relationshipCadenceQuarterly.
   ///
   /// In en, this message translates to:
@@ -18501,6 +19887,18 @@ abstract class AppLocalizations {
   /// **'Weekly'**
   String get relationshipCadenceWeekly;
 
+  /// No description provided for @relationshipChatAgentSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Knows your check-ins, not the channels'**
+  String get relationshipChatAgentSubtitle;
+
+  /// Title of the per-person chat header: the person's name and what the agent is
+  ///
+  /// In en, this message translates to:
+  /// **'{name} · briefing agent'**
+  String relationshipChatAgentTitle(String name);
+
   /// No description provided for @relationshipChatTooltip.
   ///
   /// In en, this message translates to:
@@ -18512,12 +19910,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No agent yet — mark this person as important first.'**
   String get relationshipChatUnavailable;
-
-  /// No description provided for @relationshipCheckedInLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Checked in {date}'**
-  String relationshipCheckedInLabel(String date);
 
   /// No description provided for @relationshipCheckInReminderBody.
   ///
@@ -18536,12 +19928,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Check-ins'**
   String get relationshipCheckInsLabel;
-
-  /// No description provided for @relationshipCheckInTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Check in · {name}'**
-  String relationshipCheckInTitle(String name);
 
   /// Relationships redesign label.
   ///
@@ -18585,6 +19971,12 @@ abstract class AppLocalizations {
   /// **'Add person'**
   String get relationshipCreateTitle;
 
+  /// No description provided for @relationshipDaysOver.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 day over} other{{count} days over}}'**
+  String relationshipDaysOver(int count);
+
   /// No description provided for @relationshipDeleteConfirmMessage.
   ///
   /// In en, this message translates to:
@@ -18602,6 +19994,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Due {day}'**
   String relationshipDueDay(String day);
+
+  /// No description provided for @relationshipDueSince.
+  ///
+  /// In en, this message translates to:
+  /// **'Due since {day} · {count, plural, =1{1 day over} other{{count} days over}}'**
+  String relationshipDueSince(String day, int count);
+
+  /// No description provided for @relationshipDueToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Due today'**
+  String get relationshipDueToday;
+
+  /// No description provided for @relationshipDurationHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h'**
+  String relationshipDurationHours(int hours);
+
+  /// No description provided for @relationshipDurationHoursMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h {minutes}'**
+  String relationshipDurationHoursMinutes(int hours, String minutes);
+
+  /// No description provided for @relationshipDurationMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} min'**
+  String relationshipDurationMinutes(int count);
 
   /// No description provided for @relationshipEditTitle.
   ///
@@ -18632,6 +20054,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not save the changes. Please try again.'**
   String get relationshipErrorUpdateFailed;
+
+  /// No description provided for @relationshipFormImportantBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Turns on a briefing, nudges and a chat. Check-in notes go to the agent; contact channels never do.'**
+  String get relationshipFormImportantBody;
+
+  /// Explains what marking a named person important turns on
+  ///
+  /// In en, this message translates to:
+  /// **'Turns on a briefing, nudges and a chat for {name}. Check-in notes go to the agent; contact channels never do.'**
+  String relationshipFormImportantBodyNamed(String name);
+
+  /// No description provided for @relationshipFormReachTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How to reach them'**
+  String get relationshipFormReachTitle;
+
+  /// No description provided for @relationshipFormWhoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Who'**
+  String get relationshipFormWhoTitle;
 
   /// No description provided for @relationshipHealthNeedsAttention.
   ///
@@ -18705,6 +20151,12 @@ abstract class AppLocalizations {
   /// **'Allow access'**
   String get relationshipImportGrantButton;
 
+  /// No description provided for @relationshipImportImportantBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Briefings, nudges and a chat. Without it, nothing runs on its own.'**
+  String get relationshipImportImportantBody;
+
   /// Shown when the contact search matches nothing
   ///
   /// In en, this message translates to:
@@ -18734,6 +20186,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{Review 1} other{Review {count}}}'**
   String relationshipImportReviewButton(int count);
+
+  /// Subtitle of the contact import review step, naming how many contacts were chosen
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 person selected · contact details stay on this device} other{{count} people selected · contact details stay on this device}}'**
+  String relationshipImportReviewSubtitle(int count);
 
   /// Title of the import review step, where importance and cadence are set
   ///
@@ -18771,11 +20229,11 @@ abstract class AppLocalizations {
   /// **'Just added'**
   String get relationshipJustAdded;
 
-  /// No description provided for @relationshipLastCheckInLabel.
+  /// No description provided for @relationshipLastSpoke.
   ///
   /// In en, this message translates to:
-  /// **'Last check-in {date}'**
-  String relationshipLastCheckInLabel(String date);
+  /// **'last spoke {time}'**
+  String relationshipLastSpoke(String time);
 
   /// Action that opens the OS contact picker to copy channels onto a person
   ///
@@ -18801,17 +20259,11 @@ abstract class AppLocalizations {
   /// **'Log check-in'**
   String get relationshipLogCheckIn;
 
-  /// Relationships redesign label.
+  /// Tooltip of the person page's overflow menu (link contact, delete)
   ///
   /// In en, this message translates to:
-  /// **'Lotti\'s read'**
-  String get relationshipLottisRead;
-
-  /// No description provided for @relationshipLottisReadAsOf.
-  ///
-  /// In en, this message translates to:
-  /// **'as of {time}'**
-  String relationshipLottisReadAsOf(String time);
+  /// **'More actions'**
+  String get relationshipMoreActions;
 
   /// No description provided for @relationshipNameLabel.
   ///
@@ -18825,11 +20277,17 @@ abstract class AppLocalizations {
   /// **'A name is required'**
   String get relationshipNameRequired;
 
-  /// No description provided for @relationshipNextByDay.
+  /// No description provided for @relationshipNextDueOn.
   ///
   /// In en, this message translates to:
-  /// **'next by {day}'**
-  String relationshipNextByDay(String day);
+  /// **'Next due {day}'**
+  String relationshipNextDueOn(String day);
+
+  /// No description provided for @relationshipNextTimeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Next time'**
+  String get relationshipNextTimeTitle;
 
   /// No description provided for @relationshipNicknameLabel.
   ///
@@ -18849,23 +20307,107 @@ abstract class AppLocalizations {
   /// **'No tasks linked yet.'**
   String get relationshipNoLinkedTasks;
 
+  /// No description provided for @relationshipNotEnrolled.
+  ///
+  /// In en, this message translates to:
+  /// **'Not enrolled'**
+  String get relationshipNotEnrolled;
+
   /// No description provided for @relationshipNotFound.
   ///
   /// In en, this message translates to:
   /// **'This person is no longer tracked.'**
   String get relationshipNotFound;
 
-  /// Relationships redesign label.
+  /// No description provided for @relationshipOnTrackCadence.
   ///
   /// In en, this message translates to:
-  /// **'nudges on'**
-  String get relationshipNudgesOn;
+  /// **'On track · {cadence}'**
+  String relationshipOnTrackCadence(String cadence);
 
-  /// Body of the prompt offered after returning from a call or message
+  /// No description provided for @relationshipPayAttentionTo.
   ///
   /// In en, this message translates to:
-  /// **'You reached out a moment ago. Log a check-in while it is fresh?'**
-  String get relationshipPostCallBody;
+  /// **'Pay attention to'**
+  String get relationshipPayAttentionTo;
+
+  /// No description provided for @relationshipPhotoAddBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Add banner'**
+  String get relationshipPhotoAddBanner;
+
+  /// No description provided for @relationshipPhotoAdjustCrop.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust crop'**
+  String get relationshipPhotoAdjustCrop;
+
+  /// No description provided for @relationshipPhotoBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Banner'**
+  String get relationshipPhotoBanner;
+
+  /// No description provided for @relationshipPhotoCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get relationshipPhotoCardTitle;
+
+  /// No description provided for @relationshipPhotoChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get relationshipPhotoChange;
+
+  /// No description provided for @relationshipPhotoChoose.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from library'**
+  String get relationshipPhotoChoose;
+
+  /// No description provided for @relationshipPhotoDragToReposition.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to reposition'**
+  String get relationshipPhotoDragToReposition;
+
+  /// No description provided for @relationshipPhotoFace.
+  ///
+  /// In en, this message translates to:
+  /// **'Face'**
+  String get relationshipPhotoFace;
+
+  /// No description provided for @relationshipPhotoPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Only on your devices · the agent never sees it'**
+  String get relationshipPhotoPrivacy;
+
+  /// No description provided for @relationshipPhotoRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove photo'**
+  String get relationshipPhotoRemove;
+
+  /// No description provided for @relationshipPhotoRemoveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get relationshipPhotoRemoveAction;
+
+  /// No description provided for @relationshipPhotoSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the photo'**
+  String get relationshipPhotoSaveFailed;
+
+  /// No description provided for @relationshipPhotoSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo of {name}'**
+  String relationshipPhotoSheetTitle(String name);
 
   /// Button that opens a pre-filled check-in from the post-call prompt
   ///
@@ -18879,17 +20421,53 @@ abstract class AppLocalizations {
   /// **'Not now'**
   String get relationshipPostCallDismiss;
 
-  /// Title of the prompt offered after returning from a call or message
+  /// No description provided for @relationshipPostCallMeta.
   ///
   /// In en, this message translates to:
-  /// **'How did it go with {name}?'**
-  String relationshipPostCallTitle(String name);
+  /// **'started {time} · {minutes, plural, =0{under a minute} =1{about 1 min} other{about {minutes} min}}'**
+  String relationshipPostCallMeta(String time, int minutes);
 
-  /// No description provided for @relationshipQuietForDays.
+  /// No description provided for @relationshipPostCallOfferCall.
   ///
   /// In en, this message translates to:
-  /// **'Quiet for {count, plural, =1{1 day} other{{count} days}}'**
-  String relationshipQuietForDays(int count);
+  /// **'You called {name} {minutes, plural, =0{less than a minute} =1{1 minute} other{{minutes} minutes}} ago — log it while it is fresh?'**
+  String relationshipPostCallOfferCall(String name, int minutes);
+
+  /// No description provided for @relationshipPostCallOfferMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You wrote to {name} {minutes, plural, =0{less than a minute} =1{1 minute} other{{minutes} minutes}} ago — log it while it is fresh?'**
+  String relationshipPostCallOfferMessage(String name, int minutes);
+
+  /// No description provided for @relationshipProposalAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Added → {title}'**
+  String relationshipProposalAdded(String title);
+
+  /// No description provided for @relationshipProposalEvidence.
+  ///
+  /// In en, this message translates to:
+  /// **'From the check-in on {date}'**
+  String relationshipProposalEvidence(String date);
+
+  /// No description provided for @relationshipProposalUndoFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not undo. The task may have changed.'**
+  String get relationshipProposalUndoFailed;
+
+  /// No description provided for @relationshipReachPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Stays on this device · never shared with the AI'**
+  String get relationshipReachPrivacy;
+
+  /// No description provided for @relationshipReachTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reach'**
+  String get relationshipReachTitle;
 
   /// Menu action that replaces the OS contact a person is linked to
   ///
@@ -18897,23 +20475,59 @@ abstract class AppLocalizations {
   /// **'Link a different contact'**
   String get relationshipRelinkContact;
 
-  /// Relationships redesign label.
-  ///
-  /// In en, this message translates to:
-  /// **'See all check-ins'**
-  String get relationshipSeeAllCheckIns;
-
   /// No description provided for @relationshipsEmptyState.
   ///
   /// In en, this message translates to:
   /// **'Add the people you want to stay close to.'**
   String get relationshipsEmptyState;
 
+  /// No description provided for @relationshipsGroupDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Due'**
+  String get relationshipsGroupDue;
+
   /// No description provided for @relationshipsPageTitle.
   ///
   /// In en, this message translates to:
   /// **'People'**
   String get relationshipsPageTitle;
+
+  /// No description provided for @relationshipsSelectPersonHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a person to see their page.'**
+  String get relationshipsSelectPersonHint;
+
+  /// No description provided for @relationshipsSummaryDueNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Due now'**
+  String get relationshipsSummaryDueNow;
+
+  /// No description provided for @relationshipsSummaryEnrolled.
+  ///
+  /// In en, this message translates to:
+  /// **'/ {count} enrolled'**
+  String relationshipsSummaryEnrolled(int count);
+
+  /// No description provided for @relationshipsSummaryNextDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Next due {name} · {day}'**
+  String relationshipsSummaryNextDue(String name, String day);
+
+  /// No description provided for @relationshipsSummaryNoneDue.
+  ///
+  /// In en, this message translates to:
+  /// **'No one due'**
+  String get relationshipsSummaryNoneDue;
+
+  /// No description provided for @relationshipsSummaryNotEnrolled.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 person not enrolled} other{{count} people not enrolled}}'**
+  String relationshipsSummaryNotEnrolled(int count);
 
   /// No description provided for @relationshipStatusActive.
   ///
@@ -18939,17 +20553,33 @@ abstract class AppLocalizations {
   /// **'Status'**
   String get relationshipStatusFieldLabel;
 
-  /// Relationships redesign label.
+  /// No description provided for @relationshipStatusLineAdded.
   ///
   /// In en, this message translates to:
-  /// **'Staying in touch'**
-  String get relationshipStayingInTouch;
+  /// **'Just added · {cadence}'**
+  String relationshipStatusLineAdded(String cadence);
 
-  /// Relationships redesign label.
+  /// No description provided for @relationshipStatusLineAddedFirstDue.
   ///
   /// In en, this message translates to:
-  /// **'Stay in touch'**
-  String get relationshipStayInTouch;
+  /// **'Just added · {cadence} · first due {day}'**
+  String relationshipStatusLineAddedFirstDue(String cadence, String day);
+
+  /// No description provided for @relationshipStatusLineContacted.
+  ///
+  /// In en, this message translates to:
+  /// **'{type} · {time} · {cadence}'**
+  String relationshipStatusLineContacted(
+    String type,
+    String time,
+    String cadence,
+  );
+
+  /// No description provided for @relationshipTasksLinkedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 linked} other{{count} linked}}'**
+  String relationshipTasksLinkedCount(int count);
 
   /// The relative day word in a relationship timestamp, e.g. "Today 14:20".
   ///
@@ -21165,12 +22795,6 @@ abstract class AppLocalizations {
   /// **'Detected AI capabilities'**
   String get settingsSyncNodeProfileCapabilitiesLabel;
 
-  /// No description provided for @settingsSyncNodeProfileCapabilityMlxAudio.
-  ///
-  /// In en, this message translates to:
-  /// **'MLX Audio (local)'**
-  String get settingsSyncNodeProfileCapabilityMlxAudio;
-
   /// No description provided for @settingsSyncNodeProfileCapabilityOllamaLlm.
   ///
   /// In en, this message translates to:
@@ -21255,6 +22879,18 @@ abstract class AppLocalizations {
   /// **'Configure sync and view stats'**
   String get settingsSyncSubtitle;
 
+  /// No description provided for @settingsSystemHealthSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyze recent logs and copy a shareable report'**
+  String get settingsSystemHealthSubtitle;
+
+  /// No description provided for @settingsSystemHealthTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'System health'**
+  String get settingsSystemHealthTitle;
+
   /// No description provided for @settingsThemingAutomatic.
   ///
   /// In en, this message translates to:
@@ -21326,6 +22962,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'What\'s New'**
   String get settingsWhatsNewTitle;
+
+  /// No description provided for @sherpaAllFamilies.
+  ///
+  /// In en, this message translates to:
+  /// **'All families'**
+  String get sherpaAllFamilies;
+
+  /// Number of search matches in the downloadable model catalog.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} of {total} models'**
+  String sherpaCatalogMatches(int count, int total);
+
+  /// No description provided for @sherpaDeleteModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {model} from this device'**
+  String sherpaDeleteModel(String model);
+
+  /// No description provided for @sherpaDownloadAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Download'**
+  String get sherpaDownloadAction;
+
+  /// No description provided for @sherpaDownloadModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Download {model}'**
+  String sherpaDownloadModel(String model);
+
+  /// No description provided for @sherpaInstalledModelsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Installed models'**
+  String get sherpaInstalledModelsTitle;
+
+  /// No description provided for @sherpaInstallingModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Installing model'**
+  String get sherpaInstallingModel;
+
+  /// No description provided for @sherpaLanguageCantonese.
+  ///
+  /// In en, this message translates to:
+  /// **'Cantonese'**
+  String get sherpaLanguageCantonese;
+
+  /// No description provided for @sherpaModelCatalogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Model catalog'**
+  String get sherpaModelCatalogTitle;
+
+  /// No description provided for @sherpaModelConfigurationError.
+  ///
+  /// In en, this message translates to:
+  /// **'Model downloaded, but its configuration could not be saved.'**
+  String get sherpaModelConfigurationError;
+
+  /// No description provided for @sherpaModelError.
+  ///
+  /// In en, this message translates to:
+  /// **'Model operation failed. Try again.'**
+  String get sherpaModelError;
+
+  /// No description provided for @sherpaModelFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Model family'**
+  String get sherpaModelFamily;
+
+  /// No description provided for @sherpaModelInstalled.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloaded'**
+  String get sherpaModelInstalled;
+
+  /// No description provided for @sherpaModelNotInstalled.
+  ///
+  /// In en, this message translates to:
+  /// **'Download a model on this device'**
+  String get sherpaModelNotInstalled;
+
+  /// No description provided for @sherpaModelSizeGB.
+  ///
+  /// In en, this message translates to:
+  /// **'{size} GB · Multilingual'**
+  String sherpaModelSizeGB(String size);
+
+  /// No description provided for @sherpaModelSizeMB.
+  ///
+  /// In en, this message translates to:
+  /// **'{size} MB · Multilingual'**
+  String sherpaModelSizeMB(String size);
+
+  /// No description provided for @sherpaProviderDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Transcribe on this device without a server. Download a model, then select it in your inference profile.'**
+  String get sherpaProviderDescription;
 
   /// No description provided for @sidebarActiveSectionTitle.
   ///
@@ -21494,6 +23232,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No audio was recorded. Try again.'**
   String get speechNoAudioRecorded;
+
+  /// No description provided for @speechSettingsAutoPrepareChatAudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Prepare chat audio automatically'**
+  String get speechSettingsAutoPrepareChatAudio;
+
+  /// No description provided for @speechSettingsChatAudioDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Prepare new chat replies on this device so playback starts sooner. Audio plays only when you tap play.'**
+  String get speechSettingsChatAudioDescription;
+
+  /// No description provided for @speechSettingsChatAudioLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat audio'**
+  String get speechSettingsChatAudioLabel;
 
   /// No description provided for @speechSettingsModelDescription.
   ///
@@ -22646,6 +24402,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Step {step} of 3: {label}'**
   String syncWizardStepStatus(int step, String label);
+
+  /// No description provided for @systemHealthAnalyzedWindow.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzed {start} → {end}'**
+  String systemHealthAnalyzedWindow(String start, String end);
+
+  /// No description provided for @systemHealthChooseModelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose model'**
+  String get systemHealthChooseModelTitle;
+
+  /// No description provided for @systemHealthCopiedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Report copied. Known personal-data patterns were redacted.'**
+  String get systemHealthCopiedToast;
+
+  /// No description provided for @systemHealthCopyButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy report'**
+  String get systemHealthCopyButton;
+
+  /// No description provided for @systemHealthCustomFromLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get systemHealthCustomFromLabel;
+
+  /// No description provided for @systemHealthCustomToLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get systemHealthCustomToLabel;
+
+  /// No description provided for @systemHealthDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Scans the log files on this device for errors, warnings and slow queries, redacts known personal-data patterns, and writes a short report you can paste into a coding assistant.'**
+  String get systemHealthDescription;
+
+  /// No description provided for @systemHealthDomainsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'The domains switched on here are the ones analyzed, the same setting that decides what gets logged. Slow queries are included when slow-query logging is on.'**
+  String get systemHealthDomainsDescription;
+
+  /// No description provided for @systemHealthDomainsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Log domains'**
+  String get systemHealthDomainsTitle;
+
+  /// No description provided for @systemHealthFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis failed'**
+  String get systemHealthFailedTitle;
+
+  /// No description provided for @systemHealthGeneratedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated {time}'**
+  String systemHealthGeneratedAt(String time);
+
+  /// No description provided for @systemHealthHideDigest.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide digest'**
+  String get systemHealthHideDigest;
+
+  /// No description provided for @systemHealthModelDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Writes the findings from the redacted digest. Proposes the thinking model of your default profile.'**
+  String get systemHealthModelDescription;
+
+  /// No description provided for @systemHealthModelNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Digest only, no model'**
+  String get systemHealthModelNone;
+
+  /// No description provided for @systemHealthModelNoneDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a default inference profile or add an agentic text model to get findings.'**
+  String get systemHealthModelNoneDescription;
+
+  /// No description provided for @systemHealthModelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Model'**
+  String get systemHealthModelTitle;
+
+  /// No description provided for @systemHealthPresetCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get systemHealthPresetCustom;
+
+  /// No description provided for @systemHealthPresetLast14Days.
+  ///
+  /// In en, this message translates to:
+  /// **'14 days'**
+  String get systemHealthPresetLast14Days;
+
+  /// No description provided for @systemHealthPresetLast24Hours.
+  ///
+  /// In en, this message translates to:
+  /// **'24 h'**
+  String get systemHealthPresetLast24Hours;
+
+  /// No description provided for @systemHealthPresetLast7Days.
+  ///
+  /// In en, this message translates to:
+  /// **'7 days'**
+  String get systemHealthPresetLast7Days;
+
+  /// No description provided for @systemHealthPreviousReportsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Every report is kept on this device. Tap one to show it again.'**
+  String get systemHealthPreviousReportsDescription;
+
+  /// No description provided for @systemHealthPreviousReportsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous reports'**
+  String get systemHealthPreviousReportsTitle;
+
+  /// No description provided for @systemHealthRangeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Time range'**
+  String get systemHealthRangeTitle;
+
+  /// No description provided for @systemHealthReportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report'**
+  String get systemHealthReportTitle;
+
+  /// No description provided for @systemHealthRunButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Run analysis'**
+  String get systemHealthRunButton;
+
+  /// No description provided for @systemHealthSavedTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to {path}'**
+  String systemHealthSavedTo(String path);
+
+  /// No description provided for @systemHealthShowDigest.
+  ///
+  /// In en, this message translates to:
+  /// **'Show digest'**
+  String get systemHealthShowDigest;
 
   /// No description provided for @taskActionBarAudioRecordingActive.
   ///
