@@ -108,16 +108,16 @@ jobs:
         run: |
           sha256sum build/app/outputs/flutter-apk/*-release.apk | tee apk-sha256.txt
 
-      - name: Create or update GitHub Release (zh-v1.1.1)
+      - name: Create or update GitHub Release (zh-v1.1.16)
         id: release
         run: |
-          gh release create "zh-v1.1.1" --title "Lotti 简体中文汉化版" --generate-notes --target "$GITHUB_SHA" || true
+          gh release create "zh-v1.1.16" --title "Lotti 简体中文汉化版" --generate-notes --target "$GITHUB_SHA" || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload APKs to GitHub Release
         run: |
-          gh release upload "zh-v1.1.1" \
+          gh release upload "zh-v1.1.16" \
             build/app/outputs/flutter-apk/app-release.apk \
             build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk \
             build/app/outputs/flutter-apk/app-arm64-v8a-release.apk \
