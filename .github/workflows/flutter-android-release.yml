@@ -52,8 +52,8 @@ jobs:
       - name: Verify bundled keystore
         run: |
           keytool -list -keystore android/app/lotti-zh-release.jks \
-            -storepass "$(grep storePassword= android/app/key.properties | cut -d= -f2)" \
-            -alias "$(grep keyAlias= android/app/key.properties | cut -d= -f2)"
+            -storepass "$(grep storePassword= android/key.properties | cut -d= -f2)" \
+            -alias "$(grep keyAlias= android/key.properties | cut -d= -f2)"
 
       - name: Build Split APKs
         run: flutter build apk --release --split-per-abi
