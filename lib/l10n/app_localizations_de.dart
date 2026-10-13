@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -2833,8 +2834,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           'Setzt alle $count unlösbaren Sequenzlog-Einträge zurück auf fehlend, damit der reguläre Backfill-Sweep Peers erneut fragt. Peers, die die Daten noch haben, antworten; wirklich nicht wiederherstellbare Einträge werden nach dem 7-Tage-Schonfenster erneut zurückgezogen.',
-      one:
-          'Setzt 1 unlösbaren Sequenzlog-Eintrag zurück auf fehlend, damit der reguläre Backfill-Sweep Peers erneut fragt. Peers, die die Daten noch haben, antworten; wirklich nicht wiederherstellbare Einträge werden nach dem 7-Tage-Schonfenster erneut zurückgezogen.',
+      one: 'Setzt 1 unlösbaren Sequenzlog-Eintrag zurück auf fehlend, damit der reguläre Backfill-Sweep Peers erneut fragt. Peers, die die Daten noch haben, antworten; wirklich nicht wiederherstellbare Einträge werden nach dem 7-Tage-Schonfenster erneut zurückgezogen.',
     );
     return '$_temp0';
   }
@@ -2975,8 +2975,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           'Markiert $count aktuell offene (fehlende oder angeforderte) Sequenzlog-Einträge als unlösbar. Nutze dies, um den Watermark zu entsperren, wenn Einträge bereits eine Weile feststecken, ohne dass das 7-Tage-Schonfenster abgelaufen ist. Einträge können später wiederhergestellt werden, wenn ihre Nutzdaten mit gültiger Vector Clock auf der Festplatte ankommen.',
-      one:
-          'Markiert 1 aktuell offenen (fehlenden oder angeforderten) Sequenzlog-Eintrag als unlösbar. Nutze dies, um den Watermark zu entsperren, wenn Einträge bereits eine Weile feststecken, ohne dass das 7-Tage-Schonfenster abgelaufen ist. Einträge können später wiederhergestellt werden, wenn ihre Nutzdaten mit gültiger Vector Clock auf der Festplatte ankommen.',
+      one: 'Markiert 1 aktuell offenen (fehlenden oder angeforderten) Sequenzlog-Eintrag als unlösbar. Nutze dies, um den Watermark zu entsperren, wenn Einträge bereits eine Weile feststecken, ohne dass das 7-Tage-Schonfenster abgelaufen ist. Einträge können später wiederhergestellt werden, wenn ihre Nutzdaten mit gültiger Vector Clock auf der Festplatte ankommen.',
     );
     return '$_temp0';
   }
@@ -6787,8 +6786,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           'Dieser Pull-Request ist schon mit $count anderen Aufgaben verknüpft. Auch mit dieser Aufgabe verknüpfen?',
-      one:
-          'Dieser Pull-Request ist schon mit einer anderen Aufgabe verknüpft. Auch mit dieser Aufgabe verknüpfen?',
+      one: 'Dieser Pull-Request ist schon mit einer anderen Aufgabe verknüpft. Auch mit dieser Aufgabe verknüpfen?',
     );
     return '$_temp0';
   }
@@ -7476,13 +7474,10 @@ class AppLocalizationsDe extends AppLocalizations {
     String direction,
     String target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      target,
-      {
-        '1': 'Stunde',
-        'other': 'Stunden',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(target, {
+      '1': 'Stunde',
+      'other': 'Stunden',
+    });
     return '$categoryName: $direction $target $_temp0 pro rollierende 7 Tage';
   }
 
@@ -7641,13 +7636,10 @@ class AppLocalizationsDe extends AppLocalizations {
     String direction,
     String target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      target,
-      {
-        '1': 'Stunde',
-        'other': 'Stunden',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(target, {
+      '1': 'Stunde',
+      'other': 'Stunden',
+    });
     return '$labelName: $direction $target $_temp0 pro Tag';
   }
 
@@ -7805,14 +7797,11 @@ class AppLocalizationsDe extends AppLocalizations {
     Object value,
     Object target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      status,
-      {
-        'missing': '$date: kein Wert; Ziel $target',
-        'met': '$date: $value; Ziel $target; erreicht',
-        'other': '$date: $value; Ziel $target; nicht erreicht',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(status, {
+      'missing': '$date: kein Wert; Ziel $target',
+      'met': '$date: $value; Ziel $target; erreicht',
+      'other': '$date: $value; Ziel $target; nicht erreicht',
+    });
     return '$_temp0';
   }
 
@@ -12128,8 +12117,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           '$count Aufnahmen hatten keinen durchsuchbaren Text, als diese Antwort entstand.',
-      one:
-          '1 Aufnahme hatte keinen durchsuchbaren Text, als diese Antwort entstand.',
+      one: '1 Aufnahme hatte keinen durchsuchbaren Text, als diese Antwort entstand.',
     );
     return '$_temp0';
   }
@@ -12389,8 +12377,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           '$count Sync-Ereignisse, die die Warteschlange aufgegeben hat. Tippe auf Wiederholen, um sie erneut zu versuchen.',
-      one:
-          '1 Sync-Ereignis, das die Warteschlange aufgegeben hat. Tippe auf Wiederholen, um es erneut zu versuchen.',
+      one: '1 Sync-Ereignis, das die Warteschlange aufgegeben hat. Tippe auf Wiederholen, um es erneut zu versuchen.',
     );
     return '$_temp0';
   }
@@ -12501,10 +12488,8 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           'Noch kein Briefing. „Jetzt briefen“ schreibt eins aus deinen $count Check-ins; Telefonnummer und E-Mail sieht es nie.',
-      one:
-          'Noch kein Briefing. „Jetzt briefen“ schreibt eins aus deinem Check-in; Telefonnummer und E-Mail sieht es nie.',
-      zero:
-          'Noch kein Briefing. „Jetzt briefen“ schreibt eins, sobald du einen Check-in erfasst hast; Telefonnummer und E-Mail sieht es nie.',
+      one: 'Noch kein Briefing. „Jetzt briefen“ schreibt eins aus deinem Check-in; Telefonnummer und E-Mail sieht es nie.',
+      zero: 'Noch kein Briefing. „Jetzt briefen“ schreibt eins, sobald du einen Check-in erfasst hast; Telefonnummer und E-Mail sieht es nie.',
     );
     return '$_temp0';
   }
@@ -15217,8 +15202,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           '$count nicht verifizierte Geräte können neue Einträge nicht lesen — lösche oder verifiziere sie unten.',
-      one:
-          '1 nicht verifiziertes Gerät kann neue Einträge nicht lesen — lösche oder verifiziere es unten.',
+      one: '1 nicht verifiziertes Gerät kann neue Einträge nicht lesen — lösche oder verifiziere es unten.',
     );
     return '$_temp0';
   }
@@ -15230,8 +15214,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           '$count nicht verifizierte Geräte können neue Einträge nicht lesen — lösche sie unten.',
-      one:
-          '1 nicht verifiziertes Gerät kann neue Einträge nicht lesen — lösche es unten.',
+      one: '1 nicht verifiziertes Gerät kann neue Einträge nicht lesen — lösche es unten.',
     );
     return '$_temp0';
   }
@@ -15243,8 +15226,7 @@ class AppLocalizationsDe extends AppLocalizations {
       locale: localeName,
       other:
           '$count nicht verifizierte Geräte können neue Einträge nicht lesen — verifiziere sie unten.',
-      one:
-          '1 nicht verifiziertes Gerät kann neue Einträge nicht lesen — verifiziere es unten.',
+      one: '1 nicht verifiziertes Gerät kann neue Einträge nicht lesen — verifiziere es unten.',
     );
     return '$_temp0';
   }

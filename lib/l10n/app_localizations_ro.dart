@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -2853,8 +2854,7 @@ class AppLocalizationsRo extends AppLocalizations {
           'Aceasta resetează cele $count de intrări nerezolvabile din jurnalul de secvență înapoi la lipsă, astfel încât parcurgerea normală de completare să întrebe din nou colegii. Colegii care încă au datele vor răspunde; intrările cu adevărat irecuperabile vor fi retrase din nou după fereastra de amnistie de 7 zile.',
       few:
           'Aceasta resetează cele $count intrări nerezolvabile din jurnalul de secvență înapoi la lipsă, astfel încât parcurgerea normală de completare să întrebe din nou colegii. Colegii care încă au datele vor răspunde; intrările cu adevărat irecuperabile vor fi retrase din nou după fereastra de amnistie de 7 zile.',
-      one:
-          'Aceasta resetează 1 intrare nerezolvabilă din jurnalul de secvență înapoi la lipsă, astfel încât parcurgerea normală de completare să întrebe din nou colegii. Colegii care încă au datele vor răspunde; intrările cu adevărat irecuperabile vor fi retrase din nou după fereastra de amnistie de 7 zile.',
+      one: 'Aceasta resetează 1 intrare nerezolvabilă din jurnalul de secvență înapoi la lipsă, astfel încât parcurgerea normală de completare să întrebe din nou colegii. Colegii care încă au datele vor răspunde; intrările cu adevărat irecuperabile vor fi retrase din nou după fereastra de amnistie de 7 zile.',
     );
     return '$_temp0';
   }
@@ -2999,8 +2999,7 @@ class AppLocalizationsRo extends AppLocalizations {
           'Marcați cele $count de intrări deschise în prezent (lipsă sau solicitate) din jurnalul de secvență ca nerezolvabile. Folosiți această opțiune pentru a debloca marcajul când intrările sunt blocate de ceva vreme, fără ca fereastra de amnistie de 7 zile să fi expirat. Intrările pot fi recuperate dacă datele lor ajung ulterior pe disc cu un ceas vectorial valid.',
       few:
           'Marcați cele $count intrări deschise în prezent (lipsă sau solicitate) din jurnalul de secvență ca nerezolvabile. Folosiți această opțiune pentru a debloca marcajul când intrările sunt blocate de ceva vreme, fără ca fereastra de amnistie de 7 zile să fi expirat. Intrările pot fi recuperate dacă datele lor ajung ulterior pe disc cu un ceas vectorial valid.',
-      one:
-          'Marcați 1 intrare deschisă în prezent (lipsă sau solicitată) din jurnalul de secvență ca nerezolvabilă. Folosiți această opțiune pentru a debloca marcajul când intrările sunt blocate de ceva vreme, fără ca fereastra de amnistie de 7 zile să fi expirat. Intrările pot fi recuperate dacă datele lor ajung ulterior pe disc cu un ceas vectorial valid.',
+      one: 'Marcați 1 intrare deschisă în prezent (lipsă sau solicitată) din jurnalul de secvență ca nerezolvabilă. Folosiți această opțiune pentru a debloca marcajul când intrările sunt blocate de ceva vreme, fără ca fereastra de amnistie de 7 zile să fi expirat. Intrările pot fi recuperate dacă datele lor ajung ulterior pe disc cu un ceas vectorial valid.',
     );
     return '$_temp0';
   }
@@ -6857,8 +6856,7 @@ class AppLocalizationsRo extends AppLocalizations {
           'Acest pull request este deja legat de alte $count de sarcini. Doriți să-l legați și de aceasta?',
       few:
           'Acest pull request este deja legat de alte $count sarcini. Doriți să-l legați și de aceasta?',
-      one:
-          'Acest pull request este deja legat de o altă sarcină. Doriți să-l legați și de aceasta?',
+      one: 'Acest pull request este deja legat de o altă sarcină. Doriți să-l legați și de aceasta?',
     );
     return '$_temp0';
   }
@@ -7563,13 +7561,7 @@ class AppLocalizationsRo extends AppLocalizations {
     String direction,
     String target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      target,
-      {
-        '1': 'oră',
-        'other': 'ore',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(target, {'1': 'oră', 'other': 'ore'});
     return '$categoryName: $direction $target $_temp0 în ultimele 7 zile';
   }
 
@@ -7731,13 +7723,7 @@ class AppLocalizationsRo extends AppLocalizations {
     String direction,
     String target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      target,
-      {
-        '1': 'oră',
-        'other': 'ore',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(target, {'1': 'oră', 'other': 'ore'});
     return '$labelName: $direction $target $_temp0 pe zi';
   }
 
@@ -7894,14 +7880,11 @@ class AppLocalizationsRo extends AppLocalizations {
     Object value,
     Object target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      status,
-      {
-        'missing': '$date: nicio valoare; țintă $target',
-        'met': '$date: $value; țintă $target; atinsă',
-        'other': '$date: $value; țintă $target; neatinsă',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(status, {
+      'missing': '$date: nicio valoare; țintă $target',
+      'met': '$date: $value; țintă $target; atinsă',
+      'other': '$date: $value; țintă $target; neatinsă',
+    });
     return '$_temp0';
   }
 
@@ -12275,8 +12258,7 @@ class AppLocalizationsRo extends AppLocalizations {
           '$count de înregistrări audio nu aveau text căutabil la redactarea acestui răspuns.',
       few:
           '$count înregistrări audio nu aveau text căutabil la redactarea acestui răspuns.',
-      one:
-          '1 înregistrare audio nu avea text căutabil la redactarea acestui răspuns.',
+      one: '1 înregistrare audio nu avea text căutabil la redactarea acestui răspuns.',
     );
     return '$_temp0';
   }
@@ -12551,8 +12533,7 @@ class AppLocalizationsRo extends AppLocalizations {
           '$count de evenimente de sincronizare pe care coada le-a abandonat. Apasă pe reîncearcă pentru o nouă încercare.',
       few:
           '$count evenimente de sincronizare pe care coada le-a abandonat. Apasă pe reîncearcă pentru o nouă încercare.',
-      one:
-          '1 eveniment de sincronizare pe care coada l-a abandonat. Apasă pe reîncearcă pentru o nouă încercare.',
+      one: '1 eveniment de sincronizare pe care coada l-a abandonat. Apasă pe reîncearcă pentru o nouă încercare.',
     );
     return '$_temp0';
   }
@@ -12666,10 +12647,8 @@ class AppLocalizationsRo extends AppLocalizations {
           'Niciun briefing încă. „Creați briefingul acum“ scrie unul din cele $count de check-in-uri; nu vede niciodată telefonul sau e-mailul.',
       few:
           'Niciun briefing încă. „Creați briefingul acum“ scrie unul din cele $count check-in-uri; nu vede niciodată telefonul sau e-mailul.',
-      one:
-          'Niciun briefing încă. „Creați briefingul acum“ scrie unul din check-in-ul dumneavoastră; nu vede niciodată telefonul sau e-mailul.',
-      zero:
-          'Niciun briefing încă. „Creați briefingul acum“ scrie unul de îndată ce înregistrați un check-in; nu vede niciodată telefonul sau e-mailul.',
+      one: 'Niciun briefing încă. „Creați briefingul acum“ scrie unul din check-in-ul dumneavoastră; nu vede niciodată telefonul sau e-mailul.',
+      zero: 'Niciun briefing încă. „Creați briefingul acum“ scrie unul de îndată ce înregistrați un check-in; nu vede niciodată telefonul sau e-mailul.',
     );
     return '$_temp0';
   }
@@ -15409,8 +15388,7 @@ class AppLocalizationsRo extends AppLocalizations {
           '$count de dispozitive neverificate nu pot citi intrările noi — ștergeți-le sau verificați-le mai jos.',
       few:
           '$count dispozitive neverificate nu pot citi intrările noi — ștergeți-le sau verificați-le mai jos.',
-      one:
-          'Un dispozitiv neverificat nu poate citi intrările noi — ștergeți-l sau verificați-l mai jos.',
+      one: 'Un dispozitiv neverificat nu poate citi intrările noi — ștergeți-l sau verificați-l mai jos.',
     );
     return '$_temp0';
   }
@@ -15424,8 +15402,7 @@ class AppLocalizationsRo extends AppLocalizations {
           '$count de dispozitive neverificate nu pot citi intrările noi — ștergeți-le mai jos.',
       few:
           '$count dispozitive neverificate nu pot citi intrările noi — ștergeți-le mai jos.',
-      one:
-          'Un dispozitiv neverificat nu poate citi intrările noi — ștergeți-l mai jos.',
+      one: 'Un dispozitiv neverificat nu poate citi intrările noi — ștergeți-l mai jos.',
     );
     return '$_temp0';
   }
@@ -15439,8 +15416,7 @@ class AppLocalizationsRo extends AppLocalizations {
           '$count de dispozitive neverificate nu pot citi intrările noi — verificați-le mai jos.',
       few:
           '$count dispozitive neverificate nu pot citi intrările noi — verificați-le mai jos.',
-      one:
-          'Un dispozitiv neverificat nu poate citi intrările noi — verificați-l mai jos.',
+      one: 'Un dispozitiv neverificat nu poate citi intrările noi — verificați-l mai jos.',
     );
     return '$_temp0';
   }

@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -2836,8 +2837,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           'Esto vuelve a poner las $count entradas irresolubles del registro de secuencia como faltantes para que el barrido normal de relleno pregunte de nuevo a los pares. Los pares que aún tienen los datos responderán; las entradas realmente irrecuperables se retirarán de nuevo tras la ventana de amnistía de 7 días.',
-      one:
-          'Esto vuelve a poner 1 entrada irresoluble del registro de secuencia como faltante para que el barrido normal de relleno pregunte de nuevo a los pares. Los pares que aún tienen los datos responderán; las entradas realmente irrecuperables se retirarán de nuevo tras la ventana de amnistía de 7 días.',
+      one: 'Esto vuelve a poner 1 entrada irresoluble del registro de secuencia como faltante para que el barrido normal de relleno pregunte de nuevo a los pares. Los pares que aún tienen los datos responderán; las entradas realmente irrecuperables se retirarán de nuevo tras la ventana de amnistía de 7 días.',
     );
     return '$_temp0';
   }
@@ -2978,8 +2978,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           'Marca $count entradas del registro de secuencia actualmente abiertas (faltantes o solicitadas) como irresolubles. Úsalo para desbloquear la marca de agua cuando hay entradas atascadas desde hace un tiempo sin que haya pasado la ventana de amnistía de 7 días. Las entradas pueden resucitarse si sus datos llegan al disco con un reloj vectorial válido.',
-      one:
-          'Marca 1 entrada del registro de secuencia actualmente abierta (faltante o solicitada) como irresoluble. Úsalo para desbloquear la marca de agua cuando hay entradas atascadas desde hace un tiempo sin que haya pasado la ventana de amnistía de 7 días. Las entradas pueden resucitarse si sus datos llegan al disco con un reloj vectorial válido.',
+      one: 'Marca 1 entrada del registro de secuencia actualmente abierta (faltante o solicitada) como irresoluble. Úsalo para desbloquear la marca de agua cuando hay entradas atascadas desde hace un tiempo sin que haya pasado la ventana de amnistía de 7 días. Las entradas pueden resucitarse si sus datos llegan al disco con un reloj vectorial válido.',
     );
     return '$_temp0';
   }
@@ -6822,8 +6821,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           'Esta pull request ya está vinculada a $count tareas más. ¿La vinculas también a esta tarea?',
-      one:
-          'Esta pull request ya está vinculada a otra tarea. ¿La vinculas también a esta tarea?',
+      one: 'Esta pull request ya está vinculada a otra tarea. ¿La vinculas también a esta tarea?',
     );
     return '$_temp0';
   }
@@ -7517,13 +7515,10 @@ class AppLocalizationsEs extends AppLocalizations {
     String direction,
     String target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      target,
-      {
-        '1': 'hora',
-        'other': 'horas',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(target, {
+      '1': 'hora',
+      'other': 'horas',
+    });
     return '$categoryName: $direction $target $_temp0 por semana móvil';
   }
 
@@ -7685,13 +7680,10 @@ class AppLocalizationsEs extends AppLocalizations {
     String direction,
     String target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      target,
-      {
-        '1': 'hora',
-        'other': 'horas',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(target, {
+      '1': 'hora',
+      'other': 'horas',
+    });
     return '$labelName: $direction $target $_temp0 al día';
   }
 
@@ -7848,14 +7840,11 @@ class AppLocalizationsEs extends AppLocalizations {
     Object value,
     Object target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      status,
-      {
-        'missing': '$date: sin valor; objetivo $target',
-        'met': '$date: $value; objetivo $target; cumplido',
-        'other': '$date: $value; objetivo $target; no cumplido',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(status, {
+      'missing': '$date: sin valor; objetivo $target',
+      'met': '$date: $value; objetivo $target; cumplido',
+      'other': '$date: $value; objetivo $target; no cumplido',
+    });
     return '$_temp0';
   }
 
@@ -12212,8 +12201,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           '$count grabaciones no tenían texto para buscar cuando se escribió esta respuesta.',
-      one:
-          '1 grabación no tenía texto para buscar cuando se escribió esta respuesta.',
+      one: '1 grabación no tenía texto para buscar cuando se escribió esta respuesta.',
     );
     return '$_temp0';
   }
@@ -12473,8 +12461,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           '$count eventos de sincronización que la cola descartó. Toca reintentar para volver a intentarlo.',
-      one:
-          '1 evento de sincronización que la cola descartó. Toca reintentar para volver a intentarlo.',
+      one: '1 evento de sincronización que la cola descartó. Toca reintentar para volver a intentarlo.',
     );
     return '$_temp0';
   }
@@ -12586,10 +12573,8 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           'Aún no hay briefing. „Crear briefing ahora“ escribe uno a partir de tus $count check-ins; nunca ve el teléfono ni el correo.',
-      one:
-          'Aún no hay briefing. „Crear briefing ahora“ escribe uno a partir de tu check-in; nunca ve el teléfono ni el correo.',
-      zero:
-          'Aún no hay briefing. „Crear briefing ahora“ escribe uno en cuanto registres un check-in; nunca ve el teléfono ni el correo.',
+      one: 'Aún no hay briefing. „Crear briefing ahora“ escribe uno a partir de tu check-in; nunca ve el teléfono ni el correo.',
+      zero: 'Aún no hay briefing. „Crear briefing ahora“ escribe uno en cuanto registres un check-in; nunca ve el teléfono ni el correo.',
     );
     return '$_temp0';
   }
@@ -13001,8 +12986,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           '$count personas seleccionadas · los datos de contacto se quedan en este dispositivo',
-      one:
-          '1 persona seleccionada · los datos de contacto se quedan en este dispositivo',
+      one: '1 persona seleccionada · los datos de contacto se quedan en este dispositivo',
     );
     return '$_temp0';
   }
@@ -15305,8 +15289,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           '$count dispositivos sin verificar no pueden leer las entradas nuevas: elimínalos o verifícalos abajo.',
-      one:
-          '1 dispositivo sin verificar no puede leer las entradas nuevas: elimínalo o verifícalo abajo.',
+      one: '1 dispositivo sin verificar no puede leer las entradas nuevas: elimínalo o verifícalo abajo.',
     );
     return '$_temp0';
   }
@@ -15318,8 +15301,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           '$count dispositivos sin verificar no pueden leer las entradas nuevas: elimínalos abajo.',
-      one:
-          '1 dispositivo sin verificar no puede leer las entradas nuevas: elimínalo abajo.',
+      one: '1 dispositivo sin verificar no puede leer las entradas nuevas: elimínalo abajo.',
     );
     return '$_temp0';
   }
@@ -15331,8 +15313,7 @@ class AppLocalizationsEs extends AppLocalizations {
       locale: localeName,
       other:
           '$count dispositivos sin verificar no pueden leer las entradas nuevas: verifícalos abajo.',
-      one:
-          '1 dispositivo sin verificar no puede leer las entradas nuevas: verifícalo abajo.',
+      one: '1 dispositivo sin verificar no puede leer las entradas nuevas: verifícalo abajo.',
     );
     return '$_temp0';
   }

@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -2818,8 +2819,7 @@ class AppLocalizationsSv extends AppLocalizations {
       locale: localeName,
       other:
           'Detta vänder alla $count olösbara sekvensloggposter tillbaka till att saknas, så att den normala backfill-sweepen frågar peers igen. Jämliker som fortfarande har nyttolasten kommer att svara; Verkligt oåterkalleliga inträden kommer att pensioneras igen efter sju dagars amnestifönster. ',
-      one:
-          'Detta vänder tillbaka en olösbar sekvensloggpost till att saknas, så den normala backfill-svepningen frågar om peers. Jämliker som fortfarande har nyttolasten kommer att svara; Verkligt oåterkalleliga inträden kommer att pensioneras igen efter sju dagars amnestifönster. ',
+      one: 'Detta vänder tillbaka en olösbar sekvensloggpost till att saknas, så den normala backfill-svepningen frågar om peers. Jämliker som fortfarande har nyttolasten kommer att svara; Verkligt oåterkalleliga inträden kommer att pensioneras igen efter sju dagars amnestifönster. ',
     );
     return '$_temp0';
   }
@@ -2958,8 +2958,7 @@ class AppLocalizationsSv extends AppLocalizations {
       locale: localeName,
       other:
           'Detta markerar $count som för närvarande är öppna (saknade eller begärda) sekvensloggposter som olösbara. Använd detta för att avblockera vattenstämpeln när inlägg har fastnat ett tag utan att sjudagarsfönstret för amnesti har passerat. Poster kan fortfarande återupplivas om deras nyttolast senare anländer till disken med en giltig vektorklocka. ',
-      one:
-          'Detta markerar en för närvarande öppen (saknad eller begärd) sekvensloggpost som olösbar. Använd detta för att avblockera vattenstämpeln när inlägg har fastnat ett tag utan att sjudagarsfönstret för amnesti har passerat. Poster kan fortfarande återupplivas om deras nyttolast senare anländer till disken med en giltig vektorklocka. ',
+      one: 'Detta markerar en för närvarande öppen (saknad eller begärd) sekvensloggpost som olösbar. Använd detta för att avblockera vattenstämpeln när inlägg har fastnat ett tag utan att sjudagarsfönstret för amnesti har passerat. Poster kan fortfarande återupplivas om deras nyttolast senare anländer till disken med en giltig vektorklocka. ',
     );
     return '$_temp0';
   }
@@ -6749,8 +6748,7 @@ class AppLocalizationsSv extends AppLocalizations {
       locale: localeName,
       other:
           'Den här pull requesten är redan kopplad till $count andra uppgifter. Vill du koppla den till den här uppgiften också?',
-      one:
-          'Den här pull requesten är redan kopplad till en annan uppgift. Vill du koppla den till den här uppgiften också?',
+      one: 'Den här pull requesten är redan kopplad till en annan uppgift. Vill du koppla den till den här uppgiften också?',
     );
     return '$_temp0';
   }
@@ -7435,13 +7433,10 @@ class AppLocalizationsSv extends AppLocalizations {
     String direction,
     String target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      target,
-      {
-        '1': 'timme',
-        'other': 'timmar',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(target, {
+      '1': 'timme',
+      'other': 'timmar',
+    });
     return '$categoryName: $direction $target $_temp0 per rullande 7 dagar';
   }
 
@@ -7600,13 +7595,10 @@ class AppLocalizationsSv extends AppLocalizations {
     String direction,
     String target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      target,
-      {
-        '1': 'timme',
-        'other': 'timmar',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(target, {
+      '1': 'timme',
+      'other': 'timmar',
+    });
     return '$labelName: $direction $target $_temp0 per dag';
   }
 
@@ -7762,14 +7754,11 @@ class AppLocalizationsSv extends AppLocalizations {
     Object value,
     Object target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      status,
-      {
-        'missing': '$date: inget värde; mål $target',
-        'met': '$date: $value; mål $target; uppnått',
-        'other': '$date: $value; mål $target; inte uppnått',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(status, {
+      'missing': '$date: inget värde; mål $target',
+      'met': '$date: $value; mål $target; uppnått',
+      'other': '$date: $value; mål $target; inte uppnått',
+    });
     return '$_temp0';
   }
 
@@ -12320,8 +12309,7 @@ class AppLocalizationsSv extends AppLocalizations {
       locale: localeName,
       other:
           '$count synkhändelser som kön gav upp på. Tryck på försök igen för att försöka igen. ',
-      one:
-          '1 synkroniseringshändelse som kön gav upp. Tryck på försök igen för att försöka igen. ',
+      one: '1 synkroniseringshändelse som kön gav upp. Tryck på försök igen för att försöka igen. ',
     );
     return '$_temp0';
   }
@@ -12432,10 +12420,8 @@ class AppLocalizationsSv extends AppLocalizations {
       locale: localeName,
       other:
           'Ingen briefing än. „Briefa nu“ skriver en utifrån dina $count avstämningar; den ser aldrig telefonnummer eller e-post.',
-      one:
-          'Ingen briefing än. „Briefa nu“ skriver en utifrån din avstämning; den ser aldrig telefonnummer eller e-post.',
-      zero:
-          'Ingen briefing än. „Briefa nu“ skriver en så fort du loggat en avstämning; den ser aldrig telefonnummer eller e-post.',
+      one: 'Ingen briefing än. „Briefa nu“ skriver en utifrån din avstämning; den ser aldrig telefonnummer eller e-post.',
+      zero: 'Ingen briefing än. „Briefa nu“ skriver en så fort du loggat en avstämning; den ser aldrig telefonnummer eller e-post.',
     );
     return '$_temp0';
   }
@@ -15125,8 +15111,7 @@ class AppLocalizationsSv extends AppLocalizations {
       locale: localeName,
       other:
           '$count overifierade enheter kan inte läsa nya poster — ta bort eller verifiera dem nedan.',
-      one:
-          '1 overifierad enhet kan inte läsa nya poster — ta bort eller verifiera den nedan.',
+      one: '1 overifierad enhet kan inte läsa nya poster — ta bort eller verifiera den nedan.',
     );
     return '$_temp0';
   }

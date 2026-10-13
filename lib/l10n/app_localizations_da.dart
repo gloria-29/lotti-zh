@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -2809,8 +2810,7 @@ class AppLocalizationsDa extends AppLocalizations {
       locale: localeName,
       other:
           'Dette vender alle $count uløselige sekvenslog-poster tilbage til at mangle, så den normale backfill-sweep spørger peers igen. Jævnaldrende, der stadig har nyttelasten, vil reagere; Virkelig uoprettelige bidrag vil igen trække sig tilbage efter 7-dages amnestivinduet. ',
-      one:
-          'Dette vender én uløselig sekvenslog-post tilbage til manglende, så den normale backfill-gennemgang spørger peers igen. Jævnaldrende, der stadig har nyttelasten, vil reagere; Virkelig uoprettelige bidrag vil igen trække sig tilbage efter 7-dages amnestivinduet. ',
+      one: 'Dette vender én uløselig sekvenslog-post tilbage til manglende, så den normale backfill-gennemgang spørger peers igen. Jævnaldrende, der stadig har nyttelasten, vil reagere; Virkelig uoprettelige bidrag vil igen trække sig tilbage efter 7-dages amnestivinduet. ',
     );
     return '$_temp0';
   }
@@ -2948,8 +2948,7 @@ class AppLocalizationsDa extends AppLocalizations {
       locale: localeName,
       other:
           'Dette markerer $count aktuelt åbne (manglende eller anmodede) sekvenslog-poster som uløselige. Brug dette til at fjerne blokeringen af vandmærket, når indgange har siddet fast i et stykke tid uden at 7-dages amnestivinduet er overstået. Poster kan stadig genoplives, hvis deres nyttelast senere ankommer til disken med en gyldig vektorclock. ',
-      one:
-          'Dette markerer 1 aktuelt åben (manglende eller anmodet om) sekvenslogpost som uløselig. Brug dette til at fjerne blokeringen af vandmærket, når indgange har siddet fast i et stykke tid uden at 7-dages amnestivinduet er overstået. Poster kan stadig genoplives, hvis deres nyttelast senere ankommer til disken med en gyldig vektorclock. ',
+      one: 'Dette markerer 1 aktuelt åben (manglende eller anmodet om) sekvenslogpost som uløselig. Brug dette til at fjerne blokeringen af vandmærket, når indgange har siddet fast i et stykke tid uden at 7-dages amnestivinduet er overstået. Poster kan stadig genoplives, hvis deres nyttelast senere ankommer til disken med en gyldig vektorclock. ',
     );
     return '$_temp0';
   }
@@ -6740,8 +6739,7 @@ class AppLocalizationsDa extends AppLocalizations {
       locale: localeName,
       other:
           'Denne pull request er allerede knyttet til $count andre opgaver. Vil du også knytte den til denne opgave?',
-      one:
-          'Denne pull request er allerede knyttet til en anden opgave. Vil du også knytte den til denne opgave?',
+      one: 'Denne pull request er allerede knyttet til en anden opgave. Vil du også knytte den til denne opgave?',
     );
     return '$_temp0';
   }
@@ -7424,13 +7422,10 @@ class AppLocalizationsDa extends AppLocalizations {
     String direction,
     String target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      target,
-      {
-        '1': 'time',
-        'other': 'timer',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(target, {
+      '1': 'time',
+      'other': 'timer',
+    });
     return '$categoryName: $direction $target $_temp0 pr. rullende 7 dage';
   }
 
@@ -7588,13 +7583,10 @@ class AppLocalizationsDa extends AppLocalizations {
     String direction,
     String target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      target,
-      {
-        '1': 'time',
-        'other': 'timer',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(target, {
+      '1': 'time',
+      'other': 'timer',
+    });
     return '$labelName: $direction $target $_temp0 pr. dag';
   }
 
@@ -7750,14 +7742,11 @@ class AppLocalizationsDa extends AppLocalizations {
     Object value,
     Object target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      status,
-      {
-        'missing': '$date: ingen værdi; mål $target',
-        'met': '$date: $value; mål $target; nået',
-        'other': '$date: $value; mål $target; ikke nået',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(status, {
+      'missing': '$date: ingen værdi; mål $target',
+      'met': '$date: $value; mål $target; nået',
+      'other': '$date: $value; mål $target; ikke nået',
+    });
     return '$_temp0';
   }
 
@@ -12307,8 +12296,7 @@ class AppLocalizationsDa extends AppLocalizations {
       locale: localeName,
       other:
           '$count synkroniserer begivenheder, som køen opgav. Tryk på prøv igen for at forsøge igen. ',
-      one:
-          '1 synkroniseringsbegivenhed, som køen opgav på. Tryk på prøv igen for at forsøge igen. ',
+      one: '1 synkroniseringsbegivenhed, som køen opgav på. Tryk på prøv igen for at forsøge igen. ',
     );
     return '$_temp0';
   }
@@ -12418,10 +12406,8 @@ class AppLocalizationsDa extends AppLocalizations {
       locale: localeName,
       other:
           'Ingen briefing endnu. „Brief nu“ skriver en ud fra dine $count check-ins; den ser aldrig telefonnummer eller e-mail.',
-      one:
-          'Ingen briefing endnu. „Brief nu“ skriver en ud fra dit check-in; den ser aldrig telefonnummer eller e-mail.',
-      zero:
-          'Ingen briefing endnu. „Brief nu“ skriver en, når du har logget et check-in; den ser aldrig telefonnummer eller e-mail.',
+      one: 'Ingen briefing endnu. „Brief nu“ skriver en ud fra dit check-in; den ser aldrig telefonnummer eller e-mail.',
+      zero: 'Ingen briefing endnu. „Brief nu“ skriver en, når du har logget et check-in; den ser aldrig telefonnummer eller e-mail.',
     );
     return '$_temp0';
   }
@@ -15110,8 +15096,7 @@ class AppLocalizationsDa extends AppLocalizations {
       locale: localeName,
       other:
           '$count ubekræftede enheder kan ikke læse nye poster — slet eller bekræft dem nedenfor.',
-      one:
-          '1 ubekræftet enhed kan ikke læse nye poster — slet eller bekræft den nedenfor.',
+      one: '1 ubekræftet enhed kan ikke læse nye poster — slet eller bekræft den nedenfor.',
     );
     return '$_temp0';
   }

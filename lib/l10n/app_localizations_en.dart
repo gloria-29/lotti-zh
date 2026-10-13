@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -2799,8 +2800,7 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other:
           'This flips all $count unresolvable sequence-log entries back to missing so the normal backfill sweep re-asks peers. Peers who still have the payload will respond; truly unrecoverable entries will retire again after the 7-day amnesty window.',
-      one:
-          'This flips 1 unresolvable sequence-log entry back to missing so the normal backfill sweep re-asks peers. Peers who still have the payload will respond; truly unrecoverable entries will retire again after the 7-day amnesty window.',
+      one: 'This flips 1 unresolvable sequence-log entry back to missing so the normal backfill sweep re-asks peers. Peers who still have the payload will respond; truly unrecoverable entries will retire again after the 7-day amnesty window.',
     );
     return '$_temp0';
   }
@@ -2938,8 +2938,7 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other:
           'This marks $count currently-open (missing or requested) sequence-log entries as unresolvable. Use this to unblock the watermark when entries have been stuck for a while without the 7-day amnesty window having passed. Entries can still be resurrected if their payload later arrives on disk with a valid vector clock.',
-      one:
-          'This marks 1 currently-open (missing or requested) sequence-log entry as unresolvable. Use this to unblock the watermark when entries have been stuck for a while without the 7-day amnesty window having passed. Entries can still be resurrected if their payload later arrives on disk with a valid vector clock.',
+      one: 'This marks 1 currently-open (missing or requested) sequence-log entry as unresolvable. Use this to unblock the watermark when entries have been stuck for a while without the 7-day amnesty window having passed. Entries can still be resurrected if their payload later arrives on disk with a valid vector clock.',
     );
     return '$_temp0';
   }
@@ -6713,8 +6712,7 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other:
           'This pull request is already linked to $count other tasks. Link it to this task as well?',
-      one:
-          'This pull request is already linked to another task. Link it to this task as well?',
+      one: 'This pull request is already linked to another task. Link it to this task as well?',
     );
     return '$_temp0';
   }
@@ -7397,13 +7395,10 @@ class AppLocalizationsEn extends AppLocalizations {
     String direction,
     String target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      target,
-      {
-        '1': 'hour',
-        'other': 'hours',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(target, {
+      '1': 'hour',
+      'other': 'hours',
+    });
     return '$categoryName: $direction $target $_temp0 per rolling 7 days';
   }
 
@@ -7562,13 +7557,10 @@ class AppLocalizationsEn extends AppLocalizations {
     String direction,
     String target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      target,
-      {
-        '1': 'hour',
-        'other': 'hours',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(target, {
+      '1': 'hour',
+      'other': 'hours',
+    });
     return '$labelName: $direction $target $_temp0 per day';
   }
 
@@ -7725,14 +7717,11 @@ class AppLocalizationsEn extends AppLocalizations {
     Object value,
     Object target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      status,
-      {
-        'missing': '$date: no value; target $target',
-        'met': '$date: $value; target $target; met',
-        'other': '$date: $value; target $target; not met',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(status, {
+      'missing': '$date: no value; target $target',
+      'met': '$date: $value; target $target; met',
+      'other': '$date: $value; target $target; not met',
+    });
     return '$_temp0';
   }
 
@@ -12360,10 +12349,8 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other:
           'No briefing yet. Brief now writes one from your $count check-ins; it never sees the phone number or email.',
-      one:
-          'No briefing yet. Brief now writes one from your check-in; it never sees the phone number or email.',
-      zero:
-          'No briefing yet. Brief now writes one once you have logged a check-in; it never sees the phone number or email.',
+      one: 'No briefing yet. Brief now writes one from your check-in; it never sees the phone number or email.',
+      zero: 'No briefing yet. Brief now writes one once you have logged a check-in; it never sees the phone number or email.',
     );
     return '$_temp0';
   }
@@ -15026,8 +15013,7 @@ class AppLocalizationsEn extends AppLocalizations {
       locale: localeName,
       other:
           '$count unverified devices can\'t read new entries — delete or verify them below.',
-      one:
-          '1 unverified device can\'t read new entries — delete or verify it below.',
+      one: '1 unverified device can\'t read new entries — delete or verify it below.',
     );
     return '$_temp0';
   }

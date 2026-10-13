@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -2847,8 +2848,7 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           'Questa operazione riporta $count voci irrisolvibili del log di sequenza allo stato mancante, in modo che il normale ciclo di recupero richieda di nuovo i peer. I peer che hanno ancora il contenuto risponderanno; le voci realmente irrecuperabili saranno nuovamente ritirate dopo i 7 giorni di tolleranza.',
-      one:
-          'Questa operazione riporta 1 voce irrisolvibile del log di sequenza allo stato mancante, in modo che il normale ciclo di recupero richieda di nuovo i peer. I peer che hanno ancora il contenuto risponderanno; le voci realmente irrecuperabili saranno nuovamente ritirate dopo i 7 giorni di tolleranza.',
+      one: 'Questa operazione riporta 1 voce irrisolvibile del log di sequenza allo stato mancante, in modo che il normale ciclo di recupero richieda di nuovo i peer. I peer che hanno ancora il contenuto risponderanno; le voci realmente irrecuperabili saranno nuovamente ritirate dopo i 7 giorni di tolleranza.',
     );
     return '$_temp0';
   }
@@ -2988,8 +2988,7 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           'Questa operazione contrassegna $count voci attualmente aperte del log di sequenza (mancanti o richieste) come irrisolvibili. Usala per sbloccare il watermark quando delle voci sono bloccate da tempo ma non sono ancora trascorsi i 7 giorni di tolleranza. Le voci potranno comunque essere ripristinate se i loro contenuti arriveranno in seguito sul disco con un vettore di versione valido.',
-      one:
-          'Questa operazione contrassegna 1 voce attualmente aperta del log di sequenza (mancante o richiesta) come irrisolvibile. Usala per sbloccare il watermark quando una voce è bloccata da tempo ma non sono ancora trascorsi i 7 giorni di tolleranza. La voce potrà comunque essere ripristinata se il suo contenuto arriverà in seguito sul disco con un vettore di versione valido.',
+      one: 'Questa operazione contrassegna 1 voce attualmente aperta del log di sequenza (mancante o richiesta) come irrisolvibile. Usala per sbloccare il watermark quando una voce è bloccata da tempo ma non sono ancora trascorsi i 7 giorni di tolleranza. La voce potrà comunque essere ripristinata se il suo contenuto arriverà in seguito sul disco con un vettore di versione valido.',
     );
     return '$_temp0';
   }
@@ -6823,8 +6822,7 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           'Questa pull request è già collegata ad altre $count attività. Vuoi collegarla anche a questa?',
-      one:
-          'Questa pull request è già collegata a un\'altra attività. Vuoi collegarla anche a questa?',
+      one: 'Questa pull request è già collegata a un\'altra attività. Vuoi collegarla anche a questa?',
     );
     return '$_temp0';
   }
@@ -7519,13 +7517,7 @@ class AppLocalizationsIt extends AppLocalizations {
     String direction,
     String target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      target,
-      {
-        '1': 'ora',
-        'other': 'ore',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(target, {'1': 'ora', 'other': 'ore'});
     return '$categoryName: $direction $target $_temp0 ogni 7 giorni mobili';
   }
 
@@ -7686,13 +7678,7 @@ class AppLocalizationsIt extends AppLocalizations {
     String direction,
     String target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      target,
-      {
-        '1': 'ora',
-        'other': 'ore',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(target, {'1': 'ora', 'other': 'ore'});
     return '$labelName: $direction $target $_temp0 al giorno';
   }
 
@@ -7849,14 +7835,11 @@ class AppLocalizationsIt extends AppLocalizations {
     Object value,
     Object target,
   ) {
-    String _temp0 = intl.Intl.selectLogic(
-      status,
-      {
-        'missing': '$date: nessun valore; obiettivo $target',
-        'met': '$date: $value; obiettivo $target; raggiunto',
-        'other': '$date: $value; obiettivo $target; non raggiunto',
-      },
-    );
+    String _temp0 = intl.Intl.selectLogic(status, {
+      'missing': '$date: nessun valore; obiettivo $target',
+      'met': '$date: $value; obiettivo $target; raggiunto',
+      'other': '$date: $value; obiettivo $target; non raggiunto',
+    });
     return '$_temp0';
   }
 
@@ -10124,8 +10107,7 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           'Non è stato possibile accodare $failed elementi. Riprova solo quegli elementi.',
-      one:
-          'Non è stato possibile accodare 1 elemento. Riprova solo quell’elemento.',
+      one: 'Non è stato possibile accodare 1 elemento. Riprova solo quell’elemento.',
     );
     return '$_temp0';
   }
@@ -12201,8 +12183,7 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           '$count registrazioni non avevano testo ricercabile al momento di questa risposta.',
-      one:
-          '1 registrazione non aveva testo ricercabile al momento di questa risposta.',
+      one: '1 registrazione non aveva testo ricercabile al momento di questa risposta.',
     );
     return '$_temp0';
   }
@@ -12464,8 +12445,7 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           '$count sincronizza gli eventi che la coda ha rinunciato. Toccare la re-attempt.',
-      one:
-          '1 sincronizzazione della coda ha rinunciato. Toccare la rettiva per re-attempt.',
+      one: '1 sincronizzazione della coda ha rinunciato. Toccare la rettiva per re-attempt.',
     );
     return '$_temp0';
   }
@@ -12577,10 +12557,8 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           'Nessun briefing ancora. „Crea il briefing ora“ ne scrive uno dai tuoi $count check-in; non vede mai numero di telefono né e-mail.',
-      one:
-          'Nessun briefing ancora. „Crea il briefing ora“ ne scrive uno dal tuo check-in; non vede mai numero di telefono né e-mail.',
-      zero:
-          'Nessun briefing ancora. „Crea il briefing ora“ ne scrive uno appena registri un check-in; non vede mai numero di telefono né e-mail.',
+      one: 'Nessun briefing ancora. „Crea il briefing ora“ ne scrive uno dal tuo check-in; non vede mai numero di telefono né e-mail.',
+      zero: 'Nessun briefing ancora. „Crea il briefing ora“ ne scrive uno appena registri un check-in; non vede mai numero di telefono né e-mail.',
     );
     return '$_temp0';
   }
@@ -15307,8 +15285,7 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           '$count dispositivi non verificati non possono leggere le nuove voci: eliminali o verificali qui sotto.',
-      one:
-          '1 dispositivo non verificato non può leggere le nuove voci: eliminalo o verificalo qui sotto.',
+      one: '1 dispositivo non verificato non può leggere le nuove voci: eliminalo o verificalo qui sotto.',
     );
     return '$_temp0';
   }
@@ -15320,8 +15297,7 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           '$count dispositivi non verificati non possono leggere le nuove voci: eliminali qui sotto.',
-      one:
-          '1 dispositivo non verificato non può leggere le nuove voci: eliminalo qui sotto.',
+      one: '1 dispositivo non verificato non può leggere le nuove voci: eliminalo qui sotto.',
     );
     return '$_temp0';
   }
@@ -15333,8 +15309,7 @@ class AppLocalizationsIt extends AppLocalizations {
       locale: localeName,
       other:
           '$count dispositivi non verificati non possono leggere le nuove voci: verificali qui sotto.',
-      one:
-          '1 dispositivo non verificato non può leggere le nuove voci: verificalo qui sotto.',
+      one: '1 dispositivo non verificato non può leggere le nuove voci: verificalo qui sotto.',
     );
     return '$_temp0';
   }
